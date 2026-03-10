@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RaktSetu | Donation Eligibility Rules</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  :root {
+    --primary-red: #8b0000;
+    --accent-orange: #f4a261;
+    --light-cream: #fdf3e7;
+    --text-dark: #2b2b2b;
+    --success-green: #28a745;
+    --warning-yellow: #ffb703;
+    --error-red: #d32f2f;
+  }
+
+  body {
+    font-family: "Poppins", Arial, sans-serif;
+    background-color: var(--light-cream);
+    color: var(--text-dark);
+    margin: 0;
+    padding: 3rem 0;
+    line-height: 1.6;
+  }
+
+  /* UPDATED STYLES FOR BACK BUTTON (NOT FIXED) */
+  .back-btn{
+    display: inline-flex;
+    align-items: center;
+    background: #fff;
+    color: var(--primary-red);
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: background 0.2s;
+    font-size: 0.9rem;
+    margin-bottom: 2rem; /* Added margin to push it away from the title */
+  }
+  .back-btn:hover{
+    background: #fff;
+  }
+  .back-btn i{
+    margin-right: 6px;
+  }
+  /* END UPDATED STYLES */
+
+  .container {
+    max-width: 75%;
+    margin: 0 auto;
+  }
+
+  h1 {
+    text-align: center;
+    color: var(--primary-red);
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  p.subtitle {
+    text-align: center;
+    color: #555;
+    margin-bottom: 2.5rem;
+  }
+
+  /* Eligibility Cards Grid */
+  .eligibility-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .eligibility-card {
+    background-color: #fff;
+    border-radius: 15px;
+    padding: 1.8rem 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .eligibility-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+  }
+
+  .eligibility-card i {
+    font-size: 2.2rem;
+    margin-bottom: 1rem;
+  }
+
+  .eligibility-card.success i {
+    color: var(--success-green);
+  }
+
+  .eligibility-card.warning i {
+    color: var(--warning-yellow);
+  }
+
+  .eligibility-card h3 {
+    color: var(--primary-red);
+    margin-bottom: 0.5rem;
+  }
+
+  .eligibility-card p {
+    color: #333;
+    font-size: 0.95rem;
+  }
+
+  /* Temporary Restrictions Section */
+  .restrictions-section {
+    background-color: #fff;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  }
+
+  .restrictions-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .restrictions-header i {
+    color: var(--error-red);
+    font-size: 1.5rem;
+  }
+
+  .restrictions-header h2 {
+    color: var(--primary-red);
+    margin: 0;
+    font-size: 1.4rem;
+  }
+
+  .restrictions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+  }
+
+  .restriction-card {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background-color: #fdf3f3;
+    border-radius: 10px;
+    padding: 0.8rem 1rem;
+    border-left: 4px solid var(--error-red);
+    color: #333;
+  }
+
+  .restriction-card i {
+    color: var(--error-red);
+    font-size: 1.1rem;
+  }
+
+  .note {
+    font-size: 0.9rem;
+    margin-top: 1.5rem;
+    color: #555;
+    font-style: italic;
+  }
+
+  @media (max-width: 768px) {
+    .container {
+      max-width: 90%;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <a href="javascript:history.back()" class="back-btn" title="Go Back">
+    <i class="fa-solid fa-arrow-left"></i> Back
+  </a>
+  <h1>Donation Eligibility Rules</h1>
+  <p class="subtitle">Make sure you meet the requirements before donating blood</p>
+
+  <div class="eligibility-grid">
+    <div class="eligibility-card success">
+      <i class="fa-solid fa-user-check"></i>
+      <h3>Age Requirement</h3>
+      <p>18–65 years old</p>
+    </div>
+
+    <div class="eligibility-card success">
+      <i class="fa-solid fa-weight-scale"></i>
+      <h3>Weight Requirement</h3>
+      <p>Minimum 50 kg (110 lbs)</p>
+    </div>
+
+    <div class="eligibility-card success">
+      <i class="fa-solid fa-heart-pulse"></i>
+      <h3>Health Status</h3>
+      <p>Good general health and no active infections</p>
+    </div>
+
+    <div class="eligibility-card warning">
+      <i class="fa-solid fa-calendar-check"></i>
+      <h3>Donation Frequency</h3>
+      <p>Every 3 months (men), every 4 months (women)</p>
+    </div>
+  </div>
+
+  <div class="restrictions-section">
+    <div class="restrictions-header">
+      <i class="fa-solid fa-ban"></i>
+      <h2>Temporary Restrictions</h2>
+    </div>
+
+    <div class="restrictions-grid">
+      <div class="restriction-card"><i class="fa-solid fa-xmark"></i>Recent tattoo or piercing (within 6 months)</div>
+      <div class="restriction-card"><i class="fa-solid fa-xmark"></i>Pregnant or breastfeeding</div>
+      <div class="restriction-card"><i class="fa-solid fa-xmark"></i>Recent surgery or major illness</div>
+      <div class="restriction-card"><i class="fa-solid fa-xmark"></i>Certain medications or antibiotics</div>
+      <div class="restriction-card"><i class="fa-solid fa-xmark"></i>Travel to malaria or high-risk areas</div>
+      <div class="restriction-card"><i class="fa-solid fa-xmark"></i>Chronic conditions (consult your doctor)</div>
+    </div>
+
+    <p class="note">
+      * Always consult with medical staff during screening to ensure you’re eligible to donate safely.
+    </p>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>RaktSetu — Find Blood Donation Centers</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+<style>
+:root{
+  --maroon:#8b0000;
+  --cream:#faf5f0;
+  --muted:#6b6b6b;
+  --card-shadow:0 10px 30px rgba(0,0,0,0.08);
+  --radius:14px;
+  --accent:#b30000;
+  --success-bg:#e9fff0;
+}
+*{box-sizing:border-box}
+body{
+  font-family:'Poppins', Arial, sans-serif;
+  margin:0;
+  background:var(--cream);
+  color:#222;
+  -webkit-font-smoothing:antialiased;
+}
+/* Back Button Styles */
+.back-btn{
+  display: inline-flex;
+  align-items: center;
+  background: #fff;
+  color: var(--maroon);
+  border: 1px solid #eee;
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: background 0.2s;
+  font-size: 15px; 
+  margin-bottom: 18px;
+}
+.back-btn:hover{
+  background: #f4f4f4;
+}
+.back-btn i{
+  margin-right: 6px;
+}
+
+.header{
+  background:var(--maroon);
+  color:#fff;
+  padding:14px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--maroon),#b30000);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:18px}
+.header-title{font-weight:700}
+.btn-primary{background:var(--maroon);color:#fff;padding:12px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:800; width: 100%;}
+.btn-primary:hover { background: #6b0000; }
+
+.container{max-width:980px;margin:22px auto;padding:0 16px 60px}
+
+/* Card & Layout */
+.card{background:#fff;border-radius:var(--radius);padding:18px;box-shadow:var(--card-shadow);margin-bottom:18px}
+.section-title{color:var(--maroon);font-weight:800;margin-bottom:10px;font-size:1.05rem}
+.small-muted{color:var(--muted);font-size:13px}
+
+/* Input styles */
+.input-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.input-row > div {
+  flex: 1;
+  min-width: 200px;
+}
+.input-field {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #e6e6e6;
+  font-size: 15px;
+  font-family:'Poppins', Arial, sans-serif;
+}
+
+/* Hospitals list */
+.hospital-item{border-radius:10px;border:1px solid #eee;padding:14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px; background: #fff;}
+.hospital-item:hover { border-color: var(--maroon); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+.hospital-item .meta strong { display: block; font-size: 1.1rem; color: #333; }
+.hospital-item .meta small{display:block;color:var(--muted);margin-top:4px;}
+
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="brand">
+    <div class="logo">
+      <img src="/raktsetu-logo.jpg" alt="RaktSetu" width="70">
+    </div>
+    <div>
+      <div class="header-title">RaktSetu</div>
+      <div style="font-size:12px;color:#ffdede">Find Nearby Donation Centers</div>
+    </div>
+  </div>
+</div>
+
+
+<div class="container">
+  <a href="javascript:history.back()" class="back-btn" title="Go Back">
+    <i class="fa-solid fa-arrow-left"></i> Back
+  </a>
+
+  <div class="card">
+    <div class="section-title">Find Nearby RaktSetu Centers</div>
+    <div class="small-muted" style="margin-bottom:12px">Enter your city or pincode to locate registered centers.</div>
+
+    <div class="input-row">
+      <div>
+        <input id="mainCity" class="input-field" placeholder="City (e.g. Delhi)">
+      </div>
+      <div>
+        <input id="mainPincode" class="input-field" placeholder="Pincode (6 digits)">
+      </div>
+    </div>
+
+    <div style="margin-top:14px">
+      <button class="btn-primary" onclick="findCenters()">Find Centers</button>
+    </div>
+
+    <div id="centersList" style="margin-top:18px">
+      </div>
+  </div>
+
+</div> 
+
+<script>
+/* ===========================
+  CONFIG: LIVE API URL
+  =========================== */
+const API_URL = "https://script.google.com/macros/s/AKfycbya3BWwqA_mhDTUb2PTsioEJ4uzozCsbRymQOawpeUnrd51MHNGeT6318SrncfUAKCorg/exec";
+
+/* ===========================
+  MOCK DATA (FALLBACK)
+  =========================== */
+const MOCK_CENTERS = [
+  { id: 'M1', name: 'AIIMS Blood Bank', address: 'Ansari Nagar, New Delhi', phone: '+91-11-26588500' },
+  { id: 'M2', name: 'Red Cross Society', address: 'Red Cross Road, New Delhi', phone: '+91-11-23716441' },
+  { id: 'M3', name: 'Rotary Blood Bank', address: 'Tughlakabad Institutional Area, New Delhi', phone: '+91-11-29054066' },
+  { id: 'M4', name: 'Apollo Hospital Blood Center', address: 'Sarita Vihar, Mathura Road', phone: '+91-11-26925858' }
+];
+
+/* ===========================
+  Center Lookup Logic
+  =========================== */
+
+async function findCenters(){
+  const city = document.getElementById('mainCity').value.trim();
+  const pincode = document.getElementById('mainPincode').value.trim();
+  const list = document.getElementById('centersList');
+  
+  if (!city && !pincode) {
+    list.innerHTML = '<div class="small-muted" style="color:var(--maroon)">Please enter a City or Pincode to search.</div>';
+    return;
+  }
+
+  list.innerHTML = '<div class="small-muted">Searching for registered centers... <i class="fa-solid fa-spinner fa-spin"></i></div>';
+
+  let centers = [];
+
+  try {
+    // Construct URL
+    const queryParams = new URLSearchParams({
+        action: "findCenters",
+        city: city,
+        pincode: pincode
+    });
+
+    // Fetch from API
+    console.log("Fetching from:", `${API_URL}?${queryParams.toString()}`);
+    const res = await fetch(`${API_URL}?${queryParams.toString()}`);
+    
+    if (!res.ok) throw new Error("Network response was not ok");
+    
+    const result = await res.json();
+
+    if (result.status === "success" && result.data.length > 0) {
+        centers = result.data;
+    } else {
+        console.warn("API returned no data or error:", result);
+        // If API returns nothing, use Mock Data for demonstration if query matches 'Delhi' or empty
+        if (city.toLowerCase().includes('delhi') || pincode.startsWith('11')) {
+           centers = MOCK_CENTERS;
+        }
+    }
+  } catch(err) {
+    console.error("Fetch Error:", err);
+    // Fallback to Mock Data on Error
+    if (city.toLowerCase().includes('delhi') || pincode.startsWith('11')) {
+        centers = MOCK_CENTERS;
+    }
+  }
+  
+  renderCenters(centers);
+}
+
+function renderCenters(centers){
+  const list = document.getElementById('centersList');
+  list.innerHTML = '';
+  
+  if(!centers || centers.length === 0){
+    list.innerHTML = `
+      <div style="text-align:center; padding:20px; color:#666;">
+        <i class="fa-solid fa-hospital-user" style="font-size:24px; margin-bottom:10px; color:#ccc;"></i>
+        <p>No registered centers found matching your query.</p>
+        <small>Try searching for "Delhi" to see demo results.</small>
+      </div>`; 
+    return;
+  }
+  
+  // Title
+  const title = document.createElement('div');
+  title.className = 'section-title';
+  title.style.fontSize = '1rem';
+  title.style.marginBottom = '15px';
+  title.innerHTML = `Found ${centers.length} Center(s) <span style="font-size:11px; color:#888; font-weight:400">(Live/Demo Results)</span>`;
+  list.appendChild(title);
+  
+  // Render Items
+  centers.forEach(c=>{
+    const item = document.createElement('div');
+    item.className = 'hospital-item';
+    item.innerHTML = `
+      <div class="meta">
+        <strong>${c.name}</strong>
+        <small><i class="fa-solid fa-location-dot" style="color:var(--maroon)"></i> ${c.address}</small>
+        <small style="margin-top:6px; color:#222; font-weight:500;">
+          <i class="fa-solid fa-phone" style="color:var(--maroon)"></i> ${c.phone || 'Contact Unavailable'}
+        </small>
+      </div>
+      <div>
+         <a href="tel:${c.phone}" style="text-decoration:none;">
+           <button class="btn-light" style="color:var(--maroon); border:1px solid var(--maroon); background:#fff;">
+             <i class="fa-solid fa-phone"></i> Call
+           </button>
+         </a>
+      </div>`;
+    list.appendChild(item);
+  });
+}
+</script>
+</body>
+</html>
