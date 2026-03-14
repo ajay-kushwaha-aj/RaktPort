@@ -32,3 +32,11 @@ yarn-error.log*
 
 # TypeScript cache
 *.tsbuildinfo
+
+# Build artifact text files
+build_ci.log
+build_error.txt
+build_log.txt
+build_output.txt
+tsc_log.txt
+verify_server.mjs

@@ -51,12 +51,20 @@ interface FormData {
   pincode: string;
 }
 
-// Admin registration keys (In production, store these securely in environment variables)
-const VALID_ADMIN_KEYS = [
-  'ADMIN2026',
-  'RAKTPORT_ADMIN_2026',
-  // Add more keys as needed
-];
+// Admin registration keys loaded from environment variable (comma-separated).
+// Extra commas and whitespace are ignored. In development, a warning is logged
+// if the variable is missing or results in no valid keys.
+const VALID_ADMIN_KEYS: string[] = (import.meta.env.VITE_ADMIN_REGISTRATION_KEYS ?? '')
+  .split(',')
+  .map((k: string) => k.trim())
+  .filter(Boolean);
+
+if (import.meta.env.DEV && VALID_ADMIN_KEYS.length === 0) {
+  console.warn(
+    '[AdminSignup] VITE_ADMIN_REGISTRATION_KEYS is not set or contains no valid entries. ' +
+    'Admin registration will be unavailable. Set this variable in your .env file.'
+  );
+}
 
 const indianStates = [
   'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
@@ -137,6 +145,11 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
   const validateAdminKey = () => {
     if (!formData.adminKey.trim()) {
       setError('Admin key is required');
+      return false;
+    }
+
+    if (VALID_ADMIN_KEYS.length === 0) {
+      setError('Admin registration is currently unavailable due to missing configuration. Please contact your system administrator.');
       return false;
     }
 
@@ -361,7 +374,6 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
           pincode: formData.pincode,
           state: formData.state,
           isVerified: true, // Admins are auto-verified
-          adminKeyUsed: formData.adminKey, // Track which key was used
         },
         phoneAuthUid
       );
