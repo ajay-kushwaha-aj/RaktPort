@@ -14,8 +14,8 @@ import {
 } from '@/components/ui/select';
 import { Loader2, CheckCircle, Phone, User, AlertCircle, Shield } from 'lucide-react';
 import { toast } from 'sonner';
-import { API_URL } from '@/config';
-import { auth } from '@/firebase';
+import { auth, db } from '@/firebase';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from 'firebase/auth';
 
 // Fix for TypeScript window error
@@ -141,18 +141,24 @@ export const AppointmentModal = ({
       setIsPhoneVerified(true);
       setIsOtpSent(false);
       
-      // After OTP verification, check donor in database
+      // After OTP verification, check donor in Firestore
       try {
-        const res = await fetch(`${API_URL}?action=getDonorByMobile&mobile=${formData.mobile}`);
-        const result = await res.json();
+        const mobileWithCode = `+91${formData.mobile}`;
+        const q = query(
+          collection(db, "users"),
+          where("mobile", "==", mobileWithCode),
+          where("role", "==", "donor")
+        );
+        const snapshot = await getDocs(q);
 
-        if (result.status === 'success' && result.data) {
+        if (!snapshot.empty) {
+          const donorData = snapshot.docs[0].data();
           // Donor Found: Auto-fill
           setFormData(prev => ({
             ...prev,
-            donorName: result.data.fullName || '',
-            bloodGroup: (result.data.bloodGroup as BloodGroup) || 'O+',
-            gender: result.data.gender || ''
+            donorName: donorData.fullName || '',
+            bloodGroup: (donorData.bloodGroup as BloodGroup) || 'O+',
+            gender: donorData.gender || ''
           }));
           setIsNewDonor(false);
           toast.success("Phone Verified & Donor Found!", { description: "Donor details auto-filled." });
