@@ -6,13 +6,41 @@ import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
+// Values are loaded from environment variables (see .env.example)
+const {
+  VITE_FIREBASE_API_KEY,
+  VITE_FIREBASE_AUTH_DOMAIN,
+  VITE_FIREBASE_PROJECT_ID,
+  VITE_FIREBASE_STORAGE_BUCKET,
+  VITE_FIREBASE_MESSAGING_SENDER_ID,
+  VITE_FIREBASE_APP_ID,
+} = import.meta.env;
+
+const missingVars = [
+  ["VITE_FIREBASE_API_KEY", VITE_FIREBASE_API_KEY],
+  ["VITE_FIREBASE_AUTH_DOMAIN", VITE_FIREBASE_AUTH_DOMAIN],
+  ["VITE_FIREBASE_PROJECT_ID", VITE_FIREBASE_PROJECT_ID],
+  ["VITE_FIREBASE_STORAGE_BUCKET", VITE_FIREBASE_STORAGE_BUCKET],
+  ["VITE_FIREBASE_MESSAGING_SENDER_ID", VITE_FIREBASE_MESSAGING_SENDER_ID],
+  ["VITE_FIREBASE_APP_ID", VITE_FIREBASE_APP_ID],
+]
+  .filter(([, value]) => !value)
+  .map(([name]) => name);
+
+if (missingVars.length > 0) {
+  throw new Error(
+    `Missing required Firebase environment variables: ${missingVars.join(", ")}. ` +
+      "Please copy .env.example to .env and fill in the values."
+  );
+}
+
 const firebaseConfig = {
-  apiKey: "AIzaSyDYGXLwrtutPremWLDblWsTJEqxtsmwuO0",
-  authDomain: "raktport.firebaseapp.com",
-  projectId: "raktport",
-  storageBucket: "raktport.firebasestorage.app",
-  messagingSenderId: "462310246892",
-  appId: "1:462310246892:web:288e9e3323b418498cd8c9"
+  apiKey: VITE_FIREBASE_API_KEY,
+  authDomain: VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: VITE_FIREBASE_PROJECT_ID,
+  storageBucket: VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: VITE_FIREBASE_APP_ID,
 };
 
 // Initialize Firebase
