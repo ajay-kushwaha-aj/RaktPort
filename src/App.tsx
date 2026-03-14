@@ -1,5 +1,5 @@
 // src/App.tsx
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
@@ -11,9 +11,54 @@ import { DonorDashboard } from './components/DonorDashboard';
 
 // --- Import the dashboards with CONSISTENT DEFAULT IMPORTS ---
 import HospitalDashboard from './components/HospitalDashboard';
-import BloodBankDashboard from './components/BloodBankDashboard';  // ✅ FIXED: Now using default import
-import AdminDashboard from './components/AdminDashboard';  // ✅ FIXED: Now using default import
+import BloodBankDashboard from './components/BloodBankDashboard';
+import AdminDashboard from './components/AdminDashboard';
 import { Button } from './components/ui/button';
+
+// --- Error Boundary to prevent blank page on runtime errors ---
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: '2rem', textAlign: 'center', fontFamily: 'sans-serif' }}>
+          <h1 style={{ color: '#8B0000', fontSize: '1.5rem', marginBottom: '1rem' }}>
+            Something went wrong
+          </h1>
+          <p style={{ color: '#555', marginBottom: '1rem' }}>
+            {this.state.error?.message || 'An unexpected error occurred.'}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              padding: '0.5rem 1.5rem',
+              backgroundColor: '#8B0000',
+              color: 'white',
+              border: 'none',
+              borderRadius: '0.375rem',
+              cursor: 'pointer',
+            }}
+          >
+            Reload Page
+          </button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 // --- Imports for providers ---
 import { Toaster } from "@/components/ui/toaster";
@@ -221,8 +266,10 @@ import { ThemeProvider } from "@/components/theme-provider"
 
 export default function App() {
   return (
-    <ThemeProvider defaultTheme="system" storageKey="viser-theme">
-      <AppContent />
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider defaultTheme="system" storageKey="viser-theme">
+        <AppContent />
+      </ThemeProvider>
+    </ErrorBoundary>
   )
 }
