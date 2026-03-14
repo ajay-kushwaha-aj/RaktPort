@@ -8,6 +8,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
+<!-- Firebase compat SDK (used for Firestore queries) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
 <style>
 :root{
   --maroon:#8b0000;
@@ -143,9 +147,10 @@ body{
 
 <script>
 /* ===========================
-  CONFIG: LIVE API URL
+  CONFIG: Firebase is initialized via the compat SDK loaded above.
+  The configuration values below must match those in your .env file.
+  Update them with your own Firebase project settings.
   =========================== */
-const API_URL = "https://script.google.com/macros/s/AKfycbya3BWwqA_mhDTUb2PTsioEJ4uzozCsbRymQOawpeUnrd51MHNGeT6318SrncfUAKCorg/exec";
 
 /* ===========================
   MOCK DATA (FALLBACK)
@@ -158,8 +163,29 @@ const MOCK_CENTERS = [
 ];
 
 /* ===========================
+  Firebase Initialization
+  =========================== */
+let db = null;
+try {
+  // Reuse the Firebase app if already initialized by the main app, otherwise initialize
+  const app = firebase.apps.length
+    ? firebase.app()
+    : firebase.initializeApp(window.FIREBASE_CONFIG || {});
+  db = firebase.firestore(app);
+} catch (e) {
+  console.warn("Firebase init skipped for blood center page:", e.message);
+}
+
+/* ===========================
   Center Lookup Logic
   =========================== */
+
+function citiesMatch(input, bankCity) {
+  if (!input || !bankCity) return false;
+  const a = input.toLowerCase().trim();
+  const b = bankCity.toLowerCase().trim();
+  return a === b || a.includes(b) || b.includes(a);
+}
 
 async function findCenters(){
   const city = document.getElementById('mainCity').value.trim();
@@ -176,34 +202,45 @@ async function findCenters(){
   let centers = [];
 
   try {
-    // Construct URL
-    const queryParams = new URLSearchParams({
-        action: "findCenters",
-        city: city,
-        pincode: pincode
+    if (!db) throw new Error("Firebase not initialized");
+
+    // Query Firestore for blood bank users
+    const snapshot = await db.collection("users")
+      .where("role", "==", "bloodbank")
+      .get();
+
+    snapshot.forEach(function(doc) {
+      const data = doc.data();
+      const bankCity = data.district || data.city || '';
+      const bankPincode = data.pincode || '';
+
+      const cityMatches = city ? citiesMatch(city, bankCity) : false;
+      const pincodeMatches = pincode ? bankPincode === pincode : false;
+
+      if (cityMatches || pincodeMatches) {
+        centers.push({
+          id: doc.id,
+          name: data.fullName || 'Blood Bank',
+          address: (data.address || '') +
+            (bankCity ? ', ' + bankCity : '') +
+            (data.state ? ', ' + data.state : '') +
+            (bankPincode ? ' - ' + bankPincode : ''),
+          phone: data.mobile || 'Contact Unavailable'
+        });
+      }
     });
 
-    // Fetch from API
-    console.log("Fetching from:", `${API_URL}?${queryParams.toString()}`);
-    const res = await fetch(`${API_URL}?${queryParams.toString()}`);
-    
-    if (!res.ok) throw new Error("Network response was not ok");
-    
-    const result = await res.json();
-
-    if (result.status === "success" && result.data.length > 0) {
-        centers = result.data;
-    } else {
-        console.warn("API returned no data or error:", result);
-        // If API returns nothing, use Mock Data for demonstration if query matches 'Delhi' or empty
-        if (city.toLowerCase().includes('delhi') || pincode.startsWith('11')) {
-           centers = MOCK_CENTERS;
-        }
+    if (centers.length === 0) {
+      console.warn("No blood banks found in Firestore for this query");
+      // Fallback to mock data for demonstration if query matches 'Delhi' or pincode starts with '11'
+      if ((city && city.toLowerCase().includes('delhi')) || (pincode && pincode.startsWith('11'))) {
+         centers = MOCK_CENTERS;
+      }
     }
   } catch(err) {
-    console.error("Fetch Error:", err);
+    console.error("Firestore Query Error:", err);
     // Fallback to Mock Data on Error
-    if (city.toLowerCase().includes('delhi') || pincode.startsWith('11')) {
+    if ((city && city.toLowerCase().includes('delhi')) || (pincode && pincode.startsWith('11'))) {
         centers = MOCK_CENTERS;
     }
   }
