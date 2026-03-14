@@ -148,8 +148,8 @@ body{
 <script>
 /* ===========================
   CONFIG: Firebase is initialized via the compat SDK loaded above.
-  The configuration values below must match those in your .env file.
-  Update them with your own Firebase project settings.
+  Set window.FIREBASE_CONFIG before this script runs, or the page
+  will gracefully fall back to mock data when Firebase is unavailable.
   =========================== */
 
 /* ===========================
@@ -167,11 +167,15 @@ const MOCK_CENTERS = [
   =========================== */
 let db = null;
 try {
-  // Reuse the Firebase app if already initialized by the main app, otherwise initialize
-  const app = firebase.apps.length
-    ? firebase.app()
-    : firebase.initializeApp(window.FIREBASE_CONFIG || {});
-  db = firebase.firestore(app);
+  if (!window.FIREBASE_CONFIG && !firebase.apps.length) {
+    console.warn("Firebase config not found (window.FIREBASE_CONFIG). Blood center search will use mock data.");
+  } else {
+    // Reuse the Firebase app if already initialized by the main app, otherwise initialize
+    const app = firebase.apps.length
+      ? firebase.app()
+      : firebase.initializeApp(window.FIREBASE_CONFIG);
+    db = firebase.firestore(app);
+  }
 } catch (e) {
   console.warn("Firebase init skipped for blood center page:", e.message);
 }
