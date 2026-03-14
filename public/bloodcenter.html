@@ -141,100 +141,128 @@ body{
 
 </div> 
 
-<script>
-/* ===========================
-  CONFIG: LIVE API URL
-  =========================== */
-const API_URL = "https://script.google.com/macros/s/AKfycbya3BWwqA_mhDTUb2PTsioEJ4uzozCsbRymQOawpeUnrd51MHNGeT6318SrncfUAKCorg/exec";
+<script src="/firebase-config.js"></script>
+<!-- Firebase SDK (loaded via CDN — no Google Apps Script required) -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
 /* ===========================
-  MOCK DATA (FALLBACK)
+  Firebase Initialisation
   =========================== */
-const MOCK_CENTERS = [
-  { id: 'M1', name: 'AIIMS Blood Bank', address: 'Ansari Nagar, New Delhi', phone: '+91-11-26588500' },
-  { id: 'M2', name: 'Red Cross Society', address: 'Red Cross Road, New Delhi', phone: '+91-11-23716441' },
-  { id: 'M3', name: 'Rotary Blood Bank', address: 'Tughlakabad Institutional Area, New Delhi', phone: '+91-11-29054066' },
-  { id: 'M4', name: 'Apollo Hospital Blood Center', address: 'Sarita Vihar, Mathura Road', phone: '+91-11-26925858' }
+let db = null;
+
+function initFirebase() {
+  if (!window.FIREBASE_CONFIG || window.FIREBASE_CONFIG.apiKey === "YOUR_FIREBASE_API_KEY") {
+    console.warn("Firebase config not set in firebase-config.js. Running in demo mode.");
+    return false;
+  }
+  try {
+    const app = initializeApp(window.FIREBASE_CONFIG);
+    db = getFirestore(app);
+    return true;
+  } catch (err) {
+    console.error("Firebase init error:", err);
+    return false;
+  }
+}
+
+/* ===========================
+  DEMO DATA (shown when Firebase
+  is not yet configured)
+  =========================== */
+const DEMO_CENTERS = [
+  { id: 'D1', name: 'AIIMS Blood Bank', address: 'Ansari Nagar, New Delhi', district: 'New Delhi', state: 'Delhi', pincode: '110029', phone: '+91-11-26588500' },
+  { id: 'D2', name: 'Red Cross Society', address: 'Red Cross Road, New Delhi', district: 'New Delhi', state: 'Delhi', pincode: '110001', phone: '+91-11-23716441' },
+  { id: 'D3', name: 'Rotary Blood Bank', address: 'Tughlakabad Institutional Area, New Delhi', district: 'New Delhi', state: 'Delhi', pincode: '110044', phone: '+91-11-29054066' },
+  { id: 'D4', name: 'Apollo Hospital Blood Center', address: 'Sarita Vihar, Mathura Road', district: 'South Delhi', state: 'Delhi', pincode: '110076', phone: '+91-11-26925858' }
 ];
 
 /* ===========================
   Center Lookup Logic
   =========================== */
 
-async function findCenters(){
-  const city = document.getElementById('mainCity').value.trim();
+async function findCenters() {
+  const city    = document.getElementById('mainCity').value.trim().toLowerCase();
   const pincode = document.getElementById('mainPincode').value.trim();
-  const list = document.getElementById('centersList');
-  
+  const list    = document.getElementById('centersList');
+
   if (!city && !pincode) {
     list.innerHTML = '<div class="small-muted" style="color:var(--maroon)">Please enter a City or Pincode to search.</div>';
     return;
   }
 
-  list.innerHTML = '<div class="small-muted">Searching for registered centers... <i class="fa-solid fa-spinner fa-spin"></i></div>';
+  list.innerHTML = '<div class="small-muted">Searching for registered centers… <i class="fa-solid fa-spinner fa-spin"></i></div>';
 
   let centers = [];
+  const firebaseReady = initFirebase();
 
-  try {
-    // Construct URL
-    const queryParams = new URLSearchParams({
-        action: "findCenters",
-        city: city,
-        pincode: pincode
-    });
+  if (firebaseReady && db) {
+    try {
+      // Query blood banks registered in Firestore
+      const snap = await getDocs(query(collection(db, 'users'), where('role', '==', 'bloodbank')));
 
-    // Fetch from API
-    console.log("Fetching from:", `${API_URL}?${queryParams.toString()}`);
-    const res = await fetch(`${API_URL}?${queryParams.toString()}`);
-    
-    if (!res.ok) throw new Error("Network response was not ok");
-    
-    const result = await res.json();
+      snap.forEach(docSnap => {
+        const d = docSnap.data();
+        const matchesCity    = city    && (
+          (d.district && d.district.toLowerCase().includes(city)) ||
+          (d.state    && d.state.toLowerCase().includes(city))    ||
+          (d.address  && d.address.toLowerCase().includes(city))
+        );
+        const matchesPincode = pincode && d.pincode && d.pincode.startsWith(pincode);
 
-    if (result.status === "success" && result.data.length > 0) {
-        centers = result.data;
-    } else {
-        console.warn("API returned no data or error:", result);
-        // If API returns nothing, use Mock Data for demonstration if query matches 'Delhi' or empty
-        if (city.toLowerCase().includes('delhi') || pincode.startsWith('11')) {
-           centers = MOCK_CENTERS;
+        if (matchesCity || matchesPincode) {
+          centers.push({
+            id:      docSnap.id,
+            name:    d.fullName  || 'Unnamed Center',
+            address: [d.address, d.district, d.state].filter(Boolean).join(', '),
+            phone:   d.mobile    || ''
+          });
         }
+      });
+    } catch (err) {
+      console.error("Firestore query error:", err);
     }
-  } catch(err) {
-    console.error("Fetch Error:", err);
-    // Fallback to Mock Data on Error
-    if (city.toLowerCase().includes('delhi') || pincode.startsWith('11')) {
-        centers = MOCK_CENTERS;
-    }
+  } else {
+    // Demo mode — filter the built-in demo centers
+    centers = DEMO_CENTERS.filter(c => {
+      const matchesCity    = city    && (
+        c.district.toLowerCase().includes(city) ||
+        c.state.toLowerCase().includes(city)    ||
+        c.address.toLowerCase().includes(city)
+      );
+      const matchesPincode = pincode && c.pincode.startsWith(pincode);
+      return matchesCity || matchesPincode;
+    });
   }
-  
-  renderCenters(centers);
+
+  renderCenters(centers, !firebaseReady);
 }
 
-function renderCenters(centers){
+function renderCenters(centers, isDemoMode) {
   const list = document.getElementById('centersList');
   list.innerHTML = '';
-  
-  if(!centers || centers.length === 0){
+
+  if (!centers || centers.length === 0) {
     list.innerHTML = `
       <div style="text-align:center; padding:20px; color:#666;">
         <i class="fa-solid fa-hospital-user" style="font-size:24px; margin-bottom:10px; color:#ccc;"></i>
         <p>No registered centers found matching your query.</p>
-        <small>Try searching for "Delhi" to see demo results.</small>
-      </div>`; 
+        ${isDemoMode ? '<small>Configure <code>firebase-config.js</code> to search live data, or try "Delhi" for a demo.</small>' : ''}
+      </div>`;
     return;
   }
-  
+
   // Title
   const title = document.createElement('div');
   title.className = 'section-title';
   title.style.fontSize = '1rem';
   title.style.marginBottom = '15px';
-  title.innerHTML = `Found ${centers.length} Center(s) <span style="font-size:11px; color:#888; font-weight:400">(Live/Demo Results)</span>`;
+  title.innerHTML = `Found ${centers.length} Center(s) <span style="font-size:11px; color:#888; font-weight:400">${isDemoMode ? '(Demo Results)' : '(Live Results)'}</span>`;
   list.appendChild(title);
-  
+
   // Render Items
-  centers.forEach(c=>{
+  centers.forEach(c => {
     const item = document.createElement('div');
     item.className = 'hospital-item';
     item.innerHTML = `
@@ -246,15 +274,18 @@ function renderCenters(centers){
         </small>
       </div>
       <div>
-         <a href="tel:${c.phone}" style="text-decoration:none;">
-           <button class="btn-light" style="color:var(--maroon); border:1px solid var(--maroon); background:#fff;">
-             <i class="fa-solid fa-phone"></i> Call
-           </button>
-         </a>
+        <a href="tel:${c.phone}" style="text-decoration:none;">
+          <button class="btn-light" style="color:var(--maroon); border:1px solid var(--maroon); background:#fff;">
+            <i class="fa-solid fa-phone"></i> Call
+          </button>
+        </a>
       </div>`;
     list.appendChild(item);
   });
 }
+
+// Expose to global scope for the onclick handler
+window.findCenters = findCenters;
 </script>
 </body>
 </html>
