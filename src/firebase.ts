@@ -27,7 +27,7 @@ const missingVars = [
   .map(([name]) => name);
 
 if (missingVars.length > 0) {
-  throw new Error(
+  console.error(
     `Missing required Firebase environment variables: ${missingVars.join(", ")}. ` +
       "Please copy .env.example to .env and fill in the values."
   );
