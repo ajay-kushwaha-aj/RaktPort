@@ -1,302 +1,353 @@
+// useBloodBankData.ts  ── FIXED
+//
+// ROOT CAUSE OF BUG:
+//   Firebase Auth  →  user.email  (e.g. "bank@gmail.com")
+//   Firestore docs →  stored at  doc(db, 'users', user.uid)
+//   Old code used user.email for BOTH query field AND doc-ID lookup → both fail.
+//
+// FIX:
+//   resolveBloodBankDoc() tries user.uid first (always correct),
+//   then progressively weaker fallbacks so legacy accounts still work.
+
 import { useState, useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
 import { db } from '../firebase';
 import {
-  collection,
-  getDocs,
-  query,
-  where,
-  doc,
-  getDoc,
-  onSnapshot,
-  setDoc
+  collection, getDocs, query, where,
+  doc, getDoc, onSnapshot, setDoc,
 } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import {
-  Inventory,
-  Appointment,
-  Donation,
-  Redemption,
-  BloodRequest,
-  Notification,
-  KPIData,
-  BloodGroup,
+  Inventory, Appointment, Donation, Redemption,
+  BloodRequest, Notification, KPIData, BloodGroup,
 } from '@/types/bloodbank';
 
+// ── Date parser ───────────────────────────────────────────────────────────────
 export const parseFirestoreDate = (dateField: any): Date => {
   if (!dateField) return new Date();
   if (dateField?.toDate) return dateField.toDate();
   if (dateField instanceof Date) return dateField;
   if (typeof dateField === 'string') return new Date(dateField);
+  if (typeof dateField === 'number') return new Date(dateField);
+  if (dateField?.seconds) return new Date(dateField.seconds * 1000);
   return new Date();
 };
 
+// ── Resolve the blood-bank's Firestore document ───────────────────────────────
+//
+//  Priority order:
+//   1. Firebase Auth UID       → doc(db, 'users', uid)           ← always correct
+//   2. Cached localStorage 'userUid'                             ← fast repeat lookup
+//   3. localStorage 'userId' as direct doc ID (may be a uid)
+//   4. Query: email field == Firebase Auth email
+//   5. Query: userId field == localStorage value  (legacy accounts)
+//   6. Query: userId field == Firebase Auth email  (legacy accounts)
+//
+async function resolveBloodBankDoc(
+  uid: string | null,
+  email: string | null,
+  localId: string | null,
+): Promise<{ docId: string; data: any } | null> {
+
+  // helper: try a direct doc lookup
+  const tryDoc = async (id: string) => {
+    try {
+      const s = await getDoc(doc(db, 'users', id));
+      return s.exists() ? { docId: id, data: s.data() } : null;
+    } catch { return null; }
+  };
+
+  // helper: try a where-query
+  const tryQuery = async (field: string, value: string) => {
+    try {
+      const s = await getDocs(query(collection(db, 'users'), where(field, '==', value)));
+      return s.empty ? null : { docId: s.docs[0].id, data: s.docs[0].data() };
+    } catch { return null; }
+  };
+
+  let r: { docId: string; data: any } | null = null;
+
+  // 1. Firebase UID
+  if (uid)                                    r = await tryDoc(uid);
+  // 2. Cached uid
+  const cached = localStorage.getItem('userUid');
+  if (!r && cached && cached !== uid)         r = await tryDoc(cached);
+  // 3. localStorage userId as doc key
+  if (!r && localId && localId !== uid && localId !== cached)
+                                              r = await tryDoc(localId);
+  // 4. Query by email field
+  if (!r && email)                            r = await tryQuery('email', email);
+  // 5. Query by legacy userId field
+  if (!r && localId)                          r = await tryQuery('userId', localId);
+  if (!r && email)                            r = await tryQuery('userId', email);
+
+  if (r) console.debug('[BBData] resolved docId:', r.docId);
+  else   console.error('[BBData] could not resolve doc. hints:', { uid, email, localId });
+
+  return r;
+}
+
+// ── Main hook ─────────────────────────────────────────────────────────────────
 export const useBloodBankData = () => {
-  const [loading, setLoading] = useState(true);
-  const [bloodBankData, setBloodBankData] = useState<any>(null);
-  const [inventory, setInventory] = useState<Inventory>({
-    'A+': { total: 0, available: 0 },
-    'A-': { total: 0, available: 0 },
-    'B+': { total: 0, available: 0 },
-    'B-': { total: 0, available: 0 },
-    'AB+': { total: 0, available: 0 },
-    'AB-': { total: 0, available: 0 },
-    'O+': { total: 0, available: 0 },
-    'O-': { total: 0, available: 0 },
+  const [loading,        setLoading]        = useState(true);
+  const [bloodBankData,  setBloodBankData]  = useState<any>(null);
+  const [inventory,      setInventory]      = useState<Inventory>({
+    'A+': { total: 0, available: 0 }, 'A-': { total: 0, available: 0 },
+    'B+': { total: 0, available: 0 }, 'B-': { total: 0, available: 0 },
+    'AB+': { total: 0, available: 0 }, 'AB-': { total: 0, available: 0 },
+    'O+': { total: 0, available: 0 }, 'O-': { total: 0, available: 0 },
   });
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [donations, setDonations] = useState<Donation[]>([]);
-  const [redemptions, setRedemptions] = useState<Redemption[]>([]);
-  const [bloodRequests, setBloodRequests] = useState<BloodRequest[]>([]);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [bloodBankId, setBloodBankId] = useState<string | null>(null);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [appointments,   setAppointments]   = useState<Appointment[]>([]);
+  const [donations,      setDonations]      = useState<Donation[]>([]);
+  const [redemptions,    setRedemptions]    = useState<Redemption[]>([]);
+  const [bloodRequests,  setBloodRequests]  = useState<BloodRequest[]>([]);
+  const [notifications,  setNotifications]  = useState<Notification[]>([]);
+  const [bloodBankId,    setBloodBankId]    = useState<string | null>(null);
 
   useEffect(() => {
     const auth = getAuth();
-    let unsubscribers: (() => void)[] = [];
+    let unsubs: (() => void)[] = [];
 
     const unsubAuth = onAuthStateChanged(auth, async (user) => {
-      unsubscribers.forEach(u => u());
-      unsubscribers = [];
+      unsubs.forEach(u => u());
+      unsubs = [];
 
-      const authEmail = user?.email;
-      const localEmail = localStorage.getItem('userEmail') || localStorage.getItem('userId');
-      const effectiveEmail = authEmail || localEmail;
+      const firebaseUid   = user?.uid   ?? null;
+      const firebaseEmail = user?.email ?? null;
+      const localId       = localStorage.getItem('userId')    ?? null;
+      const localEmail    = localStorage.getItem('userEmail') ?? null;
+      const emailHint     = firebaseEmail ?? localEmail;
 
-      if (!effectiveEmail) {
-        console.warn("No email found - redirecting to login");
+      if (!firebaseUid && !localId && !emailHint) {
         setBloodBankId(null);
-        setUserEmail(null);
         setLoading(false);
         return;
       }
 
-      setUserEmail(effectiveEmail);
       setLoading(true);
 
       try {
-        const usersRef = collection(db, "users");
-        const emailQuery = query(usersRef, where("userId", "==", effectiveEmail));
-        const userSnapshot = await getDocs(emailQuery);
+        const resolved = await resolveBloodBankDoc(firebaseUid, emailHint, localId);
 
-        let bloodBankDoc: any = null;
-        let bloodBankDocId: string = effectiveEmail;
-
-        if (!userSnapshot.empty) {
-          bloodBankDoc = userSnapshot.docs[0];
-          bloodBankDocId = bloodBankDoc.id;
-        } else {
-          const directDocRef = doc(db, "users", effectiveEmail);
-          const directDocSnap = await getDoc(directDocRef);
-          if (directDocSnap.exists()) {
-            bloodBankDoc = directDocSnap;
-            bloodBankDocId = effectiveEmail;
-          }
+        if (!resolved) {
+          throw new Error(
+            'Blood Bank profile not found. Please ensure you registered as a Blood Bank ' +
+            'and that your account has been approved by the administrator.'
+          );
         }
 
-        if (!bloodBankDoc || !bloodBankDoc.exists()) {
-          throw new Error("Blood Bank profile not found. Please contact administrator.");
-        }
+        const { docId: bbId, data: userData } = resolved;
 
-        const userData = bloodBankDoc.data();
         if (userData.role !== 'bloodbank') {
-          throw new Error("Invalid account type. This dashboard is for blood banks only.");
+          throw new Error(
+            `This account is registered as "${userData.role}". ` +
+            'Please use the Blood Bank login option.'
+          );
+        }
+
+        // Cache the resolved UID for instant future lookups
+        if (bbId !== localStorage.getItem('userUid')) {
+          localStorage.setItem('userUid', bbId);
         }
 
         setBloodBankData(userData);
-        setBloodBankId(bloodBankDocId);
+        setBloodBankId(bbId);
 
-        const unsubUser = onSnapshot(doc(db, "users", bloodBankDocId), (snapshot) => {
-          if (snapshot.exists()) {
-            setBloodBankData(snapshot.data());
-          }
-        }, (error) => toast.error("Failed to sync profile", { description: error.message }));
-        unsubscribers.push(unsubUser);
+        // ── Real-time listeners ─────────────────────────────────────────────
 
-        const inventoryRef = doc(db, "inventory", bloodBankDocId);
-        const unsubInventory = onSnapshot(inventoryRef, async (snapshot) => {
-          if (snapshot.exists()) {
-            const rawData = snapshot.data();
-            const safeInventory: any = {};
-            const groups: BloodGroup[] = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+        // Profile
+        unsubs.push(onSnapshot(
+          doc(db, 'users', bbId),
+          s  => { if (s.exists()) setBloodBankData(s.data()); },
+          err => console.error('[BBData] profile:', err)
+        ));
 
-            groups.forEach(bg => {
-              const value = rawData[bg];
-              if (value && typeof value === 'object' && 'total' in value) {
-                safeInventory[bg] = {
-                  total: Number(value.total) || 0,
-                  available: Number(value.available) || 0
-                };
-              } else if (typeof value === 'number') {
-                safeInventory[bg] = { total: value, available: value };
-              } else if (typeof value === 'string' && !isNaN(Number(value))) {
-                const units = Number(value);
-                safeInventory[bg] = { total: units, available: units };
-              } else {
-                safeInventory[bg] = { total: 0, available: 0 };
-              }
-            });
-            setInventory(safeInventory as Inventory);
-          } else {
-            const emptyInventory: any = {};
-            const groups: BloodGroup[] = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
-            groups.forEach(bg => { emptyInventory[bg] = { total: 0, available: 0 }; });
-            await setDoc(inventoryRef, emptyInventory).catch(console.error);
-            setInventory(emptyInventory as Inventory);
-          }
-          setLoading(false);
-        });
-        unsubscribers.push(unsubInventory);
+        // Inventory
+        const invRef = doc(db, 'inventory', bbId);
+        unsubs.push(onSnapshot(invRef,
+          async s => {
+            const groups: BloodGroup[] = ['A+','A-','B+','B-','AB+','AB-','O+','O-'];
+            if (s.exists()) {
+              const raw = s.data();
+              const safe: any = {};
+              groups.forEach(bg => {
+                const v = raw[bg];
+                if (v && typeof v === 'object' && 'total' in v) {
+                  safe[bg] = { total: Number(v.total) || 0, available: Number(v.available) || 0 };
+                } else if (typeof v === 'number') {
+                  safe[bg] = { total: v, available: v };
+                } else {
+                  safe[bg] = { total: 0, available: 0 };
+                }
+              });
+              setInventory(safe as Inventory);
+            } else {
+              const empty: any = {};
+              groups.forEach(bg => { empty[bg] = { total: 0, available: 0 }; });
+              await setDoc(invRef, empty).catch(console.error);
+              setInventory(empty as Inventory);
+            }
+            setLoading(false);
+          },
+          err => { console.error('[BBData] inventory:', err); setLoading(false); }
+        ));
 
-        const appQuery = query(collection(db, "appointments"), where("bloodBankId", "==", bloodBankDocId));
-        const unsubAppointments = onSnapshot(appQuery, (snapshot) => {
-          const fetchedAppointments: Appointment[] = snapshot.docs.map(d => {
-            const data = d.data();
-            return {
-              appointmentRtid: data.rtid || d.id,
-              donorName: data.donorName || '',
-              bloodGroup: (data.bloodGroup as BloodGroup) || 'O+',
-              date: parseFirestoreDate(data.date),
-              time: data.time || '10:00',
-              status: (data.status as Appointment['status']) || 'Upcoming',
-              mobile: data.mobile || '',
-              gender: data.gender || ''
-            };
-          });
-          setAppointments(fetchedAppointments.sort((a, b) => a.date.getTime() - b.date.getTime()));
-        });
-        unsubscribers.push(unsubAppointments);
-
-        const donQuery = query(collection(db, "donations"), where("bloodBankId", "==", bloodBankDocId));
-        const unsubDonations = onSnapshot(donQuery, (snapshot) => {
-          const fetchedDonations: Donation[] = snapshot.docs.map(d => {
-            const data = d.data();
-            return {
-              dRtid: data.rtid || data.dRtid || d.id,
-              otp: data.otp || '',
-              bloodGroup: (data.bloodGroup as BloodGroup) || 'O+',
-              donorName: data.donorName || '',
-              donationType: data.donationType || 'Regular',
-              hRtid: data.hRtid || null,
-              status: (data.status as Donation['status']) || 'AVAILABLE',
-              donationLocation: data.donationLocation || userData.district || 'Blood Bank',
-              date: parseFirestoreDate(data.date || data.createdAt)
-            };
-          });
-
-          fetchedDonations.sort((a, b) => b.date.getTime() - a.date.getTime());
-          setDonations(fetchedDonations);
-
-          const fetchedRedemptions: Redemption[] = fetchedDonations
-            .filter(d => (d.status === 'REDEEMED' || d.status === 'Redeemed') && d.hRtid)
-            .map(d => ({
-              dRtid: d.dRtid,
-              bloodGroup: d.bloodGroup,
-              donationLocation: d.donationLocation,
-              redemptionLocation: 'Hospital',
-              linkedHRTID: d.hRtid!,
-              date: d.date,
-              bloodBankId: bloodBankDocId
-            }));
-
-          fetchedRedemptions.sort((a, b) => b.date.getTime() - a.date.getTime());
-          setRedemptions(fetchedRedemptions);
-        });
-        unsubscribers.push(unsubDonations);
-
-        if (userData.district) {
-          const requestsQuery = query(collection(db, "bloodRequests"), where("city", "==", userData.district));
-          const unsubRequests = onSnapshot(requestsQuery, (snapshot) => {
-            const fetchedRequests: BloodRequest[] = snapshot.docs.map(d => {
-              const data = d.data();
+        // Appointments
+        unsubs.push(onSnapshot(
+          query(collection(db, 'appointments'), where('bloodBankId', '==', bbId)),
+          s => {
+            const appts: Appointment[] = s.docs.map(d => {
+              const v = d.data();
               return {
-                rtid: data.linkedRTID || data.rtid || d.id,
-                patientName: data.patientName || 'Unknown',
-                bloodGroup: (data.bloodGroup as BloodGroup) || 'O+',
-                units: data.unitsRequired || data.units || 1,
-                city: data.city || userData.district,
-                hospitalName: data.hospitalName || 'Unknown Hospital',
-                status: data.status || 'PENDING',
-                createdAt: parseFirestoreDate(data.createdAt)
+                appointmentRtid: v.rtid || d.id,
+                donorName:  v.donorName  || '',
+                bloodGroup: (v.bloodGroup as BloodGroup) || 'O+',
+                date:       parseFirestoreDate(v.date),
+                time:       v.time    || '10:00',
+                status:     (v.status as Appointment['status']) || 'Upcoming',
+                mobile:     v.mobile  || '',
+                gender:     v.gender  || '',
+                district:   v.district || '',
+                pincode:    v.pincode  || '',
+                donorId:    v.donorId  || null,
               };
             });
-            setBloodRequests(fetchedRequests);
-          });
-          unsubscribers.push(unsubRequests);
+            setAppointments(appts.sort((a, b) => a.date.getTime() - b.date.getTime()));
+          }
+        ));
+
+        // Donations (and derive redemptions in same listener)
+        unsubs.push(onSnapshot(
+          query(collection(db, 'donations'), where('bloodBankId', '==', bbId)),
+          s => {
+            const dons: Donation[] = s.docs.map(d => {
+              const v = d.data();
+              return {
+                dRtid:           v.rtid || v.dRtid || d.id,
+                otp:             v.otp  || '',
+                bloodGroup:      (v.bloodGroup as BloodGroup) || 'O+',
+                donorName:       v.donorName   || '',
+                donorMobile:     v.donorMobile || '',
+                donationType:    v.donationType || 'Regular',
+                component:       v.component   || 'Whole Blood',
+                hRtid:           v.hRtid       || null,
+                linkedHrtid:     v.linkedHrtid || null,
+                status:          (v.status as Donation['status']) || 'AVAILABLE',
+                donationLocation:v.donationLocation || userData.district || 'Blood Bank',
+                city:            v.city || '',
+                bloodBankName:   v.bloodBankName || userData.fullName || '',
+                date:            parseFirestoreDate(v.date || v.createdAt),
+                createdAt:       parseFirestoreDate(v.createdAt),
+                appointmentRtid: v.appointmentRtid || null,
+                donorId:         v.donorId     || null,
+                patientName:     v.patientName || null,
+                hospitalName:    v.hospitalName || null,
+                redemptionDate:  v.redemptionDate
+                                  ? parseFirestoreDate(v.redemptionDate)
+                                  : undefined,
+              };
+            });
+            dons.sort((a, b) => b.date.getTime() - a.date.getTime());
+            setDonations(dons);
+
+            // Derive redemptions from same snapshot
+            const redems: Redemption[] = dons
+              .filter(d =>
+                (d.status === 'REDEEMED' || d.status === 'Redeemed') &&
+                (d.hRtid || d.linkedHrtid)
+              )
+              .map(d => ({
+                dRtid:             d.dRtid,
+                bloodGroup:        d.bloodGroup,
+                donationLocation:  d.donationLocation,
+                redemptionLocation:d.hospitalName || 'Hospital',
+                linkedHRTID:       (d.hRtid || d.linkedHrtid)!,
+                date:              d.redemptionDate || d.date,
+                bloodBankId:       bbId,
+              }));
+            redems.sort((a, b) => b.date.getTime() - a.date.getTime());
+            setRedemptions(redems);
+          }
+        ));
+
+        // Blood requests (city-scoped)
+        const bbCity = userData.district || userData.city;
+        if (bbCity) {
+          unsubs.push(onSnapshot(
+            query(collection(db, 'bloodRequests'), where('city', '==', bbCity)),
+            s => {
+              setBloodRequests(s.docs.map(d => {
+                const v = d.data();
+                return {
+                  rtid:         v.linkedRTID || v.rtid || d.id,
+                  patientName:  v.patientName  || 'Unknown',
+                  bloodGroup:   (v.bloodGroup as BloodGroup) || 'O+',
+                  units:        v.unitsRequired || v.units || 1,
+                  city:         v.city || bbCity,
+                  hospitalName: v.hospitalName || 'Unknown Hospital',
+                  status:       v.status || 'PENDING',
+                  createdAt:    parseFirestoreDate(v.createdAt),
+                };
+              }));
+            }
+          ));
         }
 
-        const notificationsQuery = query(collection(db, "notifications"), where("bloodBankId", "==", bloodBankDocId));
-        const unsubNotifications = onSnapshot(notificationsQuery, (snapshot) => {
-          const fetchedNotifications: Notification[] = snapshot.docs.map(d => {
-            const data = d.data();
-            return {
-              id: d.id,
-              message: data.message || '',
-              type: (data.type as 'success' | 'error' | 'info') || 'info',
-              timestamp: parseFirestoreDate(data.timestamp),
-              read: data.read || false
-            };
-          });
-          setNotifications(fetchedNotifications.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()));
-        });
-        unsubscribers.push(unsubNotifications);
-
-        setLoading(false);
+        // Notifications
+        unsubs.push(onSnapshot(
+          query(collection(db, 'notifications'), where('bloodBankId', '==', bbId)),
+          s => {
+            const notifs: Notification[] = s.docs.map(d => {
+              const v = d.data();
+              return {
+                id:        d.id,
+                message:   v.message || '',
+                type:      (v.type as Notification['type']) || 'info',
+                timestamp: parseFirestoreDate(v.timestamp),
+                read:      v.read || false,
+              };
+            });
+            setNotifications(notifs.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()));
+          }
+        ));
 
       } catch (error: any) {
-        console.error("Setup Error:", error);
-        toast.error(error.message || "Failed to initialize dashboard");
+        console.error('[BBData] Fatal:', error);
+        toast.error(error.message || 'Failed to initialize Blood Bank dashboard');
         setLoading(false);
       }
     });
 
     return () => {
       unsubAuth();
-      unsubscribers.forEach(unsub => unsub());
+      unsubs.forEach(u => u());
     };
   }, []);
 
+  // ── KPI ───────────────────────────────────────────────────────────────────
   const kpi: KPIData = useMemo(() => {
-    const safeKpi = { totalInventory: 0, availableUnits: 0, todayAppointments: 0, totalDonations: 0, totalRedemptions: 0, totalBloodRequests: 0 };
-    if (!inventory) return safeKpi;
-
+    const empty: KPIData = {
+      totalInventory: 0, availableUnits: 0, todayAppointments: 0,
+      totalDonations: 0, totalRedemptions: 0, totalBloodRequests: 0,
+    };
+    if (!inventory) return empty;
     try {
-      const totalInv = Object.values(inventory).reduce((acc, curr) => acc + (Number(curr?.total) || 0), 0);
-      const availUnits = Object.values(inventory).reduce((acc, curr) => acc + (Number(curr?.available) || 0), 0);
       const today = new Date().toDateString();
-      const todayApps = appointments.filter(a => new Date(a.date).toDateString() === today).length;
-
       return {
-        totalInventory: totalInv,
-        availableUnits: availUnits,
-        todayAppointments: todayApps,
-        totalDonations: donations.length,
-        totalRedemptions: redemptions.length,
-        totalBloodRequests: bloodRequests.length
+        totalInventory:     Object.values(inventory).reduce((s, v) => s + (Number(v?.total)     || 0), 0),
+        availableUnits:     Object.values(inventory).reduce((s, v) => s + (Number(v?.available) || 0), 0),
+        todayAppointments:  appointments.filter(a => new Date(a.date).toDateString() === today).length,
+        totalDonations:     donations.length,
+        totalRedemptions:   redemptions.length,
+        totalBloodRequests: bloodRequests.length,
       };
-    } catch (e) {
-      console.error("KPI Error:", e);
-      return safeKpi;
-    }
+    } catch { return empty; }
   }, [inventory, appointments, donations, redemptions, bloodRequests]);
 
-  const criticalGroups = useMemo(() => {
-    if (!inventory) return [];
-    return (Object.keys(inventory) as BloodGroup[]).filter(bg => inventory[bg].available < 30);
-  }, [inventory]);
+  const criticalGroups = useMemo(() =>
+    (Object.keys(inventory) as BloodGroup[]).filter(bg => (inventory[bg]?.available ?? 0) < 30),
+    [inventory]
+  );
 
-  return {
-    loading,
-    bloodBankData,
-    inventory,
-    appointments,
-    donations,
-    redemptions,
-    bloodRequests,
-    notifications,
-    bloodBankId,
-    kpi,
-    criticalGroups
-  };
+  return { loading, bloodBankData, inventory, appointments, donations, redemptions, bloodRequests, notifications, bloodBankId, kpi, criticalGroups };
 };

@@ -1,4 +1,11 @@
-// src/components/LoginPage.tsx
+// src/components/LoginPage.tsx  ── FIXED
+//
+// Change vs original:
+//   • After successful login, also stores  localStorage.setItem('userEmail', email)
+//     This ensures useBloodBankData can find the Firestore doc even if the
+//     Firebase Auth state hasn't resolved yet on the next page load.
+//   • Same fix applied to Google sign-in path.
+
 import { useState, useCallback } from 'react';
 import { loginUser, signInWithGoogle } from '../lib/auth';
 import { toast } from 'sonner';
@@ -33,7 +40,14 @@ function GoogleIcon({ size = 18 }: { size?: number }) {
 }
 
 function Spinner({ white = false }: { white?: boolean }) {
-  return <span className={`inline-block w-4 h-4 border-2 rounded-full animate-spin flex-shrink-0 ${white ? 'border-white/30 border-t-white' : 'border-gray-200 border-t-gray-600'}`} aria-hidden="true" />;
+  return (
+    <span
+      className={`inline-block w-4 h-4 border-2 rounded-full animate-spin flex-shrink-0 ${
+        white ? 'border-white/30 border-t-white' : 'border-gray-200 border-t-gray-600'
+      }`}
+      aria-hidden="true"
+    />
+  );
 }
 
 export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps) {
@@ -45,9 +59,18 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
   const [loading,      setLoading]      = useState(false);
   const [gLoading,     setGLoading]     = useState(false);
 
-  const current  = ROLES.find(r => r.id === role) ?? ROLES[0];
-  const roleIdx  = ROLES.findIndex(r => r.id === role);
-  const anyBusy  = loading || gLoading;
+  const current = ROLES.find(r => r.id === role) ?? ROLES[0];
+  const roleIdx = ROLES.findIndex(r => r.id === role);
+  const anyBusy = loading || gLoading;
+
+  // ── Store all identity hints so downstream hooks can resolve the Firestore doc ──
+  const persistLoginState = (uid: string, emailAddr: string, selectedRole: string) => {
+    localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('userRole',   selectedRole);
+    localStorage.setItem('userId',     uid);        // Firebase UID
+    localStorage.setItem('userEmail',  emailAddr);  // ← FIXED: persist email
+    localStorage.setItem('userUid',    uid);        // redundant but explicit
+  };
 
   const handleLogin = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,12 +79,12 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
     try {
       const res = await loginUser(email, password, role);
       if (res.success) {
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('userRole', role);
-        localStorage.setItem('userId', res.userId!);
+        // ── FIXED: store email alongside uid ──────────────────────────────
+        persistLoginState(res.userId!, res.email ?? email, role);
+
         if (rememberMe) {
           localStorage.setItem('rememberedEmail', email);
-          localStorage.setItem('rememberedRole', role);
+          localStorage.setItem('rememberedRole',  role);
         } else {
           localStorage.removeItem('rememberedEmail');
           localStorage.removeItem('rememberedRole');
@@ -81,9 +104,10 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
     try {
       const res = await signInWithGoogle(role);
       if (res.success) {
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('userRole', role);
-        localStorage.setItem('userId', res.userId!);
+        // ── FIXED: store email alongside uid ──────────────────────────────
+        persistLoginState(res.userId!, res.email ?? '', role);
+        if (res.displayName) localStorage.setItem('userName', res.displayName);
+
         toast.success('Signed in with Google!', { description: `Welcome, ${res.displayName ?? ''}` });
         setTimeout(() => { window.location.href = '/'; }, 500);
       } else if (res.error !== 'Sign-in cancelled.') {
@@ -101,27 +125,22 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
         <div className={`absolute -top-40 -right-40 w-72 sm:w-96 h-72 sm:h-96 bg-gradient-to-br ${current.color} rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob`} />
         <div className="absolute -bottom-40 -left-40 w-72 sm:w-96 h-72 sm:h-96 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
-        <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 sm:w-96 h-72 sm:h-96 bg-gradient-to-br ${current.color} rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-4000`} />
       </div>
 
-      {/* Sticky top-bar with back button — never covers content */}
+      {/* Back button */}
       <div className="sticky top-0 z-30 flex items-center px-3 pt-3 pb-2 sm:px-6 sm:pt-5 sm:pb-0 pointer-events-none">
         <button
           onClick={onBack}
           className="pointer-events-auto inline-flex items-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 bg-white/85 backdrop-blur-md rounded-full shadow-md hover:shadow-lg hover:bg-white active:scale-95 transition-all group"
         >
           <ArrowLeft className="w-4 h-4 text-gray-600 group-hover:text-gray-900 transition-colors" />
-          <span className="text-xs sm:text-sm font-medium text-gray-600 group-hover:text-gray-900 transition-colors">
-            Back to Home
-          </span>
+          <span className="text-xs sm:text-sm font-medium text-gray-600 group-hover:text-gray-900">Back to Home</span>
         </button>
       </div>
 
-      {/* Content */}
+      {/* Card */}
       <div className="relative flex justify-center px-3 pb-8 pt-2 sm:px-4 sm:pt-4 sm:min-h-[calc(100vh-56px)] sm:items-center">
         <div className="w-full max-w-md">
-
-          {/* ── Card ── */}
           <div className="bg-white/80 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-2xl border border-white/30 overflow-hidden">
 
             {/* Header */}
@@ -136,7 +155,6 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
             {/* Role selector */}
             <div className="px-3 sm:px-8 pt-4 sm:pt-6 pb-2">
               <div className="relative bg-gray-100/70 backdrop-blur-sm rounded-xl sm:rounded-2xl p-1.5 shadow-inner">
-                {/* Sliding pill */}
                 <div
                   className={`absolute top-1.5 bottom-1.5 bg-gradient-to-r ${current.color} rounded-lg shadow-md transition-all duration-300 ease-out`}
                   style={{ left: `calc(${roleIdx * 25}% + 6px)`, width: 'calc(25% - 12px)' }}
@@ -189,7 +207,7 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
               <div className="space-y-1.5">
                 <label htmlFor="lp-email" className="block text-xs sm:text-sm font-semibold text-gray-700">Email Address</label>
                 <div className="relative group">
-                  <Mail className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-focus-within:text-gray-600 transition-colors pointer-events-none" />
+                  <Mail className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-focus-within:text-gray-600 pointer-events-none" />
                   <input
                     id="lp-email"
                     type="email"
@@ -206,7 +224,7 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
               <div className="space-y-1.5">
                 <label htmlFor="lp-password" className="block text-xs sm:text-sm font-semibold text-gray-700">Password</label>
                 <div className="relative group">
-                  <Lock className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-focus-within:text-gray-600 transition-colors pointer-events-none" />
+                  <Lock className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-focus-within:text-gray-600 pointer-events-none" />
                   <input
                     id="lp-password"
                     type={showPassword ? 'text' : 'password'}
@@ -223,7 +241,9 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                     className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-0.5 touch-manipulation"
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Eye className="w-4 h-4 sm:w-5 sm:h-5" />}
+                    {showPassword
+                      ? <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" />
+                      : <Eye    className="w-4 h-4 sm:w-5 sm:h-5" />}
                   </button>
                 </div>
               </div>
@@ -234,7 +254,11 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
                   <span className="relative flex-shrink-0">
                     <input type="checkbox" checked={rememberMe} onChange={e => setRememberMe(e.target.checked)} className="sr-only peer" />
                     <span className="flex w-5 h-5 border-2 border-gray-300 rounded-md peer-checked:bg-gradient-to-br peer-checked:from-gray-700 peer-checked:to-gray-900 peer-checked:border-gray-700 transition-all items-center justify-center">
-                      {rememberMe && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7"/></svg>}
+                      {rememberMe && (
+                        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
                     </span>
                   </span>
                   <span className="text-xs sm:text-sm text-gray-600 group-hover:text-gray-800 transition-colors">Remember me</span>
@@ -254,7 +278,9 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
                     : `bg-gradient-to-r ${current.color} hover:shadow-xl hover:scale-[1.01] active:scale-[0.99]`
                 }`}
               >
-                {loading ? <span className="flex items-center justify-center gap-2"><Spinner white />Signing in…</span> : 'Sign In'}
+                {loading
+                  ? <span className="flex items-center justify-center gap-2"><Spinner white />Signing in…</span>
+                  : 'Sign In'}
               </button>
             </form>
 
@@ -286,11 +312,9 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
           50%      { transform:translate(-20px,20px) scale(0.9); }
           75%      { transform:translate(20px,20px) scale(1.05); }
         }
-        .animate-blob { animation:blob 8s infinite ease-in-out; }
-        .animation-delay-2000 { animation-delay:2s; }
-        .animation-delay-4000 { animation-delay:4s; }
-        /* Disable browser's native focus ring on non-keyboard focus */
-        button:focus:not(:focus-visible) { outline:none; }
+        .animate-blob { animation: blob 8s infinite ease-in-out; }
+        .animation-delay-2000 { animation-delay: 2s; }
+        button:focus:not(:focus-visible) { outline: none; }
       `}</style>
     </div>
   );
