@@ -1,0 +1,149 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* RaktPort Theme Colors */
+    --maroon: 0 100% 27%;         /* Primary Brand - #8B0000 */
+    --maroon-dark: 0 100% 35%;    /* Secondary Red - #B30000 */
+    --cream: 33 100% 97%;         /* Light Background - #FAF5F0 */
+    --success: 122 39% 33%;       /* Success Green - #2E7D32 */
+    --warn: 45 100% 51%;          /* Warning Yellow - #FFC107 */
+    --info: 191 100% 29%;         /* Info Blue - #007792 */
+    
+    /* Status Colors */
+    --status-pending-bg: 48 100% 96%;
+    --status-pending-fg: 30 97% 45%;
+    --status-pending-border: 48 96% 57%;
+    
+    --status-donated-bg: 199 100% 94%;
+    --status-donated-fg: 199 89% 30%;
+    --status-donated-border: 199 95% 61%;
+    
+    --status-redeemed-bg: 120 60% 94%;
+    --status-redeemed-fg: 122 39% 33%;
+    --status-redeemed-border: 153 73% 69%;
+    
+    --status-expired-bg: 220 14% 96%;
+    --status-expired-fg: 0 0% 47%;
+    --status-expired-border: 220 13% 82%;
+
+    /* Semantic Tokens */
+    --background: 33 100% 97%;
+    --foreground: 0 0% 13%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 13%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 13%;
+
+    --primary: 0 100% 27%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 33 100% 97%;
+    --secondary-foreground: 0 100% 27%;
+
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 47%;
+
+    --accent: 0 100% 35%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 0 100% 27%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 0 0% 7%;
+    --foreground: 0 0% 98%;
+
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 0 100% 35%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 65%;
+
+    --accent: 0 100% 27%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 17%;
+    --input: 0 0% 17%;
+    --ring: 0 100% 35%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+@layer utilities {
+  /* Card hover effect */
+  .card-hover {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .card-hover:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* RaktPort Shadow */
+  .shadow-raktsetu {
+    box-shadow: 0 4px 15px rgba(139, 0, 0, 0.2);
+  }
+  
+  /* Status Badge Styles */
+  .status-pending {
+    background-color: hsl(var(--status-pending-bg));
+    color: hsl(var(--status-pending-fg));
+    border-color: hsl(var(--status-pending-border));
+  }
+  
+  .status-donated {
+    background-color: hsl(var(--status-donated-bg));
+    color: hsl(var(--status-donated-fg));
+    border-color: hsl(var(--status-donated-border));
+  }
+  
+  .status-redeemed {
+    background-color: hsl(var(--status-redeemed-bg));
+    color: hsl(var(--status-redeemed-fg));
+    border-color: hsl(var(--status-redeemed-border));
+  }
+  
+  .status-expired {
+    background-color: hsl(var(--status-expired-bg));
+    color: hsl(var(--status-expired-fg));
+    border-color: hsl(var(--status-expired-border));
+  }
+}

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RaktPort | About Us</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-red: #8b0000;
+      --accent-orange: #f4a261;
+      --light-cream: #fdf3e7;
+      --text-dark: #2b2b2b;
+    }
+
+    body {
+      font-family: "Poppins", Arial, sans-serif;
+      background-color: var(--light-cream);
+      margin: 0;
+      padding: 0;
+      color: var(--text-dark);
+      line-height: 1.7;
+    }
+
+    /* UPDATED STYLES FOR BACK BUTTON WRAPPER */
+    .back-btn-wrapper {
+      max-width: 950px;
+      margin: 1rem auto 0.5rem;
+      /* Aligns with main container and adds spacing */
+      padding: 0 2.5rem;
+      /* Matches main's padding */
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      background: #fff;
+      color: var(--primary-red);
+      border: 1px solid #ccc;
+      padding: 8px 12px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      transition: background 0.2s;
+      font-size: 0.9rem;
+    }
+
+    .back-btn:hover {
+      background: var(--light-cream);
+    }
+
+    .back-btn i {
+      margin-right: 6px;
+    }
+
+    /* END UPDATED STYLES */
+
+    header {
+      background-color: var(--primary-red);
+      color: #fff;
+      text-align: center;
+      padding: 2rem 1rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    header img {
+      height: 80px;
+    }
+
+    header h1 {
+      margin: 0.5rem 0 0;
+      font-size: 1.8rem;
+    }
+
+    main {
+      max-width: 950px;
+      margin: 0 auto;
+      /* Removed top margin, now handled by back-btn-wrapper */
+      background: #fff;
+      border-radius: 10px;
+      padding: 2.5rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      color: var(--primary-red);
+      border-bottom: 3px solid var(--accent-orange);
+      padding-bottom: 0.4rem;
+    }
+
+    h3 {
+      color: var(--accent-orange);
+      margin-top: 1.5rem;
+    }
+
+    p {
+      margin-top: 0.5rem;
+    }
+
+    ul {
+      padding-left: 1.5rem;
+    }
+
+    footer {
+      background-color: var(--primary-red);
+      color: #fff;
+      text-align: center;
+      padding: 1rem 0;
+      margin-top: 3rem;
+      font-size: 0.9rem;
+    }
+
+    a {
+      color: var(--accent-orange);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 600px) {
+      .back-btn-wrapper {
+        padding: 0 1.5rem;
+      }
+
+      main {
+        margin: 1rem;
+        padding: 1.5rem;
+      }
+
+      header h1 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <img src="/RaktPort-logo.jpg" alt="RaktPort Logo" width="80">
+    <h1>RaktPort</h1>
+    <p>Donate Blood Anywhere. Save Lives Everywhere.</p>
+  </header>
+
+  <div class="back-btn-wrapper">
+    <a href="javascript:history.back()" class="back-btn" title="Go Back">
+      <i class="fa-solid fa-arrow-left"></i> Back
+    </a>
+  </div>
+
+  <main>
+    <h2>About RaktPort</h2>
+    <p><strong>RaktPort</strong> is a digital bridge that connects voluntary blood donors, hospitals, and blood banks
+      through real-time verified requests and data transparency. Our mission is to ensure that safe blood reaches every
+      patient who needs it — without delay, exploitation, or uncertainty.</p>
+
+    <h3>What We Do</h3>
+    <ul>
+      <li><strong>For Donors:</strong> Easy registration, donation tracking, and alerts for nearby needs.</li>
+      <li><strong>For Hospitals:</strong> Verified donor matching and efficient patient request handling.</li>
+      <li><strong>For Blood Banks:</strong> Real-time stock visibility and integration with hospitals.</li>
+    </ul>
+
+    <h3>Why Choose RaktPort?</h3>
+    <p>We go beyond matching donors — we build trust. Each request and donor is authenticated through secure backend
+      systems, preventing misuse and fraud. RaktPort operates on transparency, community participation, and digital
+      safety.</p>
+
+    <h3>Our Vision</h3>
+    <p>To create India’s most reliable, secure, and accessible digital blood donation network — where no life is lost
+      due to the unavailability of blood.</p>
+
+    <p>📧 <a href="mailto:contact.raktsetu@gmail.com
+">contact.raktsetu@gmail.com
+      </a>
+  </main>
+
+  <footer>
+    &copy; 2025 RaktPort. All Rights Reserved. |
+    <a href="terms.html">Terms</a> |
+    <a href="privacy.html">Privacy</a> |
+    <a href="contact.html">Contact</a>
+  </footer>
+</body>
+
+</html>
