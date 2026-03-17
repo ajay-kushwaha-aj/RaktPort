@@ -1,26 +1,34 @@
-// src/components/DonorDashboard.tsx - PART 1: IMPORTS & TYPE DEFINITIONS
-// ========================================================================
+// DonorDashboard.tsx
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-
-import { Button } from './ui/button';
+import { Button }  from './ui/button';
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from './ui/card';
-import { Badge } from './ui/badge';
+import { Badge }   from './ui/badge';
 import {
   Calendar, Heart, Printer, QrCode, Loader2, User, List, KeyRound,
-  Edit2, Share2, Award, Droplet, Clock, Star, ShieldCheck,
-  MapPin, Phone, Mail, CalendarCheck, Info, ChevronRight,
-  Building2, AlertCircle, AlertTriangle, TrendingUp, Activity,
-  Check, X, Timer, Zap, FileText, History, Gift, Bell, Eye, EyeOff
+  Edit2, Share2, Award, Droplet, Clock, Star, ShieldCheck, MapPin,
+  Phone, Mail, CalendarCheck, Info, ChevronRight, Building2, AlertCircle,
+  AlertTriangle, TrendingUp, Activity, Check, X, Timer, Zap, FileText,
+  History, Gift, Bell, Eye, EyeOff, XCircle, Download, Sparkles,
+  BookOpen, Flame, Target, ChevronDown, ChevronUp, RefreshCw, ExternalLink,
+  Shield, Navigation, HeartHandshake, BadgeCheck
 } from 'lucide-react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose, DialogDescription } from './ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import {
+  Table, TableBody, TableCell, TableHead,
+  TableHeader, TableRow,
+} from './ui/table';
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle,
+  DialogFooter, DialogClose, DialogDescription,
+} from './ui/dialog';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from './ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Input } from './ui/input';
-import { Switch } from './ui/switch';
-import { Label } from './ui/label';
+import { Input }    from './ui/input';
+import { Switch }   from './ui/switch';
+import { Label }    from './ui/label';
 import { Alert, AlertDescription } from './ui/alert';
 import { Progress } from './ui/progress';
 import { calculateDonorEligibility } from '../lib/medical-eligibility';
@@ -30,689 +38,447 @@ import logo from '../assets/raktsetu-logo.jpg';
 import Swal from 'sweetalert2';
 import { db } from '../firebase';
 import {
-  doc,
-  getDoc,
-  collection,
-  query,
-  where,
-  getDocs,
-  addDoc,
-  setDoc,
-  updateDoc,
-  Timestamp
+  doc, getDoc, collection, query, where, getDocs,
+  addDoc, setDoc, updateDoc, Timestamp, deleteDoc,
 } from 'firebase/firestore';
 
-
-// ========================================================================
+// ─────────────────────────────────────────────────────────────
 // HELPER FUNCTIONS
-// ========================================================================
+// ─────────────────────────────────────────────────────────────
 
-// --- NEW: City Normalization for Flexible Search ---
-const normalizeCityName = (city: string): string => {
-  if (!city) return '';
-
-  // Convert to lowercase and trim
-  let normalized = city.toLowerCase().trim();
-
-  // Common city name variations mapping
-  const cityVariations: Record<string, string[]> = {
-    'delhi': ['delhi', 'new delhi', 'nd', 'ncr delhi', 'delhi ncr'],
-    'mumbai': ['mumbai', 'bombay'],
-    'bengaluru': ['bengaluru', 'bangalore'],
-    'kolkata': ['kolkata', 'calcutta'],
-    'chennai': ['chennai', 'madras'],
-    'hyderabad': ['hyderabad', 'hyd'],
-    'pune': ['pune', 'poona'],
-    'gurugram': ['gurugram', 'gurgaon'],
-    'noida': ['noida', 'greater noida'],
-    'ghaziabad': ['ghaziabad', 'ghz'],
-  };
-
-  // Find the standard name
-  for (const [standard, variations] of Object.entries(cityVariations)) {
-    if (variations.some(v => normalized.includes(v) || v.includes(normalized))) {
-      return standard;
-    }
-  }
-
-  return normalized;
-};
-
-// --- NEW: Flexible City Matching ---
-const citiesMatch = (city1: string, city2: string): boolean => {
-  if (!city1 || !city2) return false;
-
-  const normalized1 = normalizeCityName(city1);
-  const normalized2 = normalizeCityName(city2);
-
-  // Exact match
-  if (normalized1 === normalized2) return true;
-
-  // Partial match (one contains the other)
-  if (normalized1.includes(normalized2) || normalized2.includes(normalized1)) return true;
-
-  return false;
-};
-
-// --- NEW: Helper to Mask UID ---
-const maskUID = (uid: string): string => {
-  if (!uid || uid.length < 8) return uid;
-  const visibleStart = uid.substring(0, 4);
-  const visibleEnd = uid.substring(uid.length - 4);
-  return `${visibleStart}${'*'.repeat(uid.length - 8)}${visibleEnd}`;
-};
-
-// --- Helper: Robust Date Parser v2.0 ---
-const safeDate = (dateInput: any): Date => {
-  if (!dateInput) return new Date();
-
-  // Firestore Timestamp
-  if (typeof dateInput === 'object' && 'seconds' in dateInput) {
-    return new Date(dateInput.seconds * 1000);
-  }
-
-  // Date object
-  if (dateInput instanceof Date && !isNaN(dateInput.getTime())) return dateInput;
-
-  // String
-  if (typeof dateInput === 'string') {
-    const d = new Date(dateInput);
-    if (!isNaN(d.getTime())) return d;
-  }
-
-  // Number (timestamp)
-  if (typeof dateInput === 'number') return new Date(dateInput);
-
+/** Robust Firestore / Date parser */
+const safeDate = (v: any): Date => {
+  if (!v) return new Date();
+  if (v?.toDate) return v.toDate();
+  if (v instanceof Date && !isNaN(v.getTime())) return v;
+  if (typeof v === 'string') { const d = new Date(v); if (!isNaN(d.getTime())) return d; }
+  if (typeof v === 'number') return new Date(v);
+  if (v?.seconds)  return new Date(v.seconds * 1000);
   return new Date();
 };
 
-// --- Helper: Generate RTID ---
-const generateUniqueAppointmentRtid = async (dateStr: string): Promise<string> => {
+/** DD/MM/YYYY */
+const formatDateDMY = (d: Date | string | null | undefined): string => {
+  if (!d) return 'N/A';
   try {
-    const d = new Date(dateStr);
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const year = String(d.getFullYear()).slice(-2);
-
-    // Generate 5 random alphanumeric characters
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let randomPart = '';
-    for (let i = 0; i < 5; i++) {
-      randomPart += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-
-    return `D-RTID-${day}${month}${year}-${randomPart}`;
-  } catch (error) {
-    console.error('RTID generation error:', error);
-    throw new Error('Failed to generate appointment ID');
-  }
+    const date = d instanceof Date ? d : new Date(d as string);
+    if (isNaN(date.getTime())) return 'N/A';
+    const dd = String(date.getDate()).padStart(2, '0');
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    return `${dd}/${mm}/${date.getFullYear()}`;
+  } catch { return 'N/A'; }
 };
 
-// --- Helper: Calculate Age ---
-const calculateAge = (dobString?: string): string => {
-  if (!dobString) return 'N/A';
-  const birthDate = new Date(dobString);
-  if (isNaN(birthDate.getTime())) return 'N/A';
-
-  const today = new Date();
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const m = today.getMonth() - birthDate.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-    age--;
-  }
-  return age.toString();
+/** DD/MM/YYYY HH:MM */
+const formatDateTimeDMY = (d: Date | string | null | undefined): string => {
+  if (!d) return 'N/A';
+  try {
+    const date = d instanceof Date ? d : new Date(d as string);
+    if (isNaN(date.getTime())) return 'N/A';
+    const dd = String(date.getDate()).padStart(2, '0');
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const hh = String(date.getHours()).padStart(2, '0');
+    const min = String(date.getMinutes()).padStart(2, '0');
+    return `${dd}/${mm}/${date.getFullYear()} ${hh}:${min}`;
+  } catch { return 'N/A'; }
 };
 
-// ========================================================================
-// TYPE DEFINITIONS & INTERFACES
-// ========================================================================
+/** Generate unique Donor ID e.g. RKT-A1B2C3 */
+export const generateDonorId = (): string => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let id = 'RKT-';
+  for (let i = 0; i < 6; i++) id += chars[Math.floor(Math.random() * chars.length)];
+  return id;
+};
 
-interface DonorDashboardProps {
-  onLogout: () => void;
-}
+/** Generate appointment RTID */
+const generateUniqueAppointmentRtid = async (dateStr: string): Promise<string> => {
+  const d  = new Date(dateStr);
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yy = String(d.getFullYear()).slice(-2);
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let code = 'A';
+  for (let i = 0; i < 4; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return `D-RTID-${dd}${mm}${yy}-${code}`;
+};
+
+const calculateAge = (dob?: string): string => {
+  if (!dob) return 'N/A';
+  const b = new Date(dob);
+  if (isNaN(b.getTime())) return 'N/A';
+  const t = new Date();
+  let age = t.getFullYear() - b.getFullYear();
+  if (t.getMonth() < b.getMonth() || (t.getMonth() === b.getMonth() && t.getDate() < b.getDate())) age--;
+  return String(age);
+};
+
+const normalizeCityName = (city: string): string => {
+  if (!city) return '';
+  let n = city.toLowerCase().trim();
+  const map: Record<string, string[]> = {
+    delhi:     ['delhi','new delhi','ncr delhi','delhi ncr','nd'],
+    mumbai:    ['mumbai','bombay'],
+    bengaluru: ['bengaluru','bangalore'],
+    kolkata:   ['kolkata','calcutta'],
+    chennai:   ['chennai','madras'],
+    hyderabad: ['hyderabad','hyd'],
+    pune:      ['pune','poona'],
+    gurugram:  ['gurugram','gurgaon'],
+    noida:     ['noida','greater noida'],
+  };
+  for (const [std, vars] of Object.entries(map)) {
+    if (vars.some(v => n.includes(v) || v.includes(n))) return std;
+  }
+  return n;
+};
+
+const citiesMatch = (a: string, b: string): boolean => {
+  const na = normalizeCityName(a), nb = normalizeCityName(b);
+  return na === nb || na.includes(nb) || nb.includes(na);
+};
+
+const convert12to24 = (t: string): string => {
+  const [time, mod] = t.split(' ');
+  let [h, m] = time.split(':');
+  if (h === '12') h = '00';
+  if (mod === 'PM') h = String(parseInt(h) + 12);
+  return `${h}:${m}:00`;
+};
+
+// ─────────────────────────────────────────────────────────────
+// TYPES
+// ─────────────────────────────────────────────────────────────
+
+type DonationComponent = 'Whole Blood' | 'Platelets' | 'Plasma' | 'PRBC';
+type DonationStatus =
+  | 'Scheduled' | 'Pending' | 'Donated' | 'Verified' | 'Credited'
+  | 'Redeemed-Credit' | 'Pledged' | 'Completed' | 'Expired' | 'Archived' | 'Cancelled';
+type Gender = 'Male' | 'Female' | 'male' | 'female';
+
+interface DonorDashboardProps { onLogout: () => void; }
 
 interface DonorData {
-  fullName?: string;
-  bloodGroup?: string;
-  gender?: string;
-  lastDonationDate?: string;
-  city?: string;
-  pincode?: string;
-  donationsCount?: number;
-  credits?: number;
-  email?: string;
-  mobile?: string;
-  dob?: string;
-  availabilityMode?: 'available' | 'weekends' | 'unavailable';
-  preferredLanguage?: 'en' | 'hi';
+  fullName?:          string;
+  bloodGroup?:        string;
+  gender?:            string;
+  lastDonationDate?:  string;
+  city?:              string;
+  pincode?:           string;
+  donationsCount?:    number;
+  credits?:           number;
+  email?:             string;
+  mobile?:            string;
+  dob?:               string;
+  donorId?:           string;   // RKT-XXXXXX
+  availabilityMode?:  'available' | 'weekends' | 'unavailable';
 }
-
-// NEW: Donation Component Types
-type DonationComponent = 'Whole Blood' | 'Platelets' | 'Plasma' | 'PRBC';
-
-// NEW: Donation Status State Machine
-type DonationStatus = 'Scheduled' | 'Pending' | 'Donated' | 'Verified' | 'Credited' | 'Redeemed-Credit' | 'Pledged' | 'Completed' | 'Expired' | 'Archived';
-
-// NEW: Deferral Reasons
-type DeferralReason =
-  | 'Low Hemoglobin'
-  | 'Recent Surgery'
-  | 'Donation Interval Not Complete'
-  | 'Medication Restriction'
-  | 'Travel History'
-  | 'Health Screening Failed'
-  | null;
 
 interface Donation {
-  date: Date;
-  rtidCode: string;
-  linkedHrtid: string;
+  date:         Date;
+  rtidCode:     string;
+  linkedHrtid:  string;
   hospitalName: string;
-  city: string;
-  status: DonationStatus;
-  otp: string;
-  expiryDate?: Date;
-  component?: DonationComponent;
+  city:         string;
+  status:       DonationStatus;
+  otp:          string;
+  expiryDate?:  Date;
+  component?:   DonationComponent;
   qrRedemptionStatus?: 'Redeemed' | 'Pending' | 'Expired';
-  otpExpiryTime?: Date;
-  impactTimeline?: ImpactTimeline;
-  time?: string; // 🆕 ADD THIS LINE
+  otpExpiryTime?:      Date;
+  impactTimeline?:     ImpactTimeline;
+  time?:        string;
 }
 
-// NEW: Impact Timeline
 interface ImpactTimeline {
-  donated: Date;
+  donated:          Date;
   linkedToRequest?: Date;
-  usedByPatient?: Date;
-  creditIssued?: Date;
-}
-
-// NEW: Credit Transaction
-interface CreditTransaction {
-  id: string;
-  type: 'earned' | 'redeemed' | 'expired';
-  amount: number;
-  date: Date;
-  rtid?: string;
-  hospitalName?: string;
-  description: string;
-}
-
-// NEW: Emergency Alert
-interface EmergencyAlert {
-  id: string;
-  bloodGroup: string;
-  hospitalName: string;
-  distance: number; // in km
-  urgency: 'critical' | 'high' | 'medium';
-  expiresAt: Date;
-  hrtid: string;
-}
-
-// NEW: Milestone
-interface Milestone {
-  id: string;
-  title: string;
-  description: string;
-  icon: string;
-  achieved: boolean;
-  achievedDate?: Date;
+  usedByPatient?:   Date;
+  creditIssued?:    Date;
 }
 
 interface BloodCenter {
-  id: string;
-  name: string;
-  address: string;
-  phone: string;
-  city?: string;
-  state?: string;
-  pincode?: string;
-  latitude?: number;  // NEW: For Google Maps
-  longitude?: number; // NEW: For Google Maps
-  fullAddress?: string; // NEW: Complete formatted address
+  id:           string;
+  name:         string;
+  address:      string;
+  phone:        string;
+  city?:        string;
+  state?:       string;
+  pincode?:     string;
+  latitude?:    number;
+  longitude?:   number;
+  fullAddress?: string;
 }
 
 interface HrtidDetails {
-  patientName: string;
-  bloodGroup: string;
-  units: string | number;
-  hospital: string;
-  rtidCode: string;
-  bloodBankId: string;
-  requiredBy?: string;
-  component?: DonationComponent; // NEW
-  impactTimeline?: ImpactTimeline; // NEW
+  patientName:     string;
+  bloodGroup:      string;
+  units:           string | number;
+  hospital:        string;
+  rtidCode:        string;
+  bloodBankId:     string;
+  requiredBy?:     string;
+  component?:      DonationComponent;
+  impactTimeline?: ImpactTimeline;
 }
 
-// ========================================================================
-// CONSTANTS
-// ========================================================================
+interface EmergencyAlert {
+  id:          string;
+  bloodGroup:  string;
+  hospitalName:string;
+  urgency:     'critical' | 'high' | 'medium';
+  expiresAt:   Date;
+  hrtid:       string;
+  city:        string;
+}
 
-// --- Motivational Quotes ---
+// ─────────────────────────────────────────────────────────────
+// CONSTANTS
+// ─────────────────────────────────────────────────────────────
+
 const QUOTES = [
   "You don't have to be a doctor to save lives. Just donate blood. 🩸",
-  "Your blood is a lifeline for someone in need. Be a hero today! 🦸‍♂️",
+  "Your blood is a lifeline for someone in need. Be a hero today! 🦸",
   "Tears of a mother cannot save her child. But your blood can. ❤️",
   "The finest gesture one can make is to save life by donating blood. 🌟",
-  "Every drop counts. Every donor matters. Thank you for being one! 🙏"
+  "Every drop counts. Every donor matters. Thank you for being one! 🙏",
 ];
 
-// NEW: Health Insights
-const HEALTH_INSIGHTS = [
-  "💧 Hydrate well before your next donation - aim for 16 oz of water 2 hours before",
-  "🥗 Iron-rich foods recommended: spinach, red meat, beans, and fortified cereals",
-  "😴 Get 7-8 hours of sleep before donation day",
-  "🍊 Vitamin C helps iron absorption - pair iron-rich foods with citrus",
-  "🥤 Avoid alcohol 24 hours before donation"
+const HEALTH_TIPS = [
+  { icon: '💧', title: 'Hydrate Well', tip: 'Drink at least 500ml of water 2 hours before donating. Proper hydration speeds up the donation process.' },
+  { icon: '🥗', title: 'Eat Iron-Rich Foods', tip: 'Spinach, red meat, beans and fortified cereals boost your hemoglobin — eat them 24h before donating.' },
+  { icon: '😴', title: 'Sleep Well', tip: 'Get 7–8 hours of sleep the night before donation. Fatigue affects both your eligibility and recovery.' },
+  { icon: '🍊', title: 'Vitamin C Boost', tip: 'Pair iron-rich foods with citrus fruits — Vitamin C greatly enhances iron absorption.' },
+  { icon: '🚫', title: 'Avoid Alcohol', tip: 'Do not consume alcohol for at least 24 hours before and after donating blood.' },
+  { icon: '🏃', title: 'Light Activity Only', tip: 'Avoid strenuous exercise on donation day. Light walking is perfectly fine.' },
+  { icon: '🍌', title: 'Post-Donation Snack', tip: 'Have a juice and biscuits after donation. Avoid skipping meals for the rest of the day.' },
+  { icon: '📅', title: 'Track Your Dates', tip: 'Whole blood donors must wait 90 days (male) or 120 days (female) between donations.' },
 ];
 
-// NEW: Donation Cooldown Periods (in days)
-const COOLDOWN_PERIODS: Record<DonationComponent, { male: number; female: number }> = {
-  'Whole Blood': { male: 90, female: 120 },
-  'Platelets': { male: 7, female: 7 },
-  'Plasma': { male: 14, female: 14 },
-  'PRBC': { male: 90, female: 120 }
+const BLOOD_COMPATIBILITY: Record<string, { donateTo: string[]; receiveFrom: string[]; facts: string }> = {
+  'A+':  { donateTo: ['A+', 'AB+'],                               receiveFrom: ['A+','A-','O+','O-'],                    facts: 'A+ is the 2nd most common blood type. Great compatibility with A and AB groups.' },
+  'A-':  { donateTo: ['A+','A-','AB+','AB-'],                     receiveFrom: ['A-','O-'],                              facts: 'A- donors are valuable — they can donate to all A and AB recipients.' },
+  'B+':  { donateTo: ['B+','AB+'],                                receiveFrom: ['B+','B-','O+','O-'],                    facts: 'B+ is relatively rare. Your donation helps other B+ and AB+ patients.' },
+  'B-':  { donateTo: ['B+','B-','AB+','AB-'],                     receiveFrom: ['B-','O-'],                              facts: 'B- donors can help both positive and negative B/AB recipients.' },
+  'O+':  { donateTo: ['A+','B+','O+','AB+'],                      receiveFrom: ['O+','O-'],                              facts: 'O+ is the most common blood type! Your blood saves lives every day.' },
+  'O-':  { donateTo: ['A+','A-','B+','B-','O+','O-','AB+','AB-'], receiveFrom: ['O-'],                                   facts: 'O- is the universal donor. Every emergency room needs your blood.' },
+  'AB+': { donateTo: ['AB+'],                                     receiveFrom: ['A+','A-','B+','B-','O+','O-','AB+','AB-'], facts: 'AB+ is the universal recipient and can donate plasma to everyone.' },
+  'AB-': { donateTo: ['AB+','AB-'],                               receiveFrom: ['A-','B-','O-','AB-'],                   facts: 'AB- is one of the rarest blood types. Your plasma can help all recipients.' },
 };
 
-// PART 2: SUB-COMPONENTS
-// ========================================================================
+const COOLDOWN_DAYS: Record<DonationComponent, { male: number; female: number }> = {
+  'Whole Blood': { male: 90,  female: 120 },
+  'Platelets':   { male: 7,   female: 7   },
+  'Plasma':      { male: 14,  female: 14  },
+  'PRBC':        { male: 90,  female: 120 },
+};
 
-// --- Component: QRCodeCanvas ---
-interface QRCodeCanvasProps {
-  data: string;
-  size?: number;
-  className?: string;
-}
+// ─────────────────────────────────────────────────────────────
+// SUB-COMPONENTS
+// ─────────────────────────────────────────────────────────────
 
-const QRCodeCanvas = ({ data, size = 256, className = "" }: QRCodeCanvasProps) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
+// QR Code canvas
+interface QRCodeCanvasProps { data: string; size?: number; className?: string; }
+const QRCodeCanvas = ({ data, size = 256, className = '' }: QRCodeCanvasProps) => {
+  const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
-    if (canvasRef.current && data) {
+    if (ref.current && data) {
       try {
-        const context = canvasRef.current.getContext('2d');
-        if (context) context.clearRect(0, 0, size, size);
-        new QRious({
-          element: canvasRef.current,
-          value: data,
-          size: size,
-          foreground: "#8B0000",
-          level: "H",
-        });
-      } catch (e) {
-        console.error("Error drawing QR code:", e);
-      }
+        new QRious({ element: ref.current, value: data, size, foreground: '#8B0000', level: 'H' });
+      } catch (_) {}
     }
   }, [data, size]);
-
-  return <canvas ref={canvasRef} width={size} height={size} className={className} />;
+  return <canvas ref={ref} width={size} height={size} className={className} />;
 };
 
-// NEW: QR Redemption Status Badge
-interface QRStatusBadgeProps {
-  status: 'Redeemed' | 'Pending' | 'Expired';
-  expiryTime?: Date;
-}
+// Live countdown timer
+interface CountdownTimerProps { targetDate: Date; compact?: boolean; label?: string; }
+const CountdownTimer = ({ targetDate, compact = false, label = '' }: CountdownTimerProps) => {
+  const [display, setDisplay] = useState('');
+  const [isPast,  setIsPast]  = useState(false);
 
-const QRStatusBadge = ({ status, expiryTime }: QRStatusBadgeProps) => {
-  const getStatusConfig = () => {
-    switch (status) {
-      case 'Redeemed':
-        return { icon: Check, color: 'bg-green-100 text-green-700 border-green-300', label: '✅ Redeemed' };
-      case 'Expired':
-        return { icon: X, color: 'bg-red-100 text-red-700 border-red-300', label: '❌ Expired' };
-      case 'Pending':
-        return { icon: Timer, color: 'bg-yellow-100 text-yellow-700 border-yellow-300', label: '⏳ Pending' };
-    }
-  };
+  useEffect(() => {
+    const update = () => {
+      const diff = targetDate.getTime() - Date.now();
+      setIsPast(diff <= 0);
+      if (diff <= 0) { setDisplay('Time passed'); return; }
+      const days  = Math.floor(diff / 86400000);
+      const hours = Math.floor((diff % 86400000) / 3600000);
+      const mins  = Math.floor((diff % 3600000)  / 60000);
+      const secs  = Math.floor((diff % 60000)    / 1000);
+      if (days > 1)        setDisplay(`${days}d ${hours}h ${mins}m`);
+      else if (days === 1) setDisplay(`1d ${hours}h ${mins}m`);
+      else if (hours > 0)  setDisplay(`${hours}h ${mins}m ${secs}s`);
+      else                 setDisplay(`${mins}m ${secs}s`);
+    };
+    update();
+    const id = setInterval(update, 1000);
+    return () => clearInterval(id);
+  }, [targetDate]);
 
-  const config = getStatusConfig();
-  const Icon = config.icon;
+  if (compact) return (
+    <span className={`text-xs font-mono font-semibold ${isPast ? 'text-red-500' : 'text-blue-600'}`}>
+      {label && <span className="opacity-70">{label} </span>}{display}
+    </span>
+  );
 
   return (
-    <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold border ${config.color}`}>
-      <Icon className="w-3 h-3" />
-      {config.label}
-      {status === 'Pending' && expiryTime && (
-        <span className="ml-1 opacity-75">
-          ({Math.max(0, Math.floor((expiryTime.getTime() - Date.now()) / (1000 * 60 * 60)))}h left)
-        </span>
-      )}
+    <div className={`flex items-center gap-1.5 ${isPast ? 'text-red-600' : 'text-blue-700'}`}>
+      <Clock className="w-3.5 h-3.5 flex-shrink-0" />
+      <span className="text-xs font-semibold font-mono">{label && `${label}: `}{display}</span>
     </div>
   );
 };
 
-// NEW: Donation Component Badge
-interface ComponentBadgeProps {
-  component: DonationComponent;
-}
-
-const ComponentBadge = ({ component }: ComponentBadgeProps) => {
-  const getComponentColor = (comp: DonationComponent) => {
-    switch (comp) {
-      case 'Whole Blood': return 'bg-red-100 text-red-700 border-red-300';
-      case 'Platelets': return 'bg-amber-100 text-amber-700 border-amber-300';
-      case 'Plasma': return 'bg-yellow-100 text-yellow-700 border-yellow-300';
-      case 'PRBC': return 'bg-rose-100 text-rose-700 border-rose-300';
-    }
+// Component badge
+const ComponentBadge = ({ component }: { component: DonationComponent }) => {
+  const colors: Record<DonationComponent, string> = {
+    'Whole Blood': 'bg-red-100 text-red-700 border-red-300',
+    Platelets:     'bg-amber-100 text-amber-700 border-amber-300',
+    Plasma:        'bg-yellow-100 text-yellow-700 border-yellow-300',
+    PRBC:          'bg-rose-100 text-rose-700 border-rose-300',
   };
+  return <Badge variant="outline" className={`text-xs font-medium ${colors[component] ?? ''}`}>{component}</Badge>;
+};
 
+// QR status badge
+const QRStatusBadge = ({ status, expiryTime }: { status: 'Redeemed'|'Pending'|'Expired'; expiryTime?: Date }) => {
+  const cfg = { Redeemed: { cls: 'bg-green-100 text-green-700 border-green-300', lbl: '✅ Redeemed' }, Expired: { cls: 'bg-red-100 text-red-700 border-red-300', lbl: '❌ Expired' }, Pending: { cls: 'bg-yellow-100 text-yellow-700 border-yellow-300', lbl: '⏳ Pending' } }[status];
+  const hoursLeft = expiryTime ? Math.max(0, Math.floor((expiryTime.getTime() - Date.now()) / 3600000)) : null;
   return (
-    <Badge variant="outline" className={`text-xs font-medium ${getComponentColor(component)}`}>
-      {component}
-    </Badge>
+    <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold border ${cfg.cls}`}>
+      {cfg.lbl}
+      {status === 'Pending' && hoursLeft !== null && <span className="ml-1 opacity-75">({hoursLeft}h left)</span>}
+    </div>
   );
 };
 
-// NEW: Impact Timeline Component
-interface ImpactTimelineProps {
-  timeline: ImpactTimeline;
-  component?: DonationComponent;
-}
-
-const ImpactTimelineView = ({ timeline, component }: ImpactTimelineProps) => {
+// Impact timeline
+const ImpactTimelineView = ({ timeline }: { timeline: ImpactTimeline }) => {
   const stages = [
-    { key: 'donated', label: 'Donated', date: timeline.donated, icon: Droplet },
-    { key: 'linkedToRequest', label: 'Linked to Request', date: timeline.linkedToRequest, icon: Heart },
-    { key: 'usedByPatient', label: 'Used by Patient', date: timeline.usedByPatient, icon: Activity },
-    { key: 'creditIssued', label: 'Credit Issued', date: timeline.creditIssued, icon: Gift }
+    { key: 'donated',          label: 'Donated',           date: timeline.donated,          icon: Droplet },
+    { key: 'linkedToRequest',  label: 'Linked to Request', date: timeline.linkedToRequest,  icon: Heart },
+    { key: 'usedByPatient',    label: 'Used by Patient',   date: timeline.usedByPatient,    icon: Activity },
+    { key: 'creditIssued',     label: 'Credit Issued',     date: timeline.creditIssued,     icon: Gift },
   ];
-
   return (
     <div className="space-y-3">
-      <div className="flex items-center gap-2 mb-4">
-        <TrendingUp className="w-5 h-5 text-green-600" />
-        <h4 className="font-semibold text-gray-800">Impact Journey</h4>
-        {component && <ComponentBadge component={component} />}
-      </div>
-
-      <div className="relative pl-6">
-        {stages.map((stage, idx) => {
-          const Icon = stage.icon;
-          const isCompleted = !!stage.date;
-          const isLast = idx === stages.length - 1;
-
+      <h4 className="font-semibold text-gray-800 flex items-center gap-2"><TrendingUp className="w-4 h-4 text-green-600" /> Impact Journey</h4>
+      <div className="relative pl-5">
+        {stages.map((s, i) => {
+          const Icon = s.icon;
+          const done = !!s.date, last = i === stages.length - 1;
           return (
-            <div key={stage.key} className="relative pb-6">
-              {!isLast && (
-                <div className={`absolute left-0 top-6 w-0.5 h-full ${isCompleted ? 'bg-green-500' : 'bg-gray-300'}`} />
-              )}
-
-              <div className="flex items-start gap-3">
-                <div className={`relative z-10 w-8 h-8 rounded-full flex items-center justify-center ${isCompleted ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-600'
-                  }`}>
-                  <Icon className="w-4 h-4" />
+            <div key={s.key} className="relative pb-5">
+              {!last && <div className={`absolute left-0 top-5 w-0.5 h-full ${done ? 'bg-green-500' : 'bg-gray-200'}`} />}
+              <div className="flex items-start gap-2.5">
+                <div className={`relative z-10 w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${done ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-400'}`}>
+                  <Icon className="w-3.5 h-3.5" />
                 </div>
-
-                <div className="flex-1 pt-1">
-                  <p className={`font-medium text-sm ${isCompleted ? 'text-gray-800' : 'text-gray-400'}`}>
-                    {stage.label}
-                  </p>
-                  {stage.date && (
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      {stage.date.toLocaleDateString('en-IN', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </p>
-                  )}
+                <div className="pt-0.5">
+                  <p className={`font-medium text-sm ${done ? 'text-gray-800' : 'text-gray-400'}`}>{s.label}</p>
+                  {s.date && <p className="text-xs text-gray-400 mt-0.5">{formatDateTimeDMY(s.date)}</p>}
                 </div>
               </div>
             </div>
           );
         })}
       </div>
-
-      <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-        <p className="text-sm text-green-800 font-medium flex items-center gap-2">
-          <Heart className="w-4 h-4 fill-green-600" />
-          {timeline.usedByPatient
-            ? "Your donation directly helped save a life! 🎉"
-            : timeline.linkedToRequest
-              ? "Your donation is fulfilling a patient's need..."
-              : "Your donation is being processed..."
-          }
-        </p>
+      <div className="p-3 bg-green-50 rounded-lg border border-green-200 text-sm text-green-800 font-medium flex items-center gap-2">
+        <Heart className="w-4 h-4 fill-green-600 flex-shrink-0" />
+        {timeline.usedByPatient ? 'Your donation directly saved a life! 🎉' : timeline.linkedToRequest ? "Your donation is fulfilling a patient's need..." : 'Your donation is being processed...'}
       </div>
     </div>
   );
 };
 
-// NEW: Emergency Alert Banner
-interface EmergencyAlertBannerProps {
-  alert: EmergencyAlert;
-  onRespond: () => void;
-  onDismiss: () => void;
-}
-
-const EmergencyAlertBanner = ({ alert, onRespond, onDismiss }: EmergencyAlertBannerProps) => {
-  const urgencyConfig = {
-    critical: { bg: 'bg-red-600', text: 'text-white', icon: '🚨', label: 'CRITICAL' },
-    high: { bg: 'bg-orange-500', text: 'text-white', icon: '⚠️', label: 'HIGH' },
-    medium: { bg: 'bg-yellow-500', text: 'text-gray-900', icon: '⏰', label: 'MEDIUM' }
-  };
-
-  const config = urgencyConfig[alert.urgency];
-
-  return (
-    <Alert className={`${config.bg} ${config.text} border-none shadow-lg animate-in slide-in-from-top duration-500`}>
-      <AlertTriangle className="w-5 h-5" />
-      <AlertDescription className="ml-2">
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">{config.icon}</span>
-            <div>
-              <p className="font-bold text-lg">{config.label}: {alert.bloodGroup} Blood Needed!</p>
-              <p className="text-sm opacity-90">
-                📍 {alert.hospitalName} • {alert.distance.toFixed(1)} km away •
-                <span className="ml-1">Expires in {Math.floor((alert.expiresAt.getTime() - Date.now()) / 60000)} mins</span>
-              </p>
-            </div>
-          </div>
-
-          <div className="flex gap-2">
-            <Button
-              onClick={onRespond}
-              size="sm"
-              className="bg-white text-red-600 hover:bg-gray-100 font-bold animate-pulse"
-            >
-              <Zap className="w-4 h-4 mr-1" /> Respond Now
-            </Button>
-            <Button
-              onClick={onDismiss}
-              size="sm"
-              variant="ghost"
-              className="hover:bg-white/20"
-            >
-              Dismiss
-            </Button>
-          </div>
-        </div>
-      </AlertDescription>
-    </Alert>
-  );
-};
-
-// --- Component: HistoryQRModal ---
+// ── History QR Modal ─────────────────────────────────────────
 interface HistoryQRModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  data: {
-    rtid: string;
-    payload: string;
-    location: string;
-    date: Date;
-    component?: DonationComponent;
-    qrStatus?: 'Redeemed' | 'Pending' | 'Expired';
-    otpExpiryTime?: Date;
-  } | null;
+  isOpen: boolean; onClose: () => void;
+  data: { rtid: string; payload: string; location: string; date: Date; component?: DonationComponent; qrStatus?: 'Redeemed'|'Pending'|'Expired'; otpExpiryTime?: Date; } | null;
 }
-
 const HistoryQRModal = ({ isOpen, onClose, data }: HistoryQRModalProps) => {
   if (!data) return null;
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md rounded-xl no-print">
+      <DialogContent className="sm:max-w-md rounded-2xl">
         <DialogHeader>
-          <DialogTitle className="text-primary text-center flex items-center justify-center gap-2">
-            <QrCode className="w-5 h-5" /> Donation QR
-          </DialogTitle>
-          <DialogDescription className="text-center">
-            Verification Code: <span className="font-mono font-bold text-black">{data.rtid}</span>
-          </DialogDescription>
+          <DialogTitle className="text-primary text-center flex items-center justify-center gap-2"><QrCode className="w-5 h-5" /> Donation QR</DialogTitle>
+          <DialogDescription className="text-center">RTID: <span className="font-mono font-bold text-black">{data.rtid}</span></DialogDescription>
         </DialogHeader>
-
-        <div className="flex flex-col items-center space-y-4 py-4 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-          <QRCodeCanvas key={data.rtid} data={data.payload} className="border-4 border-white shadow-sm rounded-lg" />
-
-          <div className="text-center space-y-2">
-            <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
-              <Calendar className="w-3 h-3" /> Date: <span className="font-semibold text-foreground">{data.date.toLocaleDateString()}</span>
-            </p>
-            <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
-              <MapPin className="w-3 h-3" /> Loc: <span className="font-semibold text-foreground">{data.location}</span>
-            </p>
-            {data.component && (
-              <div className="flex justify-center mt-2">
-                <ComponentBadge component={data.component} />
-              </div>
-            )}
-            {data.qrStatus && (
-              <div className="flex justify-center mt-2">
-                <QRStatusBadge status={data.qrStatus} expiryTime={data.otpExpiryTime} />
-              </div>
-            )}
+        <div className="flex flex-col items-center gap-4 py-4 bg-gray-50 rounded-xl border border-dashed border-gray-300">
+          <QRCodeCanvas data={data.payload} className="border-4 border-white shadow rounded-lg" />
+          <div className="text-center space-y-1">
+            <p className="text-sm text-muted-foreground">{formatDateDMY(data.date)} · {data.location}</p>
+            {data.component && <div className="flex justify-center"><ComponentBadge component={data.component} /></div>}
+            {data.qrStatus  && <div className="flex justify-center"><QRStatusBadge status={data.qrStatus} expiryTime={data.otpExpiryTime} /></div>}
           </div>
-
-          {data.qrStatus === 'Pending' && data.otpExpiryTime && (
-            <Alert className="w-full bg-yellow-50 border-yellow-200">
-              <Clock className="w-4 h-4 text-yellow-600" />
-              <AlertDescription className="text-xs text-yellow-800 ml-2">
-                OTP invalid after {data.otpExpiryTime.toLocaleString()}
-              </AlertDescription>
-            </Alert>
-          )}
         </div>
-
-        <Button onClick={onClose} className="w-full rounded-full bg-primary hover:bg-primary/90">
-          Done
-        </Button>
+        <Button onClick={onClose} className="w-full rounded-full">Done</Button>
       </DialogContent>
     </Dialog>
   );
 };
 
-// --- Component: PrintableDonation ---
-interface PrintableDonationProps {
-  donation: Donation | null;
-  donorData: DonorData;
-}
-
-const PrintableDonation = ({ donation, donorData }: PrintableDonationProps) => {
+// ── Printable Donation Slip ───────────────────────────────────
+const PrintableDonation = ({ donation, donorData }: { donation: Donation | null; donorData: DonorData }) => {
   const qrRef = useRef<HTMLCanvasElement>(null);
-
   useEffect(() => {
     if (donation && qrRef.current) {
       const payload = `${donorData.fullName}|${donorData.bloodGroup}|${donation.rtidCode}|${donation.hospitalName}|${donation.city}|${donation.component || 'Whole Blood'}`;
-      new QRious({
-        element: qrRef.current,
-        value: payload,
-        size: 180,
-        level: "H",
-      });
+      try { new QRious({ element: qrRef.current, value: payload, size: 150, level: 'H' }); } catch (_) {}
     }
   }, [donation, donorData]);
-
   if (!donation) return null;
-
+  const nextEligible = donation.component && COOLDOWN_DAYS[donation.component]
+    ? new Date(donation.date.getTime() + COOLDOWN_DAYS[donation.component][donorData.gender?.toLowerCase() === 'female' ? 'female' : 'male'] * 86400000)
+    : null;
   return createPortal(
     <>
-      <style>{`
-        @media print {
-          @page { size: A4; margin: 0; }
-          body > *:not(#printable-root-portal) { display: none !important; }
-          #printable-root-portal {
-            display: flex !important;
-            position: absolute;
-            top: 0; left: 0; width: 100vw; min-height: 100vh;
-            background: white; z-index: 99999;
-            align-items: flex-start; justify-content: center;
-            padding-top: 20px;
-          }
-          .no-print { display: none !important; }
-        }
-        @media screen { #printable-root-portal { display: none !important; } }
-      `}</style>
-
-      <div id="printable-root-portal">
-        <div className="w-[210mm] border border-gray-300 p-10 rounded-lg bg-white text-black font-sans shadow-none">
-          <div className="flex justify-between items-start border-b-2 border-black pb-6 mb-8">
-            <div className="flex items-center gap-4">
-              <img src={logo} alt="Logo" className="h-16 w-16 object-contain" />
+      <style>{`@media print{@page{size:A4;margin:10mm}body>*:not(#pd-portal){display:none!important}#pd-portal{display:flex!important;position:fixed;inset:0;background:white;z-index:99999;align-items:start;justify-content:center;padding:10mm}.no-print{display:none!important}}@media screen{#pd-portal{display:none!important}}`}</style>
+      <div id="pd-portal">
+        <div style={{ width: '190mm', border: '2px solid #1a0505', padding: '8mm', fontFamily: 'Georgia, serif', color: '#1a0505' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #8B0000', paddingBottom: '4mm', marginBottom: '5mm' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4mm' }}>
+              <img src={logo} alt="" style={{ width: '14mm', height: '14mm', objectFit: 'contain' }} />
               <div>
-                <h1 className="text-3xl font-bold text-[#8B0000] uppercase tracking-wider">Donation Slip</h1>
-                <p className="text-sm text-black">Official RaktPort Record</p>
+                <div style={{ fontSize: '14pt', fontWeight: 'bold', color: '#8B0000' }}>RaktPort</div>
+                <div style={{ fontSize: '7pt', color: '#555' }}>National Blood Management System</div>
               </div>
             </div>
-            <div className="text-right">
-              <p className="text-sm text-black">Generated On</p>
-              <p className="font-semibold">{new Date().toLocaleDateString()}</p>
-              <p className="text-xs text-black">{new Date().toLocaleTimeString()}</p>
+            <div style={{ textAlign: 'right', fontSize: '7.5pt', color: '#555' }}>
+              <div>DONATION SLIP</div>
+              <div style={{ fontFamily: 'monospace', fontWeight: 'bold', fontSize: '9pt' }}>{donation.rtidCode}</div>
+              <div>Generated: {formatDateDMY(new Date())}</div>
             </div>
           </div>
-
-          <div className="grid grid-cols-2 gap-8 mb-8">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4mm', marginBottom: '4mm' }}>
             <div>
-              <h3 className="text-lg font-bold text-black border-b border-gray-400 mb-4 pb-1">Donor Details</h3>
-              <div className="space-y-3 text-sm text-black">
-                <p className="flex"><span className="font-bold w-28">Name:</span> <span>{donorData.fullName}</span></p>
-                <p className="flex"><span className="font-bold w-28">User ID:</span> <span>{localStorage.getItem('userId')}</span></p>
-                <p className="flex"><span className="font-bold w-28">Blood Group:</span> <span className="text-xl font-bold text-[#8B0000]">{donorData.bloodGroup}</span></p>
-                <p className="flex"><span className="font-bold w-28">City:</span> <span>{donorData.city || 'N/A'}</span></p>
-              </div>
+              <div style={{ fontSize: '8pt', fontWeight: 'bold', color: '#8B0000', marginBottom: '2mm', borderBottom: '1px solid #ddd', paddingBottom: '1mm' }}>DONOR DETAILS</div>
+              {[['Name', donorData.fullName], ['Donor ID', donorData.donorId || 'N/A'], ['Blood Group', donorData.bloodGroup], ['City', donorData.city]].map(([k, v]) => (
+                <div key={k} style={{ fontSize: '8pt', marginBottom: '1mm' }}><b>{k}:</b> {v}</div>
+              ))}
             </div>
             <div>
-              <h3 className="text-lg font-bold text-black border-b border-gray-400 mb-4 pb-1">Transaction Details</h3>
-              <div className="space-y-3 text-sm text-black">
-                <p className="flex"><span className="font-bold w-28">D-RTID:</span> <span className="font-mono bg-gray-100 px-2 rounded border border-gray-300">{donation.rtidCode}</span></p>
-                <p className="flex"><span className="font-bold w-28">Date:</span> <span>{donation.date.toLocaleDateString()}</span></p>
-                <p className="flex"><span className="font-bold w-28">Center:</span> <span>{donation.hospitalName}</span></p>
-                <p className="flex"><span className="font-bold w-28">Component:</span> <span className="font-semibold text-[#8B0000]">{donation.component || 'Whole Blood'}</span></p>
-                <p className="flex"><span className="font-bold w-28">Status:</span> <span>{donation.status}</span></p>
-                {/* OTP REMOVED from printable slip */}
-              </div>
+              <div style={{ fontSize: '8pt', fontWeight: 'bold', color: '#8B0000', marginBottom: '2mm', borderBottom: '1px solid #ddd', paddingBottom: '1mm' }}>DONATION DETAILS</div>
+              {[['Date', formatDateDMY(donation.date)], ['Time', donation.time || 'N/A'], ['Centre', donation.hospitalName], ['Component', donation.component || 'Whole Blood'], ['Status', donation.status]].map(([k, v]) => (
+                <div key={k} style={{ fontSize: '8pt', marginBottom: '1mm' }}><b>{k}:</b> {v}</div>
+              ))}
             </div>
           </div>
-
-          <div className="flex flex-col items-center justify-center border-2 border-dashed border-black bg-gray-50 p-6 rounded-xl mb-8">
-            <p className="font-bold text-black mb-4 uppercase text-sm tracking-wide">Scan for Verification</p>
-            <div className="bg-white p-2 rounded shadow-sm border border-gray-200">
+          {nextEligible && (
+            <div style={{ background: '#fff9f0', border: '1px solid #f0d0a0', borderRadius: '3mm', padding: '3mm', marginBottom: '4mm', fontSize: '8pt' }}>
+              <b>Next eligible donation date:</b> {formatDateDMY(nextEligible)} ({donation.component || 'Whole Blood'})
+            </div>
+          )}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '4mm' }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '7pt', fontWeight: 'bold', marginBottom: '2mm' }}>SCAN TO VERIFY</div>
               <canvas ref={qrRef} />
             </div>
-            <p className="text-xs mt-3 text-black font-mono">{donation.rtidCode}</p>
           </div>
-
-          <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg mb-6">
-            <h4 className="font-bold text-sm mb-2 text-blue-900">Clinical Information</h4>
-            <p className="text-xs text-blue-800">
-              Component Donated: <span className="font-semibold">{donation.component || 'Whole Blood'}</span>
-            </p>
-            <p className="text-xs text-blue-800 mt-1">
-              Next Eligible: <span className="font-semibold">
-                {donation.component ?
-                  new Date(donation.date.getTime() + COOLDOWN_PERIODS[donation.component][donorData.gender?.toLowerCase() === 'female' ? 'female' : 'male'] * 24 * 60 * 60 * 1000).toLocaleDateString()
-                  : 'Refer to guidelines'}
-              </span>
-            </p>
-          </div>
-
-          <div className="text-center text-xs text-black pt-6 border-t border-black mt-10">
-            <p className="font-medium mb-1">Thank you for saving lives.</p>
-            <p>This is a computer-generated document. Valid across all RaktPort partner networks.</p>
+          <div style={{ borderTop: '1px solid #ccc', paddingTop: '3mm', fontSize: '7pt', color: '#777', textAlign: 'center' }}>
+            This is a computer-generated document valid across all RaktPort partner networks. • www.raktport.in
           </div>
         </div>
       </div>
@@ -721,518 +487,496 @@ const PrintableDonation = ({ donation, donorData }: PrintableDonationProps) => {
   );
 };
 
-// PART 3: MAIN COMPONENT - STATE & HELPER FUNCTIONS
-// ========================================================================
+// ── Impact Certificate ────────────────────────────────────────
+interface CertModalProps { isOpen: boolean; onClose: () => void; donorData: DonorData; donationHistory: Donation[]; }
+const CertificateModal = ({ isOpen, onClose, donorData, donationHistory }: CertModalProps) => {
+  const certRef = useRef<HTMLCanvasElement>(null);
+  const qrRef   = useRef<HTMLCanvasElement>(null);
 
+  const completed = donationHistory.filter(d => ['Donated','Completed','Redeemed-Credit','Verified','Credited'].includes(d.status));
+  const firstDate = completed.length > 0 ? completed[completed.length - 1].date : null;
+  const lastDate  = completed.length > 0 ? completed[0].date : null;
+  const lives     = (donorData.donationsCount || 0) * 3;
+  const certNo    = `CERT-${donorData.donorId?.replace('RKT-','') || 'XXXXXX'}-${new Date().getFullYear()}`;
+
+  useEffect(() => {
+    if (isOpen && qrRef.current) {
+      try {
+        new QRious({ element: qrRef.current, value: `${donorData.donorId || 'N/A'}|${certNo}|${donorData.bloodGroup}|${donorData.donationsCount || 0}`, size: 80, foreground: '#8B0000', level: 'H' });
+      } catch (_) {}
+    }
+  }, [isOpen, donorData, certNo]);
+
+  const handleDownload = () => window.print();
+
+  return (
+    <>
+      {/* Print-only certificate */}
+      {isOpen && createPortal(
+        <>
+          <style>{`@media print{@page{size:A4 landscape;margin:0}body>*:not(#cert-portal){display:none!important}#cert-portal{display:block!important;position:fixed;inset:0;background:white;z-index:99999}}.no-print{display:none!important}@media screen{#cert-portal{display:none!important}}`}</style>
+          <div id="cert-portal">
+            <div style={{
+              width: '297mm', height: '210mm', position: 'relative',
+              background: 'linear-gradient(135deg, #fff8f5 0%, #ffffff 50%, #fff5f5 100%)',
+              fontFamily: "'Georgia', serif", overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              padding: '12mm',
+            }}>
+              {/* Decorative corner borders */}
+              {['tl','tr','bl','br'].map(pos => (
+                <div key={pos} style={{
+                  position: 'absolute',
+                  [pos.includes('t') ? 'top' : 'bottom']: '6mm',
+                  [pos.includes('l') ? 'left' : 'right']: '6mm',
+                  width: '20mm', height: '20mm',
+                  borderTop:    pos.includes('t') ? '3px solid #8B0000' : 'none',
+                  borderBottom: pos.includes('b') ? '3px solid #8B0000' : 'none',
+                  borderLeft:   pos.includes('l') ? '3px solid #8B0000' : 'none',
+                  borderRight:  pos.includes('r') ? '3px solid #8B0000' : 'none',
+                }} />
+              ))}
+              {/* Outer border */}
+              <div style={{ position: 'absolute', inset: '4mm', border: '1px solid rgba(139,0,0,0.2)', pointerEvents: 'none' }} />
+
+              {/* Header */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5mm', marginBottom: '5mm' }}>
+                <img src={logo} alt="" style={{ width: '18mm', height: '18mm', objectFit: 'contain' }} />
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '20pt', fontWeight: 'bold', color: '#8B0000', letterSpacing: '0.05em' }}>RaktPort</div>
+                  <div style={{ fontSize: '8pt', color: '#666', letterSpacing: '0.15em', textTransform: 'uppercase' }}>National Blood Management System</div>
+                </div>
+                <img src={logo} alt="" style={{ width: '18mm', height: '18mm', objectFit: 'contain', opacity: 0.3 }} />
+              </div>
+
+              {/* Divider */}
+              <div style={{ width: '180mm', height: '1px', background: 'linear-gradient(to right, transparent, #8B0000 30%, #8B0000 70%, transparent)', marginBottom: '5mm' }} />
+
+              {/* Title */}
+              <div style={{ fontSize: '24pt', fontWeight: 'bold', color: '#8B0000', letterSpacing: '0.08em', marginBottom: '2mm', textAlign: 'center' }}>
+                CERTIFICATE OF APPRECIATION
+              </div>
+              <div style={{ fontSize: '9pt', color: '#666', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: '6mm', textAlign: 'center' }}>
+                This is to certify that
+              </div>
+
+              {/* Donor Name */}
+              <div style={{ fontSize: '28pt', fontWeight: 'bold', color: '#1a0505', letterSpacing: '-0.02em', marginBottom: '1mm', textAlign: 'center' }}>
+                {(donorData.fullName || 'Donor Name').toUpperCase()}
+              </div>
+              <div style={{ fontSize: '10pt', color: '#8B0000', fontStyle: 'italic', marginBottom: '5mm', textAlign: 'center' }}>
+                Donor ID: {donorData.donorId || 'RKT-XXXXXX'} · Blood Group: {donorData.bloodGroup || 'N/A'}
+              </div>
+
+              {/* Body text */}
+              <div style={{ fontSize: '10pt', color: '#444', lineHeight: 1.7, textAlign: 'center', maxWidth: '200mm', marginBottom: '6mm' }}>
+                has generously donated blood <strong style={{ color: '#8B0000' }}>{donorData.donationsCount || 0} time{(donorData.donationsCount || 0) !== 1 ? 's' : ''}</strong> through the RaktPort National Blood Donation Programme,
+                potentially saving up to <strong style={{ color: '#8B0000' }}>{lives} lives</strong> through their selfless and noble act of giving.
+              </div>
+
+              {/* Stats strip */}
+              <div style={{ display: 'flex', gap: '8mm', marginBottom: '6mm', background: '#8B0000', borderRadius: '4mm', padding: '4mm 8mm' }}>
+                {[
+                  ['Blood Group', donorData.bloodGroup || 'N/A'],
+                  ['Total Donations', String(donorData.donationsCount || 0)],
+                  ['Lives Impacted', `~${lives}`],
+                  ['First Donation', firstDate ? formatDateDMY(firstDate) : 'N/A'],
+                  ['Latest Donation', lastDate  ? formatDateDMY(lastDate)  : 'N/A'],
+                ].map(([lbl, val]) => (
+                  <div key={lbl} style={{ textAlign: 'center', minWidth: '28mm' }}>
+                    <div style={{ fontSize: '7pt', color: 'rgba(255,255,255,0.7)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '1mm' }}>{lbl}</div>
+                    <div style={{ fontSize: '13pt', fontWeight: 'bold', color: 'white' }}>{val}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Footer row */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', width: '230mm', marginTop: '2mm' }}>
+                <div style={{ textAlign: 'center' }}>
+                  <canvas ref={qrRef} />
+                  <div style={{ fontSize: '6pt', color: '#999', marginTop: '1mm' }}>{certNo}</div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '8pt', color: '#888' }}>Issue Date</div>
+                  <div style={{ fontSize: '10pt', fontWeight: 'bold', color: '#333' }}>{formatDateDMY(new Date())}</div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ width: '50mm', borderBottom: '1px solid #333', marginBottom: '1mm' }} />
+                  <div style={{ fontSize: '7.5pt', color: '#666' }}>Authorised by RaktPort</div>
+                  <div style={{ fontSize: '7pt', color: '#999' }}>National Blood Authority</div>
+                </div>
+              </div>
+
+              {/* Bottom tagline */}
+              <div style={{ position: 'absolute', bottom: '7mm', textAlign: 'center', width: '100%', fontSize: '7.5pt', color: '#8B0000', fontStyle: 'italic', letterSpacing: '0.05em' }}>
+                "Every drop of blood donated is a promise of hope — Thank you for saving lives"
+              </div>
+            </div>
+          </div>
+        </>,
+        document.body
+      )}
+
+      {/* UI Modal preview */}
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-xl rounded-2xl no-print">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-primary"><Award className="w-5 h-5" /> Impact Certificate</DialogTitle>
+            <DialogDescription>Preview your achievement certificate. Click Download to save as PDF.</DialogDescription>
+          </DialogHeader>
+
+          {/* Preview card */}
+          <div className="rounded-xl overflow-hidden border-2 border-red-100 bg-gradient-to-br from-[#8B0000] to-[#5a0000] p-5 text-white text-center space-y-3">
+            <div className="flex justify-center"><img src={logo} alt="" className="w-12 h-12 rounded-xl" /></div>
+            <div className="text-xs uppercase tracking-widest opacity-70">Certificate of Appreciation</div>
+            <div className="text-2xl font-bold">{donorData.fullName}</div>
+            <div className="text-sm opacity-80">{donorData.donorId || 'RKT-XXXXXX'} · {donorData.bloodGroup}</div>
+            <div className="flex justify-center gap-6 py-3 bg-white/10 rounded-xl">
+              {[['Donations', donorData.donationsCount || 0], ['Lives Saved', `~${lives}`], ['Blood Group', donorData.bloodGroup]].map(([l, v]) => (
+                <div key={l as string} className="text-center">
+                  <div className="text-xl font-black">{v}</div>
+                  <div className="text-xs opacity-70">{l}</div>
+                </div>
+              ))}
+            </div>
+            <div className="text-xs opacity-60">{certNo} · Issued {formatDateDMY(new Date())}</div>
+          </div>
+
+          <div className="flex gap-3">
+            <Button variant="outline" className="flex-1" onClick={onClose}>Close</Button>
+            <Button className="flex-1 bg-primary gap-2" onClick={handleDownload}>
+              <Download className="w-4 h-4" /> Download Certificate
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+};
+
+// ── Blood Compatibility Modal ─────────────────────────────────
+const BloodCompatibilityModal = ({ isOpen, onClose, bloodGroup }: { isOpen: boolean; onClose: () => void; bloodGroup: string }) => {
+  const info = BLOOD_COMPATIBILITY[bloodGroup];
+  const ALL_GROUPS = ['A+','A-','B+','B-','O+','O-','AB+','AB-'];
+  if (!info) return null;
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-lg rounded-2xl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2"><HeartHandshake className="w-5 h-5 text-red-600" /> Blood Type Compatibility</DialogTitle>
+          <DialogDescription>Your blood type <strong>{bloodGroup}</strong> compatibility guide</DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4">
+          {/* Blood group hero */}
+          <div className="flex items-center justify-center">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center shadow-xl">
+              <span className="text-2xl font-black text-white">{bloodGroup}</span>
+            </div>
+          </div>
+          <p className="text-sm text-gray-600 text-center bg-red-50 rounded-xl p-3 border border-red-100">{info.facts}</p>
+
+          {/* Donate to */}
+          <div>
+            <h4 className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-1.5"><Droplet className="w-4 h-4 text-red-500" /> You can donate to</h4>
+            <div className="flex flex-wrap gap-2">
+              {ALL_GROUPS.map(g => (
+                <div key={g} className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-black border-2 transition-all ${
+                  info.donateTo.includes(g) ? 'bg-red-500 text-white border-red-600 shadow-md scale-110' : 'bg-gray-100 text-gray-300 border-gray-200'
+                }`}>{g}</div>
+              ))}
+            </div>
+          </div>
+
+          {/* Receive from */}
+          <div>
+            <h4 className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-1.5"><Heart className="w-4 h-4 text-green-500 fill-green-500" /> You can receive from</h4>
+            <div className="flex flex-wrap gap-2">
+              {ALL_GROUPS.map(g => (
+                <div key={g} className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-black border-2 transition-all ${
+                  info.receiveFrom.includes(g) ? 'bg-green-500 text-white border-green-600 shadow-md scale-110' : 'bg-gray-100 text-gray-300 border-gray-200'
+                }`}>{g}</div>
+              ))}
+            </div>
+          </div>
+
+          {bloodGroup === 'O-' && (
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm text-amber-800 flex gap-2">
+              <Star className="w-4 h-4 fill-amber-500 flex-shrink-0 mt-0.5" />
+              <span><strong>Universal Donor:</strong> Your blood can be given to anyone in an emergency!</span>
+            </div>
+          )}
+          {bloodGroup === 'AB+' && (
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-sm text-blue-800 flex gap-2">
+              <Star className="w-4 h-4 fill-blue-500 flex-shrink-0 mt-0.5" />
+              <span><strong>Universal Recipient:</strong> You can receive blood from any blood type!</span>
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// ── Health Tips Section ───────────────────────────────────────
+const HealthTipsSection = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+  const [current, setCurrent] = useState(0);
+  useEffect(() => {
+    if (!isOpen) return;
+    const id = setInterval(() => setCurrent(c => (c + 1) % HEALTH_TIPS.length), 4000);
+    return () => clearInterval(id);
+  }, [isOpen]);
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-md rounded-2xl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2"><BookOpen className="w-5 h-5 text-blue-600" /> Health Tips for Donors</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          {/* Featured tip */}
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-5 border border-blue-100 text-center min-h-[120px] flex flex-col items-center justify-center transition-all">
+            <div className="text-4xl mb-3">{HEALTH_TIPS[current].icon}</div>
+            <h3 className="font-bold text-gray-900 mb-1">{HEALTH_TIPS[current].title}</h3>
+            <p className="text-sm text-gray-600 leading-relaxed">{HEALTH_TIPS[current].tip}</p>
+          </div>
+          {/* Dots */}
+          <div className="flex justify-center gap-1.5">
+            {HEALTH_TIPS.map((_, i) => (
+              <button key={i} onClick={() => setCurrent(i)}
+                className={`h-2 rounded-full transition-all ${i === current ? 'bg-blue-600 w-6' : 'bg-gray-300 w-2'}`} />
+            ))}
+          </div>
+          {/* All tips list */}
+          <div className="space-y-2 max-h-52 overflow-y-auto">
+            {HEALTH_TIPS.map((t, i) => (
+              <button key={i} onClick={() => setCurrent(i)}
+                className={`w-full flex items-start gap-3 p-3 rounded-xl text-left transition-all ${i === current ? 'bg-blue-50 border border-blue-200' : 'hover:bg-gray-50'}`}>
+                <span className="text-xl flex-shrink-0">{t.icon}</span>
+                <div>
+                  <p className="text-sm font-semibold text-gray-800">{t.title}</p>
+                  <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{t.tip}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// ── Share Card ────────────────────────────────────────────────
+const ShareCardModal = ({ isOpen, onClose, donorData }: { isOpen: boolean; onClose: () => void; donorData: DonorData }) => {
+  const shareText = `🩸 I'm a blood donor with RaktPort!\nDonor ID: ${donorData.donorId || 'RKT-XXXXXX'} | Blood Group: ${donorData.bloodGroup}\nTotal Donations: ${donorData.donationsCount || 0} | Lives Impacted: ~${(donorData.donationsCount || 0) * 3}\nJoin me in saving lives: raktport.in`;
+  const handleShare = () => {
+    if (navigator.share) { navigator.share({ title: 'I am a RaktPort Donor!', text: shareText, url: 'https://raktport.in' }).catch(() => {}); }
+    else { navigator.clipboard.writeText(shareText); toast.success('Copied to clipboard!'); }
+  };
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-sm rounded-2xl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2"><Share2 className="w-5 h-5 text-primary" /> Share Your Story</DialogTitle>
+        </DialogHeader>
+        {/* Card preview */}
+        <div className="rounded-2xl overflow-hidden bg-gradient-to-br from-[#8B0000] to-[#4a0000] p-5 text-white text-center space-y-3 shadow-xl">
+          <div className="flex items-center justify-center gap-2 text-xs opacity-70 uppercase tracking-widest"><Droplet className="w-3 h-3 fill-current" /> RaktPort Blood Donor</div>
+          <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-2xl font-black mx-auto">
+            {(donorData.fullName || 'D').split(' ').map(s => s[0]).join('').toUpperCase().slice(0,2)}
+          </div>
+          <div className="text-xl font-bold">{donorData.fullName}</div>
+          <div className="text-3xl font-black text-red-200">{donorData.bloodGroup}</div>
+          <div className="flex justify-center gap-6 py-2 bg-white/10 rounded-xl">
+            {[['Donations', donorData.donationsCount || 0], ['Lives', `~${(donorData.donationsCount||0)*3}`]].map(([l,v]) => (
+              <div key={l as string} className="text-center"><div className="text-xl font-black">{v}</div><div className="text-xs opacity-70">{l}</div></div>
+            ))}
+          </div>
+          <div className="text-xs opacity-60">{donorData.donorId || 'RKT-XXXXXX'}</div>
+        </div>
+        <Button className="w-full bg-primary gap-2" onClick={handleShare}><Share2 className="w-4 h-4" /> Share</Button>
+      </DialogContent>
+    </Dialog>
+  );
+};
+// DonorDashboard.tsx  — PART 2 of 3
+// ─────────────────────────────────────────────────────────────
+// MAIN COMPONENT
+// ─────────────────────────────────────────────────────────────
 export function DonorDashboard({ onLogout }: DonorDashboardProps) {
-  // ========================================================================
-  // STATE DECLARATIONS
-  // ========================================================================
 
-  const [donorData, setDonorData] = useState<DonorData>({});
-  const [donationHistory, setDonationHistory] = useState<Donation[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [isEligible, setIsEligible] = useState(false);
-  const [eligibilityMessage, setEligibilityMessage] = useState('Checking eligibility...');
-  const [deferralReason, setDeferralReason] = useState<DeferralReason>(null);
-  const [motivationQuote, setMotivationQuote] = useState('');
-  const [healthInsight, setHealthInsight] = useState('');
-  const [showFullUID, setShowFullUID] = useState(false); // NEW: For UID masking toggle
+  // ── State ──
+  const [donorData,        setDonorData]        = useState<DonorData>({});
+  const [donationHistory,  setDonationHistory]  = useState<Donation[]>([]);
+  const [loading,          setLoading]          = useState(true);
+  const [error,            setError]            = useState('');
+  const [isEligible,       setIsEligible]       = useState(false);
+  const [eligibilityMsg,   setEligibilityMsg]   = useState('Checking eligibility...');
+  const [motivationQuote,  setMotivationQuote]  = useState('');
+  const [currentHealthTip, setCurrentHealthTip] = useState(0);
+  const [emergencyAlerts,  setEmergencyAlerts]  = useState<EmergencyAlert[]>([]);
+  const [centers,          setCenters]          = useState<BloodCenter[]>([]);
+  const [selectedCenter,   setSelectedCenter]   = useState<BloodCenter | null>(null);
+  const [apiLoading,       setApiLoading]       = useState(false);
+  const [donationToPrint,  setDonationToPrint]  = useState<Donation | null>(null);
+  const [scheduleCity,     setScheduleCity]     = useState('');
 
-  const [centers, setCenters] = useState<BloodCenter[]>([]);
-  const [selectedCenter, setSelectedCenter] = useState<BloodCenter | null>(null);
-  const [apiLoading, setApiLoading] = useState(false);
+  // Modals
+  const [profileOpen,       setProfileOpen]       = useState(false);
+  const [scheduleOpen,      setScheduleOpen]      = useState(false);
+  const [bookingOpen,       setBookingOpen]       = useState(false);
+  const [bookingConfirmOpen,setBookingConfirmOpen]= useState(false);
+  const [rescheduleOpen,    setRescheduleOpen]    = useState(false);
+  const [certOpen,          setCertOpen]          = useState(false);
+  const [compatOpen,        setCompatOpen]        = useState(false);
+  const [healthTipsOpen,    setHealthTipsOpen]    = useState(false);
+  const [shareOpen,         setShareOpen]         = useState(false);
+  const [historyQROpen,     setHistoryQROpen]     = useState(false);
+  const [hrtidModalOpen,    setHrtidModalOpen]    = useState(false);
+  const [emergencyOpen,     setEmergencyOpen]     = useState(false);
 
-  // Modal State
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isScheduleOpen, setIsScheduleOpen] = useState(false);
-  const [isBookingOpen, setIsBookingOpen] = useState(false);
-  const [isBookingConfirmOpen, setIsBookingConfirmOpen] = useState(false);
-  const [isRescheduleOpen, setIsRescheduleOpen] = useState(false);
-  const [isCreditHistoryOpen, setIsCreditHistoryOpen] = useState(false);
-  const [isMilestonesOpen, setIsMilestonesOpen] = useState(false);
+  // QR data
+  const [selectedHistoryQR, setSelectedHistoryQR] = useState<any>(null);
+  const [hrtidDetails,      setHrtidDetails]      = useState<HrtidDetails | null>(null);
+  const [hrtidLoading,      setHrtidLoading]      = useState(false);
+  const [bookingDetails,    setBookingDetails]    = useState({ rtid: '', qrPayload: '' });
 
-  // History QR Modal State
-  const [isHistoryQROpen, setIsHistoryQROpen] = useState(false);
-  const [selectedHistoryQR, setSelectedHistoryQR] = useState<{
-    rtid: string;
-    payload: string;
-    location: string;
-    date: Date;
-    component?: DonationComponent;
-    qrStatus?: 'Redeemed' | 'Pending' | 'Expired';
-    otpExpiryTime?: Date;
-  } | null>(null);
-
-  // H-RTID Details Modal State
-  const [isHrtidModalOpen, setIsHrtidModalOpen] = useState(false);
-  const [hrtidDetails, setHrtidDetails] = useState<HrtidDetails | null>(null);
-  const [hrtidLoading, setHrtidLoading] = useState(false);
-
-  // NEW: Enhanced State
-  const [creditTransactions, setCreditTransactions] = useState<CreditTransaction[]>([]);
-  const [emergencyAlerts, setEmergencyAlerts] = useState<EmergencyAlert[]>([]);
-  const [milestones, setMilestones] = useState<Milestone[]>([]);
-  const [donationStreak, setDonationStreak] = useState(0);
-
-  const [donationToPrint, setDonationToPrint] = useState<Donation | null>(null);
-
-  // Form State
-  const [scheduleFormData, setScheduleFormData] = useState({ city: '', pincode: '' });
-  const [bookingFormData, setBookingFormData] = useState({
-    date: '',
-    time: '09:00 AM',
-    component: 'Whole Blood' as DonationComponent
+  // Booking form
+  const [bookingForm, setBookingForm] = useState({
+    date: '', time: '09:00 AM', component: 'Whole Blood' as DonationComponent,
   });
-  const [bookingDetails, setBookingDetails] = useState({ rtid: '', qrPayload: '' });
-  const [rescheduleFormData, setRescheduleFormData] = useState({ date: '', time: '09:00 AM' });
-  const [selectedAppointmentToReschedule, setSelectedAppointmentToReschedule] = useState<Donation | null>(null);
+
+  // Reschedule
+  const [rescheduleForm,     setRescheduleForm]     = useState({ date: '', time: '09:00 AM' });
+  const [apptToReschedule,   setApptToReschedule]   = useState<Donation | null>(null);
 
   const qrCanvasRef = useRef<HTMLCanvasElement>(null);
+  const userId      = localStorage.getItem('userId') || localStorage.getItem('userUid');
 
-  const userName = localStorage.getItem('userName') || 'Donor';
-  const userId = localStorage.getItem('userId');
-
-  // ========================================================================
-  // HELPER FUNCTIONS
-  // ========================================================================
-
-  // --- Helper: Convert 12h Time to 24h ---
-  const convert12to24 = (time12h: string): string => {
-    const [time, modifier] = time12h.split(' ');
-    let [hours, minutes] = time.split(':');
-    if (hours === '12') {
-      hours = '00';
-    }
-    if (modifier === 'PM') {
-      hours = parseInt(hours, 10) + 12 + '';
-    }
-    return `${hours}:${minutes}:00`;
-  };
-
-  const initials = (name: string) => (name || '').split(' ').map(s => s[0] || '').slice(0, 2).join('').toUpperCase();
-
-  const computeBadgeText = (n: number) => {
-    if (n >= 20) return 'Diamond Donor 💎';
-    if (n >= 10) return 'Gold Donor 🥇';
-    if (n >= 5) return 'Silver Donor 🥈';
-    return 'Bronze Donor 🥉';
-  };
-
-  const getBadgeClass = (n: number) => {
-    if (n >= 20) return 'bg-blue-600 text-white';
-    if (n >= 10) return 'bg-yellow-500 text-white';
-    if (n >= 5) return 'bg-gray-500 text-white';
-    return 'bg-orange-700 text-white';
-  };
-
-
-
-  // ENHANCED: Check Eligibility with Medical Rules
-
-  const checkEligibility = (
-    lastDonationProfile?: string,
-    lastDonationType?: DonationComponent,
-    gender?: string,
-    history: Donation[] = [],
-    hemoglobin?: number,
-    donationsThisYear?: number
-  ) => {
-    // Safety check: Ensure history is an array
-    const safeHistory = Array.isArray(history) ? history : [];
-
-    const hasPending = safeHistory.some(d => d.status === 'Pending' || d.status === 'Scheduled');
-    if (hasPending) {
-      setIsEligible(false);
-      setEligibilityMessage('🚫 You have a pending appointment.');
-      setDeferralReason('Pending Appointment');
-      return;
-    }
-
-    let latestDateObj: Date | null = null;
-    let latestComponent: DonationComponent = 'Whole Blood';
-
-    // Find most recent completed donation
-    const completedStatuses: DonationStatus[] = ['Donated', 'Redeemed-Credit', 'Pledged', 'Completed', 'Verified', 'Credited'];
-    const completedDonations = safeHistory.filter(d => completedStatuses.includes(d.status));
-
-    if (completedDonations.length > 0) {
-      const sorted = completedDonations.sort((a, b) => b.date.getTime() - a.date.getTime());
-      latestDateObj = sorted[0].date;
-      latestComponent = sorted[0].component || 'Whole Blood';
-    } else if (lastDonationProfile) {
-      const pDate = new Date(lastDonationProfile);
-      if (!isNaN(pDate.getTime())) {
-        latestDateObj = pDate;
-        latestComponent = (lastDonationType as DonationComponent) || 'Whole Blood';
-      }
-    }
-
-    // Use medical eligibility algorithm
-    const result = calculateDonorEligibility(
-      gender as Gender || 'Male',
-      'Whole Blood', // Default check for Whole Blood
-      latestDateObj,
-      latestComponent,
-      new Date(),
-      hemoglobin,
-      donationsThisYear
-    );
-
-    setIsEligible(result.eligible);
-
-    if (result.eligible) {
-      if (!latestDateObj) {
-        setEligibilityMessage('✨ You are ready for your first donation!');
-      } else {
-        const daysSince = Math.floor((new Date().getTime() - latestDateObj.getTime()) / (1000 * 60 * 60 * 24));
-        setEligibilityMessage(`✅ Eligible! Last ${latestComponent} donation was ${daysSince} days ago.`);
-      }
-      setDeferralReason(null);
-    } else {
-      setEligibilityMessage(result.rejectionReason || 'Not eligible at this time.');
-
-      // Extract deferral reason from rejection message
-      if (result.rejectionReason?.includes('Hemoglobin')) {
-        setDeferralReason('Low Hemoglobin');
-      } else if (result.rejectionReason?.includes('recovery period')) {
-        setDeferralReason('Donation Interval Not Complete');
-      } else if (result.rejectionReason?.includes('Annual')) {
-        setDeferralReason('Annual Limit Reached');
-      } else {
-        setDeferralReason('Health Screening Required');
-      }
-    }
-  };
-
-  // NEW: Calculate Next Eligible Date
-  const calculateNextEligibleDate = (
-    lastDonation?: Date,
-    component?: DonationComponent,
-    gender?: string
-  ): Date | null => {
-    if (!lastDonation || !component) return null;
-
-    const isFemale = (gender || '').toLowerCase() === 'female';
-    const genderKey = isFemale ? 'female' : 'male';
-    const cooldownDays = COOLDOWN_PERIODS[component][genderKey];
-
-    const nextDate = new Date(lastDonation);
-    nextDate.setDate(nextDate.getDate() + cooldownDays);
-
-    return nextDate;
-  };
-
-  // NEW: Calculate Donation Streak
-  const calculateDonationStreak = (history: Donation[]) => {
-    if (history.length === 0) return 0;
-
-    const completedStatuses: DonationStatus[] = ['Donated', 'Redeemed-Credit', 'Completed'];
-    const completedDonations = history
-      .filter(d => completedStatuses.includes(d.status))
-      .sort((a, b) => b.date.getTime() - a.date.getTime());
-
-    if (completedDonations.length === 0) return 0;
-
-    let streak = 0;
-    const twelveMonthsAgo = new Date();
-    twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
-
-    for (const donation of completedDonations) {
-      if (donation.date >= twelveMonthsAgo) {
-        streak++;
-      } else {
-        break;
-      }
-    }
-
-    return streak;
-  };
-
-  // UPDATED: Milestone Initialization with Real Donation Data
-  // ============================================================================
-
-  const initializeMilestones = (donationsCount: number, history: Donation[]): Milestone[] => {
-    const completedStatuses: DonationStatus[] = ['Donated', 'Redeemed-Credit', 'Completed', 'Verified', 'Credited'];
-
-    // Get all completed donations sorted by date
-    const completedDonations = history
-      .filter(d => completedStatuses.includes(d.status))
-      .sort((a, b) => a.date.getTime() - b.date.getTime());
-
-    // Count emergency donations (linked to H-RTID)
-    const emergencyDonations = completedDonations.filter(d =>
-      d.linkedHrtid && d.linkedHrtid !== 'N/A' && d.linkedHrtid !== '—'
-    );
-
-    const livesImpacted = donationsCount * 3; // Each donation impacts ~3 lives
-
-    return [
-      {
-        id: '1',
-        title: 'First Drop',
-        description: 'Complete your first donation',
-        icon: '🩸',
-        achieved: donationsCount >= 1,
-        achievedDate: completedDonations[0]?.date
-      },
-      {
-        id: '2',
-        title: 'Regular Hero',
-        description: '5 donations completed',
-        icon: '🥈',
-        achieved: donationsCount >= 5,
-        achievedDate: completedDonations[4]?.date
-      },
-      {
-        id: '3',
-        title: 'Life Champion',
-        description: '10 donations completed',
-        icon: '🥇',
-        achieved: donationsCount >= 10,
-        achievedDate: completedDonations[9]?.date
-      },
-      {
-        id: '4',
-        title: 'Emergency Responder',
-        description: 'First emergency donation',
-        icon: '🚨',
-        achieved: emergencyDonations.length >= 1,
-        achievedDate: emergencyDonations[0]?.date
-      },
-      {
-        id: '5',
-        title: 'Decade of Life',
-        description: 'Save 30+ lives',
-        icon: '🌟',
-        achieved: livesImpacted >= 30,
-        achievedDate: completedDonations[9]?.date // Approximate
-      },
-      {
-        id: '6',
-        title: 'Diamond Legacy',
-        description: '20 donations completed',
-        icon: '💎',
-        achieved: donationsCount >= 20,
-        achievedDate: completedDonations[19]?.date
-      }
-    ];
-  };
-
-  // NEW: Generate Credit Transactions
-  const generateCreditTransactions = (history: Donation[], credits: number): CreditTransaction[] => {
-    const transactions: CreditTransaction[] = [];
-
-    history.forEach((donation, idx) => {
-      if (donation.status === 'Donated' || donation.status === 'Completed') {
-        transactions.push({
-          id: `earn-${idx}`,
-          type: 'earned',
-          amount: 1,
-          date: donation.date,
-          rtid: donation.rtidCode,
-          hospitalName: donation.hospitalName,
-          description: `Credit earned from ${donation.component || 'Whole Blood'} donation`
-        });
-      }
-
-      if (donation.status === 'Redeemed-Credit') {
-        transactions.push({
-          id: `redeem-${idx}`,
-          type: 'redeemed',
-          amount: -1,
-          date: donation.date,
-          rtid: donation.rtidCode,
-          hospitalName: donation.hospitalName,
-          description: `Credit redeemed at ${donation.hospitalName}`
-        });
-      }
-    });
-
-    return transactions.sort((a, b) => b.date.getTime() - a.date.getTime());
-  };
-
-  // NEW: Check for Emergency Alerts
-  const checkForEmergencyAlerts = (bloodGroup?: string, city?: string): EmergencyAlert[] => {
-    // In production, this would be a real-time Firestore listener
-    return [];
-  };
-
-  // ========================================================================
-  // INITIALIZATION EFFECTS
-  // ========================================================================
-
-  // Set random quote and health insight
+  // ── Init ──
   useEffect(() => {
     setMotivationQuote(QUOTES[Math.floor(Math.random() * QUOTES.length)]);
-    setHealthInsight(HEALTH_INSIGHTS[Math.floor(Math.random() * HEALTH_INSIGHTS.length)]);
+    const id = setInterval(() => setCurrentHealthTip(c => (c + 1) % HEALTH_TIPS.length), 8000);
+    return () => clearInterval(id);
   }, []);
 
-  // Logout Handler
-  const handleLogoutConfirm = () => {
-    Swal.fire({
-      title: "Logout?",
-      text: "Are you sure you want to logout?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#8B0000",
-      cancelButtonColor: "#6c757d",
-      confirmButtonText: "Yes, Logout",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        onLogout();
-      }
-    });
-  };
-
-
-  // Continue with data fetching in next part...
-  // PART 4: DATA FETCHING & EFFECTS
-  // ========================================================================
-
-  // Main Data Fetching Effect
-  // DonorDashboard.tsx - FIXED Data Fetching with Real-time Sync
-  // Replace the entire useEffect for data fetching with this updated version
-
+  // ── Data Fetch ──
   useEffect(() => {
-    if (!userId) {
-      setError("Not logged in");
-      setLoading(false);
-      return;
-    }
+    if (!userId) { setError('Not logged in'); setLoading(false); return; }
 
     const fetchData = async () => {
       try {
-        // 1. Fetch Donor Profile
-        const userRef = doc(db, "users", userId);
+        // 1. Donor profile
+        const userRef  = doc(db, 'users', userId);
         const userSnap = await getDoc(userRef);
 
         if (userSnap.exists()) {
-          const data = userSnap.data();
+          const d = userSnap.data();
+
+          // Auto-generate donorId if missing (for existing users)
+          let donorId = d.donorId;
+          if (!donorId) {
+            donorId = generateDonorId();
+            await updateDoc(userRef, { donorId }).catch(() => {});
+          }
 
           setDonorData({
-            fullName: data.fullName || 'Donor',
-            bloodGroup: data.bloodGroup || 'N/A',
-            gender: data.gender || 'male',
-            lastDonationDate: data.lastDonationDate || null,
-            lastDonationType: data.lastDonationType || null,
-            city: data.district || '',
-            pincode: data.pincode || '',
-            donationsCount: data.donationsCount || 0,
-            credits: data.credits || 0,
-            email: userId,
-            mobile: data.mobile || 'Not Set',
-            dob: data.dob || null,
-            donationsThisYear: data.donationsThisYear || 0,
-            availabilityMode: data.availabilityMode || 'available'
+            fullName:        d.fullName || 'Donor',
+            bloodGroup:      d.bloodGroup || 'N/A',
+            gender:          d.gender || 'male',
+            lastDonationDate:d.lastDonationDate || null,
+            city:            d.district || d.city || '',
+            pincode:         d.pincode || '',
+            donationsCount:  d.donationsCount || 0,
+            credits:         d.credits || 0,
+            email:           d.email || userId,
+            mobile:          d.mobile || 'Not Set',
+            dob:             d.dob || null,
+            donorId,
+            availabilityMode:d.availabilityMode || 'available',
           });
-
-          setScheduleFormData({ city: data.district || '', pincode: data.pincode || '' });
+          setScheduleCity(d.district || d.city || '');
           setError('');
         } else {
-          setError("User profile not found. Please contact support.");
+          setError('Profile not found. Please contact support.');
         }
 
-        // 2. Fetch Donation History with REAL-TIME sync
-        const donationsQuery = query(
-          collection(db, "donations"),
-          where("donorId", "==", userId)
-        );
-
-        const donationSnaps = await getDocs(donationsQuery);
+        // 2. Donation history
+        const q    = query(collection(db, 'donations'), where('donorId', '==', userId));
+        const snap = await getDocs(q);
         const history: Donation[] = [];
 
-        donationSnaps.forEach(doc => {
-          const d = doc.data() as any;
+        snap.forEach(docSnap => {
+          const d    = docSnap.data() as any;
+          const rtid = d.dRtid || d.rtid || d.donationId || docSnap.id;
+          const linked = d.linkedHrtid || d.linkedRTID || d.hRtid || 'N/A';
 
-          const rtidVal = d.dRtid || d.rtid || d.donationId || d.rtidCode || doc.id;
-          const linkedVal = d.linkedHrtid || d.linkedRTID || d.hRtid || 'N/A';
+          let status: DonationStatus = d.status;
+          if (d.status === 'AVAILABLE' || d.status === 'Donated') status = 'Donated';
+          else if (d.status === 'REDEEMED') status = 'Redeemed-Credit';
+          else if (d.status === 'CANCELLED' || d.status === 'Cancelled') status = 'Cancelled';
+          else if ((d.status === 'Scheduled' || d.status === 'Pending') && safeDate(d.date) < new Date()) status = 'Expired';
 
-          // ✅ FIXED: Map Firebase status to display status
-          let displayStatus: DonationStatus = d.status;
+          const qrStatus: 'Redeemed'|'Pending'|'Expired' =
+            ['REDEEMED','Redeemed-Credit','Completed'].includes(d.status) ? 'Redeemed' :
+            d.expiryDate && safeDate(d.expiryDate) < new Date() ? 'Expired' : 'Pending';
 
-          // Handle status mapping
-          if (d.status === 'AVAILABLE' || d.status === 'Donated') {
-            displayStatus = 'Donated'; // Show as "Donated" in history
-          } else if (d.status === 'REDEEMED') {
-            displayStatus = 'Redeemed-Credit';
-          } else if (d.status === 'Scheduled' || d.status === 'Pending') {
-            // Check if appointment is in the past
-            const appointmentDate = safeDate(d.date);
-            const now = new Date();
+          const otpExpiry = d.otpExpiryTime ? safeDate(d.otpExpiryTime) : new Date(safeDate(d.date).getTime() + 86400000);
 
-            if (appointmentDate < now) {
-              // Past appointment that hasn't been checked in
-              displayStatus = 'Expired';
-            } else {
-              displayStatus = d.status;
-            }
-          }
-
-          // Determine QR Redemption Status
-          let qrStatus: 'Redeemed' | 'Pending' | 'Expired' = 'Pending';
-          if (d.status === 'REDEEMED' || d.status === 'Redeemed-Credit' || d.status === 'Completed') {
-            qrStatus = 'Redeemed';
-          } else if (d.expiryDate && safeDate(d.expiryDate) < new Date()) {
-            qrStatus = 'Expired';
-          } else if (d.status === 'AVAILABLE' || d.status === 'Donated') {
-            qrStatus = 'Pending'; // Available for redemption
-          }
-
-          // OTP Expiry Time (24 hours from donation or specified)
-          const otpExpiry = d.otpExpiryTime
-            ? safeDate(d.otpExpiryTime)
-            : new Date(safeDate(d.date).getTime() + 24 * 60 * 60 * 1000);
-
-          // Build Impact Timeline
           const timeline: ImpactTimeline = {
-            donated: safeDate(d.date),
-            linkedToRequest: d.linkedDate ? safeDate(d.linkedDate) : (linkedVal !== 'N/A' ? safeDate(d.date) : undefined),
-            usedByPatient: d.usedDate ? safeDate(d.usedDate) : (d.status === 'REDEEMED' ? safeDate(d.redeemedAt || d.date) : undefined),
-            creditIssued: d.creditIssuedDate ? safeDate(d.creditIssuedDate) : (d.status === 'Donated' || d.status === 'AVAILABLE' ? safeDate(d.date) : undefined)
+            donated:         safeDate(d.date),
+            linkedToRequest: d.linkedDate ? safeDate(d.linkedDate) : (linked !== 'N/A' ? safeDate(d.date) : undefined),
+            usedByPatient:   d.usedDate ? safeDate(d.usedDate) : (d.status === 'REDEEMED' ? safeDate(d.redeemedAt || d.date) : undefined),
+            creditIssued:    d.creditIssuedDate ? safeDate(d.creditIssuedDate) : (['Donated','AVAILABLE'].includes(d.status) ? safeDate(d.date) : undefined),
           };
 
           history.push({
-            date: safeDate(d.date),
-            rtidCode: rtidVal,
-            linkedHrtid: linkedVal,
-            hospitalName: d.bloodBankName || d.hospitalName || 'Blood Bank',
-            city: d.city || d.donationLocation || 'Unknown',
-            status: displayStatus,
-            otp: d.otp || '',
-            expiryDate: d.expiryDate ? safeDate(d.expiryDate) : undefined,
-            component: d.component || 'Whole Blood',
-            qrRedemptionStatus: qrStatus,
-            otpExpiryTime: otpExpiry,
-            impactTimeline: timeline,
-            time: d.time || '09:00 AM'
+            date:              safeDate(d.date),
+            rtidCode:          rtid,
+            linkedHrtid:       linked,
+            hospitalName:      d.bloodBankName || d.hospitalName || 'Blood Bank',
+            city:              d.city || d.donationLocation || 'Unknown',
+            status,
+            otp:               d.otp || '',
+            expiryDate:        d.expiryDate ? safeDate(d.expiryDate) : undefined,
+            component:         d.component || 'Whole Blood',
+            qrRedemptionStatus:qrStatus,
+            otpExpiryTime:     otpExpiry,
+            impactTimeline:    timeline,
+            time:              d.time || '09:00 AM',
           });
         });
 
-        // Client-side Sort
         history.sort((a, b) => b.date.getTime() - a.date.getTime());
-
         setDonationHistory(history);
 
-        // Initialize credit transactions
-        const transactions = generateCreditTransactions(history, userSnap.data()?.credits || 0);
-        setCreditTransactions(transactions);
+        // 3. Emergency requests in donor city
+        const city = userSnap.data()?.district || userSnap.data()?.city;
+        if (city) {
+          try {
+            const eqSnap = await getDocs(query(
+              collection(db, 'bloodRequests'),
+              where('city', '==', city),
+              where('urgency', 'in', ['Critical', 'High', 'critical', 'high'])
+            ));
+            const alerts: EmergencyAlert[] = [];
+            eqSnap.forEach(d => {
+              const data = d.data() as any;
+              if (['PENDING','CREATED','PARTIAL'].includes(data.status || '')) {
+                const exp = data.requiredBy ? safeDate(data.requiredBy) : new Date(Date.now() + 12 * 3600000);
+                if (exp.getTime() > Date.now()) {
+                  alerts.push({
+                    id: d.id, bloodGroup: data.bloodGroup, hospitalName: data.hospitalName || 'Hospital',
+                    urgency: (data.urgency?.toLowerCase() || 'high') as 'critical'|'high'|'medium',
+                    expiresAt: exp, hrtid: data.linkedRTID || data.rtid || d.id, city,
+                  });
+                }
+              }
+            });
+            setEmergencyAlerts(alerts.slice(0, 3));
+          } catch (_) {}
+        }
 
-        // Calculate donation streak
-        const streak = calculateDonationStreak(history);
-        setDonationStreak(streak);
-
-        // ✅ FIXED: Initialize milestones with real-time data
-        const achievedMilestones = initializeMilestones(
-          userSnap.data()?.donationsCount || 0,
-          history
-        );
-        setMilestones(achievedMilestones);
-
-      } catch (err: any) {
-        console.error("Error fetching dashboard data:", err);
-        setError("Failed to load data. Please check connection.");
+      } catch (e: any) {
+        console.error(e);
+        setError('Failed to load data. Please check your connection.');
       } finally {
         setLoading(false);
       }
@@ -1241,1136 +985,721 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
     fetchData();
   }, [userId]);
 
-  // Calculate REAL Last Donation Date
-  const lastDonationDateDisplay = useMemo(() => {
-    let latest: Date | null = null;
-    let latestComponent: DonationComponent = 'Whole Blood';
-
-    if (donorData.lastDonationDate) {
-      const pDate = new Date(donorData.lastDonationDate);
-      if (!isNaN(pDate.getTime())) latest = pDate;
-    }
-
-    const completedStatuses: DonationStatus[] = ['Donated', 'Redeemed-Credit', 'Pledged', 'Completed', 'Verified', 'Credited'];
-    donationHistory.forEach(d => {
-      if (completedStatuses.includes(d.status)) {
-        if (!latest || d.date > latest) {
-          latest = d.date;
-          latestComponent = d.component || 'Whole Blood';
-        }
-      }
-    });
-
-    return latest
-      ? `${latest.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} (${latestComponent})`
-      : 'Never';
-  }, [donorData.lastDonationDate, donationHistory]);
-
-  // NEW: Calculate Next Eligible Date Display
-  const nextEligibleDateDisplay = useMemo(() => {
-    let latest: Date | null = null;
-    let latestComponent: DonationComponent = 'Whole Blood';
-
-    const completedStatuses: DonationStatus[] = ['Donated', 'Redeemed-Credit', 'Pledged', 'Completed', 'Verified', 'Credited'];
-    donationHistory.forEach(d => {
-      if (completedStatuses.includes(d.status)) {
-        if (!latest || d.date > latest) {
-          latest = d.date;
-          latestComponent = d.component || 'Whole Blood';
-        }
-      }
-    });
-
-    if (!latest) return 'Ready now!';
-
-    const nextDate = calculateNextEligibleDate(latest, latestComponent, donorData.gender);
-    return nextDate
-      ? nextDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
-      : 'Check eligibility';
-  }, [donationHistory, donorData.gender]);
-
-  // Check Eligibility Effect
+  // ── Eligibility ──
   useEffect(() => {
-    let latestComponent: DonationComponent = 'Whole Blood';
-    const completedStatuses: DonationStatus[] = ['Donated', 'Redeemed-Credit', 'Pledged', 'Completed', 'Verified', 'Credited'];
-
+    let latestComp: DonationComponent = 'Whole Blood';
+    let latestDate: Date | null = null;
+    const done: DonationStatus[] = ['Donated','Redeemed-Credit','Pledged','Completed','Verified','Credited'];
     donationHistory.forEach(d => {
-      if (completedStatuses.includes(d.status)) {
-        latestComponent = d.component || 'Whole Blood';
+      if (done.includes(d.status)) {
+        if (!latestDate || d.date > latestDate) { latestDate = d.date; latestComp = d.component || 'Whole Blood'; }
       }
     });
+    const hasPending = donationHistory.some(d => ['Pending','Scheduled'].includes(d.status));
+    if (hasPending) { setIsEligible(false); setEligibilityMsg('🚫 You have a pending appointment.'); return; }
 
-    // Fixed: Corrected parameter order to match function signature
-    // checkEligibility(lastDonationProfile, lastDonationType, gender, history, hemoglobin, donationsThisYear)
-    checkEligibility(
-      donorData.lastDonationDate,  // lastDonationProfile
-      latestComponent,              // lastDonationType (was in wrong position)
-      donorData.gender,             // gender (was in wrong position)
-      donationHistory,              // history (correct)
-      undefined,                    // hemoglobin (optional)
-      undefined                     // donationsThisYear (optional)
+    const result = calculateDonorEligibility(
+      (donorData.gender as Gender) || 'Male', 'Whole Blood',
+      latestDate, latestComp, new Date()
     );
+    setIsEligible(result.eligible);
+    if (result.eligible) {
+      setEligibilityMsg(latestDate ? `✅ Eligible! Last donation ${Math.floor((Date.now() - latestDate!.getTime()) / 86400000)} days ago.` : '✨ Ready for your first donation!');
+    } else {
+      setEligibilityMsg(result.rejectionReason || 'Not eligible at this time.');
+    }
   }, [donorData, donationHistory]);
 
-  // Printing Logic
+  // Trigger print
   useEffect(() => {
-    if (donationToPrint) {
-      const timer = setTimeout(() => window.print(), 500);
-      return () => clearTimeout(timer);
-    }
+    if (donationToPrint) { const t = setTimeout(() => window.print(), 500); return () => clearTimeout(t); }
   }, [donationToPrint]);
 
-  // QR Generation (Booking)
+  // QR for booking confirm
   useEffect(() => {
-    if (isBookingConfirmOpen && bookingDetails.qrPayload) {
-      const timer = setTimeout(() => {
+    if (bookingConfirmOpen && bookingDetails.qrPayload && qrCanvasRef.current) {
+      setTimeout(() => {
         if (qrCanvasRef.current) {
-          const canvas = qrCanvasRef.current;
-          const context = canvas.getContext('2d');
-          if (context) context.clearRect(0, 0, canvas.width, canvas.height);
-          new QRious({
-            element: canvas,
-            value: bookingDetails.qrPayload,
-            size: 200,
-            background: '#fff',
-            foreground: '#8b0000'
-          });
+          try { new QRious({ element: qrCanvasRef.current, value: bookingDetails.qrPayload, size: 200, foreground: '#8b0000' }); } catch (_) {}
         }
-      }, 50);
-      return () => clearTimeout(timer);
+      }, 80);
     }
-  }, [isBookingConfirmOpen, bookingDetails.qrPayload]);
+  }, [bookingConfirmOpen, bookingDetails.qrPayload]);
 
+  // ── Computed ──
+  const lastDonationDisplay = useMemo(() => {
+    let latest: Date | null = null, comp: DonationComponent = 'Whole Blood';
+    if (donorData.lastDonationDate) { const d = new Date(donorData.lastDonationDate); if (!isNaN(d.getTime())) latest = d; }
+    const done: DonationStatus[] = ['Donated','Redeemed-Credit','Pledged','Completed','Verified','Credited'];
+    donationHistory.forEach(d => { if (done.includes(d.status) && (!latest || d.date > latest)) { latest = d.date; comp = d.component || 'Whole Blood'; } });
+    return latest ? `${formatDateDMY(latest)} (${comp})` : 'Never';
+  }, [donorData.lastDonationDate, donationHistory]);
 
-  // Continue with event handlers in next part...
-  // PART 5: EVENT HANDLERS
-  // ========================================================================
+  const nextEligibleDate = useMemo((): Date | null => {
+    let latest: Date | null = null, comp: DonationComponent = 'Whole Blood';
+    const done: DonationStatus[] = ['Donated','Redeemed-Credit','Pledged','Completed','Verified','Credited'];
+    donationHistory.forEach(d => { if (done.includes(d.status) && (!latest || d.date > latest)) { latest = d.date; comp = d.component || 'Whole Blood'; } });
+    if (!latest) return null;
+    const isFemale = (donorData.gender || '').toLowerCase() === 'female';
+    const days = COOLDOWN_DAYS[comp][isFemale ? 'female' : 'male'];
+    const next = new Date(latest); next.setDate(next.getDate() + days);
+    return next;
+  }, [donationHistory, donorData.gender]);
 
-  const handleViewHistoryQR = (donation: Donation) => {
-    const payload = `${donorData.fullName}|${donorData.bloodGroup}|${donation.rtidCode}|${donation.hospitalName}|${donation.city}|${donation.component || 'Whole Blood'}`;
+  const nextEligibleDisplay = useMemo(() => {
+    if (!nextEligibleDate) return 'Ready now!';
+    if (nextEligibleDate <= new Date()) return 'Ready now!';
+    return formatDateDMY(nextEligibleDate);
+  }, [nextEligibleDate]);
+
+  const daysUntilEligible = useMemo(() => {
+    if (!nextEligibleDate || nextEligibleDate <= new Date()) return 0;
+    return Math.ceil((nextEligibleDate.getTime() - Date.now()) / 86400000);
+  }, [nextEligibleDate]);
+
+  const donationStreak = useMemo(() => {
+    const done: DonationStatus[] = ['Donated','Redeemed-Credit','Completed'];
+    const cutoff = new Date(); cutoff.setMonth(cutoff.getMonth() - 12);
+    return donationHistory.filter(d => done.includes(d.status) && d.date >= cutoff).length;
+  }, [donationHistory]);
+
+  const computeBadge = (n: number) => n >= 20 ? '💎 Diamond' : n >= 10 ? '🥇 Gold' : n >= 5 ? '🥈 Silver' : '🥉 Bronze';
+  const badgeBg      = (n: number) => n >= 20 ? 'bg-blue-600' : n >= 10 ? 'bg-yellow-500' : n >= 5 ? 'bg-gray-400' : 'bg-orange-700';
+
+  // ── Handlers ──
+
+  const handleViewHistoryQR = (d: Donation) => {
     setSelectedHistoryQR({
-      rtid: donation.rtidCode,
-      payload: payload,
-      location: donation.hospitalName,
-      date: donation.date,
-      component: donation.component,
-      qrStatus: donation.qrRedemptionStatus,
-      otpExpiryTime: donation.otpExpiryTime
+      rtid: d.rtidCode,
+      payload: `${donorData.fullName}|${donorData.bloodGroup}|${d.rtidCode}|${d.hospitalName}|${d.city}|${d.component || 'Whole Blood'}`,
+      location: d.hospitalName, date: d.date, component: d.component,
+      qrStatus: d.qrRedemptionStatus, otpExpiryTime: d.otpExpiryTime,
     });
-    setIsHistoryQROpen(true);
+    setHistoryQROpen(true);
   };
-
-  const handlePrintDonation = (donation: Donation) => setDonationToPrint(donation);
 
   const handleFindCenters = async () => {
-    const inputCity = scheduleFormData.city.trim();
-
-    if (!inputCity) {
-      toast.error('Please enter a city name');
-      return;
-    }
-
-    setApiLoading(true);
-    setCenters([]);
-
+    if (!scheduleCity.trim()) { toast.error('Please enter a city'); return; }
+    setApiLoading(true); setCenters([]);
     try {
-      // Fetch all blood banks from Firestore
-      const bloodBanksRef = collection(db, 'blood-banks');
-      const snapshot = await getDocs(bloodBanksRef);
-
-      if (snapshot.empty) {
-        // Fallback to users collection with role bloodbank
-        const q = query(
-          collection(db, "users"),
-          where("role", "==", "bloodbank")
-        );
-        const querySnapshot = await getDocs(q);
-        const foundCenters: BloodCenter[] = [];
-
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          const bankCity = data.district || data.city || '';
-
-          // Use flexible city matching
-          if (citiesMatch(inputCity, bankCity)) {
-            foundCenters.push({
-              id: doc.id,
-              name: data.fullName || 'Blood Bank',
-              address: data.address || '',
-              phone: data.mobile || 'N/A',
-              city: data.district || data.city || '',
-              state: data.state || '',
-              pincode: data.pincode || '',
-              latitude: data.latitude,
-              longitude: data.longitude,
-              fullAddress: `${data.address || ''}${data.district || data.city ? ', ' + (data.district || data.city) : ''}${data.state ? ', ' + data.state : ''}${data.pincode ? ' - ' + data.pincode : ''}`
-            });
-          }
-        });
-
-        setCenters(foundCenters);
-
-        if (foundCenters.length === 0) {
-          toast.error(`No registered blood banks found in "${inputCity}". Try variations like "Delhi" or "New Delhi"`);
-        } else {
-          toast.success(`Found ${foundCenters.length} blood bank(s) in ${inputCity}`);
-        }
-        setApiLoading(false);
-        return;
-      }
-
-      // Filter blood banks using flexible city matching
-      const matchedCenters: BloodCenter[] = [];
-
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        const bankCity = data.city || data.district || '';
-
-        // Use the flexible city matching function
-        if (citiesMatch(inputCity, bankCity)) {
-          matchedCenters.push({
-            id: doc.id,
-            name: data.name || 'Unknown Blood Bank',
-            address: data.address || '',
-            phone: data.phone || data.mobile || 'N/A',
-            city: data.city || data.district || '',
-            state: data.state || '',
-            pincode: data.pincode || '',
-            latitude: data.latitude,
-            longitude: data.longitude,
-            fullAddress: `${data.address || ''}${data.city ? ', ' + data.city : ''}${data.state ? ', ' + data.state : ''}${data.pincode ? ' - ' + data.pincode : ''}`
+      const q = query(collection(db, 'users'), where('role', '==', 'bloodbank'), where('isVerified', '==', true));
+      const snap = await getDocs(q);
+      const found: BloodCenter[] = [];
+      snap.forEach(d => {
+        const v = d.data() as any;
+        const bankCity = v.district || v.city || '';
+        if (citiesMatch(scheduleCity, bankCity)) {
+          found.push({
+            id: d.id, name: v.fullName || 'Blood Bank',
+            address: v.address || '', phone: v.mobile || 'N/A',
+            city: bankCity, state: v.state || '', pincode: v.pincode || '',
+            latitude: v.latitude, longitude: v.longitude,
+            fullAddress: `${v.address || ''}${bankCity ? ', ' + bankCity : ''}${v.state ? ', ' + v.state : ''}${v.pincode ? ' - ' + v.pincode : ''}`,
           });
         }
       });
-
-      if (matchedCenters.length === 0) {
-        toast.error(`No registered blood banks found in "${inputCity}". Try variations like "Delhi" or "New Delhi"`);
-      } else {
-        toast.success(`Found ${matchedCenters.length} blood bank(s) in ${inputCity}`);
+      // Fallback to blood-banks collection
+      if (found.length === 0) {
+        const snap2 = await getDocs(collection(db, 'blood-banks'));
+        snap2.forEach(d => {
+          const v = d.data() as any;
+          if (citiesMatch(scheduleCity, v.city || v.district || '')) {
+            found.push({ id: d.id, name: v.name || 'Blood Bank', address: v.address || '', phone: v.phone || v.mobile || 'N/A', city: v.city || '', state: v.state || '', pincode: v.pincode || '', fullAddress: v.address || '' });
+          }
+        });
       }
-
-      setCenters(matchedCenters);
-
-    } catch (err: any) {
-      console.error("Search error:", err);
-      toast.error(`Search failed: ${err.message}`);
-    } finally {
-      setApiLoading(false);
-    }
+      setCenters(found);
+      if (found.length === 0) toast.error(`No verified blood banks found in "${scheduleCity}"`);
+      else toast.success(`Found ${found.length} blood bank(s)`);
+    } catch (e: any) { toast.error('Search failed', { description: e.message }); }
+    finally { setApiLoading(false); }
   };
 
-  const handleSelectCenter = (center: BloodCenter) => {
-    setSelectedCenter(center);
-    const d = new Date();
-    d.setDate(d.getDate() + 1);
-    setBookingFormData({
-      time: '09:00 AM',
-      date: d.toISOString().slice(0, 10),
-      component: 'Whole Blood'
-    });
-    setIsBookingOpen(true);
+  const handleSelectCenter = (c: BloodCenter) => {
+    setSelectedCenter(c);
+    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+    setBookingForm({ date: tomorrow.toISOString().split('T')[0], time: '09:00 AM', component: 'Whole Blood' });
+    setBookingOpen(true);
   };
-
-  // PART 1: DonorDashboard.tsx - Appointment Booking Function
-  // Replace the existing handleBookAppointment function with this:
-
 
   const handleBookAppointment = async () => {
-    if (!selectedCenter || !bookingFormData.date || !bookingFormData.time || !userId) {
-      alert('Please fill all fields');
-      return;
-    }
-
+    if (!selectedCenter || !bookingForm.date || !userId) { toast.error('Please fill all fields'); return; }
     setApiLoading(true);
-
     try {
-      const rtid = await generateUniqueAppointmentRtid(bookingFormData.date);
-      const time24 = convert12to24(bookingFormData.time);
-      const scheduledDateTime = new Date(`${bookingFormData.date}T${time24}`);
+      const rtid = await generateUniqueAppointmentRtid(bookingForm.date);
+      const time24 = convert12to24(bookingForm.time);
+      const dt = new Date(`${bookingForm.date}T${time24}`);
+      if (isNaN(dt.getTime())) throw new Error('Invalid date/time');
 
-      if (isNaN(scheduledDateTime.getTime())) {
-        throw new Error("Invalid date or time selected");
-      }
-
-      // ====================================================================
-      // STEP 1: Create Appointment Record (for Blood Bank Appointments Tab)
-      // ====================================================================
-      const appointmentData = {
-        rtid: rtid,
-        appointmentRtid: rtid, // For linking later
-        donorName: donorData.fullName || 'Donor',
-        mobile: donorData.mobile || '',
-        gender: donorData.gender || 'Male',
-        bloodGroup: donorData.bloodGroup || 'O+',
-        date: Timestamp.fromDate(scheduledDateTime),
-        time: bookingFormData.time,
-        bloodBankId: selectedCenter.id,
-        bloodBankName: selectedCenter.name,
-        status: 'Upcoming', // ✅ Blood Bank filters by this
+      // Appointment record
+      await addDoc(collection(db, 'appointments'), {
+        rtid, appointmentRtid: rtid, donorId: userId,
+        donorName: donorData.fullName || 'Donor', mobile: donorData.mobile || '',
+        gender: donorData.gender || 'Male', bloodGroup: donorData.bloodGroup || 'O+',
+        date: Timestamp.fromDate(dt), time: bookingForm.time,
+        bloodBankId: selectedCenter.id, bloodBankName: selectedCenter.name,
+        status: 'Upcoming', component: bookingForm.component,
         createdAt: Timestamp.now(),
-        district: donorData.city || '',
-        pincode: donorData.pincode || '',
-        component: bookingFormData.component,
-        donorId: userId
-      };
-
-      // Save to appointments collection
-      await addDoc(collection(db, "appointments"), appointmentData);
-
-      console.log("✅ Appointment created in appointments collection");
-
-      // ====================================================================
-      // STEP 2: Create Donation Record (for Blood Bank Donations Tab + Donor History)
-      // ====================================================================
-      const otpExpiry = new Date(scheduledDateTime.getTime() + 24 * 60 * 60 * 1000);
-      const otp = Math.floor(1000 + Math.random() * 9000).toString();
-
-      const donationRecord = {
-        // Identity
-        rtid: rtid,
-        dRtid: rtid,
-        appointmentRtid: rtid, // Link to appointment
-
-        // Donor Info
-        donorId: userId,
-        donorName: donorData.fullName || 'Donor',
-        donorMobile: donorData.mobile || '',
-        bloodGroup: donorData.bloodGroup || 'O+',
-
-        // Blood Bank Info
-        bloodBankId: selectedCenter.id,
-        bloodBankName: selectedCenter.name,
-        donationLocation: donorData.city || '',
-        city: donorData.city || '',
-
-        // Donation Details
-        date: Timestamp.fromDate(scheduledDateTime),
-        time: bookingFormData.time,
-        component: bookingFormData.component,
-        donationType: 'Regular',
-
-        // Status & Security
-        status: 'Scheduled', // ✅ Shows as "Scheduled" in Donations Tab
-        otp: otp,
-        otpExpiryTime: Timestamp.fromDate(otpExpiry),
-
-        // Metadata
-        createdAt: Timestamp.now(),
-
-        // Patient linking (will be filled after check-in)
-        hRtid: null,
-        linkedHrtid: null,
-        patientName: null,
-        hospitalName: null
-      };
-
-      // Save to donations collection
-      const donationDocRef = doc(db, "donations", rtid);
-      await setDoc(donationDocRef, donationRecord);
-
-      console.log("✅ Donation record created in donations collection");
-
-      // ====================================================================
-      // STEP 3: Generate QR Code for appointment
-      // ====================================================================
-      const qrPayload = `${donorData.fullName}|${donorData.bloodGroup}|${rtid}|${selectedCenter.name}|${donorData.city}|${bookingFormData.component}`;
-
-      setBookingDetails({ rtid: rtid, qrPayload: qrPayload });
-
-      toast.success("Appointment Booked Successfully! ✅", {
-        description: `RTID: ${rtid} | Date: ${bookingFormData.date} at ${bookingFormData.time}`
       });
 
-      setIsBookingOpen(false);
-      setIsScheduleOpen(false);
-
-      // Refresh to show new appointment
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500);
-
-    } catch (err: any) {
-      console.error("Booking error:", err);
-      toast.error("Booking Failed", {
-        description: err.message || 'Unknown error'
+      // Donation record (scheduled)
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      await setDoc(doc(db, 'donations', rtid), {
+        rtid, dRtid: rtid, appointmentRtid: rtid, donorId: userId,
+        donorName: donorData.fullName || 'Donor', donorMobile: donorData.mobile || '',
+        bloodGroup: donorData.bloodGroup || 'O+',
+        bloodBankId: selectedCenter.id, bloodBankName: selectedCenter.name,
+        donationType: 'Regular', component: bookingForm.component,
+        status: 'Scheduled', otp, date: Timestamp.fromDate(dt), time: bookingForm.time,
+        city: donorData.city || '', donationLocation: donorData.city || '',
+        createdAt: Timestamp.now(), otpExpiryTime: Timestamp.fromDate(new Date(dt.getTime() + 86400000)),
+        hRtid: null, linkedHrtid: null, patientName: null, hospitalName: null,
       });
-    } finally {
-      setApiLoading(false);
-    }
+
+      const payload = `${donorData.fullName}|${donorData.bloodGroup}|${rtid}|${selectedCenter.name}|${donorData.city}|${bookingForm.component}`;
+      setBookingDetails({ rtid, qrPayload: payload });
+      toast.success('Appointment booked!', { description: `RTID: ${rtid}` });
+      setBookingOpen(false); setScheduleOpen(false);
+
+      // Refresh
+      setTimeout(() => window.location.reload(), 1500);
+    } catch (e: any) { toast.error('Booking failed', { description: e.message }); }
+    finally { setApiLoading(false); }
   };
 
-  const handleRescheduleClick = (appointment: Donation) => {
-    setSelectedAppointmentToReschedule(appointment);
-    const appointmentDate = appointment.date instanceof Date
-      ? appointment.date.toISOString().split('T')[0]
-      : new Date(appointment.date).toISOString().split('T')[0];
-
-    // ✅ FIXED: Use actual appointment time
-    const appointmentTime = appointment.time || '09:00 AM';
-
-    setRescheduleFormData({
-      date: appointmentDate,
-      time: appointmentTime // Now uses stored time
-    });
-    setIsRescheduleOpen(true);
+  const handleRescheduleClick = (d: Donation) => {
+    setApptToReschedule(d);
+    setRescheduleForm({ date: d.date.toISOString().split('T')[0], time: d.time || '09:00 AM' });
+    setRescheduleOpen(true);
   };
-
-  // PART 2: DonorDashboard.tsx - Reschedule Function
-  // Replace the existing handleRescheduleAppointment function with this
 
   const handleRescheduleAppointment = async () => {
-    if (!selectedAppointmentToReschedule || !rescheduleFormData.date || !rescheduleFormData.time || !userId) {
-      toast.error("Please fill in all fields");
-      return;
-    }
-
+    if (!apptToReschedule || !userId) return;
     setApiLoading(true);
-
     try {
-      const rtid = selectedAppointmentToReschedule.rtidCode;
-      const time24 = convert12to24(rescheduleFormData.time);
-      const scheduledDateTime = new Date(`${rescheduleFormData.date}T${time24}`);
-      const otpExpiry = new Date(scheduledDateTime.getTime() + 24 * 60 * 60 * 1000);
+      const rtid    = apptToReschedule.rtidCode;
+      const time24  = convert12to24(rescheduleForm.time);
+      const newDate = new Date(`${rescheduleForm.date}T${time24}`);
 
-      // ====================================================================
-      // STEP 1: Update in appointments collection
-      // ====================================================================
-      const appointmentsQuery = query(
-        collection(db, "appointments"),
-        where("rtid", "==", rtid)
-      );
-      const appointmentSnapshot = await getDocs(appointmentsQuery);
+      // Update appointments collection
+      const appSnap = await getDocs(query(collection(db, 'appointments'), where('rtid', '==', rtid)));
+      if (!appSnap.empty) await updateDoc(appSnap.docs[0].ref, { date: Timestamp.fromDate(newDate), time: rescheduleForm.time, updatedAt: Timestamp.now() });
 
-      if (!appointmentSnapshot.empty) {
-        const appointmentDoc = appointmentSnapshot.docs[0];
-        await updateDoc(appointmentDoc.ref, {
-          date: Timestamp.fromDate(scheduledDateTime),
-          time: rescheduleFormData.time,
-          updatedAt: Timestamp.now()
-        });
-        console.log("✅ Appointment updated in appointments collection");
-      }
+      // Update donations collection
+      const donRef = doc(db, 'donations', rtid);
+      const donSnap = await getDoc(donRef);
+      if (donSnap.exists()) await updateDoc(donRef, { date: Timestamp.fromDate(newDate), time: rescheduleForm.time, otpExpiryTime: Timestamp.fromDate(new Date(newDate.getTime() + 86400000)), updatedAt: Timestamp.now() });
 
-      // ====================================================================
-      // STEP 2: Update in donations collection
-      // ====================================================================
-      const donationRef = doc(db, "donations", rtid);
-      const donationDoc = await getDoc(donationRef);
+      setDonationHistory(prev => prev.map(d => d.rtidCode === rtid ? { ...d, date: newDate, time: rescheduleForm.time } : d).sort((a, b) => b.date.getTime() - a.date.getTime()));
+      setRescheduleOpen(false);
+      toast.success('Rescheduled!', { description: `New: ${formatDateDMY(newDate)} at ${rescheduleForm.time}` });
+    } catch (e: any) { toast.error('Reschedule failed', { description: e.message }); }
+    finally { setApiLoading(false); }
+  };
 
-      if (donationDoc.exists()) {
-        await updateDoc(donationRef, {
-          date: Timestamp.fromDate(scheduledDateTime),
-          time: rescheduleFormData.time,
-          otpExpiryTime: Timestamp.fromDate(otpExpiry),
-          updatedAt: Timestamp.now()
-        });
-        console.log("✅ Donation record updated in donations collection");
-      }
+  const handleCancelAppointment = async (donation: Donation) => {
+    const result = await Swal.fire({
+      title: 'Cancel Appointment?',
+      text: `Cancel your appointment on ${formatDateDMY(donation.date)} at ${donation.hospitalName}?`,
+      icon: 'warning', showCancelButton: true,
+      confirmButtonColor: '#EF4444', cancelButtonColor: '#6B7280',
+      confirmButtonText: 'Yes, Cancel', cancelButtonText: 'Keep It',
+    });
+    if (!result.isConfirmed) return;
+    try {
+      const rtid = donation.rtidCode;
+      // Cancel in appointments collection
+      const appSnap = await getDocs(query(collection(db, 'appointments'), where('rtid', '==', rtid)));
+      if (!appSnap.empty) await updateDoc(appSnap.docs[0].ref, { status: 'Cancelled', cancelledAt: Timestamp.now() });
+      // Cancel in donations collection
+      const donRef = doc(db, 'donations', rtid);
+      if ((await getDoc(donRef)).exists()) await updateDoc(donRef, { status: 'Cancelled', cancelledAt: Timestamp.now() });
 
-      // ====================================================================
-      // STEP 3: Update local state
-      // ====================================================================
-      setDonationHistory(prev => prev.map(d => {
-        if (d.rtidCode === rtid) {
-          return {
-            ...d,
-            date: scheduledDateTime,
-            time: rescheduleFormData.time,
-            otpExpiryTime: otpExpiry
-          };
-        }
-        return d;
-      }).sort((a, b) => b.date.getTime() - a.date.getTime()));
-
-      setIsRescheduleOpen(false);
-      setSelectedAppointmentToReschedule(null);
-
-      toast.success("Appointment Rescheduled! ✅", {
-        description: `New date: ${rescheduleFormData.date} at ${rescheduleFormData.time}`
-      });
-
-    } catch (err: any) {
-      console.error("Reschedule Error:", err);
-      toast.error("Reschedule Failed", { description: err.message });
-    } finally {
-      setApiLoading(false);
-    }
+      setDonationHistory(prev => prev.map(d => d.rtidCode === rtid ? { ...d, status: 'Cancelled' as DonationStatus } : d));
+      toast.success('Appointment cancelled.');
+    } catch (e: any) { toast.error('Could not cancel', { description: e.message }); }
   };
 
   const handleViewHrtid = async (hrtid: string) => {
-    setHrtidLoading(true);
-    setIsHrtidModalOpen(true);
-    setHrtidDetails(null);
-
+    setHrtidLoading(true); setHrtidModalOpen(true); setHrtidDetails(null);
     try {
-      let q = query(collection(db, "bloodRequests"), where("linkedRTID", "==", hrtid));
-      let querySnapshot = await getDocs(q);
-
-      if (querySnapshot.empty) {
-        q = query(collection(db, "bloodRequests"), where("rtid", "==", hrtid));
-        querySnapshot = await getDocs(q);
-      }
-
-      if (querySnapshot.empty) {
-        const docRef = doc(db, "bloodRequests", hrtid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          const matchingDonation = donationHistory.find(d => d.linkedHrtid === hrtid);
-
-          setHrtidDetails({
-            patientName: data.patientName,
-            bloodGroup: data.bloodGroup,
-            units: data.units,
-            hospital: "Hospital",
-            rtidCode: hrtid,
-            bloodBankId: "",
-            component: data.component || 'Whole Blood',
-            requiredBy: data.requiredBy ? safeDate(data.requiredBy).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'N/A',
-            impactTimeline: matchingDonation?.impactTimeline
-          });
-          setHrtidLoading(false);
-          return;
-        }
-      }
-
-      if (!querySnapshot.empty) {
-        const data = querySnapshot.docs[0].data();
-        let hospitalName = "Hospital";
-
-        if (data.hospitalId) {
-          try {
-            const userDoc = await getDoc(doc(db, "users", data.hospitalId));
-            if (userDoc.exists()) {
-              hospitalName = userDoc.data().fullName || "Hospital";
-            }
-          } catch (e) {
-            console.error("Hospital Fetch Error", e);
-          }
-        }
-
-        const matchingDonation = donationHistory.find(d => d.linkedHrtid === hrtid);
-
-        setHrtidDetails({
-          patientName: data.patientName,
-          bloodGroup: data.bloodGroup,
-          units: data.units,
-          hospital: hospitalName,
-          rtidCode: hrtid,
-          bloodBankId: "",
-          component: data.component || 'Whole Blood',
-          requiredBy: data.requiredBy ? safeDate(data.requiredBy).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'N/A',
-          impactTimeline: matchingDonation?.impactTimeline
-        });
-      } else {
-        toast.error("Request Not Found", { description: "The linked request ID may be invalid or deleted." });
-        setIsHrtidModalOpen(false);
-      }
-    } catch (err) {
-      console.error("H-RTID Fetch Error", err);
-      toast.error("Failed to fetch details", { description: "Check connection." });
-      setIsHrtidModalOpen(false);
-    } finally {
-      setHrtidLoading(false);
-    }
+      let data: any = null, hospitalName = 'Hospital';
+      const tryDoc  = async (id: string) => { try { const s = await getDoc(doc(db, 'bloodRequests', id)); return s.exists() ? s.data() : null; } catch { return null; } };
+      const tryQuery = async (field: string, val: string) => { try { const s = await getDocs(query(collection(db, 'bloodRequests'), where(field, '==', val))); return s.empty ? null : s.docs[0].data(); } catch { return null; } };
+      data = await tryDoc(hrtid) || await tryQuery('linkedRTID', hrtid) || await tryQuery('rtid', hrtid);
+      if (data?.hospitalId) { try { const s = await getDoc(doc(db, 'users', data.hospitalId)); if (s.exists()) hospitalName = s.data().fullName || 'Hospital'; } catch (_) {} }
+      if (!data) { toast.error('Request not found'); setHrtidModalOpen(false); return; }
+      const matching = donationHistory.find(d => d.linkedHrtid === hrtid);
+      setHrtidDetails({ patientName: data.patientName, bloodGroup: data.bloodGroup, units: data.units || data.unitsRequired, hospital: hospitalName, rtidCode: hrtid, bloodBankId: '', component: data.component || 'Whole Blood', requiredBy: data.requiredBy ? formatDateTimeDMY(safeDate(data.requiredBy)) : 'N/A', impactTimeline: matching?.impactTimeline });
+    } catch (_) { toast.error('Failed to fetch details'); setHrtidModalOpen(false); }
+    finally { setHrtidLoading(false); }
   };
 
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: 'I am a RaktPort Donor!',
-        text: `I've donated blood ${donorData.donationsCount} times on RaktPort and impacted ${(donorData.donationsCount || 0) * 3} lives! Join me in saving lives!`,
-        url: window.location.origin
-      }).catch(console.error);
-    } else {
-      toast.info("Sharing not supported on this browser.");
-    }
-  };
-
-  // NEW: Handle Emergency Alert Response
-  const handleEmergencyResponse = (alert: EmergencyAlert) => {
-    setScheduleFormData(prev => ({ ...prev, city: donorData.city || '' }));
-    setIsScheduleOpen(true);
-    setEmergencyAlerts(prev => prev.filter(a => a.id !== alert.id));
-    toast.success("Emergency Response Initiated", { description: "Please complete booking to confirm" });
-  };
-
-  // NEW: Handle Availability Mode Change
-  const handleAvailabilityChange = async (mode: 'available' | 'weekends' | 'unavailable') => {
+  const handleAvailabilityChange = async (mode: 'available'|'weekends'|'unavailable') => {
     if (!userId) return;
-
     try {
-      const userRef = doc(db, "users", userId);
-      await updateDoc(userRef, { availabilityMode: mode });
-
+      await updateDoc(doc(db, 'users', userId), { availabilityMode: mode });
       setDonorData(prev => ({ ...prev, availabilityMode: mode }));
-      toast.success("Availability Updated", { description: `You are now marked as: ${mode}` });
-    } catch (err) {
-      console.error("Availability Update Error:", err);
-      toast.error("Failed to update availability");
-    }
+      toast.success('Availability updated');
+    } catch (_) { toast.error('Update failed'); }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="w-12 h-12 animate-spin text-primary" />
-      </div>
-    );
-  }
+  const handleLogoutConfirm = () => {
+    Swal.fire({ title: 'Logout?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#8B0000', confirmButtonText: 'Yes, Logout' }).then(r => { if (r.isConfirmed) onLogout(); });
+  };
 
-  // Continue with JSX render in next part...
-  // PART 6: JSX RENDER - HEADER & MAIN CONTENT
-  // ========================================================================
+  const initials = (n: string) => (n || '').split(' ').map(s => s[0] || '').slice(0, 2).join('').toUpperCase();
 
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-background"><Loader2 className="w-12 h-12 animate-spin text-primary" /></div>;
+
+// This is the return() + modals.
+// ============================================================
   return (
-    <div className="min-h-screen bg-background">
-      {/* ===== HEADER ===== */}
-      <header className="bg-[#8B0000] text-white py-4 shadow-lg no-print">
-        <div className="container mx-auto px-4 flex justify-between items-center">
-          <div className="flex items-center space-x-3">
-            <div className="flex items-center gap-3">
-              <img src={logo} alt="RaktPort Logo" className="w-10 h-10 rounded-full border-2 border-white/50 shadow-sm" />
-              <div>
-                <h1 className="text-xl font-bold leading-tight flex items-center gap-2">
-                  Hello, {donorData.fullName ? donorData.fullName.split(' ')[0] : 'Donor'}! 👋
-                  {donorData.bloodGroup && (
-                    <span className="bg-white/20 text-white text-xs px-2 py-0.5 rounded-full border border-white/30">
-                      {donorData.bloodGroup}
-                    </span>
-                  )}
-                </h1>
-                <p className="text-xs opacity-90 text-red-100">Every drop creates a ripple of hope.</p>
-              </div>
+    <div className="min-h-screen bg-background pb-8">
+
+      {/* ═══ HEADER ═══════════════════════════════════════════ */}
+      <header className="bg-[#8B0000] text-white py-4 shadow-lg no-print sticky top-0 z-40">
+        <div className="container mx-auto px-4 max-w-3xl flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <img src={logo} alt="RaktPort" className="w-10 h-10 rounded-full border-2 border-white/40 shadow flex-shrink-0" />
+            <div className="min-w-0">
+              <h1 className="text-base sm:text-lg font-bold leading-tight truncate">
+                Hello, {(donorData.fullName || 'Donor').split(' ')[0]}! 👋
+                {donorData.bloodGroup && <span className="ml-2 bg-white/20 text-xs px-2 py-0.5 rounded-full">{donorData.bloodGroup}</span>}
+              </h1>
+              <p className="text-xs text-red-200 opacity-80 truncate">{donorData.donorId || 'RaktPort Donor'}</p>
             </div>
           </div>
-          <div className="flex items-center space-x-4">
-            <Button
-              variant="secondary"
-              className="bg-white text-[#8B0000] hover:bg-gray-100 rounded-full font-semibold shadow-sm transition-all hover:scale-105"
-              onClick={() => setIsProfileOpen(true)}
-            >
-              <User className="w-4 h-4 mr-2" /> My Profile
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <Button variant="secondary" size="sm" className="bg-white text-[#8B0000] hover:bg-gray-100 text-xs px-3" onClick={() => setProfileOpen(true)}>
+              <User className="w-3.5 h-3.5 mr-1" /> Profile
             </Button>
-            <button onClick={handleLogoutConfirm} className="text-sm font-medium hover:underline opacity-90 hover:opacity-100">
-              Logout
-            </button>
+            <button onClick={handleLogoutConfirm} className="text-xs font-medium opacity-80 hover:opacity-100 px-1">Logout</button>
           </div>
         </div>
       </header>
 
-      {/* ===== EMERGENCY ALERT BANNER ===== */}
-      {emergencyAlerts.length > 0 && (
-        <div className="no-print">
-          {emergencyAlerts.map(alert => (
-            <EmergencyAlertBanner
-              key={alert.id}
-              alert={alert}
-              onRespond={() => handleEmergencyResponse(alert)}
-              onDismiss={() => setEmergencyAlerts(prev => prev.filter(a => a.id !== alert.id))}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* ===== MOTIVATIONAL QUOTE BANNER ===== */}
-      <div className="bg-gradient-to-r from-orange-100 to-amber-50 border-b border-orange-200 py-2 text-center no-print">
-        <p className="text-sm font-medium text-orange-800 flex items-center justify-center gap-2 animate-in fade-in slide-in-from-top duration-700">
-          <Star className="w-4 h-4 fill-orange-500 text-orange-600" />
+      {/* ═══ MOTIVATION BANNER ══════════════════════════════════ */}
+      <div className="bg-gradient-to-r from-orange-50 to-amber-50 border-b border-orange-100 py-2 no-print">
+        <p className="text-xs sm:text-sm text-center text-orange-800 font-medium px-4 flex items-center justify-center gap-2">
+          <Star className="w-3.5 h-3.5 fill-orange-500 text-orange-500 flex-shrink-0" />
           <em>"{motivationQuote}"</em>
         </p>
       </div>
 
-      {/* ===== HEALTH INSIGHT BANNER ===== */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-200 py-2 text-center no-print">
-        <p className="text-sm text-blue-800 flex items-center justify-center gap-2">
-          <Activity className="w-4 h-4 text-blue-600" />
-          <span>{healthInsight}</span>
-        </p>
-      </div>
+      {/* ═══ EMERGENCY ALERTS ════════════════════════════════════ */}
+      {emergencyAlerts.length > 0 && (
+        <div className="no-print">
+          {emergencyAlerts.map(alert => (
+            <div key={alert.id} className={`px-4 py-3 flex items-center gap-3 flex-wrap ${alert.urgency === 'critical' ? 'bg-red-600' : 'bg-orange-500'} text-white`}>
+              <Zap className="w-4 h-4 flex-shrink-0" />
+              <span className="text-sm font-semibold flex-1">
+                🚨 Urgent: <strong>{alert.bloodGroup}</strong> needed at {alert.hospitalName}
+              </span>
+              <Button size="sm" className="bg-white text-red-700 hover:bg-gray-100 text-xs py-1 h-7"
+                onClick={() => { setScheduleOpen(true); setEmergencyOpen(false); }}>
+                Respond Now
+              </Button>
+              <button onClick={() => setEmergencyAlerts(prev => prev.filter(a => a.id !== alert.id))} className="opacity-70 hover:opacity-100">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
-      {/* ===== MAIN CONTENT ===== */}
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+      {/* ═══ MAIN CONTENT ════════════════════════════════════════ */}
+      <main className="container mx-auto px-4 max-w-3xl py-5 space-y-5">
+
         {error && (
-          <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-md shadow-sm no-print flex items-center gap-3">
-            <Info className="text-red-500 w-5 h-5" />
-            <p className="text-red-700 font-medium">{error}</p>
+          <div className="bg-red-50 border-l-4 border-red-500 p-3 rounded-md flex gap-2 no-print">
+            <AlertCircle className="text-red-500 w-4 h-4 mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-red-700">{error}</p>
           </div>
         )}
 
-        {/* ===== TOP SECTION: QUICK STATS & ELIGIBILITY ===== */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 no-print">
+        {/* ── ELIGIBILITY + NEXT ELIGIBLE COUNTDOWN ─────────── */}
+        <Card className={`shadow-md border-l-4 no-print ${isEligible ? 'border-l-green-500' : 'border-l-red-500'}`}>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-4">
+              <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl flex-shrink-0 ${isEligible ? 'bg-green-100' : 'bg-red-100'}`}>
+                {isEligible ? '🩸' : '🚫'}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className={`font-bold text-sm ${isEligible ? 'text-green-700' : 'text-red-600'}`}>{eligibilityMsg}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Last donation: {lastDonationDisplay}</p>
 
-          {/* Eligibility Card - Enhanced with Deferral Reason */}
-          <Card className={`col-span-1 md:col-span-2 shadow-md border-l-4 ${isEligible ? 'border-l-green-500' : 'border-l-red-500'}`}>
-            <CardContent className="p-6 flex flex-col sm:flex-row items-center justify-between gap-6">
-              <div className="flex items-center gap-5 flex-1">
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center text-3xl shadow-inner ${isEligible ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-500'}`}>
-                  {isEligible ? '🩸' : '🚫'}
-                </div>
-                <div className="flex-1">
-                  <h2 className="text-lg font-bold text-gray-800">Donation Status</h2>
-                  <p className={`font-medium ${isEligible ? 'text-green-600' : 'text-red-600'}`}>{eligibilityMessage}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Last donation: {lastDonationDateDisplay}</p>
-
-                  {/* NEW: Deferral Reason Display */}
-                  {!isEligible && deferralReason && (
-                    <div className="mt-2 p-2 bg-orange-50 border border-orange-200 rounded-md">
-                      <p className="text-xs font-semibold text-orange-800 flex items-center gap-1">
-                        <AlertCircle className="w-3 h-3" />
-                        Reason: {deferralReason}
-                      </p>
+                {!isEligible && nextEligibleDate && nextEligibleDate > new Date() && (
+                  <div className="mt-2 p-2 bg-blue-50 rounded-lg border border-blue-200">
+                    <div className="flex items-center gap-2">
+                      <AlarmClock className="w-3.5 h-3.5 text-blue-600 flex-shrink-0" />
+                      <div>
+                        <p className="text-xs font-semibold text-blue-700">Next eligible: {nextEligibleDisplay}</p>
+                        <CountdownTimer targetDate={nextEligibleDate} compact label="Time remaining" />
+                      </div>
                     </div>
-                  )}
-
-                  {/* NEW: Next Eligible Date */}
-                  {!isEligible && (
-                    <p className="text-xs text-blue-600 mt-2 font-medium flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
-                      Next eligible: {nextEligibleDateDisplay}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <Button
-                onClick={() => setIsScheduleOpen(true)}
-                disabled={!isEligible}
-                className={`rounded-full px-6 py-6 text-md font-bold shadow-lg transition-transform hover:scale-105 ${isEligible
-                  ? 'bg-green-600 hover:bg-green-700 animate-pulse text-white'
-                  : 'bg-red-600 text-white opacity-90 cursor-not-allowed hover:bg-red-700'
-                  }`}
-              >
-                {isEligible ? '❤️ Donate Now' : '🚫 Not Eligible'}
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Credits Card - Enhanced with Link to History */}
-          <Card className="shadow-md bg-gradient-to-br from-white to-red-50 border-red-100 cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setIsCreditHistoryOpen(true)}>
-            <CardContent className="p-6 text-center">
-              <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">Available Credits</p>
-              <div className="flex items-center justify-center gap-2 mt-2">
-                <Droplet className="w-8 h-8 text-red-600 fill-red-600" />
-                <span className="text-4xl font-extrabold text-gray-800">{donorData.credits || 0}</span>
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">Redeemable at any partner hospital.</p>
-              <Button variant="link" className="text-xs mt-2 p-0 h-auto" onClick={() => setIsCreditHistoryOpen(true)}>
-                <History className="w-3 h-3 mr-1" /> View History
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* ===== DONATION STREAK BANNER ===== */}
-        {donationStreak > 0 && (
-          <Alert className="mb-6 bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200 no-print">
-            <TrendingUp className="w-5 h-5 text-purple-600" />
-            <AlertDescription className="ml-2">
-              <p className="font-bold text-purple-800">
-                🔥 {donationStreak} Donation{donationStreak > 1 ? 's' : ''} in Last 12 Months!
-              </p>
-              <p className="text-sm text-purple-600">You're on an amazing streak! Keep up the life-saving work.</p>
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {/* ===== IMPACT SECTION ===== */}
-        <div className="mb-8 no-print">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-              <Award className="w-6 h-6 text-yellow-500" /> Your Impact Journey
-            </h3>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsMilestonesOpen(true)}
-              className="gap-2"
-            >
-              <Star className="w-4 h-4" /> View All Milestones
-            </Button>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="bg-white hover:shadow-lg transition-shadow border-t-4 border-t-blue-500">
-              <CardContent className="p-5 text-center">
-                <div className="mx-auto w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mb-3">
-                  <Droplet className="w-5 h-5 text-blue-600" />
-                </div>
-                <p className="text-2xl font-bold text-gray-800">{donorData.donationsCount || 0}</p>
-                <p className="text-sm text-gray-500">Total Donations</p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white hover:shadow-lg transition-shadow border-t-4 border-t-green-500">
-              <CardContent className="p-5 text-center">
-                <div className="mx-auto w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mb-3">
-                  <Heart className="w-5 h-5 text-green-600 fill-green-600" />
-                </div>
-                <p className="text-2xl font-bold text-gray-800">{(donorData.donationsCount || 0) * 3}</p>
-                <p className="text-sm text-gray-500">Lives Impacted (Est.)</p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white hover:shadow-lg transition-shadow border-t-4 border-t-yellow-500">
-              <CardContent className="p-5 text-center">
-                <div className="mx-auto w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center mb-3">
-                  <Award className="w-5 h-5 text-yellow-600" />
-                </div>
-                <p className="text-sm font-bold text-gray-800 mt-2 px-2 py-1 bg-yellow-50 rounded-full inline-block">
-                  {computeBadgeText(donorData.donationsCount || 0)}
-                </p>
-                <p className="text-sm text-gray-500 mt-1">Current Rank</p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white hover:shadow-lg transition-shadow border-t-4 border-t-purple-500 cursor-pointer" onClick={handleShare}>
-              <CardContent className="p-5 text-center">
-                <div className="mx-auto w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mb-3">
-                  <Share2 className="w-5 h-5 text-purple-600" />
-                </div>
-                <p className="text-lg font-bold text-gray-800">Share</p>
-                <p className="text-sm text-gray-500">Inspire others</p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        {/* Continue with Donation History Table in next part... */}
-
-        {/* ===== DONATION HISTORY TABLE - ENHANCED ===== */}
-        <Card className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
-          <CardHeader className="bg-gray-50/50 border-b border-gray-100 pb-4">
-            <CardTitle className="text-gray-800 text-lg flex items-center gap-2">
-              <List className="w-5 h-5 text-primary" /> Donation History & Credits
-            </CardTitle>
-            <CardDescription>Track your donations, view impact timeline, and manage credits.</CardDescription>
-          </CardHeader>
-          <CardContent className="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-gray-50/30">
-                  <TableHead className="font-semibold">Date</TableHead>
-                  <TableHead className="font-semibold">D-RTID</TableHead>
-                  <TableHead className="font-semibold">Component</TableHead>
-                  <TableHead className="font-semibold">OTP</TableHead>
-                  <TableHead className="font-semibold">Location</TableHead>
-                  <TableHead className="font-semibold">Status</TableHead>
-                  <TableHead className="text-right font-semibold pr-6">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {donationHistory.length > 0 ? donationHistory.map((r, i) => (
-                  <TableRow key={i} className="hover:bg-gray-50 transition-colors">
-                    <TableCell className="font-medium text-gray-700">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-3 h-3 text-gray-400" />
-                        {r.date.toLocaleDateString()}
-                      </div>
-                    </TableCell>
-
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded border border-gray-200">
-                          {r.rtidCode || 'N/A'}
-                        </span>
-                        {r.linkedHrtid && r.linkedHrtid !== '—' && r.linkedHrtid !== 'N/A' && (
-                          <div
-                            className="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold border border-blue-200 cursor-pointer hover:bg-blue-200"
-                            onClick={() => handleViewHrtid(r.linkedHrtid!)}
-                            title="Linked to Request - View Impact"
-                          >
-                            H
+                    {/* Progress bar */}
+                    {donationHistory.filter(d => ['Donated','Completed','Redeemed-Credit'].includes(d.status)).length > 0 && (() => {
+                      const lastDon = donationHistory.find(d => ['Donated','Completed','Redeemed-Credit'].includes(d.status));
+                      if (!lastDon) return null;
+                      const comp = lastDon.component || 'Whole Blood';
+                      const isFemale = (donorData.gender || '').toLowerCase() === 'female';
+                      const total = COOLDOWN_DAYS[comp][isFemale ? 'female' : 'male'] * 86400000;
+                      const elapsed = Date.now() - lastDon.date.getTime();
+                      const pct = Math.min(Math.round((elapsed / total) * 100), 100);
+                      return (
+                        <div className="mt-1.5">
+                          <div className="flex justify-between text-[10px] text-blue-600 mb-0.5">
+                            <span>Recovery progress</span><span>{pct}%</span>
                           </div>
-                        )}
-                      </div>
-                      {r.status === 'Donated' && (!r.linkedHrtid || r.linkedHrtid === '—' || r.linkedHrtid === 'N/A') && r.expiryDate && (
-                        <div className="text-[10px] text-orange-600 mt-1 flex items-center gap-1">
-                          <Clock className="w-3 h-3" /> Exp: {r.expiryDate.toLocaleDateString()}
+                          <Progress value={pct} className="h-1.5" />
                         </div>
-                      )}
-                    </TableCell>
-
-                    {/* NEW: Component Column */}
-                    <TableCell>
-                      <ComponentBadge component={r.component || 'Whole Blood'} />
-                    </TableCell>
-
-                    <TableCell>
-                      {r.status === 'Donated' || r.status === 'Verified' ? (
-                        <div className="flex flex-col gap-1">
-                          <div className="flex items-center gap-1 text-green-700 font-bold bg-green-50 px-2 py-1 rounded w-fit">
-                            <KeyRound className="w-3 h-3" /> {r.otp}
-                          </div>
-                          {r.otpExpiryTime && (
-                            <span className="text-[10px] text-gray-500">
-                              Valid till {r.otpExpiryTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </span>
-                          )}
-                        </div>
-                      ) : (
-                        <span className="text-gray-300 text-xs">◼◼◼◼</span>
-                      )}
-                    </TableCell>
-
-                    <TableCell className="text-sm text-gray-600">{r.hospitalName}</TableCell>
-
-                    <TableCell>
-                      <div className="flex flex-col gap-1">
-                        {/* Status Badge */}
-                        {r.status === 'Scheduled' && <Badge variant="outline" className="border-blue-300 text-blue-700 bg-blue-50">Scheduled</Badge>}
-                        {r.status === 'Pending' && <Badge variant="outline" className="border-yellow-300 text-yellow-700 bg-yellow-50">Pending</Badge>}
-                        {r.status === 'Donated' && <Badge variant="outline" className="border-green-300 text-green-700 bg-green-50">Available</Badge>}
-                        {r.status === 'Verified' && <Badge variant="outline" className="border-teal-300 text-teal-700 bg-teal-50">Verified</Badge>}
-                        {r.status === 'Credited' && <Badge variant="outline" className="border-indigo-300 text-indigo-700 bg-indigo-50">Credited</Badge>}
-                        {r.status === 'Redeemed-Credit' && <Badge variant="outline" className="border-blue-300 text-blue-700 bg-blue-50">Redeemed</Badge>}
-                        {r.status === 'Pledged' && <Badge variant="outline" className="border-purple-300 text-purple-700 bg-purple-50">Pledged</Badge>}
-                        {r.status === 'Completed' && <Badge variant="outline" className="border-gray-300 text-gray-600 bg-gray-50">Completed</Badge>}
-                        {r.status === 'Expired' && <Badge variant="outline" className="border-red-300 text-red-700 bg-red-50">Expired</Badge>}
-                        {r.status === 'Archived' && <Badge variant="outline" className="border-gray-400 text-gray-500 bg-gray-100">Archived</Badge>}
-
-                        {/* NEW: QR Status Badge */}
-                        {r.qrRedemptionStatus && (
-                          <div className="mt-1">
-                            <QRStatusBadge status={r.qrRedemptionStatus} expiryTime={r.otpExpiryTime} />
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-
-                    <TableCell className="text-right pr-4">
-                      <div className="flex items-center justify-end gap-1">
-                        {(r.status === 'Pending' || r.status === 'Scheduled') && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-blue-500 hover:text-blue-700 hover:bg-blue-50"
-                            onClick={() => handleRescheduleClick(r)}
-                            title="Reschedule"
-                          >
-                            <CalendarCheck className="w-4 h-4" />
-                          </Button>
-                        )}
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-gray-500 hover:text-primary hover:bg-red-50"
-                          onClick={() => handleViewHistoryQR(r)}
-                          title="QR"
-                        >
-                          <QrCode className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-gray-500 hover:text-primary hover:bg-red-50"
-                          onClick={() => handlePrintDonation(r)}
-                          title="Print"
-                        >
-                          <Printer className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )) : (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                      <div className="flex flex-col items-center gap-2">
-                        <List className="w-8 h-8 text-gray-300" />
-                        <p>No donation history yet.</p>
-                        <p className="text-xs">Start your life-saving journey today!</p>
-                      </div>
-                    </TableCell>
-                  </TableRow>
+                      );
+                    })()}
+                  </div>
                 )}
-              </TableBody>
-            </Table>
+              </div>
+              <Button size="sm" onClick={() => setScheduleOpen(true)} disabled={!isEligible}
+                className={`flex-shrink-0 text-xs px-3 ${isEligible ? 'bg-green-600 hover:bg-green-700 text-white animate-pulse' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}>
+                {isEligible ? '❤️ Donate' : '🚫 Not Yet'}
+              </Button>
+            </div>
           </CardContent>
         </Card>
-      </div>
 
-      {/* Continue with modals in next part... */}
+        {/* ── CREDITS + STREAK ──────────────────────────────── */}
+        <div className="grid grid-cols-3 gap-3 no-print">
+          <Card className="shadow-sm cursor-pointer hover:shadow-md transition-shadow" onClick={() => {}}>
+            <CardContent className="p-3 text-center">
+              <Droplet className="w-5 h-5 text-red-500 fill-red-500 mx-auto mb-1" />
+              <p className="text-2xl font-black text-gray-800">{donorData.credits || 0}</p>
+              <p className="text-xs text-gray-500">Credits</p>
+            </CardContent>
+          </Card>
+          <Card className="shadow-sm">
+            <CardContent className="p-3 text-center">
+              <Flame className="w-5 h-5 text-orange-500 mx-auto mb-1" />
+              <p className="text-2xl font-black text-gray-800">{donationStreak}</p>
+              <p className="text-xs text-gray-500">Streak (12mo)</p>
+            </CardContent>
+          </Card>
+          <Card className="shadow-sm">
+            <CardContent className="p-3 text-center">
+              <Heart className="w-5 h-5 text-pink-500 fill-pink-400 mx-auto mb-1" />
+              <p className="text-2xl font-black text-gray-800">{(donorData.donationsCount || 0) * 3}</p>
+              <p className="text-xs text-gray-500">Lives</p>
+            </CardContent>
+          </Card>
+        </div>
 
-      {/* ===== ENHANCED PROFILE MODAL ===== */}
-      <Dialog open={isProfileOpen} onOpenChange={setIsProfileOpen}>
-        <DialogContent className="max-w-3xl p-0 overflow-hidden rounded-2xl no-print">
-          <div className="flex flex-col md:flex-row h-full max-h-[90vh]">
+        {/* ── QUICK ACTIONS GRID ────────────────────────────── */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 no-print">
+          {[
+            { icon: '🏆', label: 'Certificate', action: () => setCertOpen(true), color: 'from-amber-50 to-yellow-50 border-amber-200' },
+            { icon: '🩸', label: 'Compatibility', action: () => setCompatOpen(true), color: 'from-red-50 to-rose-50 border-red-200' },
+            { icon: '💡', label: 'Health Tips', action: () => setHealthTipsOpen(true), color: 'from-blue-50 to-indigo-50 border-blue-200' },
+            { icon: '📤', label: 'Share', action: () => setShareOpen(true), color: 'from-purple-50 to-pink-50 border-purple-200' },
+          ].map(({ icon, label, action, color }) => (
+            <button key={label} onClick={action}
+              className={`bg-gradient-to-br ${color} border rounded-2xl p-4 flex flex-col items-center gap-2 hover:shadow-md active:scale-95 transition-all touch-manipulation`}>
+              <span className="text-2xl">{icon}</span>
+              <span className="text-xs font-semibold text-gray-700">{label}</span>
+            </button>
+          ))}
+        </div>
 
-            {/* Left: Digital ID Card Style */}
-            <div className="w-full md:w-2/5 bg-gradient-to-br from-[#8B0000] to-[#5a0000] text-white p-6 relative flex flex-col items-center justify-center text-center">
-              <div className="absolute top-4 left-4 opacity-20">
-                <img src={logo} className="w-16 h-16 grayscale invert" alt="Logo" />
+        {/* ── ROTATING HEALTH TIP ───────────────────────────── */}
+        <div className="no-print bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 border border-blue-100 flex items-start gap-3 cursor-pointer" onClick={() => setHealthTipsOpen(true)}>
+          <span className="text-2xl flex-shrink-0">{HEALTH_TIPS[currentHealthTip].icon}</span>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1 mb-0.5">
+              <p className="text-xs font-bold text-blue-800">{HEALTH_TIPS[currentHealthTip].title}</p>
+              <Badge variant="outline" className="text-[9px] px-1 py-0 border-blue-200 text-blue-600 ml-auto">Health Tip</Badge>
+            </div>
+            <p className="text-xs text-blue-600 line-clamp-2">{HEALTH_TIPS[currentHealthTip].tip}</p>
+          </div>
+          <ChevronRight className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
+        </div>
+
+        {/* ── IMPACT SECTION ────────────────────────────────── */}
+        <div className="no-print">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-base font-bold text-gray-800 flex items-center gap-2"><Award className="w-4 h-4 text-yellow-500" /> Your Impact</h3>
+            <button onClick={() => setCompatOpen(true)} className="text-xs text-primary flex items-center gap-1 font-semibold hover:underline">
+              {donorData.bloodGroup} Compatibility <ChevronRight className="w-3 h-3" />
+            </button>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <Card className="bg-white hover:shadow-md transition-shadow border-t-4 border-t-blue-500">
+              <CardContent className="p-4 text-center">
+                <Droplet className="w-5 h-5 text-blue-500 mx-auto mb-1" />
+                <p className="text-2xl font-black">{donorData.donationsCount || 0}</p>
+                <p className="text-xs text-gray-500">Total Donations</p>
+              </CardContent>
+            </Card>
+            <Card className="bg-white hover:shadow-md transition-shadow border-t-4 border-t-amber-500">
+              <CardContent className="p-4 text-center">
+                <Award className="w-5 h-5 text-amber-500 mx-auto mb-1" />
+                <p className={`text-xs font-bold mt-0.5 px-2 py-0.5 rounded-full text-white ${badgeBg(donorData.donationsCount || 0)} inline-block`}>
+                  {computeBadge(donorData.donationsCount || 0)}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">Current Rank</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* ════════════════════════════════════════════════════════════
+            DONATION HISTORY TABLE
+        ════════════════════════════════════════════════════════════ */}
+        <Card className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+          <CardHeader className="bg-gray-50/50 border-b border-gray-100 p-4">
+            <CardTitle className="text-sm text-gray-800 flex items-center gap-2">
+              <List className="w-4 h-4 text-primary" /> Donation History &amp; Credits
+            </CardTitle>
+            <CardDescription className="text-xs mt-0.5">Tap QR icon to view verification code. Tap H badge to see patient impact.</CardDescription>
+          </CardHeader>
+          <CardContent className="p-0">
+            {donationHistory.length === 0 ? (
+              <div className="p-10 text-center text-muted-foreground">
+                <List className="w-8 h-8 mx-auto mb-2 opacity-30" />
+                <p className="text-sm">No donations yet — start your life-saving journey!</p>
+                <Button size="sm" className="mt-3 bg-primary" onClick={() => setScheduleOpen(true)}>Book Appointment</Button>
               </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-gray-50/30">
+                      <TableHead className="text-xs font-semibold px-3 py-2 min-w-[100px]">Date</TableHead>
+                      <TableHead className="text-xs font-semibold px-3 py-2 min-w-[130px]">D-RTID</TableHead>
+                      <TableHead className="text-xs font-semibold px-3 py-2 hidden sm:table-cell">Component</TableHead>
+                      <TableHead className="text-xs font-semibold px-3 py-2 hidden md:table-cell">OTP</TableHead>
+                      <TableHead className="text-xs font-semibold px-3 py-2">Status</TableHead>
+                      <TableHead className="text-xs font-semibold px-3 py-2 text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {donationHistory.map((r, i) => {
+                      const canCancel = ['Scheduled','Pending'].includes(r.status);
+                      const canReschedule = canCancel;
+                      const isFuture = r.date.getTime() > Date.now();
+                      return (
+                        <TableRow key={i} className="hover:bg-gray-50 transition-colors">
 
-              <div className="w-28 h-28 rounded-full border-4 border-white/30 shadow-xl bg-white/10 flex items-center justify-center text-4xl font-bold mb-4 backdrop-blur-sm">
+                          {/* Date + countdown for scheduled */}
+                          <TableCell className="px-3 py-2.5">
+                            <div>
+                              <p className="text-xs font-semibold text-gray-800">{formatDateDMY(r.date)}</p>
+                              {r.time && <p className="text-[10px] text-gray-400">{r.time}</p>}
+                              {canCancel && isFuture && (
+                                <CountdownTimer targetDate={r.date} compact label="In" />
+                              )}
+                            </div>
+                          </TableCell>
+
+                          {/* RTID + H badge */}
+                          <TableCell className="px-3 py-2.5">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="font-mono text-[10px] bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200 max-w-[100px] truncate" title={r.rtidCode}>
+                                {r.rtidCode?.length > 14 ? r.rtidCode.slice(0,14)+'…' : r.rtidCode}
+                              </span>
+                              {r.linkedHrtid && r.linkedHrtid !== '—' && r.linkedHrtid !== 'N/A' && (
+                                <button onClick={() => handleViewHrtid(r.linkedHrtid)}
+                                  className="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[10px] font-bold border border-blue-200 hover:bg-blue-200" title="View patient impact">H</button>
+                              )}
+                            </div>
+                          </TableCell>
+
+                          {/* Component */}
+                          <TableCell className="px-3 py-2.5 hidden sm:table-cell">
+                            {r.component && <ComponentBadge component={r.component} />}
+                          </TableCell>
+
+                          {/* OTP */}
+                          <TableCell className="px-3 py-2.5 hidden md:table-cell">
+                            {['Donated','Verified'].includes(r.status) ? (
+                              <div>
+                                <div className="flex items-center gap-1 text-green-700 font-bold text-xs bg-green-50 px-1.5 py-0.5 rounded w-fit">
+                                  <KeyRound className="w-2.5 h-2.5" /> {r.otp}
+                                </div>
+                              </div>
+                            ) : <span className="text-gray-300 text-xs">●●●●●●</span>}
+                          </TableCell>
+
+                          {/* Status */}
+                          <TableCell className="px-3 py-2.5">
+                            {r.status === 'Scheduled' && <Badge variant="outline" className="border-blue-300 text-blue-700 bg-blue-50 text-[10px]">Scheduled</Badge>}
+                            {r.status === 'Pending'   && <Badge variant="outline" className="border-yellow-300 text-yellow-700 bg-yellow-50 text-[10px]">Pending</Badge>}
+                            {r.status === 'Donated'   && <Badge variant="outline" className="border-green-300 text-green-700 bg-green-50 text-[10px]">Available</Badge>}
+                            {r.status === 'Verified'  && <Badge variant="outline" className="border-teal-300 text-teal-700 bg-teal-50 text-[10px]">Verified</Badge>}
+                            {r.status === 'Credited'  && <Badge variant="outline" className="border-indigo-300 text-indigo-700 bg-indigo-50 text-[10px]">Credited</Badge>}
+                            {r.status === 'Redeemed-Credit' && <Badge variant="outline" className="border-blue-300 text-blue-700 bg-blue-50 text-[10px]">Redeemed</Badge>}
+                            {r.status === 'Completed' && <Badge variant="outline" className="border-gray-300 text-gray-600 bg-gray-50 text-[10px]">Completed</Badge>}
+                            {r.status === 'Expired'   && <Badge variant="outline" className="border-red-300 text-red-700 bg-red-50 text-[10px]">Expired</Badge>}
+                            {r.status === 'Cancelled' && <Badge variant="outline" className="border-gray-400 text-gray-500 bg-gray-100 text-[10px]">Cancelled</Badge>}
+                          </TableCell>
+
+                          {/* Actions */}
+                          <TableCell className="px-3 py-2.5 text-right">
+                            <div className="flex items-center justify-end gap-0.5">
+                              {canReschedule && (
+                                <button onClick={() => handleRescheduleClick(r)} title="Reschedule"
+                                  className="p-1.5 hover:bg-blue-50 rounded-lg text-blue-500 hover:text-blue-700 transition-colors">
+                                  <CalendarCheck className="w-4 h-4" />
+                                </button>
+                              )}
+                              {canCancel && (
+                                <button onClick={() => handleCancelAppointment(r)} title="Cancel appointment"
+                                  className="p-1.5 hover:bg-red-50 rounded-lg text-red-400 hover:text-red-600 transition-colors">
+                                  <XCircle className="w-4 h-4" />
+                                </button>
+                              )}
+                              <button onClick={() => handleViewHistoryQR(r)} title="View QR"
+                                className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-500 hover:text-primary transition-colors">
+                                <QrCode className="w-4 h-4" />
+                              </button>
+                              <button onClick={() => setDonationToPrint(r)} title="Print slip"
+                                className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-500 hover:text-primary transition-colors">
+                                <Printer className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+      </main>
+
+      {/* ═══════════════════════════════════════════════════════════
+          MODALS
+      ═══════════════════════════════════════════════════════════ */}
+
+      {/* ── Profile Modal ─────────────────────────────────── */}
+      <Dialog open={profileOpen} onOpenChange={setProfileOpen}>
+        <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-2xl no-print max-h-[95vh] overflow-y-auto">
+          <div className="flex flex-col sm:flex-row h-full">
+
+            {/* Left: Digital ID Card */}
+            <div className="w-full sm:w-[200px] sm:flex-shrink-0 bg-gradient-to-br from-[#8B0000] to-[#5a0000] text-white p-5 flex flex-col items-center justify-center text-center relative">
+              <div className="w-20 h-20 rounded-full border-4 border-white/30 bg-white/10 flex items-center justify-center text-3xl font-black mb-3">
                 {initials(donorData.fullName || 'D')}
               </div>
-
-              <h2 className="text-2xl font-bold mb-1">{donorData.fullName}</h2>
-              <p className="text-red-200 text-sm mb-4">User ID: {localStorage.getItem('userId')}</p>
-
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 w-full border border-white/10">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center border-r border-white/10">
-                    <p className="text-xs text-red-200 uppercase">Blood Group</p>
-                    <p className="text-3xl font-extrabold text-white">{donorData.bloodGroup}</p>
+              <h2 className="text-lg font-bold mb-0.5">{donorData.fullName}</h2>
+              <p className="text-xs text-red-200 mb-3 font-mono">{donorData.donorId || 'RKT-XXXXXX'}</p>
+              <div className="bg-white/10 rounded-xl p-3 w-full border border-white/10 mb-3">
+                <div className="flex justify-around">
+                  <div className="text-center">
+                    <p className="text-[10px] text-red-200 uppercase">Blood</p>
+                    <p className="text-2xl font-black">{donorData.bloodGroup}</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-xs text-red-200 uppercase">Age / Gender</p>
-                    <p className="text-lg font-semibold">
-                      {calculateAge(donorData.dob)} Yrs / {donorData.gender ? donorData.gender.charAt(0).toUpperCase() + donorData.gender.slice(1) : '-'}
-                    </p>
+                    <p className="text-[10px] text-red-200 uppercase">Age</p>
+                    <p className="text-lg font-bold">{calculateAge(donorData.dob)} yr</p>
                   </div>
                 </div>
               </div>
-
-              <div className="mt-6">
-                <QRCodeCanvas data={`Profile:${localStorage.getItem('userId')}`} size={100} className="rounded-lg bg-white p-1" />
-              </div>
+              <QRCodeCanvas data={`Profile:${donorData.donorId || userId}`} size={80} className="rounded-lg bg-white p-1" />
+              <p className="text-[9px] text-red-300 mt-1.5">Scan to verify</p>
             </div>
 
-            {/* Right: Tabs & Details */}
-            <div className="w-full md:w-3/5 bg-white p-6 overflow-y-auto">
+            {/* Right: Tabs */}
+            <div className="flex-1 bg-white p-4 overflow-y-auto">
               <Tabs defaultValue="overview">
-                <TabsList className="grid w-full grid-cols-3 mb-6">
+                <TabsList className="grid grid-cols-3 mb-4">
                   <TabsTrigger value="overview">Overview</TabsTrigger>
                   <TabsTrigger value="badges">Badges</TabsTrigger>
                   <TabsTrigger value="settings">Settings</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="overview" className="space-y-4">
-                  <div className="grid grid-cols-1 gap-4">
-                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border">
-                      <MapPin className="text-gray-400" />
-                      <div>
-                        <p className="text-xs text-gray-500">Location</p>
-                        <p className="text-sm font-medium">{donorData.city}, {donorData.pincode}</p>
+                {/* Overview */}
+                <TabsContent value="overview" className="space-y-2.5">
+                  {[
+                    { icon: MapPin,   label: 'Location',     value: `${donorData.city || '—'}${donorData.pincode ? ', ' + donorData.pincode : ''}` },
+                    { icon: BadgeCheck, label: 'Donor ID',   value: donorData.donorId || 'RKT-XXXXXX' },
+                    { icon: Mail,     label: 'Email',        value: donorData.email || '—' },
+                    { icon: Phone,    label: 'Mobile',       value: donorData.mobile || '—' },
+                    { icon: CalendarCheck, label: 'Last Donation', value: lastDonationDisplay },
+                    { icon: Calendar, label: 'Next Eligible', value: nextEligibleDisplay },
+                  ].map(({ icon: Icon, label, value }) => (
+                    <div key={label} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                      <Icon className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-[10px] text-gray-400 font-medium">{label}</p>
+                        <p className="text-sm font-semibold text-gray-800 truncate">{value}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border">
-                      <Mail className="text-gray-400" />
-                      <div className="flex-1">
-                        <p className="text-xs text-gray-500">User ID</p>
-                        <p className="text-sm font-medium break-all">{donorData.email || 'N/A'}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border">
-                      <KeyRound className="text-gray-400" />
-                      <div className="flex-1">
-                        <p className="text-xs text-gray-500">Internal ID</p>
-                        <div className="flex items-center gap-2">
-                          <p className="text-xs font-mono text-gray-600">
-                            {showFullUID ? userId : maskUID(userId || '')}
-                          </p>
-                          <button
-                            onClick={() => setShowFullUID(!showFullUID)}
-                            className="p-1 hover:bg-gray-200 rounded transition-colors"
-                            title={showFullUID ? "Hide ID" : "Show ID"}
-                          >
-                            {showFullUID ? <EyeOff className="w-3 h-3 text-gray-500" /> : <Eye className="w-3 h-3 text-gray-500" />}
-                          </button>
+                  ))}
+                  {nextEligibleDate && nextEligibleDate > new Date() && (
+                    <div className="p-3 bg-blue-50 rounded-xl border border-blue-200">
+                      <div className="flex items-center gap-2">
+                        <AlarmClock className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                        <div>
+                          <p className="text-xs font-bold text-blue-800">Countdown to next donation</p>
+                          <CountdownTimer targetDate={nextEligibleDate} compact />
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border">
-                      <Phone className="text-gray-400" />
-                      <div>
-                        <p className="text-xs text-gray-500">Mobile</p>
-                        <p className="text-sm font-medium">{donorData.mobile || 'N/A'}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border">
-                      <CalendarCheck className="text-gray-400" />
-                      <div>
-                        <p className="text-xs text-gray-500">Last Donation</p>
-                        <p className="text-sm font-medium">{lastDonationDateDisplay}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border">
-                      <Calendar className="text-gray-400" />
-                      <div>
-                        <p className="text-xs text-gray-500">Next Eligible</p>
-                        <p className="text-sm font-medium">{nextEligibleDateDisplay}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 pt-4 border-t flex justify-end">
-                    <Button variant="outline" className="gap-2" onClick={() => toast.info("Edit Profile feature coming soon!")}>
-                      <Edit2 className="w-4 h-4" /> Edit Details
+                  )}
+                  <div className="flex gap-2 pt-2">
+                    <Button size="sm" variant="outline" className="flex-1 text-xs" onClick={() => { setCompatOpen(true); setProfileOpen(false); }}>
+                      <HeartHandshake className="w-3.5 h-3.5 mr-1" /> Compatibility
+                    </Button>
+                    <Button size="sm" variant="outline" className="flex-1 text-xs" onClick={() => { setCertOpen(true); setProfileOpen(false); }}>
+                      <Download className="w-3.5 h-3.5 mr-1" /> Certificate
                     </Button>
                   </div>
                 </TabsContent>
 
-                <TabsContent value="badges" className="space-y-4">
-                  <div className="text-center mb-4">
-                    <div className={`inline-block px-4 py-1 rounded-full text-sm font-bold ${getBadgeClass(donorData.donationsCount || 0)}`}>
-                      Current Rank: {computeBadgeText(donorData.donationsCount || 0)}
-                    </div>
-                  </div>
+                {/* Badges */}
+                <TabsContent value="badges">
                   <div className="grid grid-cols-2 gap-3">
-                    <div className={`p-3 rounded-lg border text-center ${donorData.donationsCount! >= 1 ? 'bg-orange-50 border-orange-200' : 'opacity-50 grayscale'}`}>
-                      <span className="text-2xl">🥉</span>
-                      <p className="text-xs font-bold mt-1">Bronze (1+)</p>
-                    </div>
-                    <div className={`p-3 rounded-lg border text-center ${donorData.donationsCount! >= 5 ? 'bg-gray-100 border-gray-300' : 'opacity-50 grayscale'}`}>
-                      <span className="text-2xl">🥈</span>
-                      <p className="text-xs font-bold mt-1">Silver (5+)</p>
-                    </div>
-                    <div className={`p-3 rounded-lg border text-center ${donorData.donationsCount! >= 10 ? 'bg-yellow-50 border-yellow-200' : 'opacity-50 grayscale'}`}>
-                      <span className="text-2xl">🥇</span>
-                      <p className="text-xs font-bold mt-1">Gold (10+)</p>
-                    </div>
-                    <div className={`p-3 rounded-lg border text-center ${donorData.donationsCount! >= 20 ? 'bg-blue-50 border-blue-200' : 'opacity-50 grayscale'}`}>
-                      <span className="text-2xl">💎</span>
-                      <p className="text-xs font-bold mt-1">Diamond (20+)</p>
-                    </div>
+                    {[
+                      { icon: '🥉', label: 'Bronze Donor',  req: 1,  desc: '1+ donations' },
+                      { icon: '🥈', label: 'Silver Donor',  req: 5,  desc: '5+ donations' },
+                      { icon: '🥇', label: 'Gold Donor',    req: 10, desc: '10+ donations' },
+                      { icon: '💎', label: 'Diamond Donor', req: 20, desc: '20+ donations' },
+                    ].map(b => {
+                      const unlocked = (donorData.donationsCount || 0) >= b.req;
+                      return (
+                        <div key={b.label} className={`p-4 rounded-xl border-2 text-center transition-all ${unlocked ? 'border-yellow-300 bg-yellow-50' : 'border-gray-100 bg-gray-50 opacity-50 grayscale'}`}>
+                          <span className="text-3xl">{b.icon}</span>
+                          <p className="text-xs font-bold mt-1 text-gray-800">{b.label}</p>
+                          <p className="text-[10px] text-gray-500">{b.desc}</p>
+                          {unlocked && <p className="text-[9px] text-green-600 font-bold mt-0.5">✓ Unlocked</p>}
+                        </div>
+                      );
+                    })}
                   </div>
                 </TabsContent>
 
+                {/* Settings */}
                 <TabsContent value="settings" className="space-y-4">
-                  {/* NEW: Advanced Availability Toggle */}
-                  <div className="space-y-4">
-                    <div>
-                      <Label className="text-base mb-2 block">Donor Availability</Label>
-                      <Select
-                        value={donorData.availabilityMode || 'available'}
-                        onValueChange={(v) => handleAvailabilityChange(v as any)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="available">✅ Available Now</SelectItem>
-                          <SelectItem value="weekends">🗓️ Weekends Only</SelectItem>
-                          <SelectItem value="unavailable">🚫 Temporarily Unavailable</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Controls your visibility in emergency donor searches
-                      </p>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-2 border-t">
-                      <div className="space-y-0.5">
-                        <Label className="text-base">SMS Notifications</Label>
-                        <p className="text-xs text-muted-foreground">Receive updates about donation camps.</p>
+                  <div>
+                    <Label className="text-sm mb-2 block">Availability Mode</Label>
+                    <Select value={donorData.availabilityMode || 'available'} onValueChange={v => handleAvailabilityChange(v as any)}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="available">✅ Available Now</SelectItem>
+                        <SelectItem value="weekends">📅 Weekends Only</SelectItem>
+                        <SelectItem value="unavailable">🚫 Unavailable</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground mt-1">Controls visibility in emergency searches</p>
+                  </div>
+                  <div className="space-y-3">
+                    {[['SMS Notifications','Receive updates about camps'],['Emergency Alerts','Get notified for urgent nearby needs'],['Show in Donor List','Allow hospitals to find you']].map(([l,d]) => (
+                      <div key={l} className="flex items-center justify-between">
+                        <div><Label className="text-sm">{l}</Label><p className="text-xs text-muted-foreground">{d}</p></div>
+                        <Switch defaultChecked />
                       </div>
-                      <Switch defaultChecked />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label className="text-base">Emergency Alerts</Label>
-                        <p className="text-xs text-muted-foreground">Get notified about urgent blood needs nearby.</p>
-                      </div>
-                      <Switch defaultChecked />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label className="text-base">Show in Donor List</Label>
-                        <p className="text-xs text-muted-foreground">Allow hospitals to find you for emergencies.</p>
-                      </div>
-                      <Switch defaultChecked />
-                    </div>
+                    ))}
                   </div>
                 </TabsContent>
               </Tabs>
@@ -2379,584 +1708,171 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
         </DialogContent>
       </Dialog>
 
-      {/* ===== SCHEDULE MODAL ===== */}
-      {/* Schedule Modal - FIXED */}
-      <Dialog open={isScheduleOpen} onOpenChange={setIsScheduleOpen}>
-        <DialogContent className="max-w-2xl rounded-xl no-print">
+      {/* ── Schedule / Find Centres Modal ─────────────────── */}
+      <Dialog open={scheduleOpen} onOpenChange={setScheduleOpen}>
+        <DialogContent className="max-w-lg rounded-2xl no-print max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Building2 className="w-5 h-5 text-primary" />
-              Schedule Donation — Find Nearby Blood Banks
-            </DialogTitle>
-            <DialogDescription>
-              Enter your city to locate registered blood banks. Search works with variations like "Delhi", "New Delhi", etc.
-            </DialogDescription>
+            <DialogTitle className="flex items-center gap-2"><Building2 className="w-5 h-5 text-primary" /> Find Blood Banks</DialogTitle>
+            <DialogDescription>Find verified blood banks near you to book your donation</DialogDescription>
           </DialogHeader>
-
-          <div className="space-y-4">
-            <div>
-              <Label className="mb-2 block text-sm font-medium">City / District</Label>
-              <Input
-                placeholder="Enter city name (e.g., Delhi, New Delhi, Mumbai, Bangalore)"
-                value={scheduleFormData.city}
-                onChange={(e) => setScheduleFormData({ ...scheduleFormData, city: e.target.value })}
-                className="rounded-lg"
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter' && scheduleFormData.city.trim()) {
-                    handleFindCenters();
-                  }
-                }}
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                💡 Tip: Try variations like "Delhi" or "New Delhi" - both will work!
-              </p>
+          <div className="space-y-3">
+            <div className="flex gap-2">
+              <Input placeholder="Enter city (e.g. Delhi, Mumbai)" value={scheduleCity} onChange={e => setScheduleCity(e.target.value)} onKeyPress={e => e.key === 'Enter' && handleFindCenters()} className="flex-1" />
+              <Button onClick={handleFindCenters} disabled={apiLoading || !scheduleCity.trim()}>
+                {apiLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Search'}
+              </Button>
             </div>
-
-            <Button
-              onClick={handleFindCenters}
-              disabled={apiLoading || !scheduleFormData.city.trim()}
-              className="w-full bg-primary hover:bg-primary/90 rounded-lg"
-            >
-              {apiLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                  Searching Blood Banks...
-                </>
-              ) : (
-                <>
-                  <Building2 className="w-4 h-4 mr-2" />
-                  Find Blood Banks
-                </>
-              )}
-            </Button>
-          </div>
-
-          <div className="mt-6">
-            {apiLoading ? (
-              <div className="text-center py-12">
-                <Loader2 className="w-10 h-10 animate-spin text-primary mx-auto mb-3" />
-                <p className="text-sm text-gray-600 font-medium">
-                  Searching for blood banks in {scheduleFormData.city}...
-                </p>
-              </div>
-            ) : centers.length > 0 ? (
-              <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
-                <div className="flex items-center justify-between mb-2 pb-2 border-b">
-                  <p className="text-sm font-semibold text-gray-700">
-                    {centers.length} Blood Bank{centers.length > 1 ? 's' : ''} Found
-                  </p>
-                </div>
-
-                {centers.map(center => (
-                  <Card
-                    key={center.id}
-                    className="border-2 hover:border-primary transition-all cursor-pointer shadow-sm hover:shadow-md group"
-                  >
-                    <CardContent className="p-0">
-                      <div
-                        className="p-4 group-hover:bg-blue-50/50 transition-colors"
-                        onClick={() => handleSelectCenter(center)}
-                      >
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Building2 className="w-5 h-5 text-primary" />
-                              <h4 className="font-bold text-gray-800 text-base">
-                                {center.name}
-                              </h4>
-                            </div>
-
-                            <div className="space-y-2 ml-7">
-                              {/* Show complete address */}
-                              <div className="space-y-1">
-                                <p className="text-sm text-gray-600 flex items-start gap-2">
-                                  <MapPin className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
-                                  <span className="flex-1">
-                                    {center.fullAddress || center.address}
-                                  </span>
-                                </p>
-
-                                {/* Show detailed address breakdown if available */}
-                                {(center.city || center.state || center.pincode) && (
-                                  <div className="ml-5 flex flex-wrap gap-2 mt-1">
-                                    {center.city && (
-                                      <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
-                                        📍 {center.city}
-                                      </Badge>
-                                    )}
-                                    {center.state && (
-                                      <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                                        {center.state}
-                                      </Badge>
-                                    )}
-                                    {center.pincode && (
-                                      <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
-                                        PIN: {center.pincode}
-                                      </Badge>
-                                    )}
-                                  </div>
-                                )}
-                              </div>
-
-                              <p className="text-sm text-gray-600 flex items-center gap-2">
-                                <Phone className="w-3.5 h-3.5 text-gray-400" />
-                                <a href={`tel:${center.phone}`} className="hover:text-primary hover:underline">
-                                  {center.phone}
-                                </a>
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="flex flex-col items-end gap-2">
-                            <Badge className="bg-primary text-white">
-                              Book Now
-                            </Badge>
-                            <ChevronRight className="text-primary w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                          </div>
-                        </div>
+            {apiLoading && <div className="text-center py-8"><Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-2" /><p className="text-sm text-gray-500">Finding blood banks…</p></div>}
+            {!apiLoading && centers.length > 0 && (
+              <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+                {centers.map(c => (
+                  <div key={c.id} className="border-2 rounded-xl p-3 hover:border-primary cursor-pointer transition-all group" onClick={() => handleSelectCenter(c)}>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-sm text-gray-900 flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5 text-primary flex-shrink-0" />{c.name}</p>
+                        <p className="text-xs text-gray-500 mt-0.5 flex items-start gap-1"><MapPin className="w-3 h-3 flex-shrink-0 mt-0.5" />{c.fullAddress || c.address}</p>
+                        {c.phone && <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5"><Phone className="w-3 h-3" />{c.phone}</p>}
                       </div>
-
-                      {center.latitude && center.longitude && (
-                        <div className="px-4 pb-4">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="w-full gap-2 border-dashed hover:bg-blue-50 hover:border-primary"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${center.latitude},${center.longitude}`;
-                              window.open(mapsUrl, '_blank');
-                            }}
-                          >
-                            <MapPin className="w-4 h-4 text-primary" />
-                            Get Directions in Google Maps
-                          </Button>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            ) : !apiLoading && (
-              <div className="text-center py-12 bg-gray-50 rounded-lg border border-dashed">
-                <Building2 className="w-16 h-16 text-gray-300 mx-auto mb-3" />
-                <p className="text-base font-medium text-gray-700 mb-1">
-                  No Blood Banks Found
-                </p>
-                <p className="text-sm text-gray-500">
-                  No registered blood banks in "{scheduleFormData.city}"
-                </p>
-              </div>
-            )}
-          </div>
-
-          {!apiLoading && centers.length === 0 && (
-            <Alert className="bg-blue-50 border-blue-200">
-              <Info className="w-4 h-4 text-blue-600" />
-              <AlertDescription className="text-xs text-blue-800 ml-2">
-                Only registered <strong>Blood Banks</strong> are shown.
-              </AlertDescription>
-            </Alert>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Continue with booking modals in next part... */}
-
-      {/* ===== BOOKING MODAL ===== */}
-      <Dialog open={isBookingOpen} onOpenChange={setIsBookingOpen}>
-        <DialogContent className="max-w-md rounded-xl no-print">
-          <DialogHeader>
-            <DialogTitle>Confirm Appointment</DialogTitle>
-            <DialogDescription>
-              Book a slot at <span className="font-semibold text-primary">{selectedCenter?.name}</span>
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4 py-2">
-            <div className="space-y-2">
-              <Label>Date</Label>
-              <Input
-                type="date"
-                value={bookingFormData.date}
-                min={new Date().toISOString().split('T')[0]}
-                onChange={(e) => setBookingFormData({ ...bookingFormData, date: e.target.value })}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Time</Label>
-              <Select
-                value={bookingFormData.time}
-                onValueChange={(v) => setBookingFormData({ ...bookingFormData, time: v })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Time" />
-                </SelectTrigger>
-                <SelectContent>
-                  {['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM'].map(t => (
-                    <SelectItem key={t} value={t}>{t}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Donation Type</Label>
-              <Select
-                value={bookingFormData.component}
-                onValueChange={(v) => setBookingFormData({ ...bookingFormData, component: v as DonationComponent })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Component" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Whole Blood">Whole Blood (Standard)</SelectItem>
-                  <SelectItem value="Platelets">Platelets (Apheresis)</SelectItem>
-                  <SelectItem value="Plasma">Plasma</SelectItem>
-                  <SelectItem value="PRBC">Packed Red Blood Cells</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground bg-blue-50 p-2 rounded border border-blue-100">
-                <Info className="w-3 h-3 inline mr-1" />
-                {bookingFormData.component === 'Whole Blood' && "Can donate every 90 days."}
-                {bookingFormData.component === 'Platelets' && "Can donate every 7 days."}
-                {bookingFormData.component === 'Plasma' && "Can donate every 14 days."}
-                {bookingFormData.component === 'PRBC' && "Can donate every 120 days."}
-              </p>
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsBookingOpen(false)}>Cancel</Button>
-            <Button onClick={handleBookAppointment} disabled={apiLoading || !bookingFormData.date} className="bg-primary hover:bg-primary/90">
-              {apiLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : 'Confirm Booking'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* ===== BOOKING CONFIRMATION MODAL ===== */}
-      <Dialog open={isBookingConfirmOpen} onOpenChange={setIsBookingConfirmOpen}>
-        <DialogContent className="max-w-md rounded-xl text-center no-print">
-          <DialogHeader>
-            <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-              <Check className="w-8 h-8 text-green-600" />
-            </div>
-            <DialogTitle className="text-center text-2xl font-bold text-green-700">Booking Confirmed!</DialogTitle>
-            <DialogDescription className="text-center">
-              Your appointment is scheduled.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="py-6 flex flex-col items-center justify-center bg-gray-50 rounded-xl border border-dashed border-gray-300">
-            <p className="text-sm font-medium mb-4 text-gray-500">Show this QR at the center</p>
-            <canvas ref={qrCanvasRef} className="border-4 border-white shadow-sm rounded-lg" />
-            <p className="mt-4 font-mono font-bold text-lg tracking-wider bg-white px-4 py-1 rounded border">
-              {bookingDetails.rtid}
-            </p>
-          </div>
-
-          <DialogFooter className="sm:justify-center">
-            <Button onClick={() => setIsBookingConfirmOpen(false)} className="w-full rounded-full">
-              Done
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* ===== RESCHEDULE MODAL ===== */}
-      <Dialog open={isRescheduleOpen} onOpenChange={setIsRescheduleOpen}>
-        <DialogContent className="max-w-md rounded-xl no-print">
-          <DialogHeader>
-            <DialogTitle>Reschedule Appointment</DialogTitle>
-            <DialogDescription>Choose a new date and time.</DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label>New Date</Label>
-              <Input
-                type="date"
-                value={rescheduleFormData.date}
-                min={new Date().toISOString().split('T')[0]}
-                onChange={(e) => setRescheduleFormData(prev => ({ ...prev, date: e.target.value }))}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>New Time</Label>
-              <Select
-                value={rescheduleFormData.time}
-                onValueChange={(v) => setRescheduleFormData(prev => ({ ...prev, time: v }))}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM'].map(t => (
-                    <SelectItem key={t} value={t}>{t}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsRescheduleOpen(false)}>Cancel</Button>
-            <Button onClick={handleRescheduleAppointment} disabled={apiLoading} className="bg-primary text-white">
-              {apiLoading ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : 'Confirm Reschedule'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* ===== MILESTONES MODAL ===== */}
-      <Dialog open={isMilestonesOpen} onOpenChange={setIsMilestonesOpen}>
-        <DialogContent className="max-w-4xl rounded-2xl no-print max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-2xl">
-              <Award className="w-8 h-8 text-yellow-500" /> Your Donor Milestones
-            </DialogTitle>
-            <DialogDescription>
-              Unlock achievements as you save more lives!
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 py-4">
-            {milestones.map(milestone => (
-              <Card
-                key={milestone.id}
-                className={`border-2 transition-all ${milestone.achieved
-                  ? 'border-yellow-400 bg-yellow-50/30'
-                  : 'border-gray-100 bg-gray-50 opacity-60 grayscale'
-                  }`}
-              >
-                <CardContent className="p-6 relative overflow-hidden text-center">
-                  {milestone.achieved && (
-                    <div className="absolute top-0 right-0 bg-yellow-400 text-yellow-900 text-[10px] font-bold px-2 py-1 rounded-bl-lg">
-                      UNLOCKED
+                      <Badge className="bg-primary text-white text-xs flex-shrink-0 group-hover:bg-primary/90">Book</Badge>
                     </div>
-                  )}
-                  <div className="text-4xl mb-4 transform hover:scale-110 transition-transform duration-300">
-                    {milestone.icon}
-                  </div>
-                  <h3 className="font-bold text-gray-800 mb-1">{milestone.title}</h3>
-                  <p className="text-sm text-gray-500 leading-tight mb-3">{milestone.description}</p>
-
-                  {milestone.achievedDate && (
-                    <div className="inline-block bg-white px-3 py-1 rounded-full border text-xs font-medium text-gray-500 shadow-sm">
-                      {milestone.achievedDate.toLocaleDateString()}
-                    </div>
-                  )}
-
-                  {!milestone.achieved && (
-                    <div className="mt-2 text-xs font-semibold text-gray-400 uppercase tracking-widest">
-                      Locked
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* ===== CREDIT HISTORY MODAL ===== */}
-      <Dialog open={isCreditHistoryOpen} onOpenChange={setIsCreditHistoryOpen}>
-        <DialogContent className="max-w-xl rounded-xl no-print max-h-[80vh] overflow-hidden flex flex-col">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Droplet className="w-5 h-5 text-red-600" /> Credit History
-            </DialogTitle>
-            <DialogDescription>
-              Track your earned and redeemed blood credits.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="flex-1 overflow-y-auto pr-2 mt-2 space-y-3">
-            {creditTransactions.length > 0 ? creditTransactions.map(tx => (
-              <div key={tx.id} className="flex items-start gap-3 p-3 rounded-lg border bg-card text-card-foreground shadow-sm">
-                <div className={`mt-1 w-8 h-8 rounded-full flex items-center justify-center ${tx.type === 'earned' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
-                  }`}>
-                  {tx.type === 'earned' ? <TrendingUp className="w-4 h-4" /> : <Activity className="w-4 h-4" />}
-                </div>
-                <div className="flex-1">
-                  <div className="flex justify-between items-start">
-                    <p className="font-semibold text-sm">{tx.description}</p>
-                    <span className={`font-bold text-sm ${tx.type === 'earned' ? 'text-green-600' : 'text-red-600'
-                      }`}>
-                      {tx.type === 'earned' ? '+' : ''}{tx.amount}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center mt-1">
-                    <p className="text-xs text-muted-foreground">{tx.date.toLocaleDateString()}</p>
-                    {tx.hospitalName && (
-                      <Badge variant="secondary" className="text-[10px] font-normal">
-                        {tx.hospitalName}
-                      </Badge>
+                    {c.latitude && c.longitude && (
+                      <button className="mt-2 text-[10px] text-blue-600 flex items-center gap-1 hover:underline" onClick={e => { e.stopPropagation(); window.open(`https://www.google.com/maps/dir/?api=1&destination=${c.latitude},${c.longitude}`, '_blank'); }}>
+                        <Navigation className="w-3 h-3" /> Get Directions
+                      </button>
                     )}
                   </div>
-                </div>
+                ))}
               </div>
-            )) : (
-              <div className="text-center py-10 text-muted-foreground">
-                <History className="w-12 h-12 mx-auto mb-2 opacity-20" />
-                <p>No credit transactions yet.</p>
+            )}
+            {!apiLoading && centers.length === 0 && scheduleCity && (
+              <div className="text-center py-8 text-gray-400">
+                <Building2 className="w-10 h-10 mx-auto mb-2 opacity-30" />
+                <p className="text-sm">No blood banks found in "{scheduleCity}"</p>
+                <p className="text-xs mt-1">Try variations like "New Delhi" or "Mumbai"</p>
               </div>
             )}
           </div>
-          <div className="pt-4 border-t bg-white">
-            <div className="flex justify-between items-center p-3 bg-red-50 rounded-lg border border-red-100">
-              <span className="font-semibold text-red-800">Available Balance</span>
-              <span className="text-2xl font-bold text-red-600">{donorData.credits || 0}</span>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Booking Modal ─────────────────────────────────── */}
+      <Dialog open={bookingOpen} onOpenChange={setBookingOpen}>
+        <DialogContent className="max-w-sm rounded-2xl no-print">
+          <DialogHeader>
+            <DialogTitle>Confirm Appointment</DialogTitle>
+            <DialogDescription>Book at <strong>{selectedCenter?.name}</strong></DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div><Label className="text-xs mb-1 block">Date</Label>
+              <Input type="date" value={bookingForm.date} min={new Date().toISOString().split('T')[0]} onChange={e => setBookingForm(f => ({...f, date: e.target.value}))} />
+            </div>
+            <div><Label className="text-xs mb-1 block">Time</Label>
+              <Select value={bookingForm.time} onValueChange={v => setBookingForm(f => ({...f, time: v}))}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {['09:00 AM','10:00 AM','11:00 AM','12:00 PM','02:00 PM','03:00 PM','04:00 PM','05:00 PM'].map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div><Label className="text-xs mb-1 block">Donation Type</Label>
+              <Select value={bookingForm.component} onValueChange={v => setBookingForm(f => ({...f, component: v as DonationComponent}))}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Whole Blood">Whole Blood (90 day interval)</SelectItem>
+                  <SelectItem value="Platelets">Platelets (7 day interval)</SelectItem>
+                  <SelectItem value="Plasma">Plasma (14 day interval)</SelectItem>
+                  <SelectItem value="PRBC">PRBC (90 day interval)</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" size="sm" onClick={() => setBookingOpen(false)}>Cancel</Button>
+            <Button size="sm" onClick={handleBookAppointment} disabled={apiLoading || !bookingForm.date}>
+              {apiLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" /> : null} Confirm
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Continue with booking modals in next part... */}
-
-      {/* ===== H-RTID DETAILS MODAL - ENHANCED WITH IMPACT TIMELINE ===== */}
-      <Dialog open={isHrtidModalOpen} onOpenChange={setIsHrtidModalOpen}>
-        <DialogContent className="rounded-xl no-print max-w-2xl">
+      {/* ── Booking Confirm Modal ──────────────────────────── */}
+      <Dialog open={bookingConfirmOpen} onOpenChange={setBookingConfirmOpen}>
+        <DialogContent className="max-w-sm rounded-2xl text-center no-print">
           <DialogHeader>
-            <DialogTitle>Linked Request Details</DialogTitle>
-            <DialogDescription>This donation fulfilled a specific patient request.</DialogDescription>
+            <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3"><Check className="w-7 h-7 text-green-600" /></div>
+            <DialogTitle className="text-green-700">Booking Confirmed!</DialogTitle>
           </DialogHeader>
-
-          {hrtidLoading ? (
-            <div className="flex justify-center p-6">
-              <Loader2 className="w-8 h-8 animate-spin text-primary" />
-            </div>
-          ) : hrtidDetails ? (
-            <div className="space-y-4 pt-2">
-              <div className="p-4 bg-blue-50/50 rounded-lg border border-blue-100 space-y-2">
-                <div className="flex justify-between items-start">
-                  <p className="text-sm font-medium text-gray-500">H-RTID Code</p>
-                  <Badge variant="outline" className="font-mono bg-white">{hrtidDetails.rtidCode}</Badge>
-                </div>
-                <div className="grid grid-cols-2 gap-4 mt-2">
-                  <div>
-                    <p className="text-xs text-gray-500">Patient</p>
-                    <p className="font-semibold">{hrtidDetails.patientName}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">Hospital</p>
-                    <p className="font-semibold truncate" title={hrtidDetails.hospital}>{hrtidDetails.hospital}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">Requirement</p>
-                    <div className="flex items-center gap-2">
-                      <p className="font-semibold">{hrtidDetails.units} Unit(s) {hrtidDetails.bloodGroup}</p>
-                      {hrtidDetails.component && <ComponentBadge component={hrtidDetails.component} />}
-                    </div>
-                  </div>
-                  {hrtidDetails.requiredBy && (
-                    <div>
-                      <p className="text-xs text-gray-500 flex items-center gap-1">
-                        <Clock className="w-3 h-3" /> Required By
-                      </p>
-                      <p className="font-semibold text-red-600 text-sm">{hrtidDetails.requiredBy}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* NEW: Impact Timeline Display */}
-              {hrtidDetails.impactTimeline && (
-                <div className="border-t pt-4">
-                  <ImpactTimelineView
-                    timeline={hrtidDetails.impactTimeline}
-                    component={hrtidDetails.component}
-                  />
-                </div>
-              )}
-
-              <p className="text-xs text-center text-gray-400 italic">
-                Thank you for fulfilling this specific request and saving a life.
-              </p>
-            </div>
-          ) : (
-            <div className="text-center p-4 text-muted-foreground">No details available.</div>
-          )}
+          <div className="py-4 flex flex-col items-center gap-3 bg-gray-50 rounded-xl border border-dashed border-gray-300">
+            <p className="text-xs text-gray-500 font-medium">Show this QR at the centre</p>
+            <canvas ref={qrCanvasRef} className="border-4 border-white shadow rounded-lg" />
+            <p className="font-mono font-bold text-sm tracking-wider bg-white px-3 py-1 rounded border">{bookingDetails.rtid}</p>
+          </div>
+          <Button className="w-full mt-2" onClick={() => setBookingConfirmOpen(false)}>Done</Button>
         </DialogContent>
       </Dialog>
 
-      {/* ===== HISTORY QR MODAL (Enhanced - Already Defined in Part 2) ===== */}
-      <HistoryQRModal
-        isOpen={isHistoryQROpen}
-        onClose={() => setIsHistoryQROpen(false)}
-        data={selectedHistoryQR}
-      />
+      {/* ── Reschedule Modal ───────────────────────────────── */}
+      <Dialog open={rescheduleOpen} onOpenChange={setRescheduleOpen}>
+        <DialogContent className="max-w-sm rounded-2xl no-print">
+          <DialogHeader>
+            <DialogTitle>Reschedule Appointment</DialogTitle>
+            <DialogDescription>Choose a new date and time for your appointment</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div><Label className="text-xs mb-1 block">New Date</Label>
+              <Input type="date" value={rescheduleForm.date} min={new Date().toISOString().split('T')[0]} onChange={e => setRescheduleForm(f => ({...f, date: e.target.value}))} />
+            </div>
+            <div><Label className="text-xs mb-1 block">New Time</Label>
+              <Select value={rescheduleForm.time} onValueChange={v => setRescheduleForm(f => ({...f, time: v}))}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {['09:00 AM','10:00 AM','11:00 AM','12:00 PM','02:00 PM','03:00 PM','04:00 PM','05:00 PM'].map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" size="sm" onClick={() => setRescheduleOpen(false)}>Cancel</Button>
+            <Button size="sm" onClick={handleRescheduleAppointment} disabled={apiLoading}>
+              {apiLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" /> : null} Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-      {/* ===== PRINTABLE DONATION (Enhanced - Already Defined in Part 2) ===== */}
+      {/* ── H-RTID Details Modal ──────────────────────────── */}
+      <Dialog open={hrtidModalOpen} onOpenChange={setHrtidModalOpen}>
+        <DialogContent className="rounded-2xl no-print max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Linked Patient Request</DialogTitle>
+            <DialogDescription>This donation was linked to a specific patient need</DialogDescription>
+          </DialogHeader>
+          {hrtidLoading ? <div className="flex justify-center p-6"><Loader2 className="w-7 h-7 animate-spin text-primary" /></div>
+          : hrtidDetails ? (
+            <div className="space-y-3">
+              <div className="p-4 bg-blue-50 rounded-xl border border-blue-100 space-y-2 text-sm">
+                {[['H-RTID', hrtidDetails.rtidCode], ['Patient', hrtidDetails.patientName], ['Hospital', hrtidDetails.hospital], ['Blood Group', hrtidDetails.bloodGroup], ['Units', String(hrtidDetails.units)], ['Required By', hrtidDetails.requiredBy || 'N/A']].map(([k, v]) => (
+                  <div key={k} className="flex justify-between gap-2"><span className="text-xs text-gray-500 font-medium">{k}</span><span className="text-xs font-bold text-gray-900 text-right max-w-[55%] truncate" title={v}>{v}</span></div>
+                ))}
+              </div>
+              {hrtidDetails.impactTimeline && <ImpactTimelineView timeline={hrtidDetails.impactTimeline} />}
+            </div>
+          ) : <p className="text-center text-sm text-gray-400 py-4">No details available</p>}
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Feature Modals ────────────────────────────────── */}
+      <CertificateModal isOpen={certOpen} onClose={() => setCertOpen(false)} donorData={donorData} donationHistory={donationHistory} />
+      <BloodCompatibilityModal isOpen={compatOpen} onClose={() => setCompatOpen(false)} bloodGroup={donorData.bloodGroup || 'O+'} />
+      <HealthTipsSection isOpen={healthTipsOpen} onClose={() => setHealthTipsOpen(false)} />
+      <ShareCardModal isOpen={shareOpen} onClose={() => setShareOpen(false)} donorData={donorData} />
+      <HistoryQRModal isOpen={historyQROpen} onClose={() => setHistoryQROpen(false)} data={selectedHistoryQR} />
+
+      {/* Printable slip */}
       <PrintableDonation donation={donationToPrint} donorData={donorData} />
 
     </div>
   );
 }
 
-// ========================================================================
-// EXPORT COMPONENT
-// ========================================================================
-
 export default DonorDashboard;
-
-// ========================================================================
-// END OF ENHANCED DONOR DASHBOARD
-// ========================================================================
-
-/**
- * IMPLEMENTATION SUMMARY
- * ======================
- * 
- * ✅ CLINICAL SAFETY & MEDICAL COMPLIANCE
- *    - Donation Component Types (Whole Blood, Platelets, Plasma, PRBC)
- *    - Component-aware eligibility checking with different cooldown periods
- *    - Health Deferral Reasons displayed clearly
- *    - Component type shown in history, print slips, and H-RTID modals
- * 
- * ✅ DONOR TRUST, TRANSPARENCY & MOTIVATION
- *    - "Where Did My Blood Go?" Impact Timeline with 4 stages
- *    - Credit History Ledger with full transaction audit trail
- *    - Donation streaks and milestone achievements
- *    - Personalized health insights
- * 
- * ✅ EMERGENCY & NATIONAL READINESS
- *    - Emergency Alert Banner system (ready for real-time integration)
- *    - Advanced Availability Toggle (Available/Weekends/Unavailable)
- *    - Quick emergency response workflow
- * 
- * ✅ UX & PSYCHOLOGICAL RETENTION
- *    - 6 milestone achievements system
- *    - Visual progress tracking
- *    - Donation streak display
- *    - Lives impacted counter
- * 
- * ✅ SECURITY, ANTI-FRAUD & SYSTEM INTEGRITY
- *    - QR Redemption Status Badges (Redeemed/Pending/Expired)
- *    - OTP expiry countdown and validation
- *    - One-donation-one-OTP enforcement
- *    - Status state machine (Scheduled → Donated → Verified → Credited → Redeemed → Archived)
- * 
- * ✅ DATA ARCHITECTURE & SCALABILITY
- *    - Backward compatible with existing Firestore structure
- *    - Component type defaulting to "Whole Blood" for old records
- *    - Language readiness (en/hi support prepared)
- *    - All new fields are optional/have defaults
- * 
- * KEY FEATURES PRESERVED:
- * - All existing functionality intact  
- * - RaktPort theme and design consistency maintained
- * - Firestore integration unchanged
- * - Print functionality enhanced
- * - QR code generation improved
- * - Reschedule capability enhanced
- * 
- * READY FOR PRODUCTION:
- * - Clinical compliance ready
- * - Government audit ready
- * - Emergency response ready
- * - Trust and transparency maximized
- * - Future-proof architecture
- */
