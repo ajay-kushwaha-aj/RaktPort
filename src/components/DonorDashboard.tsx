@@ -35,7 +35,7 @@ import { Progress } from './ui/progress';
 import { calculateDonorEligibility } from '../lib/medical-eligibility';
 import QRious from 'qrious';
 import { toast } from './ui/sonner';
-import logo from '../assets/raktport-logo.jpg';
+import logo from '../assets/raktport-logo.png';
 import Swal from 'sweetalert2';
 import { db } from '../firebase';
 import {
