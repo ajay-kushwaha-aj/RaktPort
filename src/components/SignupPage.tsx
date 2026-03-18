@@ -14,7 +14,7 @@ import {
   FileText, Building2, Heart, Shield, AlertCircle, Loader2,
   ChevronRight, ChevronLeft, Home, Smartphone, KeyRound,
 } from 'lucide-react';
-import logo from '../assets/raktsetu-logo.jpg';
+import logo from '../assets/raktport-logo.png';
 import type { ConfirmationResult, RecaptchaVerifier } from 'firebase/auth';
 
 interface SignupPageProps {

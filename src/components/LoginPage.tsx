@@ -1,10 +1,4 @@
-// src/components/LoginPage.tsx  ── FIXED
-//
-// Change vs original:
-//   • After successful login, also stores  localStorage.setItem('userEmail', email)
-//     This ensures useBloodBankData can find the Firestore doc even if the
-//     Firebase Auth state hasn't resolved yet on the next page load.
-//   • Same fix applied to Google sign-in path.
+// src/components/LoginPage.tsx
 
 import { useState, useCallback } from 'react';
 import { loginUser, signInWithGoogle } from '../lib/auth';
@@ -13,7 +7,7 @@ import {
   Eye, EyeOff, Mail, Lock, UserCircle,
   Building2, Droplet, ShieldCheck, ArrowLeft,
 } from 'lucide-react';
-import logo from '../assets/raktsetu-logo.jpg';
+import logo from '../assets/raktport-logo.png';
 
 interface LoginPageProps {
   initialRole: string;
