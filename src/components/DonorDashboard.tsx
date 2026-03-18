@@ -1,5 +1,10 @@
 // ═══════════════════════════════════════════════════════════════
 // DonorDashboard.tsx  — PART 1 of 3
+// FIXES:
+//   • Certificate download: blob-URL new-window (no more CSS bugs)
+//     QR rendered as data-URL, logo resolved as absolute URL,
+//     images preloaded before auto-print in new tab
+//   • PrintableDonation: RTID highlighted with red border
 // ═══════════════════════════════════════════════════════════════
 
 import { useState, useEffect, useRef, useMemo } from 'react';
@@ -317,7 +322,7 @@ const CertificateModal = ({isOpen,onClose,donorData,donationHistory}:CertModalPr
   // Render preview QR
   useEffect(()=>{
     if(!isOpen) return;
-    const t=setTimeout(()=>{if(previewQrRef.current)try{new QRious({element:previewQrRef.current,value:qrValue,size:64,foreground:'#8B0000',level:'H'});}catch(_){},150);
+    const t=setTimeout(()=>{if(previewQrRef.current)try{new QRious({element:previewQrRef.current,value:qrValue,size:64,foreground:'#8B0000',level:'H'});}catch(_){}},150);
     return()=>clearTimeout(t);
   },[isOpen,qrValue]);
 
@@ -533,9 +538,6 @@ const ShareCardModal = ({isOpen,onClose,donorData}:{isOpen:boolean;onClose:()=>v
   );
 };
 
-// ─────────────────────────────────────────────────────────────
-// END OF PART 1 — Paste Part 2 immediately below
-// ─────────────────────────────────────────────────────────────
 // ═══════════════════════════════════════════════════════════════
 // DonorDashboard.tsx  — PART 2 of 3
 // FIXES:
