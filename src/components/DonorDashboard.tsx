@@ -46,7 +46,6 @@ import {
 // HELPER FUNCTIONS
 // ─────────────────────────────────────────────────────────────
 
-/** Robust Firestore / Date parser */
 const safeDate = (v: any): Date => {
   if (!v) return new Date();
   if (v?.toDate) return v.toDate();
@@ -57,7 +56,6 @@ const safeDate = (v: any): Date => {
   return new Date();
 };
 
-/** DD/MM/YYYY */
 const formatDateDMY = (d: Date | string | null | undefined): string => {
   if (!d) return 'N/A';
   try {
@@ -69,7 +67,6 @@ const formatDateDMY = (d: Date | string | null | undefined): string => {
   } catch { return 'N/A'; }
 };
 
-/** DD/MM/YYYY HH:MM */
 const formatDateTimeDMY = (d: Date | string | null | undefined): string => {
   if (!d) return 'N/A';
   try {
@@ -83,7 +80,6 @@ const formatDateTimeDMY = (d: Date | string | null | undefined): string => {
   } catch { return 'N/A'; }
 };
 
-/** Generate unique Donor ID e.g. RKT-A1B2C3 */
 export const generateDonorId = (): string => {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let id = 'RKT-';
@@ -91,7 +87,6 @@ export const generateDonorId = (): string => {
   return id;
 };
 
-/** Generate appointment RTID */
 const generateUniqueAppointmentRtid = async (dateStr: string): Promise<string> => {
   const d  = new Date(dateStr);
   const dd = String(d.getDate()).padStart(2, '0');
@@ -170,7 +165,7 @@ interface DonorData {
   email?:             string;
   mobile?:            string;
   dob?:               string;
-  donorId?:           string;   // RKT-XXXXXX
+  donorId?:           string;
   availabilityMode?:  'available' | 'weekends' | 'unavailable';
 }
 
@@ -420,7 +415,7 @@ const HistoryQRModal = ({ isOpen, onClose, data }: HistoryQRModalProps) => {
   );
 };
 
-// ── Printable Donation Slip ───────────────────────────────────
+// ── Printable Donation Slip (RTID highlighted) ───────────────
 const PrintableDonation = ({ donation, donorData }: { donation: Donation | null; donorData: DonorData }) => {
   const qrRef = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
@@ -438,6 +433,7 @@ const PrintableDonation = ({ donation, donorData }: { donation: Donation | null;
       <style>{`@media print{@page{size:A4;margin:10mm}body>*:not(#pd-portal){display:none!important}#pd-portal{display:flex!important;position:fixed;inset:0;background:white;z-index:99999;align-items:start;justify-content:center;padding:10mm}.no-print{display:none!important}}@media screen{#pd-portal{display:none!important}}`}</style>
       <div id="pd-portal">
         <div style={{ width: '190mm', border: '2px solid #1a0505', padding: '8mm', fontFamily: 'Georgia, serif', color: '#1a0505' }}>
+          {/* Header */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #8B0000', paddingBottom: '4mm', marginBottom: '5mm' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4mm' }}>
               <img src={logo} alt="" style={{ width: '14mm', height: '14mm', objectFit: 'contain' }} />
@@ -446,12 +442,23 @@ const PrintableDonation = ({ donation, donorData }: { donation: Donation | null;
                 <div style={{ fontSize: '7pt', color: '#555' }}>National Blood Management System</div>
               </div>
             </div>
-            <div style={{ textAlign: 'right', fontSize: '7.5pt', color: '#555' }}>
-              <div>DONATION SLIP</div>
-              <div style={{ fontFamily: 'monospace', fontWeight: 'bold', fontSize: '9pt' }}>{donation.rtidCode}</div>
-              <div>Generated: {formatDateDMY(new Date())}</div>
+            {/* ── RTID HIGHLIGHTED ── */}
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: '7pt', color: '#555', marginBottom: '1mm' }}>DONATION SLIP</div>
+              <div style={{
+                fontFamily: 'monospace', fontWeight: 'bold', fontSize: '11pt',
+                color: '#8B0000', background: '#fff0f0',
+                padding: '2mm 5mm', borderRadius: '3mm',
+                border: '2px solid #8B0000',
+                letterSpacing: '0.05em',
+                display: 'inline-block',
+              }}>
+                {donation.rtidCode}
+              </div>
+              <div style={{ fontSize: '7pt', color: '#555', marginTop: '1mm' }}>Generated: {formatDateDMY(new Date())}</div>
             </div>
           </div>
+
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4mm', marginBottom: '4mm' }}>
             <div>
               <div style={{ fontSize: '8pt', fontWeight: 'bold', color: '#8B0000', marginBottom: '2mm', borderBottom: '1px solid #ddd', paddingBottom: '1mm' }}>DONOR DETAILS</div>
@@ -487,11 +494,11 @@ const PrintableDonation = ({ donation, donorData }: { donation: Donation | null;
   );
 };
 
-// ── Impact Certificate ────────────────────────────────────────
+// ── Impact Certificate (proper preview + download) ────────────
 interface CertModalProps { isOpen: boolean; onClose: () => void; donorData: DonorData; donationHistory: Donation[]; }
 const CertificateModal = ({ isOpen, onClose, donorData, donationHistory }: CertModalProps) => {
-  const certRef = useRef<HTMLCanvasElement>(null);
-  const qrRef   = useRef<HTMLCanvasElement>(null);
+  const qrDialogRef = useRef<HTMLCanvasElement>(null);
+  const qrPrintRef  = useRef<HTMLCanvasElement>(null);
 
   const completed = donationHistory.filter(d => ['Donated','Completed','Redeemed-Credit','Verified','Credited'].includes(d.status));
   const firstDate = completed.length > 0 ? completed[completed.length - 1].date : null;
@@ -499,19 +506,33 @@ const CertificateModal = ({ isOpen, onClose, donorData, donationHistory }: CertM
   const lives     = (donorData.donationsCount || 0) * 3;
   const certNo    = `CERT-${donorData.donorId?.replace('RKT-','') || 'XXXXXX'}-${new Date().getFullYear()}`;
 
+  const qrValue = `${donorData.donorId || 'N/A'}|${certNo}|${donorData.bloodGroup}|${donorData.donationsCount || 0}`;
+
   useEffect(() => {
-    if (isOpen && qrRef.current) {
-      try {
-        new QRious({ element: qrRef.current, value: `${donorData.donorId || 'N/A'}|${certNo}|${donorData.bloodGroup}|${donorData.donationsCount || 0}`, size: 80, foreground: '#8B0000', level: 'H' });
-      } catch (_) {}
+    if (isOpen) {
+      setTimeout(() => {
+        [qrDialogRef, qrPrintRef].forEach(r => {
+          if (r.current) {
+            try { new QRious({ element: r.current, value: qrValue, size: 80, foreground: '#8B0000', level: 'H' }); } catch (_) {}
+          }
+        });
+      }, 100);
     }
-  }, [isOpen, donorData, certNo]);
+  }, [isOpen, qrValue]);
 
   const handleDownload = () => window.print();
 
+  const stats = [
+    ['Blood Group', donorData.bloodGroup || 'N/A'],
+    ['Donations',   String(donorData.donationsCount || 0)],
+    ['Lives Saved', `~${lives}`],
+    ['First Gift',  firstDate ? formatDateDMY(firstDate) : 'N/A'],
+    ['Latest',      lastDate  ? formatDateDMY(lastDate)  : 'N/A'],
+  ];
+
   return (
     <>
-      {/* Print-only certificate */}
+      {/* ── Print-only A4 landscape certificate ── */}
       {isOpen && createPortal(
         <>
           <style>{`@media print{@page{size:A4 landscape;margin:0}body>*:not(#cert-portal){display:none!important}#cert-portal{display:block!important;position:fixed;inset:0;background:white;z-index:99999}}.no-print{display:none!important}@media screen{#cert-portal{display:none!important}}`}</style>
@@ -519,10 +540,10 @@ const CertificateModal = ({ isOpen, onClose, donorData, donationHistory }: CertM
             <div style={{
               width: '297mm', height: '210mm', position: 'relative',
               background: 'linear-gradient(135deg, #fff8f5 0%, #ffffff 50%, #fff5f5 100%)',
-              fontFamily: "'Georgia', serif", overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              fontFamily: "'Georgia', serif", overflow: 'hidden',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
               padding: '12mm',
             }}>
-              {/* Decorative corner borders */}
               {['tl','tr','bl','br'].map(pos => (
                 <div key={pos} style={{
                   position: 'absolute',
@@ -535,10 +556,7 @@ const CertificateModal = ({ isOpen, onClose, donorData, donationHistory }: CertM
                   borderRight:  pos.includes('r') ? '3px solid #8B0000' : 'none',
                 }} />
               ))}
-              {/* Outer border */}
               <div style={{ position: 'absolute', inset: '4mm', border: '1px solid rgba(139,0,0,0.2)', pointerEvents: 'none' }} />
-
-              {/* Header */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '5mm', marginBottom: '5mm' }}>
                 <img src={logo} alt="" style={{ width: '18mm', height: '18mm', objectFit: 'contain' }} />
                 <div style={{ textAlign: 'center' }}>
@@ -547,52 +565,34 @@ const CertificateModal = ({ isOpen, onClose, donorData, donationHistory }: CertM
                 </div>
                 <img src={logo} alt="" style={{ width: '18mm', height: '18mm', objectFit: 'contain', opacity: 0.3 }} />
               </div>
-
-              {/* Divider */}
               <div style={{ width: '180mm', height: '1px', background: 'linear-gradient(to right, transparent, #8B0000 30%, #8B0000 70%, transparent)', marginBottom: '5mm' }} />
-
-              {/* Title */}
               <div style={{ fontSize: '24pt', fontWeight: 'bold', color: '#8B0000', letterSpacing: '0.08em', marginBottom: '2mm', textAlign: 'center' }}>
                 CERTIFICATE OF APPRECIATION
               </div>
               <div style={{ fontSize: '9pt', color: '#666', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: '6mm', textAlign: 'center' }}>
                 This is to certify that
               </div>
-
-              {/* Donor Name */}
               <div style={{ fontSize: '28pt', fontWeight: 'bold', color: '#1a0505', letterSpacing: '-0.02em', marginBottom: '1mm', textAlign: 'center' }}>
                 {(donorData.fullName || 'Donor Name').toUpperCase()}
               </div>
               <div style={{ fontSize: '10pt', color: '#8B0000', fontStyle: 'italic', marginBottom: '5mm', textAlign: 'center' }}>
                 Donor ID: {donorData.donorId || 'RKT-XXXXXX'} · Blood Group: {donorData.bloodGroup || 'N/A'}
               </div>
-
-              {/* Body text */}
               <div style={{ fontSize: '10pt', color: '#444', lineHeight: 1.7, textAlign: 'center', maxWidth: '200mm', marginBottom: '6mm' }}>
                 has generously donated blood <strong style={{ color: '#8B0000' }}>{donorData.donationsCount || 0} time{(donorData.donationsCount || 0) !== 1 ? 's' : ''}</strong> through the RaktPort National Blood Donation Programme,
                 potentially saving up to <strong style={{ color: '#8B0000' }}>{lives} lives</strong> through their selfless and noble act of giving.
               </div>
-
-              {/* Stats strip */}
               <div style={{ display: 'flex', gap: '8mm', marginBottom: '6mm', background: '#8B0000', borderRadius: '4mm', padding: '4mm 8mm' }}>
-                {[
-                  ['Blood Group', donorData.bloodGroup || 'N/A'],
-                  ['Total Donations', String(donorData.donationsCount || 0)],
-                  ['Lives Impacted', `~${lives}`],
-                  ['First Donation', firstDate ? formatDateDMY(firstDate) : 'N/A'],
-                  ['Latest Donation', lastDate  ? formatDateDMY(lastDate)  : 'N/A'],
-                ].map(([lbl, val]) => (
+                {stats.map(([lbl, val]) => (
                   <div key={lbl} style={{ textAlign: 'center', minWidth: '28mm' }}>
                     <div style={{ fontSize: '7pt', color: 'rgba(255,255,255,0.7)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '1mm' }}>{lbl}</div>
                     <div style={{ fontSize: '13pt', fontWeight: 'bold', color: 'white' }}>{val}</div>
                   </div>
                 ))}
               </div>
-
-              {/* Footer row */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', width: '230mm', marginTop: '2mm' }}>
                 <div style={{ textAlign: 'center' }}>
-                  <canvas ref={qrRef} />
+                  <canvas ref={qrPrintRef} />
                   <div style={{ fontSize: '6pt', color: '#999', marginTop: '1mm' }}>{certNo}</div>
                 </div>
                 <div style={{ textAlign: 'center' }}>
@@ -605,8 +605,6 @@ const CertificateModal = ({ isOpen, onClose, donorData, donationHistory }: CertM
                   <div style={{ fontSize: '7pt', color: '#999' }}>National Blood Authority</div>
                 </div>
               </div>
-
-              {/* Bottom tagline */}
               <div style={{ position: 'absolute', bottom: '7mm', textAlign: 'center', width: '100%', fontSize: '7.5pt', color: '#8B0000', fontStyle: 'italic', letterSpacing: '0.05em' }}>
                 "Every drop of blood donated is a promise of hope — Thank you for saving lives"
               </div>
@@ -616,32 +614,102 @@ const CertificateModal = ({ isOpen, onClose, donorData, donationHistory }: CertM
         document.body
       )}
 
-      {/* UI Modal preview */}
+      {/* ── Dialog with proper certificate preview ── */}
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-xl rounded-2xl no-print">
+        <DialogContent className="max-w-2xl rounded-2xl no-print max-h-[95vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-primary"><Award className="w-5 h-5" /> Impact Certificate</DialogTitle>
-            <DialogDescription>Preview your achievement certificate. Click Download to save as PDF.</DialogDescription>
+            <DialogTitle className="flex items-center gap-2 text-primary">
+              <Award className="w-5 h-5" /> Impact Certificate
+            </DialogTitle>
+            <DialogDescription>Your official RaktPort blood donation certificate. Click Download to save as PDF.</DialogDescription>
           </DialogHeader>
 
-          {/* Preview card */}
-          <div className="rounded-xl overflow-hidden border-2 border-red-100 bg-gradient-to-br from-[#8B0000] to-[#5a0000] p-5 text-white text-center space-y-3">
-            <div className="flex justify-center"><img src={logo} alt="" className="w-12 h-12 rounded-xl" /></div>
-            <div className="text-xs uppercase tracking-widest opacity-70">Certificate of Appreciation</div>
-            <div className="text-2xl font-bold">{donorData.fullName}</div>
-            <div className="text-sm opacity-80">{donorData.donorId || 'RKT-XXXXXX'} · {donorData.bloodGroup}</div>
-            <div className="flex justify-center gap-6 py-3 bg-white/10 rounded-xl">
-              {[['Donations', donorData.donationsCount || 0], ['Lives Saved', `~${lives}`], ['Blood Group', donorData.bloodGroup]].map(([l, v]) => (
-                <div key={l as string} className="text-center">
-                  <div className="text-xl font-black">{v}</div>
-                  <div className="text-xs opacity-70">{l}</div>
+          {/* ── Certificate Preview Card ── */}
+          <div className="relative overflow-hidden rounded-2xl border-2 border-red-200"
+            style={{ background: 'linear-gradient(135deg, #fff8f5 0%, #ffffff 50%, #fff5f5 100%)', fontFamily: 'Georgia, serif' }}>
+
+            {/* Corner decorations */}
+            {(['tl','tr','bl','br'] as const).map(pos => (
+              <div key={pos} className="absolute w-8 h-8" style={{
+                [pos.includes('t') ? 'top' : 'bottom']: '10px',
+                [pos.includes('l') ? 'left' : 'right']: '10px',
+                borderTop:    pos.includes('t') ? '2px solid #8B0000' : 'none',
+                borderBottom: pos.includes('b') ? '2px solid #8B0000' : 'none',
+                borderLeft:   pos.includes('l') ? '2px solid #8B0000' : 'none',
+                borderRight:  pos.includes('r') ? '2px solid #8B0000' : 'none',
+              }} />
+            ))}
+
+            <div className="px-8 py-6 text-center space-y-3">
+              {/* Org header */}
+              <div className="flex items-center justify-center gap-3">
+                <img src={logo} alt="" className="w-10 h-10 object-contain rounded-lg" />
+                <div>
+                  <p className="text-2xl font-bold text-[#8B0000] tracking-wide">RaktPort</p>
+                  <p className="text-[10px] text-gray-500 tracking-[0.15em] uppercase">National Blood Management System</p>
                 </div>
-              ))}
+              </div>
+
+              {/* Divider */}
+              <div className="h-px mx-8" style={{ background: 'linear-gradient(to right, transparent, #8B0000 30%, #8B0000 70%, transparent)' }} />
+
+              {/* Certificate title */}
+              <div>
+                <p className="text-[11px] tracking-[0.2em] text-gray-500 uppercase mb-1">Certificate of Appreciation</p>
+                <p className="text-[11px] text-gray-400 mb-2">This is to certify that</p>
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-wide leading-tight">
+                  {(donorData.fullName || 'Donor Name').toUpperCase()}
+                </h2>
+                <p className="text-sm text-[#8B0000] font-medium mt-1.5 italic">
+                  Donor ID: {donorData.donorId || 'RKT-XXXXXX'} &nbsp;·&nbsp; Blood Group: {donorData.bloodGroup || 'N/A'}
+                </p>
+              </div>
+
+              {/* Body text */}
+              <p className="text-sm text-gray-600 leading-relaxed max-w-md mx-auto">
+                has generously donated blood{' '}
+                <strong className="text-[#8B0000]">{donorData.donationsCount || 0} time{(donorData.donationsCount || 0) !== 1 ? 's' : ''}</strong>{' '}
+                through the RaktPort National Blood Donation Programme, potentially saving up to{' '}
+                <strong className="text-[#8B0000]">~{lives} lives</strong> through their selfless act of giving.
+              </p>
+
+              {/* Stats strip */}
+              <div className="flex flex-wrap justify-center gap-2 py-1">
+                {stats.map(([lbl, val]) => (
+                  <div key={lbl} className="bg-[#8B0000] text-white px-3 py-2 rounded-xl text-center min-w-[72px]">
+                    <p className="text-[9px] opacity-70 uppercase tracking-wide leading-none mb-0.5">{lbl}</p>
+                    <p className="text-sm font-bold leading-none">{val}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Divider */}
+              <div className="h-px mx-4 bg-red-100" />
+
+              {/* Footer row */}
+              <div className="flex items-center justify-between px-2">
+                <div className="flex flex-col items-center">
+                  <canvas ref={qrDialogRef} className="w-16 h-16 border border-red-100 rounded p-0.5" />
+                  <p className="text-[8px] text-gray-400 mt-1 font-mono">{certNo}</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-[10px] text-gray-400">Issue Date</p>
+                  <p className="text-sm font-bold text-gray-700">{formatDateDMY(new Date())}</p>
+                </div>
+                <div className="text-center">
+                  <div className="w-28 border-b border-gray-400 mb-1" />
+                  <p className="text-[10px] text-gray-500">Authorised by RaktPort</p>
+                  <p className="text-[9px] text-gray-400">National Blood Authority</p>
+                </div>
+              </div>
+
+              <p className="text-xs text-[#8B0000] italic pb-1">
+                "Every drop of blood donated is a promise of hope — Thank you for saving lives"
+              </p>
             </div>
-            <div className="text-xs opacity-60">{certNo} · Issued {formatDateDMY(new Date())}</div>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 pt-1">
             <Button variant="outline" className="flex-1" onClick={onClose}>Close</Button>
             <Button className="flex-1 bg-primary gap-2" onClick={handleDownload}>
               <Download className="w-4 h-4" /> Download Certificate
@@ -666,15 +734,12 @@ const BloodCompatibilityModal = ({ isOpen, onClose, bloodGroup }: { isOpen: bool
           <DialogDescription>Your blood type <strong>{bloodGroup}</strong> compatibility guide</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
-          {/* Blood group hero */}
           <div className="flex items-center justify-center">
             <div className="w-20 h-20 rounded-full bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center shadow-xl">
               <span className="text-2xl font-black text-white">{bloodGroup}</span>
             </div>
           </div>
           <p className="text-sm text-gray-600 text-center bg-red-50 rounded-xl p-3 border border-red-100">{info.facts}</p>
-
-          {/* Donate to */}
           <div>
             <h4 className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-1.5"><Droplet className="w-4 h-4 text-red-500" /> You can donate to</h4>
             <div className="flex flex-wrap gap-2">
@@ -685,8 +750,6 @@ const BloodCompatibilityModal = ({ isOpen, onClose, bloodGroup }: { isOpen: bool
               ))}
             </div>
           </div>
-
-          {/* Receive from */}
           <div>
             <h4 className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-1.5"><Heart className="w-4 h-4 text-green-500 fill-green-500" /> You can receive from</h4>
             <div className="flex flex-wrap gap-2">
@@ -697,7 +760,6 @@ const BloodCompatibilityModal = ({ isOpen, onClose, bloodGroup }: { isOpen: bool
               ))}
             </div>
           </div>
-
           {bloodGroup === 'O-' && (
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm text-amber-800 flex gap-2">
               <Star className="w-4 h-4 fill-amber-500 flex-shrink-0 mt-0.5" />
@@ -731,20 +793,17 @@ const HealthTipsSection = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
           <DialogTitle className="flex items-center gap-2"><BookOpen className="w-5 h-5 text-blue-600" /> Health Tips for Donors</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          {/* Featured tip */}
           <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-5 border border-blue-100 text-center min-h-[120px] flex flex-col items-center justify-center transition-all">
             <div className="text-4xl mb-3">{HEALTH_TIPS[current].icon}</div>
             <h3 className="font-bold text-gray-900 mb-1">{HEALTH_TIPS[current].title}</h3>
             <p className="text-sm text-gray-600 leading-relaxed">{HEALTH_TIPS[current].tip}</p>
           </div>
-          {/* Dots */}
           <div className="flex justify-center gap-1.5">
             {HEALTH_TIPS.map((_, i) => (
               <button key={i} onClick={() => setCurrent(i)}
                 className={`h-2 rounded-full transition-all ${i === current ? 'bg-blue-600 w-6' : 'bg-gray-300 w-2'}`} />
             ))}
           </div>
-          {/* All tips list */}
           <div className="space-y-2 max-h-52 overflow-y-auto">
             {HEALTH_TIPS.map((t, i) => (
               <button key={i} onClick={() => setCurrent(i)}
@@ -776,7 +835,6 @@ const ShareCardModal = ({ isOpen, onClose, donorData }: { isOpen: boolean; onClo
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2"><Share2 className="w-5 h-5 text-primary" /> Share Your Story</DialogTitle>
         </DialogHeader>
-        {/* Card preview */}
         <div className="rounded-2xl overflow-hidden bg-gradient-to-br from-[#8B0000] to-[#4a0000] p-5 text-white text-center space-y-3 shadow-xl">
           <div className="flex items-center justify-center gap-2 text-xs opacity-70 uppercase tracking-widest"><Droplet className="w-3 h-3 fill-current" /> RaktPort Blood Donor</div>
           <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-2xl font-black mx-auto">
@@ -796,6 +854,17 @@ const ShareCardModal = ({ isOpen, onClose, donorData }: { isOpen: boolean; onClo
     </Dialog>
   );
 };
+
+// ─────────────────────────────────────────────────────────────
+// END OF PART 1 — Continue with Part 2 below
+// ─────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// DonorDashboard.tsx  — PART 2 of 3
+// Paste this after Part 1. Contains: DonorDashboard main component,
+// all state, data-fetching, computed values, and handlers.
+// KEY FIX: donation history sorted — Scheduled/Pending rows first.
+// ═══════════════════════════════════════════════════════════════
+
 // DonorDashboard.tsx  — PART 2 of 3
 // ─────────────────────────────────────────────────────────────
 // MAIN COMPONENT
@@ -870,7 +939,6 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
         if (userSnap.exists()) {
           const d = userSnap.data();
 
-          // Auto-generate donorId if missing (for existing users)
           let donorId = d.donorId;
           if (!donorId) {
             donorId = generateDonorId();
@@ -944,10 +1012,20 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
           });
         });
 
-        history.sort((a, b) => b.date.getTime() - a.date.getTime());
+        // ── SORT: Scheduled/Pending first (nearest date), then rest newest-first ──
+        history.sort((a, b) => {
+          const UPCOMING: DonationStatus[] = ['Scheduled', 'Pending'];
+          const aUp = UPCOMING.includes(a.status);
+          const bUp = UPCOMING.includes(b.status);
+          if (aUp && !bUp) return -1;  // upcoming rows float to top
+          if (!aUp && bUp) return 1;
+          if (aUp && bUp)  return a.date.getTime() - b.date.getTime(); // earliest first among upcoming
+          return b.date.getTime() - a.date.getTime();                  // newest-first for past
+        });
+
         setDonationHistory(history);
 
-        // 3. Emergency requests in donor city
+        // 3. Emergency requests
         const city = userSnap.data()?.district || userSnap.data()?.city;
         if (city) {
           try {
@@ -1063,6 +1141,12 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
     return donationHistory.filter(d => done.includes(d.status) && d.date >= cutoff).length;
   }, [donationHistory]);
 
+  // ── Upcoming appointments (for dedicated section) ──
+  const upcomingAppointments = useMemo(() =>
+    donationHistory.filter(d => ['Scheduled', 'Pending'].includes(d.status)),
+    [donationHistory]
+  );
+
   const computeBadge = (n: number) => n >= 20 ? '💎 Diamond' : n >= 10 ? '🥇 Gold' : n >= 5 ? '🥈 Silver' : '🥉 Bronze';
   const badgeBg      = (n: number) => n >= 20 ? 'bg-blue-600' : n >= 10 ? 'bg-yellow-500' : n >= 5 ? 'bg-gray-400' : 'bg-orange-700';
 
@@ -1098,7 +1182,6 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
           });
         }
       });
-      // Fallback to blood-banks collection
       if (found.length === 0) {
         const snap2 = await getDocs(collection(db, 'blood-banks'));
         snap2.forEach(d => {
@@ -1131,7 +1214,6 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
       const dt = new Date(`${bookingForm.date}T${time24}`);
       if (isNaN(dt.getTime())) throw new Error('Invalid date/time');
 
-      // Appointment record
       await addDoc(collection(db, 'appointments'), {
         rtid, appointmentRtid: rtid, donorId: userId,
         donorName: donorData.fullName || 'Donor', mobile: donorData.mobile || '',
@@ -1142,7 +1224,6 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
         createdAt: Timestamp.now(),
       });
 
-      // Donation record (scheduled)
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       await setDoc(doc(db, 'donations', rtid), {
         rtid, dRtid: rtid, appointmentRtid: rtid, donorId: userId,
@@ -1160,8 +1241,8 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
       setBookingDetails({ rtid, qrPayload: payload });
       toast.success('Appointment booked!', { description: `RTID: ${rtid}` });
       setBookingOpen(false); setScheduleOpen(false);
+      setBookingConfirmOpen(true);
 
-      // Refresh
       setTimeout(() => window.location.reload(), 1500);
     } catch (e: any) { toast.error('Booking failed', { description: e.message }); }
     finally { setApiLoading(false); }
@@ -1181,16 +1262,25 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
       const time24  = convert12to24(rescheduleForm.time);
       const newDate = new Date(`${rescheduleForm.date}T${time24}`);
 
-      // Update appointments collection
       const appSnap = await getDocs(query(collection(db, 'appointments'), where('rtid', '==', rtid)));
       if (!appSnap.empty) await updateDoc(appSnap.docs[0].ref, { date: Timestamp.fromDate(newDate), time: rescheduleForm.time, updatedAt: Timestamp.now() });
 
-      // Update donations collection
       const donRef = doc(db, 'donations', rtid);
       const donSnap = await getDoc(donRef);
       if (donSnap.exists()) await updateDoc(donRef, { date: Timestamp.fromDate(newDate), time: rescheduleForm.time, otpExpiryTime: Timestamp.fromDate(new Date(newDate.getTime() + 86400000)), updatedAt: Timestamp.now() });
 
-      setDonationHistory(prev => prev.map(d => d.rtidCode === rtid ? { ...d, date: newDate, time: rescheduleForm.time } : d).sort((a, b) => b.date.getTime() - a.date.getTime()));
+      setDonationHistory(prev => {
+        const updated = prev.map(d => d.rtidCode === rtid ? { ...d, date: newDate, time: rescheduleForm.time } : d);
+        updated.sort((a, b) => {
+          const UPCOMING: DonationStatus[] = ['Scheduled', 'Pending'];
+          const aUp = UPCOMING.includes(a.status), bUp = UPCOMING.includes(b.status);
+          if (aUp && !bUp) return -1;
+          if (!aUp && bUp) return 1;
+          if (aUp && bUp)  return a.date.getTime() - b.date.getTime();
+          return b.date.getTime() - a.date.getTime();
+        });
+        return updated;
+      });
       setRescheduleOpen(false);
       toast.success('Rescheduled!', { description: `New: ${formatDateDMY(newDate)} at ${rescheduleForm.time}` });
     } catch (e: any) { toast.error('Reschedule failed', { description: e.message }); }
@@ -1208,10 +1298,8 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
     if (!result.isConfirmed) return;
     try {
       const rtid = donation.rtidCode;
-      // Cancel in appointments collection
       const appSnap = await getDocs(query(collection(db, 'appointments'), where('rtid', '==', rtid)));
       if (!appSnap.empty) await updateDoc(appSnap.docs[0].ref, { status: 'Cancelled', cancelledAt: Timestamp.now() });
-      // Cancel in donations collection
       const donRef = doc(db, 'donations', rtid);
       if ((await getDoc(donRef)).exists()) await updateDoc(donRef, { status: 'Cancelled', cancelledAt: Timestamp.now() });
 
@@ -1252,29 +1340,49 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
 
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-background"><Loader2 className="w-12 h-12 animate-spin text-primary" /></div>;
 
-// This is the return() + modals.
-// ============================================================
-  return (
-    <div className="min-h-screen bg-background pb-8">
+// ─────────────────────────────────────────────────────────────
+// END OF PART 2 — Continue with Part 3 (the return/JSX)
+// ─────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// DonorDashboard.tsx  — PART 3 of 3
+// Paste this after Part 2. Contains the full return() JSX.
+// KEY FIXES:
+//   • PC + mobile responsive layout (max-w-6xl, responsive grids)
+//   • Separate "Upcoming Appointments" card section with full details
+//   • Donation History table: upcoming rows pinned to top
+//   • All modals (Profile, Schedule, Booking, etc.)
+// ═══════════════════════════════════════════════════════════════
 
-      {/* ═══ HEADER ═══════════════════════════════════════════ */}
-      <header className="bg-[#8B0000] text-white py-4 shadow-lg no-print sticky top-0 z-40">
-        <div className="container mx-auto px-4 max-w-3xl flex items-center justify-between gap-3">
+  // ── AlarmClock alias (used in JSX below) ──
+  const AlarmClock = Clock;
+
+  return (
+    <div className="min-h-screen bg-background pb-10">
+
+      {/* ═══ HEADER ══════════════════════════════════════════════ */}
+      <header className="bg-[#8B0000] text-white py-3 shadow-lg no-print sticky top-0 z-40">
+        <div className="container mx-auto px-4 max-w-6xl flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <img src={logo} alt="RaktPort" className="w-10 h-10 rounded-full border-2 border-white/40 shadow flex-shrink-0" />
             <div className="min-w-0">
               <h1 className="text-base sm:text-lg font-bold leading-tight truncate">
                 Hello, {(donorData.fullName || 'Donor').split(' ')[0]}! 👋
-                {donorData.bloodGroup && <span className="ml-2 bg-white/20 text-xs px-2 py-0.5 rounded-full">{donorData.bloodGroup}</span>}
+                {donorData.bloodGroup && (
+                  <span className="ml-2 bg-white/20 text-xs px-2 py-0.5 rounded-full">{donorData.bloodGroup}</span>
+                )}
               </h1>
               <p className="text-xs text-red-200 opacity-80 truncate">{donorData.donorId || 'RaktPort Donor'}</p>
             </div>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
-            <Button variant="secondary" size="sm" className="bg-white text-[#8B0000] hover:bg-gray-100 text-xs px-3" onClick={() => setProfileOpen(true)}>
+            <Button variant="secondary" size="sm"
+              className="bg-white text-[#8B0000] hover:bg-gray-100 text-xs px-3"
+              onClick={() => setProfileOpen(true)}>
               <User className="w-3.5 h-3.5 mr-1" /> Profile
             </Button>
-            <button onClick={handleLogoutConfirm} className="text-xs font-medium opacity-80 hover:opacity-100 px-1">Logout</button>
+            <button onClick={handleLogoutConfirm} className="text-xs font-medium opacity-80 hover:opacity-100 px-1">
+              Logout
+            </button>
           </div>
         </div>
       </header>
@@ -1291,7 +1399,8 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
       {emergencyAlerts.length > 0 && (
         <div className="no-print">
           {emergencyAlerts.map(alert => (
-            <div key={alert.id} className={`px-4 py-3 flex items-center gap-3 flex-wrap ${alert.urgency === 'critical' ? 'bg-red-600' : 'bg-orange-500'} text-white`}>
+            <div key={alert.id}
+              className={`px-4 py-3 flex items-center gap-3 flex-wrap ${alert.urgency === 'critical' ? 'bg-red-600' : 'bg-orange-500'} text-white`}>
               <Zap className="w-4 h-4 flex-shrink-0" />
               <span className="text-sm font-semibold flex-1">
                 🚨 Urgent: <strong>{alert.bloodGroup}</strong> needed at {alert.hospitalName}
@@ -1309,7 +1418,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
       )}
 
       {/* ═══ MAIN CONTENT ════════════════════════════════════════ */}
-      <main className="container mx-auto px-4 max-w-3xl py-5 space-y-5">
+      <main className="container mx-auto px-4 max-w-6xl py-5 space-y-5">
 
         {error && (
           <div className="bg-red-50 border-l-4 border-red-500 p-3 rounded-md flex gap-2 no-print">
@@ -1318,7 +1427,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
           </div>
         )}
 
-        {/* ── ELIGIBILITY + NEXT ELIGIBLE COUNTDOWN ─────────── */}
+        {/* ── ELIGIBILITY CARD + DONATE BUTTON ─────────────────── */}
         <Card className={`shadow-md border-l-4 no-print ${isEligible ? 'border-l-green-500' : 'border-l-red-500'}`}>
           <CardContent className="p-4">
             <div className="flex items-center gap-4">
@@ -1338,7 +1447,6 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                         <CountdownTimer targetDate={nextEligibleDate} compact label="Time remaining" />
                       </div>
                     </div>
-                    {/* Progress bar */}
                     {donationHistory.filter(d => ['Donated','Completed','Redeemed-Credit'].includes(d.status)).length > 0 && (() => {
                       const lastDon = donationHistory.find(d => ['Donated','Completed','Redeemed-Credit'].includes(d.status));
                       if (!lastDon) return null;
@@ -1360,31 +1468,31 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                 )}
               </div>
               <Button size="sm" onClick={() => setScheduleOpen(true)} disabled={!isEligible}
-                className={`flex-shrink-0 text-xs px-3 ${isEligible ? 'bg-green-600 hover:bg-green-700 text-white animate-pulse' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}>
+                className={`flex-shrink-0 text-xs px-4 py-2 ${isEligible ? 'bg-green-600 hover:bg-green-700 text-white animate-pulse' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}>
                 {isEligible ? '❤️ Donate' : '🚫 Not Yet'}
               </Button>
             </div>
           </CardContent>
         </Card>
 
-        {/* ── CREDITS + STREAK ──────────────────────────────── */}
+        {/* ── STATS ROW: Credits / Streak / Lives ──────────────── */}
         <div className="grid grid-cols-3 gap-3 no-print">
-          <Card className="shadow-sm cursor-pointer hover:shadow-md transition-shadow" onClick={() => {}}>
-            <CardContent className="p-3 text-center">
+          <Card className="shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-3 sm:p-4 text-center">
               <Droplet className="w-5 h-5 text-red-500 fill-red-500 mx-auto mb-1" />
               <p className="text-2xl font-black text-gray-800">{donorData.credits || 0}</p>
               <p className="text-xs text-gray-500">Credits</p>
             </CardContent>
           </Card>
-          <Card className="shadow-sm">
-            <CardContent className="p-3 text-center">
+          <Card className="shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-3 sm:p-4 text-center">
               <Flame className="w-5 h-5 text-orange-500 mx-auto mb-1" />
               <p className="text-2xl font-black text-gray-800">{donationStreak}</p>
               <p className="text-xs text-gray-500">Streak (12mo)</p>
             </CardContent>
           </Card>
-          <Card className="shadow-sm">
-            <CardContent className="p-3 text-center">
+          <Card className="shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-3 sm:p-4 text-center">
               <Heart className="w-5 h-5 text-pink-500 fill-pink-400 mx-auto mb-1" />
               <p className="text-2xl font-black text-gray-800">{(donorData.donationsCount || 0) * 3}</p>
               <p className="text-xs text-gray-500">Lives</p>
@@ -1392,13 +1500,13 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
           </Card>
         </div>
 
-        {/* ── QUICK ACTIONS GRID ────────────────────────────── */}
+        {/* ── QUICK ACTIONS GRID ────────────────────────────────── */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 no-print">
           {[
-            { icon: '🏆', label: 'Certificate', action: () => setCertOpen(true), color: 'from-amber-50 to-yellow-50 border-amber-200' },
-            { icon: '🩸', label: 'Compatibility', action: () => setCompatOpen(true), color: 'from-red-50 to-rose-50 border-red-200' },
-            { icon: '💡', label: 'Health Tips', action: () => setHealthTipsOpen(true), color: 'from-blue-50 to-indigo-50 border-blue-200' },
-            { icon: '📤', label: 'Share', action: () => setShareOpen(true), color: 'from-purple-50 to-pink-50 border-purple-200' },
+            { icon: '🏆', label: 'Certificate',   action: () => setCertOpen(true),       color: 'from-amber-50 to-yellow-50 border-amber-200' },
+            { icon: '🩸', label: 'Compatibility',  action: () => setCompatOpen(true),     color: 'from-red-50 to-rose-50 border-red-200' },
+            { icon: '💡', label: 'Health Tips',    action: () => setHealthTipsOpen(true), color: 'from-blue-50 to-indigo-50 border-blue-200' },
+            { icon: '📤', label: 'Share',          action: () => setShareOpen(true),      color: 'from-purple-50 to-pink-50 border-purple-200' },
           ].map(({ icon, label, action, color }) => (
             <button key={label} onClick={action}
               className={`bg-gradient-to-br ${color} border rounded-2xl p-4 flex flex-col items-center gap-2 hover:shadow-md active:scale-95 transition-all touch-manipulation`}>
@@ -1408,8 +1516,9 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
           ))}
         </div>
 
-        {/* ── ROTATING HEALTH TIP ───────────────────────────── */}
-        <div className="no-print bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 border border-blue-100 flex items-start gap-3 cursor-pointer" onClick={() => setHealthTipsOpen(true)}>
+        {/* ── ROTATING HEALTH TIP ───────────────────────────────── */}
+        <div className="no-print bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 border border-blue-100 flex items-start gap-3 cursor-pointer"
+          onClick={() => setHealthTipsOpen(true)}>
           <span className="text-2xl flex-shrink-0">{HEALTH_TIPS[currentHealthTip].icon}</span>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1 mb-0.5">
@@ -1421,15 +1530,17 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
           <ChevronRight className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
         </div>
 
-        {/* ── IMPACT SECTION ────────────────────────────────── */}
+        {/* ── IMPACT SECTION ────────────────────────────────────── */}
         <div className="no-print">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-base font-bold text-gray-800 flex items-center gap-2"><Award className="w-4 h-4 text-yellow-500" /> Your Impact</h3>
+            <h3 className="text-base font-bold text-gray-800 flex items-center gap-2">
+              <Award className="w-4 h-4 text-yellow-500" /> Your Impact
+            </h3>
             <button onClick={() => setCompatOpen(true)} className="text-xs text-primary flex items-center gap-1 font-semibold hover:underline">
               {donorData.bloodGroup} Compatibility <ChevronRight className="w-3 h-3" />
             </button>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <Card className="bg-white hover:shadow-md transition-shadow border-t-4 border-t-blue-500">
               <CardContent className="p-4 text-center">
                 <Droplet className="w-5 h-5 text-blue-500 mx-auto mb-1" />
@@ -1446,33 +1557,159 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                 <p className="text-xs text-gray-500 mt-1">Current Rank</p>
               </CardContent>
             </Card>
+            <Card className="bg-white hover:shadow-md transition-shadow border-t-4 border-t-pink-500">
+              <CardContent className="p-4 text-center">
+                <Heart className="w-5 h-5 text-pink-500 fill-pink-400 mx-auto mb-1" />
+                <p className="text-2xl font-black">{(donorData.donationsCount || 0) * 3}</p>
+                <p className="text-xs text-gray-500">Lives Impacted</p>
+              </CardContent>
+            </Card>
+            <Card className="bg-white hover:shadow-md transition-shadow border-t-4 border-t-green-500">
+              <CardContent className="p-4 text-center">
+                <CalendarCheck className="w-5 h-5 text-green-500 mx-auto mb-1" />
+                <p className="text-sm font-bold text-gray-800 leading-tight">{nextEligibleDisplay}</p>
+                <p className="text-xs text-gray-500 mt-0.5">Next Eligible</p>
+              </CardContent>
+            </Card>
           </div>
         </div>
 
-        {/* ════════════════════════════════════════════════════════════
-            DONATION HISTORY TABLE
-        ════════════════════════════════════════════════════════════ */}
+        {/* ════════════════════════════════════════════════════════
+            UPCOMING APPOINTMENTS — separate dedicated section
+        ════════════════════════════════════════════════════════ */}
+        {upcomingAppointments.length > 0 && (
+          <div className="no-print">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-base font-bold text-gray-800 flex items-center gap-2">
+                <CalendarCheck className="w-4 h-4 text-blue-600" />
+                Upcoming Appointments
+                <Badge className="bg-blue-600 text-white text-[10px] px-1.5 py-0.5">{upcomingAppointments.length}</Badge>
+              </h3>
+              <Button size="sm" variant="outline" className="text-xs border-blue-300 text-blue-700 hover:bg-blue-50"
+                onClick={() => setScheduleOpen(true)}>
+                + Book New
+              </Button>
+            </div>
+
+            <div className="space-y-3">
+              {upcomingAppointments.map((appt, i) => {
+                const monthShort = appt.date.toLocaleString('default', { month: 'short' });
+                const dayNum     = String(appt.date.getDate()).padStart(2, '0');
+                const isFuture   = appt.date.getTime() > Date.now();
+                return (
+                  <Card key={i} className="border-2 border-blue-200 bg-gradient-to-r from-blue-50/60 to-white shadow-sm hover:shadow-md transition-shadow">
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-4">
+
+                        {/* Date badge */}
+                        <div className="w-14 h-14 rounded-xl bg-blue-600 flex flex-col items-center justify-center text-white flex-shrink-0 shadow-md">
+                          <span className="text-xl font-black leading-none">{dayNum}</span>
+                          <span className="text-[10px] opacity-80 uppercase tracking-wide">{monthShort}</span>
+                          <span className="text-[9px] opacity-60">{appt.date.getFullYear()}</span>
+                        </div>
+
+                        {/* Details */}
+                        <div className="flex-1 min-w-0">
+                          {/* RTID badge */}
+                          <div className="flex items-center gap-2 flex-wrap mb-1.5">
+                            <span className="font-mono text-xs bg-blue-100 text-blue-900 px-2 py-0.5 rounded-md border border-blue-300 font-bold tracking-wider">
+                              {appt.rtidCode}
+                            </span>
+                            <ComponentBadge component={appt.component || 'Whole Blood'} />
+                            <Badge variant="outline" className="border-blue-300 text-blue-700 bg-blue-50 text-[10px]">
+                              {appt.status}
+                            </Badge>
+                          </div>
+
+                          <p className="text-sm font-semibold text-gray-900 truncate">
+                            {appt.hospitalName}
+                          </p>
+
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5">
+                            <span className="text-xs text-gray-500 flex items-center gap-1">
+                              <Clock className="w-3 h-3" />{appt.time || 'N/A'}
+                            </span>
+                            <span className="text-xs text-gray-500 flex items-center gap-1">
+                              <MapPin className="w-3 h-3" />{appt.city || 'N/A'}
+                            </span>
+                            <span className="text-xs text-gray-500 flex items-center gap-1">
+                              <Droplet className="w-3 h-3 text-red-400" />{appt.component || 'Whole Blood'}
+                            </span>
+                          </div>
+
+                          {isFuture && (
+                            <div className="mt-1.5 inline-flex items-center gap-1 bg-blue-100 text-blue-700 rounded-full px-2 py-0.5">
+                              <Timer className="w-3 h-3" />
+                              <CountdownTimer targetDate={appt.date} compact label="In" />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Actions column */}
+                        <div className="flex flex-col gap-1 flex-shrink-0">
+                          <button onClick={() => handleRescheduleClick(appt)} title="Reschedule"
+                            className="p-2 hover:bg-blue-100 rounded-xl text-blue-500 hover:text-blue-700 transition-colors flex items-center justify-center"
+                            aria-label="Reschedule">
+                            <CalendarCheck className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => handleCancelAppointment(appt)} title="Cancel"
+                            className="p-2 hover:bg-red-50 rounded-xl text-red-400 hover:text-red-600 transition-colors flex items-center justify-center"
+                            aria-label="Cancel">
+                            <XCircle className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => handleViewHistoryQR(appt)} title="View QR"
+                            className="p-2 hover:bg-gray-100 rounded-xl text-gray-500 hover:text-primary transition-colors flex items-center justify-center"
+                            aria-label="View QR">
+                            <QrCode className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => setDonationToPrint(appt)} title="Print"
+                            className="p-2 hover:bg-gray-100 rounded-xl text-gray-500 hover:text-primary transition-colors flex items-center justify-center"
+                            aria-label="Print">
+                            <Printer className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* ════════════════════════════════════════════════════════
+            DONATION HISTORY TABLE (upcoming pinned to top row)
+        ════════════════════════════════════════════════════════ */}
         <Card className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
           <CardHeader className="bg-gray-50/50 border-b border-gray-100 p-4">
             <CardTitle className="text-sm text-gray-800 flex items-center gap-2">
               <List className="w-4 h-4 text-primary" /> Donation History &amp; Credits
             </CardTitle>
-            <CardDescription className="text-xs mt-0.5">Tap QR icon to view verification code. Tap H badge to see patient impact.</CardDescription>
+            <CardDescription className="text-xs mt-0.5">
+              Tap QR icon to view verification code. Tap H badge to see patient impact.
+              {upcomingAppointments.length > 0 && (
+                <span className="ml-2 text-blue-600 font-medium">
+                  · {upcomingAppointments.length} upcoming appointment{upcomingAppointments.length > 1 ? 's' : ''} shown first
+                </span>
+              )}
+            </CardDescription>
           </CardHeader>
           <CardContent className="p-0">
             {donationHistory.length === 0 ? (
               <div className="p-10 text-center text-muted-foreground">
                 <List className="w-8 h-8 mx-auto mb-2 opacity-30" />
                 <p className="text-sm">No donations yet — start your life-saving journey!</p>
-                <Button size="sm" className="mt-3 bg-primary" onClick={() => setScheduleOpen(true)}>Book Appointment</Button>
+                <Button size="sm" className="mt-3 bg-primary" onClick={() => setScheduleOpen(true)}>
+                  Book Appointment
+                </Button>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-gray-50/30">
-                      <TableHead className="text-xs font-semibold px-3 py-2 min-w-[100px]">Date</TableHead>
-                      <TableHead className="text-xs font-semibold px-3 py-2 min-w-[130px]">D-RTID</TableHead>
+                      <TableHead className="text-xs font-semibold px-3 py-2 min-w-[110px]">Date</TableHead>
+                      <TableHead className="text-xs font-semibold px-3 py-2 min-w-[140px]">D-RTID</TableHead>
                       <TableHead className="text-xs font-semibold px-3 py-2 hidden sm:table-cell">Component</TableHead>
                       <TableHead className="text-xs font-semibold px-3 py-2 hidden md:table-cell">OTP</TableHead>
                       <TableHead className="text-xs font-semibold px-3 py-2">Status</TableHead>
@@ -1481,13 +1718,15 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                   </TableHeader>
                   <TableBody>
                     {donationHistory.map((r, i) => {
-                      const canCancel = ['Scheduled','Pending'].includes(r.status);
+                      const canCancel    = ['Scheduled','Pending'].includes(r.status);
                       const canReschedule = canCancel;
-                      const isFuture = r.date.getTime() > Date.now();
+                      const isFuture     = r.date.getTime() > Date.now();
+                      const isUpcoming   = canCancel;
                       return (
-                        <TableRow key={i} className="hover:bg-gray-50 transition-colors">
+                        <TableRow key={i}
+                          className={`hover:bg-gray-50 transition-colors ${isUpcoming ? 'bg-blue-50/40 border-l-2 border-l-blue-400' : ''}`}>
 
-                          {/* Date + countdown for scheduled */}
+                          {/* Date + countdown */}
                           <TableCell className="px-3 py-2.5">
                             <div>
                               <p className="text-xs font-semibold text-gray-800">{formatDateDMY(r.date)}</p>
@@ -1501,12 +1740,17 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                           {/* RTID + H badge */}
                           <TableCell className="px-3 py-2.5">
                             <div className="flex items-center gap-1.5 flex-wrap">
-                              <span className="font-mono text-[10px] bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200 max-w-[100px] truncate" title={r.rtidCode}>
-                                {r.rtidCode?.length > 14 ? r.rtidCode.slice(0,14)+'…' : r.rtidCode}
+                              <span className={`font-mono text-[10px] px-1.5 py-0.5 rounded border max-w-[110px] truncate ${
+                                isUpcoming
+                                  ? 'bg-blue-100 text-blue-800 border-blue-300 font-bold'
+                                  : 'bg-gray-100 text-gray-700 border-gray-200'
+                              }`} title={r.rtidCode}>
+                                {r.rtidCode?.length > 15 ? r.rtidCode.slice(0,15)+'…' : r.rtidCode}
                               </span>
                               {r.linkedHrtid && r.linkedHrtid !== '—' && r.linkedHrtid !== 'N/A' && (
                                 <button onClick={() => handleViewHrtid(r.linkedHrtid)}
-                                  className="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[10px] font-bold border border-blue-200 hover:bg-blue-200" title="View patient impact">H</button>
+                                  className="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[10px] font-bold border border-blue-200 hover:bg-blue-200"
+                                  title="View patient impact">H</button>
                               )}
                             </div>
                           </TableCell>
@@ -1529,15 +1773,15 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
 
                           {/* Status */}
                           <TableCell className="px-3 py-2.5">
-                            {r.status === 'Scheduled' && <Badge variant="outline" className="border-blue-300 text-blue-700 bg-blue-50 text-[10px]">Scheduled</Badge>}
-                            {r.status === 'Pending'   && <Badge variant="outline" className="border-yellow-300 text-yellow-700 bg-yellow-50 text-[10px]">Pending</Badge>}
-                            {r.status === 'Donated'   && <Badge variant="outline" className="border-green-300 text-green-700 bg-green-50 text-[10px]">Available</Badge>}
-                            {r.status === 'Verified'  && <Badge variant="outline" className="border-teal-300 text-teal-700 bg-teal-50 text-[10px]">Verified</Badge>}
-                            {r.status === 'Credited'  && <Badge variant="outline" className="border-indigo-300 text-indigo-700 bg-indigo-50 text-[10px]">Credited</Badge>}
-                            {r.status === 'Redeemed-Credit' && <Badge variant="outline" className="border-blue-300 text-blue-700 bg-blue-50 text-[10px]">Redeemed</Badge>}
-                            {r.status === 'Completed' && <Badge variant="outline" className="border-gray-300 text-gray-600 bg-gray-50 text-[10px]">Completed</Badge>}
-                            {r.status === 'Expired'   && <Badge variant="outline" className="border-red-300 text-red-700 bg-red-50 text-[10px]">Expired</Badge>}
-                            {r.status === 'Cancelled' && <Badge variant="outline" className="border-gray-400 text-gray-500 bg-gray-100 text-[10px]">Cancelled</Badge>}
+                            {r.status === 'Scheduled'      && <Badge variant="outline" className="border-blue-300 text-blue-700 bg-blue-50 text-[10px]">Scheduled</Badge>}
+                            {r.status === 'Pending'        && <Badge variant="outline" className="border-yellow-300 text-yellow-700 bg-yellow-50 text-[10px]">Pending</Badge>}
+                            {r.status === 'Donated'        && <Badge variant="outline" className="border-green-300 text-green-700 bg-green-50 text-[10px]">Available</Badge>}
+                            {r.status === 'Verified'       && <Badge variant="outline" className="border-teal-300 text-teal-700 bg-teal-50 text-[10px]">Verified</Badge>}
+                            {r.status === 'Credited'       && <Badge variant="outline" className="border-indigo-300 text-indigo-700 bg-indigo-50 text-[10px]">Credited</Badge>}
+                            {r.status === 'Redeemed-Credit'&& <Badge variant="outline" className="border-blue-300 text-blue-700 bg-blue-50 text-[10px]">Redeemed</Badge>}
+                            {r.status === 'Completed'      && <Badge variant="outline" className="border-gray-300 text-gray-600 bg-gray-50 text-[10px]">Completed</Badge>}
+                            {r.status === 'Expired'        && <Badge variant="outline" className="border-red-300 text-red-700 bg-red-50 text-[10px]">Expired</Badge>}
+                            {r.status === 'Cancelled'      && <Badge variant="outline" className="border-gray-400 text-gray-500 bg-gray-100 text-[10px]">Cancelled</Badge>}
                           </TableCell>
 
                           {/* Actions */}
@@ -1585,7 +1829,6 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
       <Dialog open={profileOpen} onOpenChange={setProfileOpen}>
         <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-2xl no-print max-h-[95vh] overflow-y-auto">
           <div className="flex flex-col sm:flex-row h-full">
-
             {/* Left: Digital ID Card */}
             <div className="w-full sm:w-[200px] sm:flex-shrink-0 bg-gradient-to-br from-[#8B0000] to-[#5a0000] text-white p-5 flex flex-col items-center justify-center text-center relative">
               <div className="w-20 h-20 rounded-full border-4 border-white/30 bg-white/10 flex items-center justify-center text-3xl font-black mb-3">
@@ -1621,12 +1864,12 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                 {/* Overview */}
                 <TabsContent value="overview" className="space-y-2.5">
                   {[
-                    { icon: MapPin,   label: 'Location',     value: `${donorData.city || '—'}${donorData.pincode ? ', ' + donorData.pincode : ''}` },
-                    { icon: BadgeCheck, label: 'Donor ID',   value: donorData.donorId || 'RKT-XXXXXX' },
-                    { icon: Mail,     label: 'Email',        value: donorData.email || '—' },
-                    { icon: Phone,    label: 'Mobile',       value: donorData.mobile || '—' },
-                    { icon: CalendarCheck, label: 'Last Donation', value: lastDonationDisplay },
-                    { icon: Calendar, label: 'Next Eligible', value: nextEligibleDisplay },
+                    { icon: MapPin,       label: 'Location',     value: `${donorData.city || '—'}${donorData.pincode ? ', ' + donorData.pincode : ''}` },
+                    { icon: BadgeCheck,   label: 'Donor ID',     value: donorData.donorId || 'RKT-XXXXXX' },
+                    { icon: Mail,         label: 'Email',        value: donorData.email || '—' },
+                    { icon: Phone,        label: 'Mobile',       value: donorData.mobile || '—' },
+                    { icon: CalendarCheck,label: 'Last Donation',value: lastDonationDisplay },
+                    { icon: Calendar,     label: 'Next Eligible',value: nextEligibleDisplay },
                   ].map(({ icon: Icon, label, value }) => (
                     <div key={label} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
                       <Icon className="w-4 h-4 text-gray-400 flex-shrink-0" />
@@ -1717,12 +1960,19 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
           </DialogHeader>
           <div className="space-y-3">
             <div className="flex gap-2">
-              <Input placeholder="Enter city (e.g. Delhi, Mumbai)" value={scheduleCity} onChange={e => setScheduleCity(e.target.value)} onKeyPress={e => e.key === 'Enter' && handleFindCenters()} className="flex-1" />
+              <Input placeholder="Enter city (e.g. Delhi, Mumbai)" value={scheduleCity}
+                onChange={e => setScheduleCity(e.target.value)}
+                onKeyPress={e => e.key === 'Enter' && handleFindCenters()} className="flex-1" />
               <Button onClick={handleFindCenters} disabled={apiLoading || !scheduleCity.trim()}>
                 {apiLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Search'}
               </Button>
             </div>
-            {apiLoading && <div className="text-center py-8"><Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-2" /><p className="text-sm text-gray-500">Finding blood banks…</p></div>}
+            {apiLoading && (
+              <div className="text-center py-8">
+                <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-2" />
+                <p className="text-sm text-gray-500">Finding blood banks…</p>
+              </div>
+            )}
             {!apiLoading && centers.length > 0 && (
               <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
                 {centers.map(c => (
@@ -1736,7 +1986,8 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                       <Badge className="bg-primary text-white text-xs flex-shrink-0 group-hover:bg-primary/90">Book</Badge>
                     </div>
                     {c.latitude && c.longitude && (
-                      <button className="mt-2 text-[10px] text-blue-600 flex items-center gap-1 hover:underline" onClick={e => { e.stopPropagation(); window.open(`https://www.google.com/maps/dir/?api=1&destination=${c.latitude},${c.longitude}`, '_blank'); }}>
+                      <button className="mt-2 text-[10px] text-blue-600 flex items-center gap-1 hover:underline"
+                        onClick={e => { e.stopPropagation(); window.open(`https://www.google.com/maps/dir/?api=1&destination=${c.latitude},${c.longitude}`, '_blank'); }}>
                         <Navigation className="w-3 h-3" /> Get Directions
                       </button>
                     )}
@@ -1764,13 +2015,16 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
           </DialogHeader>
           <div className="space-y-3 py-2">
             <div><Label className="text-xs mb-1 block">Date</Label>
-              <Input type="date" value={bookingForm.date} min={new Date().toISOString().split('T')[0]} onChange={e => setBookingForm(f => ({...f, date: e.target.value}))} />
+              <Input type="date" value={bookingForm.date} min={new Date().toISOString().split('T')[0]}
+                onChange={e => setBookingForm(f => ({...f, date: e.target.value}))} />
             </div>
             <div><Label className="text-xs mb-1 block">Time</Label>
               <Select value={bookingForm.time} onValueChange={v => setBookingForm(f => ({...f, time: v}))}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {['09:00 AM','10:00 AM','11:00 AM','12:00 PM','02:00 PM','03:00 PM','04:00 PM','05:00 PM'].map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                  {['09:00 AM','10:00 AM','11:00 AM','12:00 PM','02:00 PM','03:00 PM','04:00 PM','05:00 PM'].map(t => (
+                    <SelectItem key={t} value={t}>{t}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -1799,7 +2053,9 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
       <Dialog open={bookingConfirmOpen} onOpenChange={setBookingConfirmOpen}>
         <DialogContent className="max-w-sm rounded-2xl text-center no-print">
           <DialogHeader>
-            <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3"><Check className="w-7 h-7 text-green-600" /></div>
+            <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <Check className="w-7 h-7 text-green-600" />
+            </div>
             <DialogTitle className="text-green-700">Booking Confirmed!</DialogTitle>
           </DialogHeader>
           <div className="py-4 flex flex-col items-center gap-3 bg-gray-50 rounded-xl border border-dashed border-gray-300">
@@ -1820,13 +2076,16 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
           </DialogHeader>
           <div className="space-y-3 py-2">
             <div><Label className="text-xs mb-1 block">New Date</Label>
-              <Input type="date" value={rescheduleForm.date} min={new Date().toISOString().split('T')[0]} onChange={e => setRescheduleForm(f => ({...f, date: e.target.value}))} />
+              <Input type="date" value={rescheduleForm.date} min={new Date().toISOString().split('T')[0]}
+                onChange={e => setRescheduleForm(f => ({...f, date: e.target.value}))} />
             </div>
             <div><Label className="text-xs mb-1 block">New Time</Label>
               <Select value={rescheduleForm.time} onValueChange={v => setRescheduleForm(f => ({...f, time: v}))}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {['09:00 AM','10:00 AM','11:00 AM','12:00 PM','02:00 PM','03:00 PM','04:00 PM','05:00 PM'].map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                  {['09:00 AM','10:00 AM','11:00 AM','12:00 PM','02:00 PM','03:00 PM','04:00 PM','05:00 PM'].map(t => (
+                    <SelectItem key={t} value={t}>{t}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -1847,23 +2106,34 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
             <DialogTitle>Linked Patient Request</DialogTitle>
             <DialogDescription>This donation was linked to a specific patient need</DialogDescription>
           </DialogHeader>
-          {hrtidLoading ? <div className="flex justify-center p-6"><Loader2 className="w-7 h-7 animate-spin text-primary" /></div>
-          : hrtidDetails ? (
-            <div className="space-y-3">
-              <div className="p-4 bg-blue-50 rounded-xl border border-blue-100 space-y-2 text-sm">
-                {[['H-RTID', hrtidDetails.rtidCode], ['Patient', hrtidDetails.patientName], ['Hospital', hrtidDetails.hospital], ['Blood Group', hrtidDetails.bloodGroup], ['Units', String(hrtidDetails.units)], ['Required By', hrtidDetails.requiredBy || 'N/A']].map(([k, v]) => (
-                  <div key={k} className="flex justify-between gap-2"><span className="text-xs text-gray-500 font-medium">{k}</span><span className="text-xs font-bold text-gray-900 text-right max-w-[55%] truncate" title={v}>{v}</span></div>
-                ))}
+          {hrtidLoading
+            ? <div className="flex justify-center p-6"><Loader2 className="w-7 h-7 animate-spin text-primary" /></div>
+            : hrtidDetails ? (
+              <div className="space-y-3">
+                <div className="p-4 bg-blue-50 rounded-xl border border-blue-100 space-y-2 text-sm">
+                  {[['H-RTID', hrtidDetails.rtidCode], ['Patient', hrtidDetails.patientName], ['Hospital', hrtidDetails.hospital], ['Blood Group', hrtidDetails.bloodGroup], ['Units', String(hrtidDetails.units)], ['Required By', hrtidDetails.requiredBy || 'N/A']].map(([k, v]) => (
+                    <div key={k} className="flex justify-between gap-2">
+                      <span className="text-xs text-gray-500 font-medium">{k}</span>
+                      <span className="text-xs font-bold text-gray-900 text-right max-w-[55%] truncate" title={v}>{v}</span>
+                    </div>
+                  ))}
+                </div>
+                {hrtidDetails.impactTimeline && <ImpactTimelineView timeline={hrtidDetails.impactTimeline} />}
               </div>
-              {hrtidDetails.impactTimeline && <ImpactTimelineView timeline={hrtidDetails.impactTimeline} />}
-            </div>
-          ) : <p className="text-center text-sm text-gray-400 py-4">No details available</p>}
+            ) : <p className="text-center text-sm text-gray-400 py-4">No details available</p>
+          }
         </DialogContent>
       </Dialog>
 
       {/* ── Feature Modals ────────────────────────────────── */}
-      <CertificateModal isOpen={certOpen} onClose={() => setCertOpen(false)} donorData={donorData} donationHistory={donationHistory} />
-      <BloodCompatibilityModal isOpen={compatOpen} onClose={() => setCompatOpen(false)} bloodGroup={donorData.bloodGroup || 'O+'} />
+      <CertificateModal
+        isOpen={certOpen} onClose={() => setCertOpen(false)}
+        donorData={donorData} donationHistory={donationHistory}
+      />
+      <BloodCompatibilityModal
+        isOpen={compatOpen} onClose={() => setCompatOpen(false)}
+        bloodGroup={donorData.bloodGroup || 'O+'}
+      />
       <HealthTipsSection isOpen={healthTipsOpen} onClose={() => setHealthTipsOpen(false)} />
       <ShareCardModal isOpen={shareOpen} onClose={() => setShareOpen(false)} donorData={donorData} />
       <HistoryQRModal isOpen={historyQROpen} onClose={() => setHistoryQROpen(false)} data={selectedHistoryQR} />
