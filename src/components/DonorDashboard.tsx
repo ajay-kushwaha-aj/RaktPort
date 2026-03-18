@@ -19,7 +19,7 @@ import {
   TrendingUp, Activity, Check, X, Timer, Zap,
   Gift, XCircle, Download,
   BookOpen, Flame, ChevronRight,
-  Navigation, HeartHandshake, BadgeCheck,
+  Navigation, HeartHandshake, BadgeCheck, Building2,
 } from 'lucide-react';
 import {
   Table, TableBody, TableCell, TableHead,
