@@ -236,13 +236,28 @@ const HD_STYLES = `
 .hd-label{font-size:0.75rem;font-weight:600;color:#374151;display:block;margin-bottom:5px;}
 .hd-required{color:#ef4444;margin-left:2px;}
 
-/* ── FIX 2: Print styles ── */
+/* ── FIX 2 + FIX 4: Print styles — hide ALL screen UI, toasts, dialogs ── */
 @media screen { .hd-print-only { display:none !important; } }
 @media print {
+  /* Hide the entire app shell */
   .hd-root, .hd-header, .hd-nav, .hd-fab, .no-print { display:none !important; }
+  /* Fix 4: Hide Sonner toasts, SweetAlert, Radix dialogs/portals, any overlay */
+  [data-sonner-toaster],
+  [data-sonner-toast],
+  .swal2-container,
+  [data-radix-popper-content-wrapper],
+  [data-radix-dialog-overlay],
+  [data-radix-dialog-content],
+  [role="dialog"],
+  [role="alertdialog"],
+  [aria-live],
+  #swal2-container,
+  .fixed, .sticky { display:none !important; }
+  /* Show only the print slip */
   .hd-print-only { display:block !important; }
-  @page { size:A4; margin:12mm; }
-  body { print-color-adjust:exact; -webkit-print-color-adjust:exact; }
+  @page { size:A4 portrait; margin:0; }
+  body { margin:0; padding:0; print-color-adjust:exact; -webkit-print-color-adjust:exact; }
+  * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
 }
 
 /* ── Responsive ── */
@@ -369,13 +384,13 @@ const QRCanvas = ({ data, size=200 }: { data:string; size?:number }) => {
 };
 
 /* ═══════════════════════════════════════════════════════════════
-   FIX 2: PRINTABLE SLIP — proper A4, no Tailwind print: classes
+   PRINTABLE SLIP — A4, logo, tagline, RTID label fix, no toast in print
 ═══════════════════════════════════════════════════════════════ */
 const PrintableRequest = ({ request, hospital }: { request:BloodRequest|null; hospital:any }) => {
   const qrRef = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     if (request && qrRef.current) {
-      try { new QRious({ element:qrRef.current, value:getQRPayload(request), size:90, foreground:"#8B0000", level:"H" }); }
+      try { new QRious({ element:qrRef.current, value:getQRPayload(request), size:100, foreground:"#8B0000", level:"H" }); }
       catch(_){}
     }
   }, [request]);
@@ -383,120 +398,263 @@ const PrintableRequest = ({ request, hospital }: { request:BloodRequest|null; ho
   const uc  = URGENCY_CONFIG[request.urgency||"Routine"];
   const rem = getTimeRemaining(request);
   const isV = isRequestValid(request);
-  const now = new Date();
+  const genTime = new Date(request.createdAt).toLocaleString("en-IN",{
+    day:"2-digit", month:"short", year:"numeric",
+    hour:"2-digit", minute:"2-digit", hour12:true,
+  });
+
+  // Inline styles used throughout — pure CSS, no Tailwind, guaranteed print fidelity
+  const S = {
+    page: {
+      fontFamily:"'Arial', sans-serif", fontSize:"10.5px", color:"#111",
+      background:"#fff", width:"210mm", minHeight:"297mm",
+      margin:"0 auto", padding:"12mm 14mm", boxSizing:"border-box" as const,
+    },
+    outerBorder: {
+      border:"2px solid #1a1a1a", borderRadius:"4px",
+      padding:"8mm 9mm", minHeight:"271mm", boxSizing:"border-box" as const,
+      display:"flex", flexDirection:"column" as const, gap:"0",
+    },
+    // ── header ──
+    headerRow: {
+      display:"flex", alignItems:"flex-start", justifyContent:"space-between",
+      borderBottom:"2.5px solid #8B0000", paddingBottom:"9px", marginBottom:"9px",
+    },
+    logoArea: { display:"flex", alignItems:"center", gap:"10px" },
+    logoImg:  { width:"44px", height:"44px", objectFit:"contain" as const, borderRadius:"8px" },
+    brandCol: { display:"flex", flexDirection:"column" as const, gap:"1px" },
+    brandName:{ fontSize:"20px", fontWeight:"900", color:"#8B0000", letterSpacing:"-0.5px", lineHeight:"1" },
+    brandSub: { fontSize:"7.5px", fontWeight:"700", textTransform:"uppercase" as const, color:"#374151", letterSpacing:"0.6px" },
+    brandGov: { fontSize:"7px", color:"#6b7280" },
+    tagline:  { fontSize:"7.5px", color:"#8B0000", fontStyle:"italic" as const, marginTop:"2px", fontWeight:"600" },
+    serialBox:{ textAlign:"right" as const, flexShrink:0 },
+    serialLbl:{ fontSize:"7px", color:"#9ca3af", textTransform:"uppercase" as const, letterSpacing:"0.8px" },
+    serialVal:{ fontFamily:"monospace", fontSize:"11px", fontWeight:"900", color:"#111", marginTop:"2px" },
+    serialDt: { fontSize:"7px", color:"#6b7280", marginTop:"2px" },
+    // ── title ──
+    titleWrap:{ textAlign:"center" as const, marginBottom:"9px" },
+    titleText:{ fontSize:"14px", fontWeight:"900", textTransform:"uppercase" as const, textDecoration:"underline", letterSpacing:"1.5px" },
+    titleSub: { fontSize:"8px", color:"#6b7280", marginTop:"3px" },
+    // ── urgency / validity chips ──
+    chipRow:  { display:"flex", justifyContent:"center", gap:"12px", marginBottom:"10px" },
+    chip:     (bg:string, border:string, color:string) => ({
+      padding:"5px 16px", border:`2px solid ${border}`, borderRadius:"5px",
+      background:bg, color, fontSize:"10px", fontWeight:"900",
+      textTransform:"uppercase" as const, letterSpacing:"0.3px",
+    }),
+    // ── section heading ──
+    secHead:  (accent:string) => ({
+      fontWeight:"800", fontSize:"11px", textTransform:"uppercase" as const,
+      borderLeft:`3.5px solid ${accent}`, paddingLeft:"6px",
+      marginBottom:"5px", color:"#111",
+    }),
+    // ── info tables ──
+    infoGrid: { display:"grid", gridTemplateColumns:"1fr 1fr", gap:"14px", marginBottom:"10px" },
+    tbl:      { width:"100%", fontSize:"10px", borderCollapse:"collapse" as const, lineHeight:"1.65" },
+    tblKey:   { color:"#6b7280", width:"36%", fontWeight:"600", paddingRight:"4px", verticalAlign:"top" as const },
+    tblVal:   { fontWeight:"700", color:"#111", verticalAlign:"top" as const },
+    // ── RTID box ──
+    rtidWrap: { textAlign:"center" as const, margin:"8px 0" },
+    rtidBox:  {
+      display:"inline-block", border:"2px dashed #9ca3af", borderRadius:"6px",
+      padding:"7px 28px", background:"#f9fafb",
+    },
+    rtidLbl:  { fontSize:"7.5px", color:"#9ca3af", textTransform:"uppercase" as const, letterSpacing:"1.2px", marginBottom:"4px" },
+    rtidCode: { fontFamily:"monospace", fontSize:"17px", fontWeight:"900", color:"#8B0000", letterSpacing:"2px" },
+    // ── blood details box ──
+    bloodBox: {
+      border:"2px solid #111827", borderRadius:"6px", padding:"8px 6px",
+      marginBottom:"9px", background:"#fafafa",
+    },
+    bloodGrid:{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", textAlign:"center" as const },
+    bloodCell:{ padding:"3px 4px", borderRight:"1px solid #e5e7eb" },
+    bloodLbl: { fontSize:"7.5px", textTransform:"uppercase" as const, color:"#6b7280", fontWeight:"700", marginBottom:"3px", letterSpacing:"0.3px" },
+    bloodValLg:{ fontSize:"28px", fontWeight:"900", color:"#8B0000", lineHeight:"1" },
+    bloodValMd:{ fontSize:"12px", fontWeight:"800", marginTop:"5px", color:"#111" },
+    bloodValSm:{ fontSize:"10px", color:"#374151", marginTop:"1px" },
+    // ── indication ──
+    indicBox: { background:"#eff6ff", border:"1px solid #bfdbfe", borderRadius:"5px", padding:"5px 10px", marginBottom:"8px", fontSize:"10px" },
+    // ── NACO warning ──
+    nacoBox:  { background:"#fef2f2", border:"1.5px solid #fca5a5", borderRadius:"5px", padding:"7px 10px", marginBottom:"10px" },
+    nacoHead: { fontWeight:"800", fontSize:"8.5px", textTransform:"uppercase" as const, color:"#7f1d1d", marginBottom:"4px" },
+    nacoLi:   { fontSize:"8.5px", color:"#991b1b", lineHeight:"1.7" },
+    // ── footer ──
+    footerWrap:{ borderTop:"2px solid #1a1a1a", paddingTop:"8px", marginTop:"auto", display:"flex", gap:"12px", alignItems:"flex-start" },
+    qrCol:    { flexShrink:0, textAlign:"center" as const, width:"110px" },
+    qrLbl:    { fontSize:"7.5px", fontWeight:"700", marginTop:"4px", color:"#374151" },
+    metaCol:  { flex:1, fontSize:"7.5px", color:"#374151", lineHeight:"1.65" },
+    metaHead: { fontWeight:"800", textTransform:"uppercase" as const, fontSize:"8px", marginBottom:"2px", color:"#111" },
+    sigCol:   { flexShrink:0, width:"130px", textAlign:"center" as const },
+    sigLine:  { height:"36px", borderBottom:"1px solid #374151", marginBottom:"4px" },
+    sigLbl:   { fontSize:"8px", fontWeight:"800", textTransform:"uppercase" as const },
+    sigSub:   { fontSize:"7.5px", color:"#6b7280" },
+    sigDate:  { fontSize:"7px", color:"#9ca3af", marginTop:"5px" },
+  } as const;
+
   return (
-    <div className="hd-print-only" style={{fontFamily:"Arial, sans-serif",fontSize:"11px",color:"#000",background:"#fff"}}>
-      <div style={{width:"186mm",margin:"0 auto",border:"3px solid #1a1a1a",padding:"10mm",boxSizing:"border-box",minHeight:"267mm"}}>
+    <div className="hd-print-only" style={S.page}>
+      <div style={S.outerBorder}>
 
-        {/* Header */}
-        <div style={{borderBottom:"2px solid #8B0000",paddingBottom:"8px",marginBottom:"8px",display:"flex",alignItems:"flex-start",gap:"12px"}}>
-          <div style={{flex:1}}>
-            <div style={{fontSize:"18px",fontWeight:"900",color:"#8B0000",letterSpacing:"-0.5px"}}>RaktPort</div>
-            <div style={{fontSize:"8.5px",fontWeight:"700",textTransform:"uppercase",color:"#374151",letterSpacing:"0.5px"}}>National Digital Blood Donation &amp; Management System</div>
-            <div style={{fontSize:"8px",color:"#6b7280",marginTop:"2px"}}>Ministry of Health &amp; Family Welfare, Government of India</div>
+        {/* ── HEADER: Logo + Brand + Serial ── */}
+        <div style={S.headerRow}>
+          {/* Fix 1: Logo image + name + tagline */}
+          <div style={S.logoArea}>
+            <img src={logo} alt="RaktPort" style={S.logoImg} />
+            <div style={S.brandCol}>
+              <div style={S.brandName}>RaktPort</div>
+              <div style={S.brandSub}>National Digital Blood Donation &amp; Management System</div>
+              <div style={S.brandGov}>Ministry of Health &amp; Family Welfare, Government of India</div>
+              {/* Fix 1: Tagline */}
+              <div style={S.tagline}>"Donate Blood Anywhere, Save Life Everywhere"</div>
+            </div>
           </div>
-          <div style={{textAlign:"right",flexShrink:0}}>
-            <div style={{fontSize:"8px",color:"#9ca3af",textTransform:"uppercase"}}>Serial No.</div>
-            <div style={{fontFamily:"monospace",fontSize:"10px",fontWeight:"900",marginTop:"2px"}}>{request.serialNumber||"—"}</div>
-            <div style={{fontSize:"7.5px",color:"#6b7280",marginTop:"2px"}}>{now.toLocaleString("en-IN",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:true})} IST</div>
-          </div>
-        </div>
-
-        {/* Title */}
-        <div style={{textAlign:"center",marginBottom:"10px"}}>
-          <div style={{fontSize:"14px",fontWeight:"900",textTransform:"uppercase",textDecoration:"underline",letterSpacing:"1px"}}>Blood Requisition Form</div>
-          <div style={{fontSize:"8.5px",color:"#6b7280",marginTop:"2px"}}>NACO / MoHFW Compliant · {hospital?.fullName||"Hospital"}</div>
-        </div>
-
-        {/* Urgency + Status row */}
-        <div style={{display:"flex",justifyContent:"center",gap:"10px",marginBottom:"10px"}}>
-          <div style={{padding:"5px 14px",border:`2px solid ${uc.border}`,borderRadius:"6px",background:uc.bg,color:uc.color,fontSize:"10.5px",fontWeight:"900",textTransform:"uppercase"}}>
-            {uc.emoji} URGENCY: {request.urgency||"ROUTINE"} · Valid {uc.validityHours}h
-          </div>
-          <div style={{padding:"5px 14px",border:`2px solid ${isV?"#86efac":"#fca5a5"}`,borderRadius:"6px",background:isV?"#f0fdf4":"#fef2f2",color:isV?"#15803d":"#b91c1c",fontSize:"10.5px",fontWeight:"900",textTransform:"uppercase"}}>
-            ⏱ VALIDITY: {rem}
+          {/* Serial number — top right */}
+          <div style={S.serialBox}>
+            <div style={S.serialLbl}>Serial No.</div>
+            <div style={S.serialVal}>{request.serialNumber||"—"}</div>
+            <div style={S.serialDt}>Gen: {genTime} IST</div>
           </div>
         </div>
 
-        {/* Patient + Hospital */}
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"12px",marginBottom:"10px"}}>
+        {/* ── TITLE ── */}
+        <div style={S.titleWrap}>
+          <div style={S.titleText}>Blood Requisition Form</div>
+          <div style={S.titleSub}>Generated On: {genTime}</div>
+        </div>
+
+        {/* ── URGENCY + VALIDITY CHIPS ── */}
+        <div style={S.chipRow}>
+          <div style={S.chip(uc.bg, uc.border, uc.color)}>
+            {uc.emoji} Urgency: {request.urgency||"Routine"} · Valid {uc.validityHours}h
+          </div>
+          <div style={S.chip(isV?"#f0fdf4":"#fef2f2", isV?"#86efac":"#fca5a5", isV?"#15803d":"#b91c1c")}>
+            ⏱ Validity: {rem}
+          </div>
+        </div>
+
+        {/* ── PATIENT + HOSPITAL INFO ── */}
+        <div style={S.infoGrid}>
+          {/* Patient */}
           <div>
-            <div style={{fontWeight:"800",fontSize:"12px",textTransform:"uppercase",borderLeft:"4px solid #8B0000",paddingLeft:"6px",marginBottom:"6px"}}>Patient Information</div>
-            <table style={{width:"100%",fontSize:"10.5px",borderCollapse:"collapse"}}>
-              {[["Full Name",request.patientName],["Age",`${request.age||"N/A"} Years`],["Mobile",request.patientMobile||"—"],["Aadhaar","XXXX XXXX "+((request.patientAadhaar||"").slice(-4)||"XXXX")],["Ward / Dept",request.wardDepartment||"—"],["Bed No.",request.bedNumber||"—"]].map(([k,v])=>(
-                <tr key={k}><td style={{padding:"2px 0",color:"#6b7280",width:"38%",fontWeight:"600"}}>{k}:</td><td style={{padding:"2px 0",fontWeight:"700"}}>{v}</td></tr>
-              ))}
+            <div style={S.secHead("#8B0000")}>Patient Information</div>
+            <table style={S.tbl}>
+              <tbody>
+                {([
+                  ["Name",        request.patientName||"—"],
+                  ["Age",         `${request.age||"N/A"} Years`],
+                  ["Mobile",      request.patientMobile||"—"],
+                  ["Ward / Dept", request.wardDepartment||"—"],
+                  ["Bed No.",     request.bedNumber||"—"],
+                ] as [string,string][]).map(([k,v])=>(
+                  <tr key={k}>
+                    <td style={S.tblKey}>{k}:</td>
+                    <td style={S.tblVal}>{v}</td>
+                  </tr>
+                ))}
+              </tbody>
             </table>
           </div>
+          {/* Hospital */}
           <div>
-            <div style={{fontWeight:"800",fontSize:"12px",textTransform:"uppercase",borderLeft:"4px solid #374151",paddingLeft:"6px",marginBottom:"6px"}}>Requesting Hospital</div>
-            <table style={{width:"100%",fontSize:"10.5px",borderCollapse:"collapse"}}>
-              {[["Hospital",hospital?.fullName||"—"],["Location",`${hospital?.district||"—"}, ${hospital?.pincode||""}`],["Contact",hospital?.mobile||"—"],["Reg. No.",hospital?.registrationNo||"—"],["Doctor",request.doctorName||"—"],["MCI / SMC",request.doctorRegNo||"—"]].map(([k,v])=>(
-                <tr key={k}><td style={{padding:"2px 0",color:"#6b7280",width:"38%",fontWeight:"600"}}>{k}:</td><td style={{padding:"2px 0",fontWeight:"700"}}>{v}</td></tr>
-              ))}
+            <div style={S.secHead("#374151")}>Requesting Hospital</div>
+            <table style={S.tbl}>
+              <tbody>
+                {([
+                  ["Name",     hospital?.fullName||"—"],
+                  ["Location", `${hospital?.district||"—"}, ${hospital?.pincode||""}`],
+                  ["Contact",  hospital?.mobile||"—"],
+                  ["Doctor",   request.doctorName||"—"],
+                  ["Reg. No.", request.doctorRegNo||"—"],
+                ] as [string,string][]).map(([k,v])=>(
+                  <tr key={k}>
+                    <td style={S.tblKey}>{k}:</td>
+                    <td style={S.tblVal}>{v}</td>
+                  </tr>
+                ))}
+              </tbody>
             </table>
           </div>
         </div>
 
-        {/* RTID */}
-        <div style={{textAlign:"center",margin:"10px 0 8px"}}>
-          <div style={{display:"inline-block",border:"2px dashed #9ca3af",borderRadius:"6px",padding:"6px 22px",background:"#f9fafb"}}>
-            <div style={{fontSize:"8.5px",color:"#9ca3af",textTransform:"uppercase",letterSpacing:"1px",marginBottom:"3px"}}>RTID (Request Token ID)</div>
-            <div style={{fontFamily:"monospace",fontSize:"16px",fontWeight:"900",color:"#8B0000",letterSpacing:"2px"}}>{request.rtid}</div>
+        {/* ── RTID — Fix 3: label updated ── */}
+        <div style={S.rtidWrap}>
+          <div style={S.rtidBox}>
+            {/* Fix 3: "RaktPort Transfusion ID" */}
+            <div style={S.rtidLbl}>RTID Code — RaktPort Transfusion ID</div>
+            <div style={S.rtidCode}>{request.rtid}</div>
           </div>
         </div>
 
-        {/* Blood Details box */}
-        <div style={{border:"2.5px solid #111827",borderRadius:"8px",padding:"8px",marginBottom:"10px"}}>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"6px",textAlign:"center"}}>
-            <div><div style={{fontSize:"8px",textTransform:"uppercase",color:"#6b7280",fontWeight:"700",marginBottom:"3px"}}>Blood Group</div><div style={{fontSize:"30px",fontWeight:"900",color:"#8B0000",lineHeight:"1"}}>{request.bloodGroup}</div></div>
-            <div><div style={{fontSize:"8px",textTransform:"uppercase",color:"#6b7280",fontWeight:"700",marginBottom:"3px"}}>Component</div><div style={{fontSize:"12px",fontWeight:"800",marginTop:"4px"}}>{request.componentType||"Whole Blood"}</div></div>
-            <div><div style={{fontSize:"8px",textTransform:"uppercase",color:"#6b7280",fontWeight:"700",marginBottom:"3px"}}>Units</div><div style={{fontSize:"30px",fontWeight:"900",lineHeight:"1"}}>{request.unitsRequired}</div></div>
-            <div><div style={{fontSize:"8px",textTransform:"uppercase",color:"#6b7280",fontWeight:"700",marginBottom:"3px"}}>Required By</div><div style={{fontSize:"11px",fontWeight:"800",marginTop:"4px"}}>{formatDate(request.requiredBy)}</div><div style={{fontSize:"10px",color:"#374151"}}>{formatTime(request.requiredBy)}</div></div>
+        {/* ── BLOOD DETAILS ── */}
+        <div style={S.bloodBox}>
+          <div style={S.bloodGrid}>
+            <div style={{...S.bloodCell}}>
+              <div style={S.bloodLbl}>Blood Group</div>
+              <div style={S.bloodValLg}>{request.bloodGroup}</div>
+            </div>
+            <div style={{...S.bloodCell}}>
+              <div style={S.bloodLbl}>Component Type</div>
+              <div style={S.bloodValMd}>{request.componentType||"Whole Blood"}</div>
+            </div>
+            <div style={{...S.bloodCell}}>
+              <div style={S.bloodLbl}>Units Required</div>
+              <div style={S.bloodValLg}>{request.unitsRequired}</div>
+            </div>
+            <div style={{...S.bloodCell, borderRight:"none"}}>
+              <div style={S.bloodLbl}>Required By</div>
+              <div style={S.bloodValMd}>{formatDate(request.requiredBy)}</div>
+              <div style={S.bloodValSm}>{formatTime(request.requiredBy)}</div>
+            </div>
           </div>
         </div>
 
-        {/* Indication */}
+        {/* ── INDICATION ── */}
         {request.transfusionIndication && (
-          <div style={{background:"#eff6ff",border:"1px solid #bfdbfe",borderRadius:"6px",padding:"6px 10px",marginBottom:"8px",fontSize:"10.5px"}}>
+          <div style={S.indicBox}>
             <span style={{fontWeight:"800",color:"#1e40af"}}>Indication for Transfusion (NACO): </span>
             <span style={{fontWeight:"600",color:"#1d4ed8"}}>{request.transfusionIndication}</span>
           </div>
         )}
 
-        {/* MoHFW Warning */}
-        <div style={{background:"#fef2f2",border:"2px solid #fca5a5",borderRadius:"6px",padding:"8px 10px",marginBottom:"12px"}}>
-          <div style={{fontWeight:"800",fontSize:"9px",textTransform:"uppercase",color:"#7f1d1d",marginBottom:"5px"}}>⚠️ MoHFW / NACO Mandatory Requirements</div>
-          <ul style={{margin:0,paddingLeft:"14px",fontSize:"9px",color:"#991b1b",lineHeight:"1.6"}}>
-            <li>Mandatory ABO-Rh typing, antibody screening &amp; cross-matching before transfusion</li>
-            <li>Emergency uncross-matched blood only if immediately life-threatening — document justification</li>
-            <li>Verify patient identity (name, age, blood group) before administration</li>
-            <li>Monitor patient for 15 min post-transfusion; report adverse reactions to regional blood bank</li>
-            <li>Informed consent mandatory for all planned transfusions (National Blood Policy 2020)</li>
+        {/* ── NACO / MoHFW REQUIREMENTS ── */}
+        <div style={S.nacoBox}>
+          <div style={S.nacoHead}>⚠ Compatibility &amp; Safety Requirements (MoHFW / NACO)</div>
+          <ul style={{margin:0, paddingLeft:"14px"}}>
+            {[
+              "Mandatory ABO-Rh typing, antibody screening & cross-matching before transfusion",
+              "Emergency uncross-matched blood only if immediately life-threatening — document justification",
+              "Verify patient identity (name, age, blood group) before administration",
+              "Monitor patient for 15 min post-transfusion; report adverse reactions to regional blood bank",
+              "Informed consent mandatory for all planned transfusions (National Blood Policy 2020)",
+            ].map((t,i)=>(<li key={i} style={S.nacoLi}>{t}</li>))}
           </ul>
         </div>
 
-        {/* Footer with QR + signatures */}
-        <div style={{borderTop:"2px solid #111827",paddingTop:"8px",display:"flex",gap:"12px",alignItems:"flex-start"}}>
-          <div style={{flexShrink:0,textAlign:"center",width:"100px"}}>
-            <canvas ref={qrRef} width={90} height={90} />
-            <div style={{fontSize:"7.5px",fontWeight:"700",marginTop:"3px",color:"#374151"}}>Scan to Verify</div>
+        {/* ── FOOTER: QR + Metadata + Signature ── */}
+        <div style={S.footerWrap}>
+          {/* QR code */}
+          <div style={S.qrCol}>
+            <canvas ref={qrRef} width={100} height={100} style={{display:"block"}} />
+            <div style={S.qrLbl}>Scan to Verify</div>
           </div>
-          <div style={{flex:1,fontSize:"8px",color:"#374151",lineHeight:"1.6"}}>
-            <div style={{fontWeight:"800",textTransform:"uppercase",fontSize:"8.5px",marginBottom:"3px"}}>Digital Metadata</div>
+          {/* Digital metadata */}
+          <div style={S.metaCol}>
+            <div style={S.metaHead}>Digital Signature &amp; Metadata</div>
             <div>Generated by: {request.generatedBy||hospital?.fullName||"Hospital"}</div>
             <div>System: RaktPort {request.systemVersion||SYSTEM_VERSION}</div>
-            <div>Timestamp: {new Date(request.createdAt).toLocaleString("en-IN")} IST</div>
-            <div style={{marginTop:"5px",fontWeight:"800",textTransform:"uppercase",fontSize:"8.5px"}}>Disclaimer</div>
-            <div>This document is electronically generated by RaktPort. Validation subject to QR code authenticity and validity period.</div>
+            <div>Timestamp: {genTime} IST</div>
+            <div style={{marginTop:"5px", ...S.metaHead}}>Disclaimer</div>
+            <div>This document is electronically generated by RaktPort Digital Platform. Blood issued against this request must be cross-matched before transfusion. Validation subject to QR code authenticity and validity period. This requisition becomes invalid after redemption or expiry.</div>
           </div>
-          <div style={{flexShrink:0,width:"120px",textAlign:"center"}}>
-            <div style={{height:"38px",borderBottom:"1px solid #374151",marginBottom:"4px"}}></div>
-            <div style={{fontSize:"8.5px",fontWeight:"800",textTransform:"uppercase"}}>Authorized Signatory</div>
-            <div style={{fontSize:"7.5px",color:"#6b7280"}}>(Medical Officer / In-Charge)</div>
-            <div style={{fontSize:"7.5px",color:"#9ca3af",marginTop:"4px"}}>Date: {formatDate(new Date())}</div>
+          {/* Authorised signatory */}
+          <div style={S.sigCol}>
+            <div style={S.sigLine}></div>
+            <div style={S.sigLbl}>Authorized Signatory</div>
+            <div style={S.sigSub}>(Medical Officer / In-Charge)</div>
+            <div style={S.sigDate}>Date: {formatDate(new Date())}</div>
           </div>
         </div>
+
       </div>
     </div>
   );
