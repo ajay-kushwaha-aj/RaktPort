@@ -1,4 +1,6 @@
 // src/components/SignupPage.tsx
+// Enhanced: Blood Bank inventory step, Google signup profile completion, password strength, better UX
+
 import { useState, useEffect, useCallback, useId } from 'react';
 import {
   initRecaptcha,
@@ -13,6 +15,7 @@ import {
   User, Mail, Phone, Lock, MapPin, Calendar, Droplet,
   FileText, Building2, Heart, Shield, AlertCircle, Loader2,
   ChevronRight, ChevronLeft, Home, Smartphone, KeyRound,
+  Package, Clock, Zap, Check, Info,
 } from 'lucide-react';
 import logo from '../assets/raktport-logo.png';
 import type { ConfirmationResult, RecaptchaVerifier } from 'firebase/auth';
@@ -42,7 +45,38 @@ const INDIAN_STATES = [
 ];
 
 const BLOOD_GROUPS = ['A+','A-','B+','B-','O+','O-','AB+','AB-'];
-const STEPS = ['Basic','OTP','Details','Address','Finish'] as const;
+
+const BLOOD_GROUP_COLORS: Record<string, { bg: string; text: string; border: string }> = {
+  'A+':  { bg: 'bg-red-50',     text: 'text-red-700',    border: 'border-red-200'   },
+  'A-':  { bg: 'bg-rose-50',    text: 'text-rose-700',   border: 'border-rose-200'  },
+  'B+':  { bg: 'bg-blue-50',    text: 'text-blue-700',   border: 'border-blue-200'  },
+  'B-':  { bg: 'bg-cyan-50',    text: 'text-cyan-700',   border: 'border-cyan-200'  },
+  'O+':  { bg: 'bg-green-50',   text: 'text-green-700',  border: 'border-green-200' },
+  'O-':  { bg: 'bg-emerald-50', text: 'text-emerald-700',border: 'border-emerald-200'},
+  'AB+': { bg: 'bg-purple-50',  text: 'text-purple-700', border: 'border-purple-200'},
+  'AB-': { bg: 'bg-violet-50',  text: 'text-violet-700', border: 'border-violet-200'},
+};
+
+// Steps: Basic → OTP → OrgDetails → [Inventory for bloodbank] → Address → Finish
+const getSteps = (role: string) =>
+  role === 'bloodbank'
+    ? ['Basic','OTP','Details','Inventory','Address','Finish']
+    : ['Basic','OTP','Details','Address','Finish'];
+
+/* ─────────────────── Helpers ─────────────────── */
+
+function getPasswordStrength(pwd: string): { score: number; label: string; color: string } {
+  let score = 0;
+  if (pwd.length >= 8) score++;
+  if (pwd.length >= 12) score++;
+  if (/[A-Z]/.test(pwd)) score++;
+  if (/[0-9]/.test(pwd)) score++;
+  if (/[^A-Za-z0-9]/.test(pwd)) score++;
+  if (score <= 1) return { score, label: 'Weak', color: 'bg-red-500' };
+  if (score <= 2) return { score, label: 'Fair', color: 'bg-amber-500' };
+  if (score <= 3) return { score, label: 'Good', color: 'bg-blue-500' };
+  return { score, label: 'Strong', color: 'bg-green-500' };
+}
 
 /* ─────────────────── Sub-components ─────────────────── */
 
@@ -61,7 +95,6 @@ function Spinner({ white = false }: { white?: boolean }) {
   return <span className={`inline-block w-4 h-4 border-2 rounded-full animate-spin flex-shrink-0 ${white ? 'border-white/30 border-t-white' : 'border-gray-200 border-t-gray-600'}`} aria-hidden="true" />;
 }
 
-/** Labelled input wrapper */
 function Field({ label, required, hint, children }: {
   label: string; required?: boolean; hint?: string; children: React.ReactNode;
 }) {
@@ -76,7 +109,6 @@ function Field({ label, required, hint, children }: {
   );
 }
 
-/** Text / email / tel / date input */
 function TInput({
   id, type = 'text', placeholder, value, onChange, max, maxLength, inputMode, prefix, disabled = false, iconLeft,
 }: {
@@ -127,6 +159,7 @@ function DocUpload({ inputId, docs, onUpload, onRemove }: {
         <ul className="mt-2.5 space-y-1.5">
           {docs.map((f, i) => (
             <li key={i} className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg">
+              <FileText className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
               <span className="text-xs sm:text-sm text-gray-700 truncate flex-1">{f.name}</span>
               <button type="button" onClick={() => onRemove(i)} className="flex-shrink-0 text-red-400 hover:text-red-600 transition-colors touch-manipulation">
                 <X className="w-4 h-4" />
@@ -139,12 +172,264 @@ function DocUpload({ inputId, docs, onUpload, onRemove }: {
   );
 }
 
+// ─── Blood Group Inventory Input ──────────────────────────────────────────────
+function InventoryInput({
+  bloodGroup,
+  value,
+  onChange,
+}: {
+  bloodGroup: string;
+  value: number;
+  onChange: (val: number) => void;
+}) {
+  const colors = BLOOD_GROUP_COLORS[bloodGroup] || { bg: 'bg-gray-50', text: 'text-gray-700', border: 'border-gray-200' };
+  return (
+    <div className={`${colors.bg} ${colors.border} border-2 rounded-xl p-3 flex flex-col items-center gap-2`}>
+      <span className={`text-lg font-black ${colors.text}`}>{bloodGroup}</span>
+      <div className="flex items-center gap-1.5">
+        <button
+          type="button"
+          onClick={() => onChange(Math.max(0, value - 5))}
+          className="w-7 h-7 rounded-lg bg-white/80 border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-100 active:scale-95 transition-all font-bold text-sm touch-manipulation"
+        >−</button>
+        <input
+          type="number"
+          min="0"
+          max="9999"
+          value={value}
+          onChange={e => onChange(Math.max(0, Math.min(9999, parseInt(e.target.value) || 0)))}
+          className={`w-14 text-center py-1 rounded-lg border-2 ${colors.border} bg-white/80 text-sm font-bold ${colors.text} outline-none focus:ring-2 focus:ring-purple-300`}
+        />
+        <button
+          type="button"
+          onClick={() => onChange(Math.min(9999, value + 5))}
+          className="w-7 h-7 rounded-lg bg-white/80 border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-100 active:scale-95 transition-all font-bold text-sm touch-manipulation"
+        >+</button>
+      </div>
+      <span className="text-[10px] text-gray-400 font-medium">units</span>
+    </div>
+  );
+}
+
+/* ─────────────────── Google Profile Completion Modal ─────────────────── */
+function GoogleProfileCompletion({
+  role,
+  displayName,
+  email,
+  googleUid,
+  onComplete,
+  onCancel,
+  cfg,
+}: {
+  role: string;
+  displayName: string;
+  email: string;
+  googleUid: string;
+  onComplete: () => void;
+  onCancel: () => void;
+  cfg: typeof ROLE_CONFIG[keyof typeof ROLE_CONFIG];
+}) {
+  const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [licenseNo, setLicenseNo] = useState('');
+  const [registrationNo, setRegistrationNo] = useState('');
+  const [address, setAddress] = useState('');
+  const [district, setDistrict] = useState('');
+  const [state, setState] = useState('');
+  const [pincode, setPincode] = useState('');
+  const [mobile, setMobile] = useState('');
+  const [inventory, setInventory] = useState<Record<string, number>>(
+    Object.fromEntries(BLOOD_GROUPS.map(bg => [bg, 0]))
+  );
+
+  const totalSteps = role === 'bloodbank' ? 3 : 2;
+
+  const handleSubmit = async () => {
+    if (!address || !district || !state || !pincode) { toast.error('Fill complete address'); return; }
+    if (pincode.length !== 6) { toast.error('Pincode must be 6 digits'); return; }
+    setLoading(true);
+    try {
+      // Update the Firestore doc with org-specific details
+      const { doc, updateDoc } = await import('firebase/firestore');
+      const { db } = await import('../firebase');
+      await updateDoc(doc(db, 'users', googleUid), {
+        address, district, state, pincode,
+        mobile: mobile ? `+91${mobile}` : '',
+        ...(role === 'hospital' && { registrationNo }),
+        ...(role === 'bloodbank' && { licenseNo }),
+        ...(role === 'bloodbank' && {
+          inventorySetup: Object.fromEntries(
+            BLOOD_GROUPS.map(bg => [bg, { total: inventory[bg], available: inventory[bg] }])
+          )
+        }),
+        profileComplete: true,
+        updatedAt: new Date(),
+      });
+
+      // For bloodbank, also create inventory doc
+      if (role === 'bloodbank') {
+        const { setDoc } = await import('firebase/firestore');
+        await setDoc(doc(db, 'inventory', googleUid), 
+          Object.fromEntries(BLOOD_GROUPS.map(bg => [bg, { total: inventory[bg], available: inventory[bg] }]))
+        );
+      }
+
+      toast.success('Profile completed! You can now log in.');
+      onComplete();
+    } catch (e: any) {
+      toast.error('Failed to save details', { description: e.message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className={`p-5 bg-gradient-to-r ${cfg.gradient} text-white rounded-t-2xl`}>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+              <GoogleIcon size={20} />
+            </div>
+            <div>
+              <h2 className="font-bold text-lg">Complete Your Profile</h2>
+              <p className="text-xs opacity-80">Signed in as {email}</p>
+            </div>
+          </div>
+          {/* Steps */}
+          <div className="flex gap-2 mt-4">
+            {Array.from({ length: totalSteps }).map((_, i) => (
+              <div key={i} className={`flex-1 h-1.5 rounded-full transition-all ${i < step ? 'bg-white' : 'bg-white/30'}`} />
+            ))}
+          </div>
+        </div>
+
+        <div className="p-5 space-y-4">
+          {/* Step 1: Org details */}
+          {step === 1 && (
+            <div className="space-y-4 animate-fadein">
+              <h3 className="font-bold text-gray-800">Organization Details</h3>
+              {role === 'hospital' && (
+                <Field label="Hospital Registration No." required>
+                  <TInput value={registrationNo} onChange={setRegistrationNo} placeholder="HOSP-2024-XXXXX"
+                    iconLeft={<FileText className="w-4 h-4" />} />
+                </Field>
+              )}
+              {role === 'bloodbank' && (
+                <Field label="Blood Bank License No." required>
+                  <TInput value={licenseNo} onChange={setLicenseNo} placeholder="BB-2024-XXXXX"
+                    iconLeft={<FileText className="w-4 h-4" />} />
+                </Field>
+              )}
+              <Field label="Mobile Number">
+                <TInput type="tel" inputMode="numeric" maxLength={10}
+                  value={mobile} onChange={v => setMobile(v.replace(/\D/g,'').slice(0,10))}
+                  placeholder="9876543210" prefix="+91"
+                  iconLeft={<Phone className="w-4 h-4" />} />
+              </Field>
+            </div>
+          )}
+
+          {/* Step 2 (bloodbank): Inventory */}
+          {step === 2 && role === 'bloodbank' && (
+            <div className="space-y-4 animate-fadein">
+              <div className="flex items-center gap-2">
+                <Droplet className="w-5 h-5 text-purple-600" />
+                <h3 className="font-bold text-gray-800">Initial Blood Inventory</h3>
+              </div>
+              <p className="text-xs text-gray-500">Enter current stock levels (you can update later from dashboard)</p>
+              <div className="grid grid-cols-4 gap-2">
+                {BLOOD_GROUPS.map(bg => (
+                  <InventoryInput key={bg} bloodGroup={bg} value={inventory[bg] || 0}
+                    onChange={v => setInventory(prev => ({ ...prev, [bg]: v }))} />
+                ))}
+              </div>
+              <div className="bg-purple-50 rounded-xl p-3 text-xs text-purple-700 flex items-start gap-2">
+                <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                <span>Total units: <strong>{Object.values(inventory).reduce((s, v) => s + v, 0)}</strong>. You can skip this and add inventory from your dashboard later.</span>
+              </div>
+            </div>
+          )}
+
+          {/* Address step */}
+          {((step === 2 && role !== 'bloodbank') || (step === 3 && role === 'bloodbank')) && (
+            <div className="space-y-4 animate-fadein">
+              <h3 className="font-bold text-gray-800">Address Details</h3>
+              <Field label="Complete Address" required>
+                <div className="relative">
+                  <Home className="absolute left-3 top-3 w-4 h-4 text-gray-400 pointer-events-none" />
+                  <textarea rows={2} value={address} onChange={e => setAddress(e.target.value)}
+                    placeholder="Street, Building, Landmark…"
+                    className="w-full pl-9 pr-3 py-3 bg-white/60 border-2 border-gray-200 rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none text-sm text-gray-800 placeholder-gray-400 resize-none transition-all" />
+                </div>
+              </Field>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="District" required>
+                  <input value={district} onChange={e => setDistrict(e.target.value)} placeholder="District"
+                    className="w-full px-3 py-3 bg-white/60 border-2 border-gray-200 rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none text-sm text-gray-800 placeholder-gray-400 transition-all" />
+                </Field>
+                <Field label="State" required>
+                  <select value={state} onChange={e => setState(e.target.value)}
+                    className="w-full px-3 py-3 bg-white/60 border-2 border-gray-200 rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none text-sm text-gray-800 transition-all">
+                    <option value="">Select</option>
+                    {INDIAN_STATES.map(s => <option key={s}>{s}</option>)}
+                  </select>
+                </Field>
+              </div>
+              <Field label="Pincode" required>
+                <TInput inputMode="numeric" maxLength={6} value={pincode}
+                  onChange={v => setPincode(v.replace(/\D/g,'').slice(0,6))} placeholder="110001"
+                  iconLeft={<MapPin className="w-4 h-4" />} />
+              </Field>
+            </div>
+          )}
+
+          {/* Navigation */}
+          <div className="flex gap-3 pt-2">
+            {step > 1 ? (
+              <button type="button" onClick={() => setStep(s => s - 1)}
+                className="px-4 py-2.5 bg-white border-2 border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 active:scale-95 transition-all">
+                ← Back
+              </button>
+            ) : (
+              <button type="button" onClick={onCancel}
+                className="px-4 py-2.5 bg-white border-2 border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 active:scale-95 transition-all">
+                Cancel
+              </button>
+            )}
+            {step < totalSteps ? (
+              <button type="button" onClick={() => {
+                if (step === 1) {
+                  if (role === 'hospital' && !registrationNo) { toast.error('Registration number required'); return; }
+                  if (role === 'bloodbank' && !licenseNo) { toast.error('License number required'); return; }
+                }
+                setStep(s => s + 1);
+              }}
+                className={`flex-1 py-2.5 bg-gradient-to-r ${cfg.gradient} text-white rounded-xl text-sm font-semibold hover:shadow-lg active:scale-95 transition-all`}>
+                Continue →
+              </button>
+            ) : (
+              <button type="button" onClick={handleSubmit} disabled={loading}
+                className={`flex-1 py-2.5 bg-gradient-to-r ${cfg.gradient} text-white rounded-xl text-sm font-bold hover:shadow-lg active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2`}>
+                {loading ? <><Spinner white />Saving…</> : <><CheckCircle2 className="w-4 h-4" />Complete Profile</>}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ─────────────────── Main Component ─────────────────── */
 
 export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
-  const cfg      = ROLE_CONFIG[role as keyof typeof ROLE_CONFIG] ?? ROLE_CONFIG.donor;
+  const cfg = ROLE_CONFIG[role as keyof typeof ROLE_CONFIG] ?? ROLE_CONFIG.donor;
   const RoleIcon = cfg.Icon;
-  const uid      = useId();
+  const uid = useId();
+  const STEPS = getSteps(role);
+  const TOTAL_STEPS = STEPS.length;
 
   /* Step state */
   const [step,            setStep]            = useState(1);
@@ -152,6 +437,10 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
   const [showConfirm,     setShowConfirm]     = useState(false);
   const [loading,         setLoading]         = useState(false);
   const [gLoading,        setGLoading]        = useState(false);
+
+  /* Google profile completion */
+  const [showGoogleCompletion, setShowGoogleCompletion] = useState(false);
+  const [googleUser, setGoogleUser] = useState<{ uid: string; displayName: string; email: string } | null>(null);
 
   /* OTP state */
   const [otpSent,         setOtpSent]         = useState(false);
@@ -169,7 +458,9 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
     address: '', district: '', state: '', pincode: '', aadhar: '',
     bloodGroup: '', gender: '', dob: '', lastDonationDate: '',
     dontRemember: false, licenseNo: '', registrationNo: '',
-    inventory: {} as Record<string, number>, acceptTerms: false,
+    totalBeds: '', operatingHours: '',
+    inventory: Object.fromEntries(BLOOD_GROUPS.map(bg => [bg, 0])) as Record<string, number>,
+    acceptTerms: false,
   });
   const [docs, setDocs] = useState<File[]>([]);
 
@@ -262,20 +553,29 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
       if (role === 'hospital'  && !form.registrationNo) { toast.error('Enter hospital registration number'); return false; }
       if (role === 'bloodbank' && !form.licenseNo)      { toast.error('Enter blood bank license number');  return false; }
     }
-    if (step === 4) {
+    // Inventory step for bloodbank (step 4)
+    if (step === 4 && role === 'bloodbank') {
+      // Inventory is optional — just proceed
+      return true;
+    }
+    // Address step
+    const addressStep = role === 'bloodbank' ? 5 : 4;
+    if (step === addressStep) {
       if (!form.address.trim() || !form.district.trim() || !form.state || !form.pincode) { toast.error('Fill complete address'); return false; }
       if (form.pincode.length !== 6) { toast.error('Pincode must be 6 digits'); return false; }
     }
-    if (step === 5) {
+    // Password step
+    const pwdStep = TOTAL_STEPS;
+    if (step === pwdStep) {
       if (!form.password || !form.confirmPassword) { toast.error('Set a password'); return false; }
       if (form.password !== form.confirmPassword)  { toast.error('Passwords do not match'); return false; }
       if (form.password.length < 6)                { toast.error('Password must be ≥ 6 characters'); return false; }
       if (!form.acceptTerms)                       { toast.error('Accept terms & conditions'); return false; }
     }
     return true;
-  }, [step, form, otpVerified, role]);
+  }, [step, form, otpVerified, role, TOTAL_STEPS]);
 
-  const goNext = () => { if (validate()) setStep(s => Math.min(s + 1, 5)); };
+  const goNext = () => { if (validate()) setStep(s => Math.min(s + 1, TOTAL_STEPS)); };
   const goPrev = () => setStep(s => Math.max(s - 1, 1));
 
   /* Submit */
@@ -283,15 +583,30 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
     if (!validate() || !otpVerified) return;
     setLoading(true);
     try {
+      const inventoryForFirestore = role === 'bloodbank'
+        ? Object.fromEntries(BLOOD_GROUPS.map(bg => [bg, { total: form.inventory[bg] || 0, available: form.inventory[bg] || 0 }]))
+        : undefined;
+
       const res = await registerUserWithPhone(form.email, form.password, {
         role, fullName: form.fullName, mobile: `+91${form.mobile}`,
         address: form.address, district: form.district, state: form.state, pincode: form.pincode,
         isVerified: role === 'donor',
         ...(role === 'donor'     && { aadhar: form.aadhar, bloodGroup: form.bloodGroup, gender: form.gender, dob: form.dob, lastDonationDate: form.dontRemember ? null : form.lastDonationDate, credits: 0 }),
-        ...(role === 'hospital'  && { registrationNo: form.registrationNo }),
-        ...(role === 'bloodbank' && { licenseNo: form.licenseNo, inventory: form.inventory }),
+        ...(role === 'hospital'  && { registrationNo: form.registrationNo, totalBeds: form.totalBeds }),
+        ...(role === 'bloodbank' && { licenseNo: form.licenseNo, operatingHours: form.operatingHours }),
       }, phoneUid);
+
       if (res.success) {
+        // For bloodbank, also initialise inventory document
+        if (role === 'bloodbank' && inventoryForFirestore && res.userId) {
+          try {
+            const { doc, setDoc } = await import('firebase/firestore');
+            const { db } = await import('../firebase');
+            await setDoc(doc(db, 'inventory', res.userId), inventoryForFirestore);
+          } catch (e) {
+            console.warn('Inventory init failed:', e);
+          }
+        }
         toast.success('Registration successful!', { description: role === 'donor' ? 'You can now log in.' : 'Account pending admin verification.' });
         setTimeout(onLoginClick, 2000);
       } else { toast.error('Registration failed', { description: res.error }); }
@@ -299,17 +614,37 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
     finally { setLoading(false); }
   };
 
-  /* Google sign-up (quick path, skips multi-step) */
+  /* Google sign-up */
   const handleGoogle = useCallback(async () => {
     setGLoading(true);
     try {
       const res = await signInWithGoogle(role);
       if (res.success) {
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('userRole', role);
-        localStorage.setItem('userId', res.userId!);
-        toast.success(res.isNewUser ? 'Account created with Google!' : 'Signed in with Google!', { description: `Welcome, ${res.displayName ?? ''}` });
-        setTimeout(() => { window.location.href = '/'; }, 600);
+        if (role === 'donor') {
+          // Donors: direct login
+          localStorage.setItem('isLoggedIn', 'true');
+          localStorage.setItem('userRole', role);
+          localStorage.setItem('userId', res.userId!);
+          if (res.email) localStorage.setItem('userEmail', res.email);
+          toast.success(res.isNewUser ? 'Account created with Google!' : 'Signed in with Google!', { description: `Welcome, ${res.displayName ?? ''}` });
+          setTimeout(() => { window.location.href = '/'; }, 600);
+        } else {
+          // Orgs: need to complete profile first
+          if (res.isNewUser) {
+            // New org account — show profile completion
+            setGoogleUser({ uid: res.userId!, displayName: res.displayName ?? '', email: res.email ?? '' });
+            setShowGoogleCompletion(true);
+            toast.info('Almost there!', { description: 'Complete your organization profile to continue.' });
+          } else {
+            // Existing account — just log in
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userRole', role);
+            localStorage.setItem('userId', res.userId!);
+            if (res.email) localStorage.setItem('userEmail', res.email);
+            toast.success('Signed in with Google!');
+            setTimeout(() => { window.location.href = '/'; }, 600);
+          }
+        }
       } else if (res.error !== 'Sign-in cancelled.') {
         toast.error('Google sign-up failed', { description: res.error });
       }
@@ -317,10 +652,15 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
     finally { setGLoading(false); }
   }, [role]);
 
-  /* ─────────────── Render ─────────────── */
+  const pwdStrength = getPasswordStrength(form.password);
+
+  /* Total units helper for inventory display */
+  const totalInventoryUnits = Object.values(form.inventory).reduce((s, v) => s + v, 0);
+
+  /* ─────────────────── Render ─────────────────── */
   return (
     <div className={`min-h-screen relative overflow-hidden bg-gradient-to-br ${cfg.bgGrad}`}>
-      {/* reCAPTCHA anchor (invisible) */}
+      {/* reCAPTCHA anchor */}
       <div id="sp-recaptcha" aria-hidden="true" />
 
       {/* Background blobs */}
@@ -329,6 +669,26 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
         <div className="absolute -bottom-40 -left-40 w-72 sm:w-96 h-72 sm:h-96 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
         <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 sm:w-96 h-72 sm:h-96 bg-gradient-to-br ${cfg.gradient} rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-4000`} />
       </div>
+
+      {/* Google Profile Completion Modal */}
+      {showGoogleCompletion && googleUser && (
+        <GoogleProfileCompletion
+          role={role}
+          displayName={googleUser.displayName}
+          email={googleUser.email}
+          googleUid={googleUser.uid}
+          cfg={cfg}
+          onComplete={() => {
+            setShowGoogleCompletion(false);
+            toast.success('Profile complete! Pending admin verification.');
+            setTimeout(onLoginClick, 1500);
+          }}
+          onCancel={() => {
+            setShowGoogleCompletion(false);
+            setGoogleUser(null);
+          }}
+        />
+      )}
 
       {/* Sticky top-bar */}
       <div className="sticky top-0 z-30 flex items-center px-3 pt-3 pb-2 sm:px-6 sm:pt-5 sm:pb-0 pointer-events-none">
@@ -403,6 +763,14 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                       <span>{gLoading ? 'Continuing…' : 'Continue with Google'}</span>
                     </button>
 
+                    {/* Google notice for orgs */}
+                    {role !== 'donor' && (
+                      <div className="flex items-start gap-2 p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-800">
+                        <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                        <span>Google sign-up for {role === 'bloodbank' ? 'Blood Banks' : 'Hospitals'} will prompt you to complete your organization profile after sign-in.</span>
+                      </div>
+                    )}
+
                     <div className="flex items-center gap-2.5" aria-hidden="true">
                       <div className="flex-1 h-px bg-gray-200" />
                       <span className="text-[10px] sm:text-xs text-gray-400 font-medium whitespace-nowrap">or fill in details</span>
@@ -410,35 +778,25 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                     </div>
 
                     <Field label="Full Name" required>
-                      <TInput
-                        value={form.fullName}
-                        onChange={v => set('fullName', v)}
-                        placeholder="Enter your full name"
-                        iconLeft={<User className="w-4 h-4 sm:w-5 sm:h-5" />}
-                      />
+                      <TInput value={form.fullName} onChange={v => set('fullName', v)} placeholder="Enter your full name"
+                        iconLeft={<User className="w-4 h-4 sm:w-5 sm:h-5" />} />
                     </Field>
 
                     <Field label="Email Address" required>
-                      <TInput
-                        type="email"
-                        value={form.email}
-                        onChange={v => set('email', v)}
-                        placeholder="you@example.com"
-                        iconLeft={<Mail className="w-4 h-4 sm:w-5 sm:h-5" />}
-                      />
+                      <TInput type="email" value={form.email} onChange={v => set('email', v)} placeholder="you@example.com"
+                        iconLeft={<Mail className="w-4 h-4 sm:w-5 sm:h-5" />} />
                     </Field>
 
                     <Field label="Mobile Number" required hint="OTP will be sent to this number for verification">
-                      <TInput
-                        type="tel"
-                        inputMode="numeric"
-                        maxLength={10}
-                        value={form.mobile}
-                        onChange={v => set('mobile', v.replace(/\D/g, '').slice(0, 10))}
-                        placeholder="9876543210"
-                        prefix="+91"
-                        iconLeft={<Phone className="w-4 h-4 sm:w-5 sm:h-5" />}
-                      />
+                      <TInput type="tel" inputMode="numeric" maxLength={10}
+                        value={form.mobile} onChange={v => set('mobile', v.replace(/\D/g, '').slice(0, 10))}
+                        placeholder="9876543210" prefix="+91"
+                        iconLeft={<Phone className="w-4 h-4 sm:w-5 sm:h-5" />} />
+                      {form.mobile.length > 0 && form.mobile.length < 10 && (
+                        <p className="mt-1 text-[10px] text-amber-600 font-medium flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3" /> {10 - form.mobile.length} more digits needed
+                        </p>
+                      )}
                     </Field>
                   </div>
                 )}
@@ -447,7 +805,7 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                 {step === 2 && (
                   <div className="space-y-5 animate-fadein">
                     <div className="flex flex-col items-center text-center gap-3">
-                      <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-r ${cfg.gradient} flex items-center justify-center`}>
+                      <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-r ${cfg.gradient} flex items-center justify-center shadow-lg`}>
                         <Smartphone className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
                       </div>
                       <div>
@@ -469,7 +827,6 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                       </button>
                     ) : (
                       <div className="space-y-4">
-                        {/* OTP boxes — large enough for easy mobile tapping */}
                         <div className="flex justify-center gap-2 sm:gap-3" role="group" aria-label="OTP input">
                           {otp.map((digit, idx) => (
                             <input
@@ -483,7 +840,7 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                               onKeyDown={e => otpKeyDown(idx, e)}
                               disabled={otpVerified}
                               aria-label={`OTP digit ${idx + 1}`}
-                              className={`w-11 h-13 sm:w-12 sm:h-14 text-center text-xl sm:text-2xl font-bold border-2 rounded-xl outline-none transition-all touch-manipulation ${
+                              className={`text-center text-xl sm:text-2xl font-bold border-2 rounded-xl outline-none transition-all touch-manipulation ${
                                 otpVerified
                                   ? 'bg-green-50 border-green-500 text-green-700'
                                   : digit
@@ -511,7 +868,7 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                             </button>
                             <p className="text-center text-xs sm:text-sm text-gray-500">
                               {resendTimer > 0
-                                ? <>Resend in <strong>{resendTimer}s</strong></>
+                                ? <>Resend in <strong className="text-gray-700">{resendTimer}s</strong></>
                                 : <button type="button" onClick={async () => { setOtp(['','','','','','']); await sendOTP(); }} className="font-semibold text-gray-700 hover:text-gray-900 underline touch-manipulation">Resend OTP</button>}
                             </p>
                           </>
@@ -531,16 +888,17 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                     {role === 'donor' && (
                       <>
                         <Field label="Aadhar Number" required>
-                          <TInput
-                            inputMode="numeric" maxLength={12}
-                            value={form.aadhar}
-                            onChange={v => set('aadhar', v.replace(/\D/g, '').slice(0, 12))}
-                            placeholder="123456789012"
-                            iconLeft={<FileText className="w-4 h-4 sm:w-5 sm:h-5" />}
-                          />
+                          <TInput inputMode="numeric" maxLength={12}
+                            value={form.aadhar} onChange={v => set('aadhar', v.replace(/\D/g, '').slice(0, 12))}
+                            placeholder="123456789012" iconLeft={<FileText className="w-4 h-4 sm:w-5 sm:h-5" />} />
+                          {form.aadhar.length > 0 && (
+                            <div className="flex gap-1 mt-1.5">
+                              {Array.from({length: 12}).map((_, i) => (
+                                <div key={i} className={`h-1 flex-1 rounded-full transition-all ${i < form.aadhar.length ? 'bg-green-500' : 'bg-gray-200'}`} />
+                              ))}
+                            </div>
+                          )}
                         </Field>
-
-                        {/* Blood group + Gender — 2 cols always */}
                         <div className="grid grid-cols-2 gap-3">
                           <Field label="Blood Group" required>
                             <select value={form.bloodGroup} onChange={e => set('bloodGroup', e.target.value)}
@@ -559,26 +917,15 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                             </select>
                           </Field>
                         </div>
-
                         <Field label="Date of Birth" required>
-                          <TInput
-                            type="date"
-                            value={form.dob}
-                            onChange={v => set('dob', v)}
+                          <TInput type="date" value={form.dob} onChange={v => set('dob', v)}
                             max={new Date(Date.now() - 18 * 365.25 * 86400000).toISOString().split('T')[0]}
-                            iconLeft={<Calendar className="w-4 h-4 sm:w-5 sm:h-5" />}
-                          />
+                            iconLeft={<Calendar className="w-4 h-4 sm:w-5 sm:h-5" />} />
                         </Field>
-
                         <Field label="Last Donation Date" hint="Leave blank if you haven't donated before">
-                          <TInput
-                            type="date"
-                            value={form.lastDonationDate}
-                            onChange={v => set('lastDonationDate', v)}
-                            max={new Date().toISOString().split('T')[0]}
-                            disabled={form.dontRemember}
-                            iconLeft={<Calendar className="w-4 h-4 sm:w-5 sm:h-5" />}
-                          />
+                          <TInput type="date" value={form.lastDonationDate} onChange={v => set('lastDonationDate', v)}
+                            max={new Date().toISOString().split('T')[0]} disabled={form.dontRemember}
+                            iconLeft={<Calendar className="w-4 h-4 sm:w-5 sm:h-5" />} />
                           <label className="flex items-center gap-2 mt-2 cursor-pointer touch-manipulation">
                             <input type="checkbox" className="w-4 h-4 rounded border-gray-300 accent-gray-700" checked={form.dontRemember}
                               onChange={e => { set('dontRemember', e.target.checked); if (e.target.checked) set('lastDonationDate', ''); }} />
@@ -588,17 +935,31 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                       </>
                     )}
 
-                    {(role === 'hospital' || role === 'bloodbank') && (
+                    {role === 'hospital' && (
                       <>
-                        <Field label={role === 'hospital' ? 'Hospital Registration No.' : 'Blood Bank License No.'} required>
-                          <TInput
-                            value={role === 'hospital' ? form.registrationNo : form.licenseNo}
-                            onChange={v => set(role === 'hospital' ? 'registrationNo' : 'licenseNo', v)}
-                            placeholder={role === 'hospital' ? 'HOSP-2024-XXXXX' : 'BB-2024-XXXXX'}
-                            iconLeft={<FileText className="w-4 h-4 sm:w-5 sm:h-5" />}
-                          />
+                        <Field label="Hospital Registration No." required>
+                          <TInput value={form.registrationNo} onChange={v => set('registrationNo', v)} placeholder="HOSP-2024-XXXXX"
+                            iconLeft={<FileText className="w-4 h-4 sm:w-5 sm:h-5" />} />
                         </Field>
-                        <DocUpload inputId={`docs-${role}-${uid}`} docs={docs} onUpload={handleUpload} onRemove={i => setDocs(d => d.filter((_, x) => x !== i))} />
+                        <Field label="Total Beds (Optional)" hint="Approximate total bed capacity">
+                          <TInput inputMode="numeric" value={form.totalBeds} onChange={v => set('totalBeds', v.replace(/\D/g,''))}
+                            placeholder="e.g. 200" iconLeft={<Package className="w-4 h-4 sm:w-5 sm:h-5" />} />
+                        </Field>
+                        <DocUpload inputId={`docs-hospital-${uid}`} docs={docs} onUpload={handleUpload} onRemove={i => setDocs(d => d.filter((_, x) => x !== i))} />
+                      </>
+                    )}
+
+                    {role === 'bloodbank' && (
+                      <>
+                        <Field label="Blood Bank License No." required>
+                          <TInput value={form.licenseNo} onChange={v => set('licenseNo', v)} placeholder="BB-2024-XXXXX"
+                            iconLeft={<FileText className="w-4 h-4 sm:w-5 sm:h-5" />} />
+                        </Field>
+                        <Field label="Operating Hours (Optional)" hint="e.g. Mon–Sat 8 AM – 8 PM">
+                          <TInput value={form.operatingHours} onChange={v => set('operatingHours', v)} placeholder="Mon–Sat 8:00 AM – 8:00 PM"
+                            iconLeft={<Clock className="w-4 h-4 sm:w-5 sm:h-5" />} />
+                        </Field>
+                        <DocUpload inputId={`docs-bb-${uid}`} docs={docs} onUpload={handleUpload} onRemove={i => setDocs(d => d.filter((_, x) => x !== i))} />
                       </>
                     )}
 
@@ -616,21 +977,83 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                   </div>
                 )}
 
-                {/* ══ STEP 4: Address ══ */}
-                {step === 4 && (
+                {/* ══ STEP 4: Blood Bank Inventory (bloodbank only) ══ */}
+                {step === 4 && role === 'bloodbank' && (
+                  <div className="space-y-4 animate-fadein">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Droplet className="w-5 h-5 text-purple-600" fill="currentColor" />
+                        <h2 className="text-base sm:text-xl font-bold text-gray-800">Initial Blood Inventory</h2>
+                      </div>
+                      {totalInventoryUnits > 0 && (
+                        <span className="text-xs font-bold bg-purple-100 text-purple-700 px-3 py-1 rounded-full">
+                          {totalInventoryUnits} units total
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs sm:text-sm text-gray-500">
+                      Enter your current blood stock. Use +/− to adjust or type directly. You can update this anytime from the dashboard.
+                    </p>
+
+                    <div className="grid grid-cols-4 gap-2.5">
+                      {BLOOD_GROUPS.map(bg => (
+                        <InventoryInput
+                          key={bg}
+                          bloodGroup={bg}
+                          value={form.inventory[bg] || 0}
+                          onChange={v => set('inventory', { ...form.inventory, [bg]: v })}
+                        />
+                      ))}
+                    </div>
+
+                    {/* Quick fill presets */}
+                    <div className="space-y-2">
+                      <p className="text-xs text-gray-500 font-medium">Quick presets:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {[
+                          { label: 'Skip (all 0)', values: Object.fromEntries(BLOOD_GROUPS.map(bg => [bg, 0])) },
+                          { label: 'Small bank (~20 each)', values: Object.fromEntries(BLOOD_GROUPS.map(bg => [bg, 20])) },
+                          { label: 'Medium bank (~50 each)', values: Object.fromEntries(BLOOD_GROUPS.map(bg => [bg, 50])) },
+                        ].map(preset => (
+                          <button
+                            key={preset.label}
+                            type="button"
+                            onClick={() => set('inventory', preset.values)}
+                            className="px-3 py-1.5 text-xs font-semibold bg-white border-2 border-purple-200 text-purple-700 rounded-xl hover:bg-purple-50 active:scale-95 transition-all touch-manipulation"
+                          >
+                            {preset.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Blood Group Tips */}
+                    <div className="bg-purple-50 rounded-xl p-3 border border-purple-200">
+                      <div className="flex items-start gap-2">
+                        <Info className="w-4 h-4 text-purple-600 flex-shrink-0 mt-0.5" />
+                        <div className="text-xs text-purple-800 space-y-1">
+                          <p className="font-semibold">Inventory Tips:</p>
+                          <p>• O+ and A+ are the most commonly needed blood types</p>
+                          <p>• O− is the universal donor — keep extra stock if possible</p>
+                          <p>• AB+ is the universal recipient blood type</p>
+                          <p className="text-purple-600">Critical alert triggers when any group falls below 30 units</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* ══ ADDRESS STEP ══ */}
+                {((step === 4 && role !== 'bloodbank') || (step === 5 && role === 'bloodbank')) && (
                   <div className="space-y-4 animate-fadein">
                     <h2 className="text-base sm:text-xl font-bold text-gray-800">Address Details</h2>
 
                     <Field label="Complete Address" required>
                       <div className="relative group">
                         <Home className="absolute left-3 sm:left-3.5 top-3 sm:top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-focus-within:text-gray-600 transition-colors pointer-events-none" />
-                        <textarea
-                          rows={3}
-                          value={form.address}
-                          onChange={e => set('address', e.target.value)}
+                        <textarea rows={3} value={form.address} onChange={e => set('address', e.target.value)}
                           placeholder="Street, Building, Landmark…"
-                          className="w-full pl-9 sm:pl-11 pr-3 sm:pr-4 py-3 sm:py-3.5 bg-white/60 border-2 border-gray-200 rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none transition-all resize-none text-sm text-gray-800 placeholder-gray-400"
-                        />
+                          className="w-full pl-9 sm:pl-11 pr-3 sm:pr-4 py-3 sm:py-3.5 bg-white/60 border-2 border-gray-200 rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none transition-all resize-none text-sm text-gray-800 placeholder-gray-400" />
                       </div>
                     </Field>
 
@@ -649,57 +1072,59 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                     </div>
 
                     <Field label="Pincode" required>
-                      <TInput
-                        inputMode="numeric" maxLength={6}
-                        value={form.pincode}
-                        onChange={v => set('pincode', v.replace(/\D/g, '').slice(0, 6))}
-                        placeholder="110001"
-                        iconLeft={<MapPin className="w-4 h-4 sm:w-5 sm:h-5" />}
-                      />
+                      <TInput inputMode="numeric" maxLength={6}
+                        value={form.pincode} onChange={v => set('pincode', v.replace(/\D/g, '').slice(0, 6))}
+                        placeholder="110001" iconLeft={<MapPin className="w-4 h-4 sm:w-5 sm:h-5" />} />
                     </Field>
                   </div>
                 )}
 
-                {/* ══ STEP 5: Password + Terms ══ */}
-                {step === 5 && (
+                {/* ══ PASSWORD STEP ══ */}
+                {step === TOTAL_STEPS && (
                   <div className="space-y-4 animate-fadein">
                     <h2 className="text-base sm:text-xl font-bold text-gray-800">Set Password &amp; Finish</h2>
 
-                    {/* Password */}
                     <Field label="Password" required>
                       <div className="relative group">
                         <Lock className="absolute left-3 sm:left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-focus-within:text-gray-600 transition-colors pointer-events-none" />
-                        <input
-                          type={showPassword ? 'text' : 'password'}
-                          value={form.password}
-                          onChange={e => set('password', e.target.value)}
-                          placeholder="••••••••"
-                          className="w-full pl-9 sm:pl-11 pr-10 sm:pr-12 py-3 sm:py-3.5 bg-white/60 border-2 border-gray-200 rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none transition-all text-sm text-gray-800 placeholder-gray-400"
-                        />
+                        <input type={showPassword ? 'text' : 'password'} value={form.password}
+                          onChange={e => set('password', e.target.value)} placeholder="••••••••"
+                          className="w-full pl-9 sm:pl-11 pr-10 sm:pr-12 py-3 sm:py-3.5 bg-white/60 border-2 border-gray-200 rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none transition-all text-sm text-gray-800 placeholder-gray-400" />
                         <button type="button" tabIndex={-1} onClick={() => setShowPassword(v => !v)} aria-label={showPassword ? 'Hide' : 'Show'}
                           className="absolute right-3 sm:right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors touch-manipulation p-0.5">
                           {showPassword ? <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Eye className="w-4 h-4 sm:w-5 sm:h-5" />}
                         </button>
                       </div>
+                      {/* Password strength meter */}
+                      {form.password.length > 0 && (
+                        <div className="mt-2 space-y-1">
+                          <div className="flex gap-1">
+                            {Array.from({length: 5}).map((_, i) => (
+                              <div key={i} className={`flex-1 h-1.5 rounded-full transition-all duration-300 ${i < pwdStrength.score ? pwdStrength.color : 'bg-gray-200'}`} />
+                            ))}
+                          </div>
+                          <p className={`text-[10px] font-semibold ${
+                            pwdStrength.label === 'Strong' ? 'text-green-600' :
+                            pwdStrength.label === 'Good'   ? 'text-blue-600' :
+                            pwdStrength.label === 'Fair'   ? 'text-amber-600' : 'text-red-500'
+                          }`}>
+                            Password strength: {pwdStrength.label}
+                          </p>
+                        </div>
+                      )}
                     </Field>
 
-                    {/* Confirm password */}
                     <Field label="Confirm Password" required>
                       <div className="relative group">
                         <Lock className="absolute left-3 sm:left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-focus-within:text-gray-600 transition-colors pointer-events-none" />
-                        <input
-                          type={showConfirm ? 'text' : 'password'}
-                          value={form.confirmPassword}
-                          onChange={e => set('confirmPassword', e.target.value)}
-                          placeholder="••••••••"
-                          className="w-full pl-9 sm:pl-11 pr-10 sm:pr-12 py-3 sm:py-3.5 bg-white/60 border-2 border-gray-200 rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none transition-all text-sm text-gray-800 placeholder-gray-400"
-                        />
+                        <input type={showConfirm ? 'text' : 'password'} value={form.confirmPassword}
+                          onChange={e => set('confirmPassword', e.target.value)} placeholder="••••••••"
+                          className="w-full pl-9 sm:pl-11 pr-10 sm:pr-12 py-3 sm:py-3.5 bg-white/60 border-2 border-gray-200 rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none transition-all text-sm text-gray-800 placeholder-gray-400" />
                         <button type="button" tabIndex={-1} onClick={() => setShowConfirm(v => !v)} aria-label={showConfirm ? 'Hide' : 'Show'}
                           className="absolute right-3 sm:right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors touch-manipulation p-0.5">
                           {showConfirm ? <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Eye className="w-4 h-4 sm:w-5 sm:h-5" />}
                         </button>
                       </div>
-                      {/* Live match indicator */}
                       {form.confirmPassword.length > 0 && (
                         <p className={`mt-1 text-[11px] font-medium flex items-center gap-1 ${form.password === form.confirmPassword ? 'text-green-600' : 'text-red-500'}`}>
                           {form.password === form.confirmPassword
@@ -709,17 +1134,27 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                       )}
                     </Field>
 
-                    {/* Password hint */}
-                    <div className="flex gap-2.5 p-3 sm:p-4 bg-blue-50 rounded-xl border border-blue-200">
-                      <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                      <div className="text-xs sm:text-sm text-blue-800">
-                        <p className="font-semibold mb-0.5">Requirements</p>
-                        <ul className="list-disc list-inside space-y-0.5 text-xs text-blue-700">
-                          <li>At least 6 characters long</li>
-                          <li>Mix letters and numbers for stronger security</li>
-                        </ul>
+                    {/* Summary card for Blood Banks */}
+                    {role === 'bloodbank' && (
+                      <div className="bg-purple-50 rounded-xl border border-purple-200 p-4">
+                        <p className="text-xs font-bold text-purple-800 mb-2 flex items-center gap-1.5">
+                          <Droplet className="w-3.5 h-3.5" fill="currentColor" /> Blood Bank Summary
+                        </p>
+                        <div className="grid grid-cols-4 gap-1.5">
+                          {BLOOD_GROUPS.map(bg => {
+                            const units = form.inventory[bg] || 0;
+                            const colors = BLOOD_GROUP_COLORS[bg];
+                            return (
+                              <div key={bg} className={`${colors.bg} ${colors.border} border rounded-lg py-1.5 text-center`}>
+                                <p className={`text-xs font-black ${colors.text}`}>{bg}</p>
+                                <p className={`text-sm font-bold ${colors.text}`}>{units}</p>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <p className="text-xs text-purple-600 mt-2 font-medium">Total: {totalInventoryUnits} units · License: {form.licenseNo || '—'}</p>
                       </div>
-                    </div>
+                    )}
 
                     {/* Terms */}
                     <label className="flex items-start gap-3 cursor-pointer touch-manipulation">
@@ -734,7 +1169,6 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                       </span>
                     </label>
 
-                    {/* Role notice */}
                     {role === 'donor' && (
                       <div className={`flex gap-2.5 p-3 sm:p-4 ${cfg.lightBg} rounded-xl border-l-4 ${cfg.borderL}`}>
                         <Heart className="w-4 h-4 flex-shrink-0 mt-0.5 text-red-600" />
@@ -763,7 +1197,7 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                     </button>
                   )}
 
-                  {step < 5 ? (
+                  {step < TOTAL_STEPS ? (
                     <button type="button" onClick={goNext}
                       disabled={step === 2 && otpSent && !otpVerified}
                       className={`ml-auto flex items-center gap-1.5 px-5 sm:px-6 py-2.5 sm:py-3 min-h-[46px] bg-gradient-to-r ${cfg.gradient} text-white rounded-xl hover:shadow-lg active:scale-95 transition-all font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation`}>
@@ -805,7 +1239,6 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
         @keyframes fadein { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
         .animate-fadein { animation:fadein 0.28s ease both; }
         button:focus:not(:focus-visible) { outline:none; }
-        /* Ensure selects look native on iOS */
         select { -webkit-appearance:none; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:36px !important; }
       `}</style>
     </div>
