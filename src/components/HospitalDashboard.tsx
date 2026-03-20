@@ -89,48 +89,58 @@ const HD_STYLES = `
   content:''; position:absolute; bottom:0; left:0; right:0; height:1px;
   background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
 }
+/* FIX Logo: solid white bg so logo is always visible on crimson */
 .hd-logo-frame {
-  background:rgba(255,255,255,0.14); border:1.5px solid rgba(255,255,255,0.24);
-  border-radius:13px; padding:5px; flex-shrink:0; transition:all 0.3s;
+  background:#ffffff; border:2px solid rgba(255,255,255,0.5);
+  border-radius:12px; padding:4px; flex-shrink:0; transition:all 0.3s;
+  box-shadow:0 2px 8px rgba(0,0,0,0.2);
 }
-.hd-logo-frame:hover { background:rgba(255,255,255,0.22); transform:scale(1.04) rotate(-1deg); }
+.hd-logo-frame:hover { transform:scale(1.04) rotate(-1deg); box-shadow:0 4px 14px rgba(0,0,0,0.25); }
 .hd-brand { font-family:var(--hd-font-display); font-weight:800; color:#fff; letter-spacing:-0.03em; line-height:1; }
-.hd-hosp-name { font-size:0.73rem; color:rgba(255,205,185,0.85); font-weight:500; margin-top:2px; display:flex; align-items:center; gap:4px; }
+.hd-hosp-name { font-size:0.7rem; color:rgba(255,205,185,0.9); font-weight:500; margin-top:1px; display:flex; align-items:center; gap:3px; }
 .hd-loc-chip {
   background:rgba(255,255,255,0.11); border:1px solid rgba(255,255,255,0.2); border-radius:999px;
   padding:3px 10px; font-size:0.68rem; color:rgba(255,255,255,0.75); font-weight:500;
   display:flex; align-items:center; gap:4px; white-space:nowrap; transition:background 0.2s; cursor:default;
 }
+/* FIX Mobile: header icon buttons — consistent square icon style */
 .hd-hdr-btn {
-  width:38px; height:38px; border-radius:10px;
-  background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);
+  width:36px; height:36px; border-radius:10px; flex-shrink:0;
+  background:rgba(255,255,255,0.12); border:1.5px solid rgba(255,255,255,0.22);
   display:flex; align-items:center; justify-content:center;
-  color:#fff; cursor:pointer; transition:all 0.2s; position:relative; flex-shrink:0;
+  color:#fff; cursor:pointer; transition:all 0.2s; position:relative;
 }
 .hd-hdr-btn:hover { background:rgba(255,255,255,0.22); transform:translateY(-1px); }
 .hd-notif-badge {
-  position:absolute; top:-5px; right:-5px; min-width:17px; height:17px;
+  position:absolute; top:-4px; right:-4px; min-width:16px; height:16px;
   background:#ff3737; border:2px solid #8B0000; border-radius:999px;
   font-size:8px; font-weight:800; color:#fff; display:flex; align-items:center; justify-content:center; padding:0 3px;
   animation: hd-bounce-dot 1.4s ease-in-out infinite;
 }
-/* FIX 1: Emergency header button — white bg so it contrasts with crimson header */
+/* Emergency button — white bg, always visible on crimson */
 .hd-emg-btn {
-  display:flex; align-items:center; gap:6px;
-  background:#ffffff; border:2px solid rgba(255,255,255,0.6);
-  border-radius:10px; padding:6px 14px;
-  color:#8B0000; font-size:0.78rem; font-weight:800;
+  display:flex; align-items:center; gap:5px;
+  background:#ffffff; border:2px solid rgba(255,255,255,0.7);
+  border-radius:10px; padding:6px 12px;
+  color:#8B0000; font-size:0.75rem; font-weight:800;
   font-family:var(--hd-font-body); cursor:pointer; transition:all 0.2s;
-  box-shadow:0 2px 8px rgba(0,0,0,0.15); white-space:nowrap; flex-shrink:0;
+  box-shadow:0 2px 8px rgba(0,0,0,0.18); white-space:nowrap; flex-shrink:0;
 }
-.hd-emg-btn:hover { background:#fff5f5; transform:translateY(-1px); box-shadow:0 4px 14px rgba(0,0,0,0.2); }
+.hd-emg-btn:hover { background:#fff5f5; transform:translateY(-1px); box-shadow:0 4px 14px rgba(0,0,0,0.22); }
+/* Logout — always visible on mobile as icon, shows text on sm+ */
 .hd-logout-btn {
-  background:rgba(255,255,255,0.1); border:1.5px solid rgba(255,255,255,0.22);
-  border-radius:9px; padding:6px 12px; color:#fff; font-size:0.78rem; font-weight:600;
-  display:flex; align-items:center; gap:5px; cursor:pointer; transition:all 0.2s;
-  font-family:var(--hd-font-body); white-space:nowrap;
+  background:rgba(255,255,255,0.12); border:1.5px solid rgba(255,255,255,0.28);
+  border-radius:10px; padding:0; width:36px; height:36px; color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:all 0.2s; font-family:var(--hd-font-body); flex-shrink:0;
 }
-.hd-logout-btn:hover { background:rgba(255,70,70,0.28); transform:translateY(-1px); }
+.hd-logout-btn:hover { background:rgba(255,80,80,0.35); border-color:rgba(255,140,120,0.5); transform:translateY(-1px); }
+@media(min-width:640px){
+  .hd-logout-btn { width:auto; padding:6px 12px; gap:5px; font-size:0.78rem; font-weight:600; }
+  .hd-logout-text { display:inline; }
+}
+.hd-logout-text { display:none; }
+/* Profile btn */
 .hd-profile-btn {
   background:rgba(255,255,255,0.12); border:1.5px solid rgba(255,255,255,0.22);
   border-radius:10px; padding:5px 10px; color:#fff; font-size:0.72rem; font-weight:600;
@@ -140,8 +150,12 @@ const HD_STYLES = `
 .hd-profile-btn:hover { background:rgba(255,255,255,0.22); transform:translateY(-1px); }
 
 /* ── Nav ── */
-.hd-nav { background:#fff; border-bottom:1px solid rgba(139,0,0,0.07); box-shadow:0 2px 8px rgba(0,0,0,0.04); position:sticky; top:64px; z-index:40; }
-@media(max-width:640px){ .hd-nav{top:58px;} }
+/* FIX Nav top: matches actual rendered header height on all breakpoints */
+.hd-nav {
+  background:#fff; border-bottom:1px solid rgba(139,0,0,0.07);
+  box-shadow:0 2px 8px rgba(0,0,0,0.04); position:sticky; top:68px; z-index:40;
+}
+@media(max-width:639px){ .hd-nav { top:72px; } }
 .hd-nav-inner { display:flex; gap:2px; overflow-x:auto; padding:8px 16px; scrollbar-width:none; }
 .hd-nav-inner::-webkit-scrollbar{display:none;}
 .hd-nav-tab {
@@ -226,9 +240,9 @@ const HD_STYLES = `
 .hd-search:focus{border-color:rgba(139,0,0,0.35);background:#fff;box-shadow:0 0 0 3px rgba(139,0,0,0.08);}
 
 /* ── FAB ── */
-.hd-fab{position:fixed;bottom:24px;right:24px;z-index:50;background:linear-gradient(135deg,#8B0000,#c41e3a);color:#fff;border:none;border-radius:50px;padding:12px 20px;font-size:0.85rem;font-weight:700;font-family:var(--hd-font-body);display:flex;align-items:center;gap:8px;cursor:pointer;box-shadow:0 6px 20px rgba(139,0,0,0.4),0 2px 6px rgba(0,0,0,0.15);transition:all 0.3s cubic-bezier(0.4,0,0.2,1);animation:hd-float 3s ease-in-out infinite;}
+.hd-fab{position:fixed;bottom:80px;right:16px;z-index:48;background:linear-gradient(135deg,#8B0000,#c41e3a);color:#fff;border:none;border-radius:50px;padding:11px 18px;font-size:0.82rem;font-weight:700;font-family:var(--hd-font-body);display:flex;align-items:center;gap:7px;cursor:pointer;box-shadow:0 6px 20px rgba(139,0,0,0.4),0 2px 6px rgba(0,0,0,0.15);transition:all 0.3s cubic-bezier(0.4,0,0.2,1);animation:hd-float 3s ease-in-out infinite;}
 .hd-fab:hover{transform:scale(1.05) translateY(-2px);box-shadow:0 10px 28px rgba(139,0,0,0.5);animation:none;}
-@media(max-width:640px){.hd-fab{bottom:16px;right:16px;padding:10px 16px;font-size:0.78rem;}}
+@media(min-width:640px){.hd-fab{bottom:24px;right:24px;padding:12px 20px;font-size:0.85rem;}}
 
 /* ── Form ── */
 .hd-input{width:100%;padding:10px 13px;border-radius:10px;border:1.5px solid #e5e7eb;font-size:0.83rem;font-family:var(--hd-font-body);color:#111827;background:#fff;outline:none;transition:all 0.2s;}
@@ -236,24 +250,45 @@ const HD_STYLES = `
 .hd-label{font-size:0.75rem;font-weight:600;color:#374151;display:block;margin-bottom:5px;}
 .hd-required{color:#ef4444;margin-left:2px;}
 
-/* ── FIX 2 + FIX 4: Print styles — hide ALL screen UI, toasts, dialogs ── */
+/* ── Analytics mini chart ── */
+.hd-bar-chart { display:flex; align-items:flex-end; gap:3px; height:48px; }
+.hd-bar { border-radius:3px 3px 0 0; transition:height 0.5s ease; min-width:10px; flex:1; }
+
+/* ── Share / action pill ── */
+.hd-share-wa {
+  display:inline-flex; align-items:center; gap:5px;
+  background:#dcfce7; border:1.5px solid #86efac; color:#166534;
+  border-radius:8px; padding:4px 10px; font-size:0.68rem; font-weight:700;
+  cursor:pointer; transition:all 0.2s;
+}
+.hd-share-wa:hover { background:#bbf7d0; transform:translateY(-1px); }
+
+/* ── Bottom mobile nav bar ── */
+.hd-bottom-nav {
+  position:fixed; bottom:0; left:0; right:0; z-index:45;
+  background:#fff; border-top:1px solid rgba(139,0,0,0.1);
+  display:flex; align-items:center; justify-content:space-around;
+  padding:8px 4px 12px; box-shadow:0 -4px 20px rgba(0,0,0,0.08);
+}
+@media(min-width:640px){ .hd-bottom-nav { display:none; } }
+.hd-bnav-btn {
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+  padding:4px 12px; border-radius:10px; border:none; background:transparent;
+  cursor:pointer; transition:all 0.2s; color:#9ca3af; font-family:var(--hd-font-body);
+}
+.hd-bnav-btn.active { color:#8B0000; }
+.hd-bnav-btn .bnav-icon { font-size:1.2rem; }
+.hd-bnav-lbl { font-size:0.6rem; font-weight:600; }
+/* Pad main content above bottom nav on mobile */
+@media(max-width:639px){ main { padding-bottom:80px !important; } }
+
+/* ── Print: popup window approach — nothing to hide in main page ── */
 @media screen { .hd-print-only { display:none !important; } }
 @media print {
-  /* Hide the entire app shell */
-  .hd-root, .hd-header, .hd-nav, .hd-fab, .no-print { display:none !important; }
-  /* Fix 4: Hide Sonner toasts, SweetAlert, Radix dialogs/portals, any overlay */
-  [data-sonner-toaster],
-  [data-sonner-toast],
-  .swal2-container,
-  [data-radix-popper-content-wrapper],
-  [data-radix-dialog-overlay],
-  [data-radix-dialog-content],
-  [role="dialog"],
-  [role="alertdialog"],
-  [aria-live],
-  #swal2-container,
-  .fixed, .sticky { display:none !important; }
-  /* Show only the print slip */
+  .hd-root, .hd-header, .hd-nav, .hd-fab, .hd-bottom-nav,
+  .no-print, [data-sonner-toaster], [data-sonner-toast],
+  .swal2-container, [role="dialog"], [role="alertdialog"],
+  [aria-live], [data-radix-portal] { display:none !important; }
   .hd-print-only { display:block !important; }
   @page { size:A4 portrait; margin:0; }
   body { margin:0; padding:0; print-color-adjust:exact; -webkit-print-color-adjust:exact; }
@@ -262,9 +297,10 @@ const HD_STYLES = `
 
 /* ── Responsive ── */
 @media(max-width:640px){
-  .hd-welcome{padding:18px 20px;}
-  .hd-welcome-title{font-size:1.05rem;}
-  .hd-kpi-val{font-size:1.4rem;}
+  .hd-welcome{padding:16px 18px;}
+  .hd-welcome-title{font-size:1rem;}
+  .hd-kpi-val{font-size:1.35rem;}
+  .hd-card{border-radius:14px;}
 }
 `;
 
@@ -384,281 +420,268 @@ const QRCanvas = ({ data, size=200 }: { data:string; size?:number }) => {
 };
 
 /* ═══════════════════════════════════════════════════════════════
-   PRINTABLE SLIP — A4, logo, tagline, RTID label fix, no toast in print
+   PRINT SLIP — popup window approach (works on all browsers incl mobile)
+   No CSS conflicts, no blank pages, single A4 sheet
 ═══════════════════════════════════════════════════════════════ */
-const PrintableRequest = ({ request, hospital }: { request:BloodRequest|null; hospital:any }) => {
-  const qrRef = useRef<HTMLCanvasElement>(null);
-  useEffect(() => {
-    if (request && qrRef.current) {
-      try { new QRious({ element:qrRef.current, value:getQRPayload(request), size:100, foreground:"#8B0000", level:"H" }); }
-      catch(_){}
-    }
-  }, [request]);
-  if (!request) return null;
-  const uc  = URGENCY_CONFIG[request.urgency||"Routine"];
+
+/* Generates a self-contained HTML string for the print popup */
+const buildSlipHTML = (request: BloodRequest, hospital: any, logoDataUrl: string): string => {
+  const uc  = URGENCY_CONFIG[request.urgency || "Routine"];
   const rem = getTimeRemaining(request);
   const isV = isRequestValid(request);
-  const genTime = new Date(request.createdAt).toLocaleString("en-IN",{
-    day:"2-digit", month:"short", year:"numeric",
-    hour:"2-digit", minute:"2-digit", hour12:true,
+  const genTime = new Date(request.createdAt).toLocaleString("en-IN", {
+    day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit", hour12:true,
   });
+  const rows = (pairs: [string,string][]) =>
+    pairs.map(([k,v]) => `<tr><td class="tkey">${k}:</td><td class="tval">${v||"—"}</td></tr>`).join("");
 
-  // Inline styles used throughout — pure CSS, no Tailwind, guaranteed print fidelity
-  const S = {
-    page: {
-      fontFamily:"'Arial', sans-serif", fontSize:"10.5px", color:"#111",
-      background:"#fff", width:"210mm", minHeight:"297mm",
-      margin:"0 auto", padding:"12mm 14mm", boxSizing:"border-box" as const,
-    },
-    outerBorder: {
-      border:"2px solid #1a1a1a", borderRadius:"4px",
-      padding:"8mm 9mm", minHeight:"271mm", boxSizing:"border-box" as const,
-      display:"flex", flexDirection:"column" as const, gap:"0",
-    },
-    // ── header ──
-    headerRow: {
-      display:"flex", alignItems:"flex-start", justifyContent:"space-between",
-      borderBottom:"2.5px solid #8B0000", paddingBottom:"9px", marginBottom:"9px",
-    },
-    logoArea: { display:"flex", alignItems:"center", gap:"10px" },
-    logoImg:  { width:"44px", height:"44px", objectFit:"contain" as const, borderRadius:"8px" },
-    brandCol: { display:"flex", flexDirection:"column" as const, gap:"1px" },
-    brandName:{ fontSize:"20px", fontWeight:"900", color:"#8B0000", letterSpacing:"-0.5px", lineHeight:"1" },
-    brandSub: { fontSize:"7.5px", fontWeight:"700", textTransform:"uppercase" as const, color:"#374151", letterSpacing:"0.6px" },
-    brandGov: { fontSize:"7px", color:"#6b7280" },
-    tagline:  { fontSize:"7.5px", color:"#8B0000", fontStyle:"italic" as const, marginTop:"2px", fontWeight:"600" },
-    serialBox:{ textAlign:"right" as const, flexShrink:0 },
-    serialLbl:{ fontSize:"7px", color:"#9ca3af", textTransform:"uppercase" as const, letterSpacing:"0.8px" },
-    serialVal:{ fontFamily:"monospace", fontSize:"11px", fontWeight:"900", color:"#111", marginTop:"2px" },
-    serialDt: { fontSize:"7px", color:"#6b7280", marginTop:"2px" },
-    // ── title ──
-    titleWrap:{ textAlign:"center" as const, marginBottom:"9px" },
-    titleText:{ fontSize:"14px", fontWeight:"900", textTransform:"uppercase" as const, textDecoration:"underline", letterSpacing:"1.5px" },
-    titleSub: { fontSize:"8px", color:"#6b7280", marginTop:"3px" },
-    // ── urgency / validity chips ──
-    chipRow:  { display:"flex", justifyContent:"center", gap:"12px", marginBottom:"10px" },
-    chip:     (bg:string, border:string, color:string) => ({
-      padding:"5px 16px", border:`2px solid ${border}`, borderRadius:"5px",
-      background:bg, color, fontSize:"10px", fontWeight:"900",
-      textTransform:"uppercase" as const, letterSpacing:"0.3px",
-    }),
-    // ── section heading ──
-    secHead:  (accent:string) => ({
-      fontWeight:"800", fontSize:"11px", textTransform:"uppercase" as const,
-      borderLeft:`3.5px solid ${accent}`, paddingLeft:"6px",
-      marginBottom:"5px", color:"#111",
-    }),
-    // ── info tables ──
-    infoGrid: { display:"grid", gridTemplateColumns:"1fr 1fr", gap:"14px", marginBottom:"10px" },
-    tbl:      { width:"100%", fontSize:"10px", borderCollapse:"collapse" as const, lineHeight:"1.65" },
-    tblKey:   { color:"#6b7280", width:"36%", fontWeight:"600", paddingRight:"4px", verticalAlign:"top" as const },
-    tblVal:   { fontWeight:"700", color:"#111", verticalAlign:"top" as const },
-    // ── RTID box ──
-    rtidWrap: { textAlign:"center" as const, margin:"8px 0" },
-    rtidBox:  {
-      display:"inline-block", border:"2px dashed #9ca3af", borderRadius:"6px",
-      padding:"7px 28px", background:"#f9fafb",
-    },
-    rtidLbl:  { fontSize:"7.5px", color:"#9ca3af", textTransform:"uppercase" as const, letterSpacing:"1.2px", marginBottom:"4px" },
-    rtidCode: { fontFamily:"monospace", fontSize:"17px", fontWeight:"900", color:"#8B0000", letterSpacing:"2px" },
-    // ── blood details box ──
-    bloodBox: {
-      border:"2px solid #111827", borderRadius:"6px", padding:"8px 6px",
-      marginBottom:"9px", background:"#fafafa",
-    },
-    bloodGrid:{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", textAlign:"center" as const },
-    bloodCell:{ padding:"3px 4px", borderRight:"1px solid #e5e7eb" },
-    bloodLbl: { fontSize:"7.5px", textTransform:"uppercase" as const, color:"#6b7280", fontWeight:"700", marginBottom:"3px", letterSpacing:"0.3px" },
-    bloodValLg:{ fontSize:"28px", fontWeight:"900", color:"#8B0000", lineHeight:"1" },
-    bloodValMd:{ fontSize:"12px", fontWeight:"800", marginTop:"5px", color:"#111" },
-    bloodValSm:{ fontSize:"10px", color:"#374151", marginTop:"1px" },
-    // ── indication ──
-    indicBox: { background:"#eff6ff", border:"1px solid #bfdbfe", borderRadius:"5px", padding:"5px 10px", marginBottom:"8px", fontSize:"10px" },
-    // ── NACO warning ──
-    nacoBox:  { background:"#fef2f2", border:"1.5px solid #fca5a5", borderRadius:"5px", padding:"7px 10px", marginBottom:"10px" },
-    nacoHead: { fontWeight:"800", fontSize:"8.5px", textTransform:"uppercase" as const, color:"#7f1d1d", marginBottom:"4px" },
-    nacoLi:   { fontSize:"8.5px", color:"#991b1b", lineHeight:"1.7" },
-    // ── footer ──
-    footerWrap:{ borderTop:"2px solid #1a1a1a", paddingTop:"8px", marginTop:"auto", display:"flex", gap:"12px", alignItems:"flex-start" },
-    qrCol:    { flexShrink:0, textAlign:"center" as const, width:"110px" },
-    qrLbl:    { fontSize:"7.5px", fontWeight:"700", marginTop:"4px", color:"#374151" },
-    metaCol:  { flex:1, fontSize:"7.5px", color:"#374151", lineHeight:"1.65" },
-    metaHead: { fontWeight:"800", textTransform:"uppercase" as const, fontSize:"8px", marginBottom:"2px", color:"#111" },
-    sigCol:   { flexShrink:0, width:"130px", textAlign:"center" as const },
-    sigLine:  { height:"36px", borderBottom:"1px solid #374151", marginBottom:"4px" },
-    sigLbl:   { fontSize:"8px", fontWeight:"800", textTransform:"uppercase" as const },
-    sigSub:   { fontSize:"7.5px", color:"#6b7280" },
-    sigDate:  { fontSize:"7px", color:"#9ca3af", marginTop:"5px" },
-  } as const;
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RaktPort — Blood Requisition ${request.rtid}</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  body{font-family:Arial,sans-serif;font-size:10.5pt;color:#111;background:#fff;}
+  @page{size:A4 portrait;margin:10mm 12mm;}
+  .page{max-width:190mm;margin:0 auto;padding:0;}
+  .outer{border:2px solid #1a1a1a;border-radius:3px;padding:6mm 7mm;min-height:0;}
 
-  return (
-    <div className="hd-print-only" style={S.page}>
-      <div style={S.outerBorder}>
+  /* Header */
+  .hdr{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2.5px solid #8B0000;padding-bottom:7pt;margin-bottom:8pt;gap:8pt;}
+  .logo-area{display:flex;align-items:center;gap:8pt;}
+  .logo-img{width:40pt;height:40pt;object-fit:contain;border-radius:6pt;border:1pt solid #e5e7eb;}
+  .brand-name{font-size:17pt;font-weight:900;color:#8B0000;letter-spacing:-0.5pt;line-height:1;}
+  .brand-sub{font-size:6.5pt;font-weight:700;text-transform:uppercase;color:#374151;letter-spacing:0.5pt;margin-top:1pt;}
+  .brand-gov{font-size:6pt;color:#6b7280;margin-top:1pt;}
+  .brand-tag{font-size:6.5pt;color:#8B0000;font-style:italic;margin-top:2pt;font-weight:600;}
+  .serial-box{text-align:right;flex-shrink:0;}
+  .serial-lbl{font-size:6pt;color:#9ca3af;text-transform:uppercase;letter-spacing:0.8pt;}
+  .serial-val{font-family:monospace;font-size:9.5pt;font-weight:900;color:#111;margin-top:1pt;}
+  .serial-dt{font-size:6pt;color:#6b7280;margin-top:1pt;}
 
-        {/* ── HEADER: Logo + Brand + Serial ── */}
-        <div style={S.headerRow}>
-          {/* Fix 1: Logo image + name + tagline */}
-          <div style={S.logoArea}>
-            <img src={logo} alt="RaktPort" style={S.logoImg} />
-            <div style={S.brandCol}>
-              <div style={S.brandName}>RaktPort</div>
-              <div style={S.brandSub}>National Digital Blood Donation &amp; Management System</div>
-              <div style={S.brandGov}>Ministry of Health &amp; Family Welfare, Government of India</div>
-              {/* Fix 1: Tagline */}
-              <div style={S.tagline}>"Donate Blood Anywhere, Save Life Everywhere"</div>
-            </div>
-          </div>
-          {/* Serial number — top right */}
-          <div style={S.serialBox}>
-            <div style={S.serialLbl}>Serial No.</div>
-            <div style={S.serialVal}>{request.serialNumber||"—"}</div>
-            <div style={S.serialDt}>Gen: {genTime} IST</div>
-          </div>
-        </div>
+  /* Title */
+  .title{text-align:center;margin-bottom:7pt;}
+  .title h1{font-size:13pt;font-weight:900;text-transform:uppercase;text-decoration:underline;letter-spacing:1.5pt;}
+  .title p{font-size:7pt;color:#6b7280;margin-top:2pt;}
 
-        {/* ── TITLE ── */}
-        <div style={S.titleWrap}>
-          <div style={S.titleText}>Blood Requisition Form</div>
-          <div style={S.titleSub}>Generated On: {genTime}</div>
-        </div>
+  /* Chips */
+  .chips{display:flex;justify-content:center;gap:10pt;margin-bottom:8pt;}
+  .chip{padding:4pt 13pt;border-radius:4pt;font-size:9pt;font-weight:900;text-transform:uppercase;letter-spacing:0.3pt;border-width:1.5pt;border-style:solid;}
+  .chip-urg{background:${uc.bg};border-color:${uc.border};color:${uc.color};}
+  .chip-val{background:${isV?"#f0fdf4":"#fef2f2"};border-color:${isV?"#86efac":"#fca5a5"};color:${isV?"#15803d":"#b91c1c"};}
 
-        {/* ── URGENCY + VALIDITY CHIPS ── */}
-        <div style={S.chipRow}>
-          <div style={S.chip(uc.bg, uc.border, uc.color)}>
-            {uc.emoji} Urgency: {request.urgency||"Routine"} · Valid {uc.validityHours}h
-          </div>
-          <div style={S.chip(isV?"#f0fdf4":"#fef2f2", isV?"#86efac":"#fca5a5", isV?"#15803d":"#b91c1c")}>
-            ⏱ Validity: {rem}
-          </div>
-        </div>
+  /* Info grid */
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12pt;margin-bottom:8pt;}
+  .sec-head{font-weight:800;font-size:9.5pt;text-transform:uppercase;border-left:3pt solid #ccc;padding-left:5pt;margin-bottom:4pt;color:#111;}
+  .sec-head.red{border-left-color:#8B0000;}
+  .sec-head.gray{border-left-color:#374151;}
+  table.info{width:100%;border-collapse:collapse;font-size:9pt;line-height:1.6;}
+  .tkey{color:#6b7280;width:36%;font-weight:600;padding-right:3pt;vertical-align:top;}
+  .tval{font-weight:700;color:#111;vertical-align:top;}
 
-        {/* ── PATIENT + HOSPITAL INFO ── */}
-        <div style={S.infoGrid}>
-          {/* Patient */}
-          <div>
-            <div style={S.secHead("#8B0000")}>Patient Information</div>
-            <table style={S.tbl}>
-              <tbody>
-                {([
-                  ["Name",        request.patientName||"—"],
-                  ["Age",         `${request.age||"N/A"} Years`],
-                  ["Mobile",      request.patientMobile||"—"],
-                  ["Ward / Dept", request.wardDepartment||"—"],
-                  ["Bed No.",     request.bedNumber||"—"],
-                ] as [string,string][]).map(([k,v])=>(
-                  <tr key={k}>
-                    <td style={S.tblKey}>{k}:</td>
-                    <td style={S.tblVal}>{v}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          {/* Hospital */}
-          <div>
-            <div style={S.secHead("#374151")}>Requesting Hospital</div>
-            <table style={S.tbl}>
-              <tbody>
-                {([
-                  ["Name",     hospital?.fullName||"—"],
-                  ["Location", `${hospital?.district||"—"}, ${hospital?.pincode||""}`],
-                  ["Contact",  hospital?.mobile||"—"],
-                  ["Doctor",   request.doctorName||"—"],
-                  ["Reg. No.", request.doctorRegNo||"—"],
-                ] as [string,string][]).map(([k,v])=>(
-                  <tr key={k}>
-                    <td style={S.tblKey}>{k}:</td>
-                    <td style={S.tblVal}>{v}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+  /* RTID */
+  .rtid-wrap{text-align:center;margin:7pt 0;}
+  .rtid-box{display:inline-block;border:1.5pt dashed #9ca3af;border-radius:5pt;padding:6pt 24pt;background:#f9fafb;}
+  .rtid-lbl{font-size:6.5pt;color:#9ca3af;text-transform:uppercase;letter-spacing:1.2pt;margin-bottom:3pt;}
+  .rtid-code{font-family:monospace;font-size:15pt;font-weight:900;color:#8B0000;letter-spacing:2pt;}
 
-        {/* ── RTID — Fix 3: label updated ── */}
-        <div style={S.rtidWrap}>
-          <div style={S.rtidBox}>
-            {/* Fix 3: "RaktPort Transfusion ID" */}
-            <div style={S.rtidLbl}>RTID Code — RaktPort Transfusion ID</div>
-            <div style={S.rtidCode}>{request.rtid}</div>
-          </div>
-        </div>
+  /* Blood box */
+  .blood-box{border:1.5pt solid #111;border-radius:5pt;background:#fafafa;margin-bottom:7pt;}
+  .blood-grid{display:grid;grid-template-columns:repeat(4,1fr);text-align:center;}
+  .blood-cell{padding:5pt 3pt;border-right:1pt solid #e5e7eb;}
+  .blood-cell:last-child{border-right:none;}
+  .blbl{font-size:6.5pt;text-transform:uppercase;color:#6b7280;font-weight:700;margin-bottom:2pt;letter-spacing:0.3pt;}
+  .bval-lg{font-size:25pt;font-weight:900;color:#8B0000;line-height:1;}
+  .bval-md{font-size:10.5pt;font-weight:800;margin-top:4pt;color:#111;}
+  .bval-sm{font-size:8.5pt;color:#374151;margin-top:1pt;}
 
-        {/* ── BLOOD DETAILS ── */}
-        <div style={S.bloodBox}>
-          <div style={S.bloodGrid}>
-            <div style={{...S.bloodCell}}>
-              <div style={S.bloodLbl}>Blood Group</div>
-              <div style={S.bloodValLg}>{request.bloodGroup}</div>
-            </div>
-            <div style={{...S.bloodCell}}>
-              <div style={S.bloodLbl}>Component Type</div>
-              <div style={S.bloodValMd}>{request.componentType||"Whole Blood"}</div>
-            </div>
-            <div style={{...S.bloodCell}}>
-              <div style={S.bloodLbl}>Units Required</div>
-              <div style={S.bloodValLg}>{request.unitsRequired}</div>
-            </div>
-            <div style={{...S.bloodCell, borderRight:"none"}}>
-              <div style={S.bloodLbl}>Required By</div>
-              <div style={S.bloodValMd}>{formatDate(request.requiredBy)}</div>
-              <div style={S.bloodValSm}>{formatTime(request.requiredBy)}</div>
-            </div>
-          </div>
-        </div>
+  /* Indication */
+  .indic-box{background:#eff6ff;border:1pt solid #bfdbfe;border-radius:4pt;padding:4pt 8pt;margin-bottom:6pt;font-size:9pt;}
+  .indic-box b{color:#1e40af;}  .indic-box span{color:#1d4ed8;font-weight:600;}
 
-        {/* ── INDICATION ── */}
-        {request.transfusionIndication && (
-          <div style={S.indicBox}>
-            <span style={{fontWeight:"800",color:"#1e40af"}}>Indication for Transfusion (NACO): </span>
-            <span style={{fontWeight:"600",color:"#1d4ed8"}}>{request.transfusionIndication}</span>
-          </div>
-        )}
+  /* NACO box */
+  .naco-box{background:#fef2f2;border:1.5pt solid #fca5a5;border-radius:4pt;padding:6pt 8pt;margin-bottom:8pt;}
+  .naco-head{font-weight:800;font-size:7.5pt;text-transform:uppercase;color:#7f1d1d;margin-bottom:3pt;}
+  .naco-box ul{padding-left:12pt;}
+  .naco-box li{font-size:7.5pt;color:#991b1b;line-height:1.65;}
 
-        {/* ── NACO / MoHFW REQUIREMENTS ── */}
-        <div style={S.nacoBox}>
-          <div style={S.nacoHead}>⚠ Compatibility &amp; Safety Requirements (MoHFW / NACO)</div>
-          <ul style={{margin:0, paddingLeft:"14px"}}>
-            {[
-              "Mandatory ABO-Rh typing, antibody screening & cross-matching before transfusion",
-              "Emergency uncross-matched blood only if immediately life-threatening — document justification",
-              "Verify patient identity (name, age, blood group) before administration",
-              "Monitor patient for 15 min post-transfusion; report adverse reactions to regional blood bank",
-              "Informed consent mandatory for all planned transfusions (National Blood Policy 2020)",
-            ].map((t,i)=>(<li key={i} style={S.nacoLi}>{t}</li>))}
-          </ul>
-        </div>
+  /* Footer */
+  .footer{border-top:2pt solid #1a1a1a;padding-top:7pt;display:flex;gap:10pt;align-items:flex-start;}
+  .qr-col{flex-shrink:0;text-align:center;width:95pt;}
+  .qr-lbl{font-size:6.5pt;font-weight:700;margin-top:3pt;color:#374151;}
+  .meta-col{flex:1;font-size:7pt;color:#374151;line-height:1.6;}
+  .meta-head{font-weight:800;text-transform:uppercase;font-size:7.5pt;margin-bottom:2pt;color:#111;}
+  .sig-col{flex-shrink:0;width:115pt;text-align:center;}
+  .sig-line{height:32pt;border-bottom:1pt solid #374151;margin-bottom:3pt;}
+  .sig-lbl{font-size:7.5pt;font-weight:800;text-transform:uppercase;}
+  .sig-sub{font-size:6.5pt;color:#6b7280;}
+  .sig-date{font-size:6pt;color:#9ca3af;margin-top:4pt;}
+</style>
+</head><body>
+<div class="page"><div class="outer">
 
-        {/* ── FOOTER: QR + Metadata + Signature ── */}
-        <div style={S.footerWrap}>
-          {/* QR code */}
-          <div style={S.qrCol}>
-            <canvas ref={qrRef} width={100} height={100} style={{display:"block"}} />
-            <div style={S.qrLbl}>Scan to Verify</div>
-          </div>
-          {/* Digital metadata */}
-          <div style={S.metaCol}>
-            <div style={S.metaHead}>Digital Signature &amp; Metadata</div>
-            <div>Generated by: {request.generatedBy||hospital?.fullName||"Hospital"}</div>
-            <div>System: RaktPort {request.systemVersion||SYSTEM_VERSION}</div>
-            <div>Timestamp: {genTime} IST</div>
-            <div style={{marginTop:"5px", ...S.metaHead}}>Disclaimer</div>
-            <div>This document is electronically generated by RaktPort Digital Platform. Blood issued against this request must be cross-matched before transfusion. Validation subject to QR code authenticity and validity period. This requisition becomes invalid after redemption or expiry.</div>
-          </div>
-          {/* Authorised signatory */}
-          <div style={S.sigCol}>
-            <div style={S.sigLine}></div>
-            <div style={S.sigLbl}>Authorized Signatory</div>
-            <div style={S.sigSub}>(Medical Officer / In-Charge)</div>
-            <div style={S.sigDate}>Date: {formatDate(new Date())}</div>
-          </div>
-        </div>
-
+  <div class="hdr">
+    <div class="logo-area">
+      ${logoDataUrl ? `<img src="${logoDataUrl}" class="logo-img" alt="RaktPort">` : ""}
+      <div>
+        <div class="brand-name">RaktPort</div>
+        <div class="brand-sub">National Digital Blood Donation &amp; Management System</div>
+        <div class="brand-gov">Ministry of Health &amp; Family Welfare, Government of India</div>
+        <div class="brand-tag">"Donate Blood Anywhere, Save Life Everywhere"</div>
       </div>
     </div>
-  );
+    <div class="serial-box">
+      <div class="serial-lbl">Serial No.</div>
+      <div class="serial-val">${request.serialNumber || "—"}</div>
+      <div class="serial-dt">Gen: ${genTime} IST</div>
+    </div>
+  </div>
+
+  <div class="title">
+    <h1>Blood Requisition Form</h1>
+    <p>Generated On: ${genTime} &nbsp;|&nbsp; NACO / MoHFW Compliant &nbsp;|&nbsp; ${hospital?.fullName || "Hospital"}</p>
+  </div>
+
+  <div class="chips">
+    <div class="chip chip-urg">${uc.emoji} Urgency: ${request.urgency || "Routine"} &middot; Valid ${uc.validityHours}h</div>
+    <div class="chip chip-val">&#x23F1; Validity: ${rem}</div>
+  </div>
+
+  <div class="info-grid">
+    <div>
+      <div class="sec-head red">Patient Information</div>
+      <table class="info"><tbody>
+        ${rows([
+          ["Name",        request.patientName || "—"],
+          ["Age",         `${request.age || "N/A"} Years`],
+          ["Mobile",      request.patientMobile || "—"],
+          ["Ward / Dept", request.wardDepartment || "—"],
+          ["Bed No.",     request.bedNumber || "—"],
+        ])}
+      </tbody></table>
+    </div>
+    <div>
+      <div class="sec-head gray">Requesting Hospital</div>
+      <table class="info"><tbody>
+        ${rows([
+          ["Name",     hospital?.fullName || "—"],
+          ["Location", `${hospital?.district || "—"}, ${hospital?.pincode || ""}`],
+          ["Contact",  hospital?.mobile || "—"],
+          ["Doctor",   request.doctorName || "—"],
+          ["Reg. No.", request.doctorRegNo || "—"],
+        ])}
+      </tbody></table>
+    </div>
+  </div>
+
+  <div class="rtid-wrap">
+    <div class="rtid-box">
+      <div class="rtid-lbl">RTID Code &mdash; RaktPort Transfusion ID</div>
+      <div class="rtid-code">${request.rtid}</div>
+    </div>
+  </div>
+
+  <div class="blood-box">
+    <div class="blood-grid">
+      <div class="blood-cell"><div class="blbl">Blood Group</div><div class="bval-lg">${request.bloodGroup}</div></div>
+      <div class="blood-cell"><div class="blbl">Component Type</div><div class="bval-md">${request.componentType || "Whole Blood"}</div></div>
+      <div class="blood-cell"><div class="blbl">Units Required</div><div class="bval-lg">${request.unitsRequired}</div></div>
+      <div class="blood-cell"><div class="blbl">Required By</div><div class="bval-md">${formatDate(request.requiredBy)}</div><div class="bval-sm">${formatTime(request.requiredBy)}</div></div>
+    </div>
+  </div>
+
+  ${request.transfusionIndication ? `
+  <div class="indic-box">
+    <b>Indication for Transfusion (NACO):</b>
+    <span>${request.transfusionIndication}</span>
+  </div>` : ""}
+
+  <div class="naco-box">
+    <div class="naco-head">&#x26A0; Compatibility &amp; Safety Requirements (MoHFW / NACO)</div>
+    <ul>
+      <li>Mandatory ABO-Rh typing, antibody screening &amp; cross-matching before transfusion</li>
+      <li>Emergency uncross-matched blood only if immediately life-threatening &mdash; document justification</li>
+      <li>Verify patient identity (name, age, blood group) before administration</li>
+      <li>Monitor patient for 15 min post-transfusion; report adverse reactions to regional blood bank</li>
+      <li>Informed consent mandatory for all planned transfusions (National Blood Policy 2020)</li>
+    </ul>
+  </div>
+
+  <div class="footer">
+    <div class="qr-col">
+      <canvas id="slip-qr" width="88" height="88"></canvas>
+      <div class="qr-lbl">Scan to Verify</div>
+    </div>
+    <div class="meta-col">
+      <div class="meta-head">Digital Signature &amp; Metadata</div>
+      <div>Generated by: ${request.generatedBy || hospital?.fullName || "Hospital"}</div>
+      <div>System: RaktPort ${request.systemVersion || SYSTEM_VERSION}</div>
+      <div>Timestamp: ${genTime} IST</div>
+      <div style="margin-top:4pt;" class="meta-head">Disclaimer</div>
+      <div>This document is electronically generated by RaktPort. Blood must be cross-matched before transfusion. Validation subject to QR code authenticity. Requisition becomes invalid after redemption or expiry.</div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-line"></div>
+      <div class="sig-lbl">Authorized Signatory</div>
+      <div class="sig-sub">(Medical Officer / In-Charge)</div>
+      <div class="sig-date">Date: ${formatDate(new Date())}</div>
+    </div>
+  </div>
+
+</div></div>
+<script>
+(function(){
+  try {
+    var qr=new QRious({element:document.getElementById('slip-qr'),value:${JSON.stringify(getQRPayload(request))},size:88,foreground:'#8B0000',level:'H'});
+  } catch(e){}
+  window.addEventListener('load',function(){ setTimeout(function(){ window.print(); setTimeout(function(){ window.close(); },800); },400); });
+})();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+</body></html>`;
 };
+
+/* Opens print popup — works on PC and mobile browsers */
+const openPrintWindow = (request: BloodRequest | null, hospital: any) => {
+  if (!request) return;
+  // Try to get logo as data URL for embedding in popup
+  const tryGetLogo = (): Promise<string> => {
+    return new Promise(resolve => {
+      try {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => {
+          try {
+            const c = document.createElement("canvas");
+            c.width = img.width; c.height = img.height;
+            const ctx = c.getContext("2d");
+            if (ctx) { ctx.drawImage(img, 0, 0); resolve(c.toDataURL()); }
+            else resolve("");
+          } catch { resolve(""); }
+        };
+        img.onerror = () => resolve("");
+        img.src = logo;
+      } catch { resolve(""); }
+    });
+  };
+  tryGetLogo().then(logoDataUrl => {
+    const html = buildSlipHTML(request, hospital, logoDataUrl);
+    const win = window.open("", "_blank", "width=850,height=1100,scrollbars=yes");
+    if (win) {
+      win.document.open();
+      win.document.write(html);
+      win.document.close();
+    } else {
+      // Fallback: if popup blocked, use data URI
+      const blob = new Blob([html], { type: "text/html" });
+      const url  = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+    }
+  });
+};
+
+/* Kept as null-render — we no longer render inline print DOM */
+const PrintableRequest = ({ request: _r, hospital: _h }: { request:BloodRequest|null; hospital:any }) => null;
 
 /* ═══════════════════════════════════════════════════════════════
    QR MODAL
@@ -1258,13 +1281,15 @@ const CompleteModal = ({
    PREMIUM OVERVIEW
 ═══════════════════════════════════════════════════════════════ */
 function PremiumDashboard({
-  requests, hospitalData, kpis, onNewRequest, onViewQR, onDelete, onPrint, onConfirmReceipt, onMarkComplete,
+  requests, hospitalData, kpis, onNewRequest, onViewQR, onDelete, onPrint, onConfirmReceipt, onMarkComplete, onWhatsAppShare, onExportCSV,
 }: {
   requests:BloodRequest[]; hospitalData:any; kpis:any;
   onNewRequest:(u:UrgencyLevel)=>void;
   onViewQR:(r:BloodRequest)=>void; onDelete:(id:string)=>void;
   onPrint:(r:BloodRequest)=>void; onConfirmReceipt:(id:string,r:BloodRequest)=>void;
   onMarkComplete:(r:BloodRequest)=>void;
+  onWhatsAppShare:(r:BloodRequest)=>void;
+  onExportCSV:()=>void;
 }) {
   const now = new Date(); const hour = now.getHours();
   const greeting = hour<12?"Good morning":hour<17?"Good afternoon":"Good evening";
@@ -1385,17 +1410,24 @@ function PremiumDashboard({
                         {r.urgency==="Emergency"?"🚨":r.urgency==="Urgent"?"⚡":"📋"}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap"><span className="text-sm font-semibold text-gray-800 truncate">{r.patientName}</span><span className="text-xs font-black text-red-700 bg-red-50 px-1.5 py-0.5 rounded border border-red-100">{r.bloodGroup}</span></div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-sm font-semibold text-gray-800 truncate">{r.patientName}</span>
+                          <span className="text-xs font-black text-red-700 bg-red-50 px-1.5 py-0.5 rounded border border-red-100">{r.bloodGroup}</span>
+                        </div>
                         <div className="text-[11px] text-gray-400 mt-0.5"><span className="font-mono">{r.rtid}</span> · {r.unitsRequired}u</div>
                         <div className="hd-validity mt-1 w-24"><div className="hd-validity-fill" style={{width:`${pct}%`,background:pct>50?"#22c55e":pct>20?"#f59e0b":"#ef4444"}} /></div>
                       </div>
                       <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
                         <span className="hd-status border" style={{background:sm.bg,color:sm.text,borderColor:sm.border}}>{sm.label}</span>
                         <span className="text-[10px] text-gray-400">{rem}</span>
-                        {/* FIX 6: Complete button on redeemed requests */}
-                        {r.status==="REDEEMED"&&(
-                          <button onClick={()=>onMarkComplete(r)} className="text-[10px] text-blue-600 font-bold hover:underline flex items-center gap-1"><HeartHandshake className="w-3 h-3"/>Mark Administered</button>
-                        )}
+                        <div className="flex items-center gap-1.5">
+                          <button onClick={()=>onWhatsAppShare(r)} className="hd-share-wa" title="Share via WhatsApp">💬</button>
+                          {r.status==="REDEEMED" && (
+                            <button onClick={()=>onMarkComplete(r)} className="text-[10px] text-blue-600 font-bold hover:underline flex items-center gap-0.5">
+                              <HeartHandshake className="w-3 h-3"/>Done
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );
@@ -1424,12 +1456,14 @@ function PremiumDashboard({
             <div className="hd-sec-hdr"><span className="hd-sec-title"><Zap className="w-4 h-4 text-amber-500" /> Quick Actions</span></div>
             <div className="space-y-2">
               {[
-                {icon:"🚨",label:"Emergency Request",sub:"Life-threatening / Critical",act:()=>onNewRequest("Emergency")},
-                {icon:"⚡",label:"Urgent Request",sub:"Needed in 2–4 hours",act:()=>onNewRequest("Urgent")},
-                {icon:"📋",label:"Routine Request",sub:"Elective / Planned",act:()=>onNewRequest("Routine")},
-                {icon:"📥",label:"Download Reports",sub:"Export request data",act:()=>toast.info("Exporting…")},
+                {icon:"🚨",label:"Emergency Request", sub:"Life-threatening / Critical",   color:"#fef2f2", act:()=>onNewRequest("Emergency")},
+                {icon:"⚡",label:"Urgent Request",    sub:"Needed in 2–4 hours",           color:"#fff7ed", act:()=>onNewRequest("Urgent")},
+                {icon:"📋",label:"Routine Request",   sub:"Elective / Planned",             color:"#f0fdf4", act:()=>onNewRequest("Routine")},
+                {icon:"📥",label:"Export CSV",        sub:"Download all request data",      color:"#eff6ff", act:onExportCSV},
               ].map(a=>(
-                <button key={a.label} onClick={a.act} className="w-full flex items-center gap-3 p-3 rounded-xl border-2 border-gray-100 hover:border-red-100 transition-all text-left group">
+                <button key={a.label} onClick={a.act} className="w-full flex items-center gap-3 p-3 rounded-xl border-2 border-gray-100 hover:border-gray-200 transition-all text-left group" style={{"--hover-bg":a.color} as any}
+                  onMouseEnter={e=>(e.currentTarget.style.background=a.color)}
+                  onMouseLeave={e=>(e.currentTarget.style.background="")}>
                   <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-base flex-shrink-0">{a.icon}</div>
                   <div><div className="text-sm font-semibold text-gray-800">{a.label}</div><div className="text-[11px] text-gray-400">{a.sub}</div></div>
                   <ArrowRight className="w-3.5 h-3.5 text-gray-300 ml-auto transition-transform group-hover:translate-x-1" />
@@ -1447,7 +1481,7 @@ function PremiumDashboard({
    REQUESTS TABLE VIEW
 ═══════════════════════════════════════════════════════════════ */
 function RequestsView({
-  requests, onViewQR, onCopyRTID, onDelete, onPrint, onConfirmReceipt, onNewRequest, onMarkComplete,
+  requests, onViewQR, onCopyRTID, onDelete, onPrint, onConfirmReceipt, onNewRequest, onMarkComplete, onWhatsAppShare,
 }: {
   requests:BloodRequest[];
   onViewQR:(r:BloodRequest)=>void; onCopyRTID:(rtid:string)=>void;
@@ -1455,6 +1489,7 @@ function RequestsView({
   onConfirmReceipt:(id:string,r:BloodRequest)=>void;
   onNewRequest:(u:UrgencyLevel)=>void;
   onMarkComplete:(r:BloodRequest)=>void;
+  onWhatsAppShare:(r:BloodRequest)=>void;
 }) {
   const [search,       setSearch]       = useState("");
   const [filterBG,     setFilterBG]     = useState("All");
@@ -1570,13 +1605,17 @@ function RequestsView({
                       <button onClick={e=>{e.stopPropagation();onPrint(r);}} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-white border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-700 transition-all"><Printer className="w-3.5 h-3.5"/>Print Slip</button>
                       <button onClick={e=>{e.stopPropagation();onViewQR(r);}} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-white border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-700 transition-all"><QrCode className="w-3.5 h-3.5"/>View QR</button>
                       <button onClick={e=>{e.stopPropagation();onCopyRTID(r.rtid);}} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-white border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-700 transition-all"><Copy className="w-3.5 h-3.5"/>Copy RTID</button>
+                      {/* WhatsApp share */}
+                      <button onClick={e=>{e.stopPropagation();onWhatsAppShare(r);}}
+                        className="hd-share-wa">
+                        <span style={{fontSize:"0.75rem"}}>💬</span> WhatsApp
+                      </button>
                       {canVerify && (
                         <button onClick={e=>{e.stopPropagation();onConfirmReceipt(r.id,r);}} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all"><CheckCircle2 className="w-3.5 h-3.5"/>Confirm Receipt</button>
                       )}
-                      {/* FIX 6: Mark Administered button */}
                       {canComplete && r.status!=="ADMINISTERED" && (
                         <button onClick={e=>{e.stopPropagation();onMarkComplete(r);}} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all">
-                          <HeartHandshake className="w-3.5 h-3.5"/>Mark Blood Administered
+                          <HeartHandshake className="w-3.5 h-3.5"/>Mark Administered
                         </button>
                       )}
                       {r.status!=="REDEEMED"&&r.status!=="ADMINISTERED" && (
@@ -1616,13 +1655,57 @@ const HospitalDashboard = ({ onLogout }: { onLogout:()=>void }) => {
 
   const hospitalId = localStorage.getItem("userId");
 
-  /* FIX 2: Print when requestToPrint is set */
+  /* Print → popup window (works on PC + mobile, no blank pages) */
   useEffect(() => {
     if (requestToPrint) {
-      const t = setTimeout(() => { window.print(); setRequestToPrint(null); }, 600);
-      return () => clearTimeout(t);
+      openPrintWindow(requestToPrint, hospitalData);
+      setRequestToPrint(null);
     }
-  }, [requestToPrint]);
+  }, [requestToPrint, hospitalData]);
+
+  /* CSV export */
+  const handleExportCSV = useCallback(() => {
+    if (!requests.length) { toast.error("No requests to export"); return; }
+    const headers = ["RTID","Serial No","Patient","Age","Blood Group","Component","Units","Urgency","Status","Required By","Created At","Doctor","Ward","Bed"];
+    const rows = requests.map(r => [
+      r.rtid, r.serialNumber||"", r.patientName, r.age||"",
+      r.bloodGroup, r.componentType||"Whole Blood", r.unitsRequired,
+      r.urgency||"Routine", r.status,
+      `${formatDate(r.requiredBy)} ${formatTime(r.requiredBy)}`,
+      `${formatDate(r.createdAt)} ${formatTime(r.createdAt)}`,
+      r.doctorName||"", r.wardDepartment||"", r.bedNumber||"",
+    ]);
+    const csv = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type:"text/csv;charset=utf-8;" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href = url; a.download = `RaktPort_Requests_${new Date().toLocaleDateString("en-IN").replace(/\//g,"-")}.csv`;
+    a.click(); URL.revokeObjectURL(url);
+    toast.success("CSV exported successfully");
+  }, [requests]);
+
+  /* WhatsApp share for a request */
+  const handleWhatsAppShare = useCallback((r: BloodRequest) => {
+    const uc = URGENCY_CONFIG[r.urgency||"Routine"];
+    const msg = `🩸 *RaktPort Blood Request*\n\n` +
+      `${uc.emoji} *Urgency:* ${r.urgency||"Routine"}\n` +
+      `*Patient:* ${r.patientName}\n` +
+      `*Blood Group:* ${r.bloodGroup}\n` +
+      `*Component:* ${r.componentType||"Whole Blood"} × ${r.unitsRequired} unit(s)\n` +
+      `*Required By:* ${formatDate(r.requiredBy)} ${formatTime(r.requiredBy)}\n` +
+      `*Hospital:* ${hospitalData?.fullName||"Hospital"}\n` +
+      `*Location:* ${hospitalData?.district||""}, ${hospitalData?.pincode||""}\n` +
+      `*RTID:* \`${r.rtid}\`\n\n` +
+      `_Please contact the hospital immediately if you can help._`;
+    const url = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+    window.open(url, "_blank");
+  }, [hospitalData]);
+
+  /* Manual refresh */
+  const handleRefresh = useCallback(() => {
+    setLoading(true);
+    setTimeout(() => window.location.reload(), 100);
+  }, []);
 
   /* Fetch data — same logic as original */
   useEffect(() => {
@@ -1835,74 +1918,99 @@ const HospitalDashboard = ({ onLogout }: { onLogout:()=>void }) => {
       <style>{HD_STYLES}</style>
       <div className="hd-root no-print">
 
-        {/* ── HEADER ── */}
+        {/* ── HEADER — mobile-safe, logo always visible ── */}
         <header className="hd-header no-print">
           <div className="container mx-auto px-3 sm:px-5 max-w-7xl relative z-10">
-            <div className="flex items-center gap-2 sm:gap-3 py-3">
+            {/* Main header row */}
+            <div className="flex items-center gap-2 py-2.5">
+              {/* Logo — solid white bg ensures visibility on any bg */}
               <div className="hd-logo-frame">
-                <img src={logo} alt="RaktPort" className="w-9 h-9 sm:w-10 sm:h-10 object-contain rounded-lg" />
+                <img src={logo} alt="RaktPort"
+                  className="w-8 h-8 sm:w-9 sm:h-9 object-contain rounded-lg block" />
               </div>
+              {/* Brand + hospital name */}
               <div className="flex flex-col min-w-0 flex-1">
-                <div className="flex items-baseline gap-2">
-                  <span className="hd-brand text-xl sm:text-[1.3rem]">RaktPort</span>
-                  <span className="text-[10px] text-red-200/40 uppercase tracking-widest font-semibold hidden sm:inline">Hospital Portal</span>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="hd-brand text-[1.1rem] sm:text-[1.25rem]">RaktPort</span>
+                  <span className="text-[9px] text-red-200/40 uppercase tracking-widest font-semibold hidden sm:inline">Hospital Portal</span>
                 </div>
                 {hospitalData?.fullName && (
                   <div className="hd-hosp-name">
-                    <Building2 className="w-3 h-3 flex-shrink-0 text-red-300/70" />
-                    <span className="truncate max-w-[180px] sm:max-w-xs">{hospitalData.fullName}</span>
+                    <Building2 className="w-2.5 h-2.5 flex-shrink-0 opacity-70" />
+                    <span className="truncate max-w-[150px] sm:max-w-xs">{hospitalData.fullName}</span>
                   </div>
                 )}
               </div>
-
-              {/* Location chip */}
-              <div className="hd-loc-chip hidden md:flex">
+              {/* Location — desktop only */}
+              <div className="hd-loc-chip hidden lg:flex">
                 <MapPin className="w-2.5 h-2.5" />
                 {hospitalData?.district||"…"}, {hospitalData?.pincode||"…"}
               </div>
-
-              {/* Emergency button in header — FIX 1 */}
+              {/* Emergency — hidden on mobile (in bottom nav instead) */}
               <button onClick={()=>openNewRequest("Emergency")} className="hd-emg-btn hidden sm:flex">
-                <Siren className="w-3.5 h-3.5 text-red-600" />
+                <Siren className="w-3.5 h-3.5" />
                 <span>Emergency</span>
               </button>
-
-              {/* Action buttons */}
-              <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-                {/* FIX 4: Profile button in header */}
+              {/* Right action buttons */}
+              <div className="flex items-center gap-1.5 flex-shrink-0">
+                {/* Profile — sm+ only */}
                 <button onClick={()=>setIsProfileOpen(true)} className="hd-profile-btn hidden sm:flex" title="Hospital Profile">
                   <UserCircle className="w-3.5 h-3.5" />
                   <span className="hidden md:inline">Profile</span>
                 </button>
+                {/* Refresh */}
+                <button onClick={handleRefresh} className="hd-hdr-btn" title="Refresh" aria-label="Refresh">
+                  <RefreshCw className="w-3.5 h-3.5" />
+                </button>
+                {/* Notifications */}
                 <button onClick={()=>setIsNotifOpen(!isNotifOpen)} className="hd-hdr-btn" aria-label="Notifications">
                   <Bell className="w-4 h-4" />
                   {unreadCount>0 && <span className="hd-notif-badge">{unreadCount>9?"9+":unreadCount}</span>}
                 </button>
-                <button onClick={handleLogout} className="hd-logout-btn">
-                  <LogOut className="w-3.5 h-3.5" /><span className="hidden sm:inline">Logout</span>
+                {/* Logout — icon on mobile, icon+text on sm+ */}
+                <button onClick={handleLogout} className="hd-logout-btn" aria-label="Logout">
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span className="hd-logout-text">Logout</span>
                 </button>
               </div>
             </div>
-            {/* Mobile bottom strip */}
-            <div className="flex items-center gap-3 pb-2 sm:hidden">
-              <div className="flex items-center gap-1"><MapPin className="w-2.5 h-2.5 text-red-200/40"/><span className="text-[11px] text-red-200/40">{hospitalData?.district||"…"}, {hospitalData?.pincode||"…"}</span></div>
-              <button onClick={()=>openNewRequest("Emergency")} className="ml-auto flex items-center gap-1 bg-white text-red-700 text-[11px] font-bold px-2.5 py-1 rounded-lg"><Siren className="w-3 h-3"/>Emergency</button>
+            {/* Mobile sub-strip: location + export */}
+            <div className="flex items-center gap-2 pb-2 sm:hidden">
+              <MapPin className="w-2.5 h-2.5 text-red-200/40 flex-shrink-0" />
+              <span className="text-[10px] text-red-200/40">{hospitalData?.district||"…"}, {hospitalData?.pincode||"…"}</span>
+              <button onClick={handleExportCSV} className="ml-auto flex items-center gap-1 text-[10px] font-semibold text-red-200/60 hover:text-white transition-colors">
+                <FileDown className="w-3 h-3" />CSV
+              </button>
             </div>
           </div>
         </header>
 
-        {/* ── NAV ── */}
+        {/* ── NAV — desktop tabs ── */}
         <nav className="hd-nav no-print">
           <div className="container mx-auto max-w-7xl">
             <div className="hd-nav-inner">
-              {([{id:"overview",label:"Dashboard",icon:"🏥"},{id:"requests",label:"All Requests",icon:"📋",badge:requests.length}] as any[]).map(t=>(
-                <button key={t.id} onClick={()=>handleTabChange(t.id)} className={`hd-nav-tab ${activeTab===t.id?"hd-nav-active":""}`}>
-                  <span>{t.icon}</span><span>{t.label}</span>
-                  {t.badge>0 && <span className={`px-1.5 py-0.5 text-[10px] font-bold rounded-full ${activeTab===t.id?"bg-white/20 text-white":"bg-[#8B0000] text-white"}`}>{t.badge}</span>}
+              {([
+                {id:"overview",  label:"Dashboard",    icon:"🏥"},
+                {id:"requests",  label:"All Requests",  icon:"📋", badge:requests.length},
+              ] as any[]).map(t=>(
+                <button key={t.id} onClick={()=>handleTabChange(t.id)}
+                  className={`hd-nav-tab ${activeTab===t.id?"hd-nav-active":""}`}>
+                  <span>{t.icon}</span>
+                  <span>{t.label}</span>
+                  {t.badge>0 && (
+                    <span className={`px-1.5 py-0.5 text-[10px] font-bold rounded-full ${activeTab===t.id?"bg-white/20 text-white":"bg-[#8B0000] text-white"}`}>{t.badge}</span>
+                  )}
                 </button>
               ))}
-              <div className="ml-auto flex items-center">
-                <button onClick={()=>openNewRequest("Routine")} className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white" style={{background:"linear-gradient(135deg,#8B0000,#b30000)"}}>
+              {/* Export CSV desktop */}
+              <button onClick={handleExportCSV}
+                className="hd-nav-tab hidden sm:flex items-center gap-1.5 text-green-700 hover:bg-green-50">
+                <FileDown className="w-3.5 h-3.5" /> Export CSV
+              </button>
+              <div className="ml-auto flex items-center gap-2">
+                <button onClick={()=>openNewRequest("Routine")}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-white"
+                  style={{background:"linear-gradient(135deg,#8B0000,#b30000)"}}>
                   <Plus className="w-3.5 h-3.5"/>New Request
                 </button>
               </div>
@@ -1947,6 +2055,8 @@ const HospitalDashboard = ({ onLogout }: { onLogout:()=>void }) => {
                   onDelete={handleDelete} onPrint={r=>setRequestToPrint(r)}
                   onConfirmReceipt={handleConfirmReceipt}
                   onMarkComplete={openComplete}
+                  onWhatsAppShare={handleWhatsAppShare}
+                  onExportCSV={handleExportCSV}
                 />
               )}
               {activeTab==="requests" && (
@@ -1958,16 +2068,44 @@ const HospitalDashboard = ({ onLogout }: { onLogout:()=>void }) => {
                   onConfirmReceipt={handleConfirmReceipt}
                   onNewRequest={openNewRequest}
                   onMarkComplete={openComplete}
+                  onWhatsAppShare={handleWhatsAppShare}
                 />
               )}
             </div>
           )}
         </main>
 
-        {/* FAB */}
-        <button className="hd-fab no-print" onClick={()=>openNewRequest("Routine")}>
+        {/* ── FAB — desktop only ── */}
+        <button className="hd-fab no-print hidden sm:flex" onClick={()=>openNewRequest("Routine")}>
           <Plus className="w-5 h-5"/><span>New Request</span>
         </button>
+
+        {/* ── MOBILE BOTTOM NAV ── */}
+        <nav className="hd-bottom-nav no-print sm:hidden">
+          <button className={`hd-bnav-btn ${activeTab==="overview"?"active":""}`} onClick={()=>handleTabChange("overview")}>
+            <span className="bnav-icon">🏥</span>
+            <span className="hd-bnav-lbl">Dashboard</span>
+          </button>
+          <button className={`hd-bnav-btn ${activeTab==="requests"?"active":""}`} onClick={()=>handleTabChange("requests")}>
+            <span className="bnav-icon">📋</span>
+            <span className="hd-bnav-lbl">Requests</span>
+            {requests.length>0 && (
+              <span className="absolute -top-1 -right-1 bg-[#8B0000] text-white text-[9px] font-bold rounded-full px-1 min-w-[14px] text-center leading-4">{requests.length}</span>
+            )}
+          </button>
+          <button className="hd-bnav-btn" onClick={()=>openNewRequest("Emergency")} style={{color:"#b91c1c"}}>
+            <span className="bnav-icon">🚨</span>
+            <span className="hd-bnav-lbl">Emergency</span>
+          </button>
+          <button className="hd-bnav-btn" onClick={()=>openNewRequest("Routine")}>
+            <span className="bnav-icon">➕</span>
+            <span className="hd-bnav-lbl">New Req.</span>
+          </button>
+          <button className="hd-bnav-btn" onClick={()=>setIsProfileOpen(true)}>
+            <span className="bnav-icon">👤</span>
+            <span className="hd-bnav-lbl">Profile</span>
+          </button>
+        </nav>
 
         {/* Modals */}
         <NewRequestModal
@@ -1978,9 +2116,8 @@ const HospitalDashboard = ({ onLogout }: { onLogout:()=>void }) => {
         />
         <QRModal isOpen={isQRModalOpen} onClose={()=>setIsQRModalOpen(false)} request={selectedRequest} />
       </div>
-
-      {/* FIX 2: Printable slip — uses hd-print-only class, pure inline styles, no Tailwind print: */}
-      <PrintableRequest request={requestToPrint} hospital={hospitalData} />
+      {/* PrintableRequest renders null — print is handled via popup window */}
+      <PrintableRequest request={null} hospital={null} />
     </>
   );
 };
