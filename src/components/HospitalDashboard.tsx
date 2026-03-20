@@ -1,7 +1,7 @@
-// HospitalDashboard.tsx — FIXED v3.1.0
-// Fixes: (1) Emergency button visibility, (2) Print slip A4, (3) Step-3 form bug,
-//        (4) Hospital profile in header, (5) Notification improvements,
-//        (6) Request Completion button (marks blood administered → updates BloodBank + Donor)
+// HospitalDashboard.tsx — v3.2.0
+// Fixes: (1) Partial donation + per-unit admin, (2) Real-time Firestore listeners,
+//        (3) Mobile print via in-app overlay, (4) Transfusion History tab,
+//        (5) Auto-hide delete for locked statuses, (6) CLOSED only after all units administered
 
 import React, { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import Swal from "sweetalert2";
@@ -29,7 +29,7 @@ import logo from '../assets/raktport-logo.png';
 import { db } from '../firebase';
 import {
   collection, query, where, getDocs, addDoc, deleteDoc,
-  doc, getDoc, updateDoc
+  doc, getDoc, updateDoc, onSnapshot
 } from 'firebase/firestore';
 
 // @ts-ignore
@@ -263,6 +263,36 @@ const HD_STYLES = `
 }
 .hd-share-wa:hover { background:#bbf7d0; transform:translateY(-1px); }
 
+/* ── Transfusion History ── */
+.hd-th-row { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid rgba(139,0,0,0.05); }
+.hd-th-row:last-child { border-bottom:none; }
+.hd-th-icon { width:36px; height:36px; border-radius:10px; background:#dbeafe; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:1rem; }
+.hd-th-badge { border-radius:999px; padding:2px 8px; font-size:0.65rem; font-weight:700; display:inline-flex; align-items:center; gap:3px; }
+
+/* ── FIX 3: Mobile print overlay ── */
+.hd-print-overlay {
+  position:fixed; inset:0; z-index:9999; background:#fff;
+  overflow-y:auto; padding:0;
+}
+.hd-print-overlay-inner {
+  max-width:210mm; margin:0 auto; padding:8mm 10mm;
+  font-family:Arial,sans-serif; font-size:10.5pt; color:#111;
+}
+.hd-print-overlay-actions {
+  position:sticky; top:0; z-index:10; background:#1e40af;
+  padding:10px 16px; display:flex; align-items:center; justify-content:space-between;
+  gap:10px; box-shadow:0 2px 8px rgba(0,0,0,0.2);
+}
+.hd-print-overlay-btn {
+  padding:8px 20px; border-radius:8px; font-size:0.82rem; font-weight:700;
+  cursor:pointer; border:none; transition:all 0.2s; font-family:inherit;
+}
+@media print {
+  .hd-print-overlay-actions { display:none !important; }
+  .hd-root { display:none !important; }
+  .hd-print-overlay { position:static !important; padding:0 !important; }
+}
+
 /* ── Bottom mobile nav bar ── */
 .hd-bottom-nav {
   position:fixed; bottom:0; left:0; right:0; z-index:45;
@@ -342,14 +372,23 @@ const URGENCY_CONFIG: Record<UrgencyLevel, {
 type BloodGroup        = "A+"  | "A-"  | "B+"  | "B-"  | "O+"  | "O-"  | "AB+" | "AB-";
 type BloodComponentType= "Whole Blood" | "PRBC" | "Platelets" | "FFP" | "Cryoprecipitate";
 type TransfusionIndication = "Anemia"|"Surgery"|"Trauma"|"Oncology"|"Obstetric"|"Hemorrhage"|"Thalassemia"|"Other";
-type RequestStatus     = "CREATED"|"PENDING"|"PROCESSING"|"PLEDGED"|"PARTIAL"|"REDEEMED"|"HOSPITAL VERIFIED"|"ADMINISTERED"|"CLOSED"|"EXPIRED"|"CANCELLED";
+// Fix 6: CLOSED only happens after ALL units administered
+type RequestStatus = "CREATED"|"PENDING"|"PROCESSING"|"PLEDGED"|"PARTIAL"|"PARTIAL REDEEMED"|"REDEEMED"|"HOSPITAL VERIFIED"|"ADMINISTERED"|"PARTIALLY ADMINISTERED"|"CLOSED"|"EXPIRED"|"CANCELLED";
 
-interface DonorInfo  { dRtid:string; name:string; date:string; }
+interface DonorInfo  {
+  dRtid:string; name:string; date:string;
+  units?:number;         // how many units this donor contributed
+  redeemed?:boolean;     // whether this donor's units have been redeemed
+  administered?:boolean; // whether administered to patient
+  administeredAt?:string;
+}
 interface BloodRequest {
   id:string; rtid:string; serialNumber?:string;
   patientName:string; bloodGroup:BloodGroup;
   componentType?:BloodComponentType; transfusionIndication?:TransfusionIndication;
   unitsRequired:number; unitsFulfilled:number;
+  // Fix 1+6: track per-unit administration
+  unitsAdministered:number;
   requiredBy:Date; status:RequestStatus;
   city:string; createdAt:Date;
   patientMobile:string; patientAadhaar:string; pincode:string;
@@ -358,6 +397,15 @@ interface BloodRequest {
   wardDepartment?:string; bedNumber?:string;
   validityHours?:number; scannedAt?:string; scannedLocation?:string;
   redeemedAt?:Date; administeredAt?:Date; generatedBy?:string; systemVersion?:string;
+  transfusionHistory?:TransfusionRecord[];
+}
+// Fix 4: Transfusion history record per unit batch
+interface TransfusionRecord {
+  recordedAt:string;
+  unitsAdministered:number;
+  notes:string;
+  administeredBy:string;
+  donorRtids:string[];
 }
 interface Notification {
   id:string; message:string; time:string;
@@ -367,7 +415,7 @@ interface Notification {
 /* ═══════════════════════════════════════════════════════════════
    CONSTANTS
 ═══════════════════════════════════════════════════════════════ */
-const SYSTEM_VERSION = "v3.1.0";
+const SYSTEM_VERSION = "v3.2.0";
 const BLOOD_COMPONENT_TYPES: BloodComponentType[] = ["Whole Blood","PRBC","Platelets","FFP","Cryoprecipitate"];
 const TRANSFUSION_INDICATIONS: TransfusionIndication[] = ["Anemia","Surgery","Trauma","Oncology","Obstetric","Hemorrhage","Thalassemia","Other"];
 
@@ -381,22 +429,34 @@ const generateSerial = () => { const n=new Date(); return `REQ/${n.getFullYear()
 const isRequestValid  = (r:BloodRequest) => { if(!r.validityHours||!r.createdAt) return true; return new Date()<new Date(r.createdAt.getTime()+r.validityHours*3600000); };
 const getTimeRemaining= (r:BloodRequest) => { if(!r.validityHours||!r.createdAt) return "N/A"; const diff=new Date(r.createdAt.getTime()+r.validityHours*3600000).getTime()-Date.now(); if(diff<=0) return "Expired"; const h=Math.floor(diff/3600000); const m=Math.floor((diff%3600000)/60000); return h>0?`${h}h ${m}m`:`${m}m`; };
 const getValidityPct  = (r:BloodRequest) => { if(!r.validityHours||!r.createdAt) return 100; return Math.max(0,Math.min(100,100-(Date.now()-r.createdAt.getTime())/(r.validityHours*3600000)*100)); };
-const getStatusMeta   = (s:string) => {
+const getStatusMeta = (s:string) => {
   const map: Record<string,{bg:string;text:string;border:string;label:string}> = {
-    CREATED:          {bg:"#f9fafb",text:"#374151",border:"#d1d5db",label:"Created"},
-    PENDING:          {bg:"#fefce8",text:"#854d0e",border:"#fde047",label:"Pending"},
-    PROCESSING:       {bg:"#eff6ff",text:"#1d4ed8",border:"#93c5fd",label:"Processing"},
-    PLEDGED:          {bg:"#eff6ff",text:"#1d4ed8",border:"#93c5fd",label:"Pledged"},
-    PARTIAL:          {bg:"#fff7ed",text:"#c2410c",border:"#fdba74",label:"Partial"},
-    REDEEMED:         {bg:"#f0fdf4",text:"#15803d",border:"#86efac",label:"Redeemed"},
-    "HOSPITAL VERIFIED":{bg:"#dcfce7",text:"#166534",border:"#4ade80",label:"Verified"},
-    ADMINISTERED:     {bg:"#dbeafe",text:"#1e40af",border:"#93c5fd",label:"Administered ✓"},
-    CLOSED:           {bg:"#f3f4f6",text:"#374151",border:"#9ca3af",label:"Closed"},
-    EXPIRED:          {bg:"#fef2f2",text:"#b91c1c",border:"#fca5a5",label:"Expired"},
-    CANCELLED:        {bg:"#fef2f2",text:"#b91c1c",border:"#fca5a5",label:"Cancelled"},
+    CREATED:                {bg:"#f9fafb",text:"#374151",border:"#d1d5db",label:"Created"},
+    PENDING:                {bg:"#fefce8",text:"#854d0e",border:"#fde047",label:"Pending"},
+    PROCESSING:             {bg:"#eff6ff",text:"#1d4ed8",border:"#93c5fd",label:"Processing"},
+    PLEDGED:                {bg:"#eff6ff",text:"#1d4ed8",border:"#93c5fd",label:"Pledged"},
+    // Fix 1: clear partial states
+    PARTIAL:                {bg:"#fff7ed",text:"#c2410c",border:"#fdba74",label:"Partial Donated"},
+    "PARTIAL REDEEMED":     {bg:"#fef9c3",text:"#92400e",border:"#fde68a",label:"Partial Redeemed"},
+    REDEEMED:               {bg:"#f0fdf4",text:"#15803d",border:"#86efac",label:"Redeemed"},
+    "HOSPITAL VERIFIED":    {bg:"#dcfce7",text:"#166534",border:"#4ade80",label:"Verified"},
+    // Fix 6: partial vs full administration
+    "PARTIALLY ADMINISTERED":{bg:"#e0f2fe",text:"#0369a1",border:"#7dd3fc",label:"Partially Administered"},
+    ADMINISTERED:           {bg:"#dbeafe",text:"#1e40af",border:"#93c5fd",label:"Fully Administered ✓"},
+    CLOSED:                 {bg:"#f0fdf4",text:"#14532d",border:"#86efac",label:"Closed ✓"},
+    EXPIRED:                {bg:"#fef2f2",text:"#b91c1c",border:"#fca5a5",label:"Expired"},
+    CANCELLED:              {bg:"#fef2f2",text:"#b91c1c",border:"#fca5a5",label:"Cancelled"},
   };
-  return map[s?.toUpperCase?.()] || {bg:"#f9fafb",text:"#6b7280",border:"#d1d5db",label:s||"—"};
+  return map[s?.toUpperCase?.()?.replace(/ /g,"_")] || map[s] || {bg:"#f9fafb",text:"#6b7280",border:"#d1d5db",label:s||"—"};
 };
+
+// Fix 5: statuses where delete is NOT allowed
+const LOCKED_STATUSES: RequestStatus[] = [
+  "PARTIAL","PARTIAL REDEEMED","PLEDGED","PROCESSING",
+  "REDEEMED","HOSPITAL VERIFIED","ADMINISTERED","PARTIALLY ADMINISTERED","CLOSED",
+];
+const canDeleteRequest = (r:BloodRequest) =>
+  !LOCKED_STATUSES.includes(r.status) && r.status !== "EXPIRED";
 const getQRPayload = (r:BloodRequest) => JSON.stringify({
   rtid:r.rtid, serial:r.serialNumber||"", name:r.patientName, city:r.city,
   bloodGroup:r.bloodGroup, component:r.componentType||"Whole Blood",
@@ -643,41 +703,193 @@ const buildSlipHTML = (request: BloodRequest, hospital: any, logoDataUrl: string
 /* Opens print popup — works on PC and mobile browsers */
 const openPrintWindow = (request: BloodRequest | null, hospital: any) => {
   if (!request) return;
-  // Try to get logo as data URL for embedding in popup
-  const tryGetLogo = (): Promise<string> => {
-    return new Promise(resolve => {
-      try {
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-        img.onload = () => {
-          try {
-            const c = document.createElement("canvas");
-            c.width = img.width; c.height = img.height;
-            const ctx = c.getContext("2d");
-            if (ctx) { ctx.drawImage(img, 0, 0); resolve(c.toDataURL()); }
-            else resolve("");
-          } catch { resolve(""); }
-        };
-        img.onerror = () => resolve("");
-        img.src = logo;
-      } catch { resolve(""); }
-    });
-  };
+  const tryGetLogo = (): Promise<string> => new Promise(resolve => {
+    try {
+      const img = new Image(); img.crossOrigin="anonymous";
+      img.onload = () => { try { const c=document.createElement("canvas"); c.width=img.width; c.height=img.height; const ctx=c.getContext("2d"); if(ctx){ctx.drawImage(img,0,0);resolve(c.toDataURL());}else resolve(""); } catch{resolve("");} };
+      img.onerror = ()=>resolve(""); img.src=logo;
+    } catch{resolve("");}
+  });
   tryGetLogo().then(logoDataUrl => {
     const html = buildSlipHTML(request, hospital, logoDataUrl);
-    const win = window.open("", "_blank", "width=850,height=1100,scrollbars=yes");
-    if (win) {
-      win.document.open();
-      win.document.write(html);
-      win.document.close();
-    } else {
-      // Fallback: if popup blocked, use data URI
-      const blob = new Blob([html], { type: "text/html" });
-      const url  = URL.createObjectURL(blob);
-      window.open(url, "_blank");
-      setTimeout(() => URL.revokeObjectURL(url), 10000);
+    const win = window.open("","_blank","width=850,height=1100,scrollbars=yes");
+    if (win) { win.document.open(); win.document.write(html); win.document.close(); }
+    else {
+      const blob=new Blob([html],{type:"text/html"});
+      const url=URL.createObjectURL(blob);
+      window.open(url,"_blank");
+      setTimeout(()=>URL.revokeObjectURL(url),10000);
     }
   });
+};
+
+/* FIX 3: In-app Print Overlay — works on all mobile browsers */
+const PrintOverlay = ({
+  request, hospital, onClose,
+}: { request:BloodRequest|null; hospital:any; onClose:()=>void }) => {
+  const qrRef = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    if (request && qrRef.current) {
+      try { new QRious({ element:qrRef.current, value:getQRPayload(request), size:96, foreground:"#8B0000", level:"H" }); }
+      catch(_){}
+    }
+  }, [request]);
+
+  if (!request) return null;
+  const uc  = URGENCY_CONFIG[request.urgency||"Routine"];
+  const rem = getTimeRemaining(request);
+  const isV = isRequestValid(request);
+  const genTime = new Date(request.createdAt).toLocaleString("en-IN",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:true});
+
+  const handlePrint = () => window.print();
+
+  return (
+    <div className="hd-print-overlay">
+      {/* Action bar — hidden on print */}
+      <div className="hd-print-overlay-actions">
+        <div className="text-white">
+          <p className="font-bold text-sm">Blood Requisition Slip</p>
+          <p className="text-blue-200 text-xs">{request.patientName} · {request.rtid}</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button className="hd-print-overlay-btn" style={{background:"#fff",color:"#1e40af"}} onClick={handlePrint}>
+            🖨️ Print / Save PDF
+          </button>
+          <button className="hd-print-overlay-btn" style={{background:"rgba(255,255,255,0.15)",color:"#fff",border:"1.5px solid rgba(255,255,255,0.3)"}} onClick={onClose}>
+            ✕ Close
+          </button>
+        </div>
+      </div>
+
+      {/* Slip content — rendered in DOM, so print captures it perfectly */}
+      <div className="hd-print-overlay-inner" style={{border:"2px solid #1a1a1a",borderRadius:"4px",padding:"7mm 8mm",marginTop:"4mm"}}>
+        {/* Header */}
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",borderBottom:"2.5px solid #8B0000",paddingBottom:"8pt",marginBottom:"8pt",gap:"8pt"}}>
+          <div style={{display:"flex",alignItems:"center",gap:"8pt"}}>
+            <img src={logo} alt="RaktPort" style={{width:"40pt",height:"40pt",objectFit:"contain",borderRadius:"6pt",border:"1pt solid #e5e7eb"}} />
+            <div>
+              <div style={{fontSize:"17pt",fontWeight:"900",color:"#8B0000",letterSpacing:"-0.5pt",lineHeight:"1"}}>RaktPort</div>
+              <div style={{fontSize:"6.5pt",fontWeight:"700",textTransform:"uppercase",color:"#374151",letterSpacing:"0.5pt"}}>National Digital Blood Donation &amp; Management System</div>
+              <div style={{fontSize:"6pt",color:"#6b7280",marginTop:"1pt"}}>Ministry of Health &amp; Family Welfare, Government of India</div>
+              <div style={{fontSize:"6.5pt",color:"#8B0000",fontStyle:"italic",marginTop:"1pt",fontWeight:"600"}}>"Donate Blood Anywhere, Save Life Everywhere"</div>
+            </div>
+          </div>
+          <div style={{textAlign:"right",flexShrink:0}}>
+            <div style={{fontSize:"6pt",color:"#9ca3af",textTransform:"uppercase",letterSpacing:"0.8pt"}}>Serial No.</div>
+            <div style={{fontFamily:"monospace",fontSize:"9.5pt",fontWeight:"900",color:"#111",marginTop:"1pt"}}>{request.serialNumber||"—"}</div>
+            <div style={{fontSize:"6pt",color:"#6b7280",marginTop:"1pt"}}>Gen: {genTime} IST</div>
+          </div>
+        </div>
+
+        {/* Title */}
+        <div style={{textAlign:"center",marginBottom:"7pt"}}>
+          <div style={{fontSize:"13pt",fontWeight:"900",textTransform:"uppercase",textDecoration:"underline",letterSpacing:"1.5pt"}}>Blood Requisition Form</div>
+          <div style={{fontSize:"7pt",color:"#6b7280",marginTop:"2pt"}}>Generated On: {genTime} | NACO / MoHFW Compliant | {hospital?.fullName||"Hospital"}</div>
+        </div>
+
+        {/* Chips */}
+        <div style={{display:"flex",justifyContent:"center",gap:"10pt",marginBottom:"8pt"}}>
+          <span style={{padding:"4pt 13pt",border:`1.5pt solid ${uc.border}`,borderRadius:"4pt",background:uc.bg,color:uc.color,fontSize:"9pt",fontWeight:"900",textTransform:"uppercase"}}>
+            {uc.emoji} Urgency: {request.urgency||"Routine"} · Valid {uc.validityHours}h
+          </span>
+          <span style={{padding:"4pt 13pt",border:`1.5pt solid ${isV?"#86efac":"#fca5a5"}`,borderRadius:"4pt",background:isV?"#f0fdf4":"#fef2f2",color:isV?"#15803d":"#b91c1c",fontSize:"9pt",fontWeight:"900",textTransform:"uppercase"}}>
+            ⏱ Validity: {rem}
+          </span>
+        </div>
+
+        {/* Patient + Hospital */}
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"12pt",marginBottom:"8pt"}}>
+          <div>
+            <div style={{fontWeight:"800",fontSize:"9.5pt",textTransform:"uppercase",borderLeft:"3pt solid #8B0000",paddingLeft:"5pt",marginBottom:"4pt",color:"#111"}}>Patient Information</div>
+            <table style={{width:"100%",borderCollapse:"collapse",fontSize:"9pt",lineHeight:"1.6"}}>
+              <tbody>
+                {([["Name",request.patientName||"—"],["Age",`${request.age||"N/A"} Yrs`],["Mobile",request.patientMobile||"—"],["Ward/Dept",request.wardDepartment||"—"],["Bed No.",request.bedNumber||"—"]] as [string,string][]).map(([k,v])=>(
+                  <tr key={k}><td style={{color:"#6b7280",width:"36%",fontWeight:"600",paddingRight:"3pt"}}>{k}:</td><td style={{fontWeight:"700",color:"#111"}}>{v}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <div style={{fontWeight:"800",fontSize:"9.5pt",textTransform:"uppercase",borderLeft:"3pt solid #374151",paddingLeft:"5pt",marginBottom:"4pt",color:"#111"}}>Requesting Hospital</div>
+            <table style={{width:"100%",borderCollapse:"collapse",fontSize:"9pt",lineHeight:"1.6"}}>
+              <tbody>
+                {([["Name",hospital?.fullName||"—"],["Location",`${hospital?.district||"—"}, ${hospital?.pincode||""}`],["Contact",hospital?.mobile||"—"],["Doctor",request.doctorName||"—"],["Reg. No.",request.doctorRegNo||"—"]] as [string,string][]).map(([k,v])=>(
+                  <tr key={k}><td style={{color:"#6b7280",width:"36%",fontWeight:"600",paddingRight:"3pt"}}>{k}:</td><td style={{fontWeight:"700",color:"#111"}}>{v}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* RTID */}
+        <div style={{textAlign:"center",margin:"7pt 0"}}>
+          <div style={{display:"inline-block",border:"1.5pt dashed #9ca3af",borderRadius:"5pt",padding:"5pt 22pt",background:"#f9fafb"}}>
+            <div style={{fontSize:"6.5pt",color:"#9ca3af",textTransform:"uppercase",letterSpacing:"1.2pt",marginBottom:"3pt"}}>RTID Code — RaktPort Transfusion ID</div>
+            <div style={{fontFamily:"monospace",fontSize:"15pt",fontWeight:"900",color:"#8B0000",letterSpacing:"2pt"}}>{request.rtid}</div>
+          </div>
+        </div>
+
+        {/* Blood box */}
+        <div style={{border:"1.5pt solid #111",borderRadius:"5pt",background:"#fafafa",marginBottom:"7pt"}}>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",textAlign:"center"}}>
+            {([
+              {l:"Blood Group",  v:request.bloodGroup,                    lg:true},
+              {l:"Component",    v:request.componentType||"Whole Blood",  lg:false},
+              {l:"Units Req.",   v:String(request.unitsRequired),         lg:true},
+              {l:"Required By",  v:`${formatDate(request.requiredBy)}\n${formatTime(request.requiredBy)}`, lg:false},
+            ]).map((c,i)=>(
+              <div key={i} style={{padding:"5pt 3pt",borderRight:i<3?"1pt solid #e5e7eb":"none"}}>
+                <div style={{fontSize:"6.5pt",textTransform:"uppercase",color:"#6b7280",fontWeight:"700",marginBottom:"2pt"}}>{c.l}</div>
+                {c.lg
+                  ? <div style={{fontSize:"24pt",fontWeight:"900",color:"#8B0000",lineHeight:"1"}}>{c.v}</div>
+                  : <div style={{fontSize:"10pt",fontWeight:"800",marginTop:"4pt",color:"#111",whiteSpace:"pre-line"}}>{c.v}</div>}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Indication */}
+        {request.transfusionIndication && (
+          <div style={{background:"#eff6ff",border:"1pt solid #bfdbfe",borderRadius:"4pt",padding:"4pt 8pt",marginBottom:"6pt",fontSize:"9pt"}}>
+            <strong style={{color:"#1e40af"}}>Indication for Transfusion (NACO): </strong>
+            <span style={{fontWeight:"600",color:"#1d4ed8"}}>{request.transfusionIndication}</span>
+          </div>
+        )}
+
+        {/* NACO warning */}
+        <div style={{background:"#fef2f2",border:"1.5pt solid #fca5a5",borderRadius:"4pt",padding:"6pt 8pt",marginBottom:"8pt"}}>
+          <div style={{fontWeight:"800",fontSize:"7.5pt",textTransform:"uppercase",color:"#7f1d1d",marginBottom:"3pt"}}>⚠ Compatibility &amp; Safety Requirements (MoHFW / NACO)</div>
+          <ul style={{paddingLeft:"12pt",margin:0}}>
+            {["Mandatory ABO-Rh typing, antibody screening & cross-matching before transfusion","Emergency uncross-matched blood only if immediately life-threatening — document justification","Verify patient identity (name, age, blood group) before administration","Monitor patient for 15 min post-transfusion; report adverse reactions to regional blood bank","Informed consent mandatory for all planned transfusions (National Blood Policy 2020)"].map((t,i)=>(
+              <li key={i} style={{fontSize:"7.5pt",color:"#991b1b",lineHeight:"1.65"}}>{t}</li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Footer */}
+        <div style={{borderTop:"2pt solid #1a1a1a",paddingTop:"7pt",display:"flex",gap:"10pt",alignItems:"flex-start"}}>
+          <div style={{flexShrink:0,textAlign:"center",width:"100pt"}}>
+            <canvas ref={qrRef} width={96} height={96} style={{display:"block"}} />
+            <div style={{fontSize:"6.5pt",fontWeight:"700",marginTop:"3pt",color:"#374151"}}>Scan to Verify</div>
+          </div>
+          <div style={{flex:1,fontSize:"7pt",color:"#374151",lineHeight:"1.6"}}>
+            <div style={{fontWeight:"800",textTransform:"uppercase",fontSize:"7.5pt",marginBottom:"2pt",color:"#111"}}>Digital Signature &amp; Metadata</div>
+            <div>Generated by: {request.generatedBy||hospital?.fullName||"Hospital"}</div>
+            <div>System: RaktPort {request.systemVersion||SYSTEM_VERSION}</div>
+            <div>Timestamp: {genTime} IST</div>
+            <div style={{marginTop:"4pt",fontWeight:"800",textTransform:"uppercase",fontSize:"7.5pt",color:"#111"}}>Disclaimer</div>
+            <div>Electronically generated by RaktPort. Cross-match mandatory before transfusion. Requisition invalid after redemption or expiry.</div>
+          </div>
+          <div style={{flexShrink:0,width:"110pt",textAlign:"center"}}>
+            <div style={{height:"32pt",borderBottom:"1pt solid #374151",marginBottom:"3pt"}}></div>
+            <div style={{fontSize:"7.5pt",fontWeight:"800",textTransform:"uppercase"}}>Authorized Signatory</div>
+            <div style={{fontSize:"6.5pt",color:"#6b7280"}}>(Medical Officer / In-Charge)</div>
+            <div style={{fontSize:"6pt",color:"#9ca3af",marginTop:"4pt"}}>Date: {formatDate(new Date())}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 /* Kept as null-render — we no longer render inline print DOM */
@@ -1190,57 +1402,137 @@ const NewRequestModal = ({
 const CompleteModal = ({
   isOpen, onClose, request, onConfirm,
 }: {
-  isOpen:boolean; onClose:()=>void; request:BloodRequest|null; onConfirm:(id:string,notes:string)=>Promise<void>;
+  isOpen:boolean; onClose:()=>void; request:BloodRequest|null;
+  onConfirm:(id:string, unitsNow:number, notes:string) => Promise<void>;
 }) => {
   const [notes,       setNotes]       = useState("");
   const [isLoading,   setIsLoading]   = useState(false);
   const [administered,setAdministered]= useState(false);
   const [noReaction,  setNoReaction]  = useState(false);
   const [consentDone, setConsentDone] = useState(false);
+  const [unitsNow,    setUnitsNow]    = useState(1);
 
-  useEffect(() => { if(isOpen){setNotes("");setAdministered(false);setNoReaction(false);setConsentDone(false);} }, [isOpen]);
+  const already  = request?.unitsAdministered ?? 0;
+  const redeemed = request?.unitsFulfilled    ?? 0;
+  const required = request?.unitsRequired     ?? 1;
+  // Only units that have been redeemed but NOT yet administered can be administered now
+  const pending  = Math.max(0, redeemed - already);
+  const maxNow   = pending;
+
+  useEffect(() => {
+    if (isOpen) {
+      setNotes(""); setAdministered(false); setNoReaction(false); setConsentDone(false);
+      setUnitsNow(Math.max(1, pending));
+    }
+  }, [isOpen, pending]);
 
   if (!request) return null;
 
-  const canSubmit = administered && noReaction;
+  const isPartial    = required > 1;
+  const willComplete = (already + unitsNow) >= required;
+  const canSubmit    = administered && noReaction && unitsNow >= 1 && unitsNow <= maxNow;
 
   const handleConfirm = async () => {
     if (!canSubmit || isLoading) return;
+    // Fix 1: SweetAlert2 confirmation popup before final commit
+    const result = await Swal.fire({
+      title: willComplete
+        ? "Confirm Full Administration"
+        : `Confirm Partial Administration (${unitsNow} of ${required} units)`,
+      html: `<div style="text-align:left;font-size:13px;line-height:1.7">
+        <p><b>Patient:</b> ${request.patientName}</p>
+        <p><b>Blood Group:</b> ${request.bloodGroup} · ${request.componentType||"Whole Blood"}</p>
+        <p><b>Units administering now:</b> <strong style="color:#1e40af">${unitsNow}</strong></p>
+        <p><b>Total after this:</b> ${already + unitsNow} / ${required}</p>
+        ${willComplete
+          ? `<p style="color:#15803d;font-weight:700;margin-top:8px">✅ This will CLOSE the request (all units administered)</p>`
+          : `<p style="color:#c2410c;font-weight:700;margin-top:8px">⚡ ${required-(already+unitsNow)} unit(s) still pending after this</p>`}
+        <p style="margin-top:8px;color:#6b7280;font-size:12px">This action is irreversible and will update Blood Bank & Donor dashboards.</p>
+      </div>`,
+      icon: willComplete ? "success" : "info",
+      showCancelButton: true,
+      confirmButtonColor: willComplete ? "#16a34a" : "#2563eb",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: willComplete ? "✅ Confirm & Close Request" : "⚡ Confirm Partial",
+      cancelButtonText: "Cancel",
+    });
+    if (!result.isConfirmed) return;
     setIsLoading(true);
-    try { await onConfirm(request.id, notes); onClose(); }
-    catch(err:any) { toast.error("Failed to mark as completed"); }
+    try { await onConfirm(request.id, unitsNow, notes); onClose(); }
+    catch { toast.error("Failed to record administration"); }
     finally { setIsLoading(false); }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={o=>{ if(!o&&!isLoading)onClose(); }}>
-      <DialogContent className="sm:max-w-md rounded-2xl">
+    <Dialog open={isOpen} onOpenChange={o=>{ if(!o&&!isLoading) onClose(); }}>
+      <DialogContent className="sm:max-w-lg rounded-2xl max-h-[92vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-blue-800" style={{fontFamily:"Outfit,sans-serif"}}>
-            <HeartHandshake className="w-5 h-5 text-blue-600" /> Mark Blood Administered
+            <HeartHandshake className="w-5 h-5 text-blue-600" /> Record Blood Administration
           </DialogTitle>
-          <DialogDescription>Confirm that blood has been successfully transfused to the patient</DialogDescription>
+          <DialogDescription>MoHFW post-transfusion confirmation — updates all dashboards in real time</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-2">
-          {/* Patient info */}
+          {/* Patient info card */}
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-xl">🩸</div>
-              <div>
+              <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-xl flex-shrink-0">🩸</div>
+              <div className="flex-1">
                 <p className="font-bold text-gray-900 text-sm">{request.patientName}</p>
-                <p className="text-xs text-gray-500">{request.bloodGroup} · {request.componentType||"Whole Blood"} × {request.unitsRequired} units · RTID: {request.rtid}</p>
+                <p className="text-xs text-gray-500">{request.bloodGroup} · {request.componentType||"Whole Blood"} · RTID: {request.rtid}</p>
+              </div>
+            </div>
+            {/* Fix 1+6: Unit progress bar */}
+            <div className="mt-3 space-y-1.5">
+              <div className="flex justify-between text-xs font-semibold">
+                <span className="text-gray-600">Units Progress</span>
+                <span className="text-blue-700">{already} administered · {redeemed} redeemed · {required} required</span>
+              </div>
+              <div className="h-3 bg-gray-200 rounded-full overflow-hidden flex">
+                <div className="h-full bg-blue-500 transition-all" style={{width:`${(already/required)*100}%`}} title="Administered"/>
+                <div className="h-full bg-amber-400 transition-all" style={{width:`${(Math.max(0,redeemed-already)/required)*100}%`}} title="Redeemed, pending"/>
+              </div>
+              <div className="flex items-center gap-3 text-[10px] text-gray-500">
+                <span className="flex items-center gap-1"><span className="w-2 h-2 bg-blue-500 rounded-full inline-block"/>Administered</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 bg-amber-400 rounded-full inline-block"/>Redeemed / Pending</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 bg-gray-200 rounded-full inline-block"/>Outstanding</span>
               </div>
             </div>
           </div>
 
+          {/* Fix 1: Unit selector — only for multi-unit requests with pending units */}
+          {isPartial && maxNow > 0 && (
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+              <p className="text-xs font-bold text-amber-800 mb-2">
+                🩸 How many units are you administering now?
+                <span className="ml-1 font-normal text-amber-600">({pending} unit{pending>1?"s":""} available)</span>
+              </p>
+              <div className="flex items-center gap-3">
+                <button type="button" onClick={()=>setUnitsNow(u=>Math.max(1,u-1))}
+                  className="w-9 h-9 rounded-lg border-2 border-amber-300 font-bold text-amber-700 hover:bg-amber-100 flex items-center justify-center transition-colors">−</button>
+                <div className="flex-1 text-center">
+                  <div className="text-3xl font-black text-amber-800" style={{fontFamily:"Outfit,sans-serif"}}>{unitsNow}</div>
+                  <div className="text-[10px] text-amber-600">of {required} total units</div>
+                </div>
+                <button type="button" onClick={()=>setUnitsNow(u=>Math.min(maxNow,u+1))}
+                  className="w-9 h-9 rounded-lg border-2 border-amber-300 font-bold text-amber-700 hover:bg-amber-100 flex items-center justify-center transition-colors">+</button>
+              </div>
+              {willComplete
+                ? <p className="mt-2 text-xs text-green-700 font-semibold text-center">✅ All units will be administered — request will close</p>
+                : <p className="mt-2 text-xs text-orange-700 font-semibold text-center">⚡ {required-(already+unitsNow)} unit(s) will remain pending after this</p>}
+            </div>
+          )}
+
           {/* MoHFW post-transfusion checklist */}
           <div className="space-y-2">
-            <p className="text-xs font-bold text-gray-600 uppercase tracking-wide flex items-center gap-1.5"><CheckSquare className="w-3.5 h-3.5 text-blue-600" /> MoHFW Post-Transfusion Checklist</p>
+            <p className="text-xs font-bold text-gray-600 uppercase tracking-wide flex items-center gap-1.5">
+              <CheckSquare className="w-3.5 h-3.5 text-blue-600" /> MoHFW Post-Transfusion Checklist
+            </p>
             {[
-              { id:"admin",   label:"Blood has been administered to the patient",              checked:administered, set:setAdministered, required:true },
-              { id:"react",   label:"No immediate adverse transfusion reaction observed",      checked:noReaction,   set:setNoReaction,   required:true },
-              { id:"consent", label:"Patient / guardian informed of completed transfusion",    checked:consentDone,  set:setConsentDone,  required:false },
+              { id:"admin",   label:`Blood (${unitsNow} unit${unitsNow>1?"s":""}) has been administered to the patient`, checked:administered, set:setAdministered, required:true },
+              { id:"react",   label:"No immediate adverse transfusion reaction observed",                                 checked:noReaction,   set:setNoReaction,   required:true },
+              { id:"consent", label:"Patient / guardian informed of transfusion",                                         checked:consentDone,  set:setConsentDone,  required:false },
             ].map(item=>(
               <label key={item.id} className={`flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${item.checked?"border-green-400 bg-green-50":"border-gray-200 bg-gray-50 hover:border-gray-300"}`}>
                 <input type="checkbox" className="mt-0.5 w-4 h-4 accent-green-600 flex-shrink-0" checked={item.checked} onChange={e=>item.set(e.target.checked)} />
@@ -1249,27 +1541,34 @@ const CompleteModal = ({
             ))}
           </div>
 
-          {/* Notes */}
           <div>
             <label className="hd-label">Clinical Notes (optional)</label>
-            <textarea className="hd-input" rows={2} value={notes} onChange={e=>setNotes(e.target.value)} placeholder="e.g. Transfusion completed without complications, Hb improved…" style={{resize:"none"}} />
+            <textarea className="hd-input" rows={2} value={notes} onChange={e=>setNotes(e.target.value)}
+              placeholder="e.g. Transfusion completed without complications, Hb improved…" style={{resize:"none"}} />
           </div>
 
-          {/* Info box */}
           <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800">
             <Info className="w-4 h-4 flex-shrink-0 mt-0.5 text-amber-600" />
-            <div>This will update the RTID status to <strong>ADMINISTERED</strong> on the Blood Bank dashboard and Donor's contribution record.</div>
+            <div>
+              {willComplete
+                ? <><strong>All units administered:</strong> Request will be marked CLOSED and all linked donor/blood bank dashboards updated in real time.</>
+                : <><strong>Partial administration:</strong> Status will update to PARTIALLY ADMINISTERED. Remaining units can be recorded later.</>}
+            </div>
           </div>
         </div>
 
         <div className="flex gap-3 mt-2">
-          <button type="button" onClick={onClose}
+          <button type="button" onClick={onClose} disabled={isLoading}
             className="flex-1 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-all">
             Cancel
           </button>
           <button type="button" onClick={handleConfirm} disabled={!canSubmit||isLoading}
-            className={`flex-1 py-2.5 rounded-xl text-sm font-bold text-white transition-all flex items-center justify-center gap-2 ${canSubmit&&!isLoading?"bg-blue-600 hover:bg-blue-700":"bg-gray-300 cursor-not-allowed"}`}>
-            {isLoading ? <><Clock className="w-4 h-4 animate-spin"/>Saving…</> : <><BadgeCheck className="w-4 h-4"/>Confirm Administered</>}
+            className={`flex-1 py-2.5 rounded-xl text-sm font-bold text-white transition-all flex items-center justify-center gap-2 ${canSubmit&&!isLoading?(willComplete?"bg-green-600 hover:bg-green-700":"bg-blue-600 hover:bg-blue-700"):"bg-gray-300 cursor-not-allowed"}`}>
+            {isLoading
+              ? <><Clock className="w-4 h-4 animate-spin"/>Saving…</>
+              : willComplete
+                ? <><CheckCircle2 className="w-4 h-4"/>Confirm & Close Request</>
+                : <><BadgeCheck className="w-4 h-4"/>Record Partial Administration</>}
           </button>
         </div>
       </DialogContent>
@@ -1422,9 +1721,14 @@ function PremiumDashboard({
                         <span className="text-[10px] text-gray-400">{rem}</span>
                         <div className="flex items-center gap-1.5">
                           <button onClick={()=>onWhatsAppShare(r)} className="hd-share-wa" title="Share via WhatsApp">💬</button>
-                          {r.status==="REDEEMED" && (
-                            <button onClick={()=>onMarkComplete(r)} className="text-[10px] text-blue-600 font-bold hover:underline flex items-center gap-0.5">
-                              <HeartHandshake className="w-3 h-3"/>Done
+                          {/* Show admin button for any redeemed/partial-redeemed/partially-administered that still has pending units */}
+                          {(["REDEEMED","PARTIAL REDEEMED","HOSPITAL VERIFIED","PARTIALLY ADMINISTERED"].includes(r.status) &&
+                            r.status !== "CLOSED" &&
+                            (r.unitsFulfilled||0) > (r.unitsAdministered||0)) && (
+                            <button onClick={()=>onMarkComplete(r)}
+                              className="text-[10px] text-blue-600 font-bold hover:underline flex items-center gap-0.5">
+                              <HeartHandshake className="w-3 h-3"/>
+                              {(r.unitsAdministered||0) > 0 ? `+More` : `Admin`}
                             </button>
                           )}
                         </div>
@@ -1503,7 +1807,7 @@ function RequestsView({
     if(filterBG!=="All")       f=f.filter(r=>r.bloodGroup===filterBG);
     if(filterUrgency!=="All")  f=f.filter(r=>r.urgency===filterUrgency);
     if(filterStatus!=="All"){
-      if(filterStatus==="VALID")   f=f.filter(r=>isRequestValid(r)&&!["REDEEMED","ADMINISTERED","EXPIRED","CANCELLED"].includes(r.status));
+      if(filterStatus==="VALID")        f=f.filter(r=>isRequestValid(r)&&!["REDEEMED","PARTIALLY ADMINISTERED","ADMINISTERED","CLOSED","EXPIRED","CANCELLED"].includes(r.status));
       else if(filterStatus==="EXPIRED") f=f.filter(r=>!isRequestValid(r)||r.status==="EXPIRED");
       else f=f.filter(r=>r.status===filterStatus);
     }
@@ -1526,7 +1830,7 @@ function RequestsView({
             {[
               {val:filterBG,     set:setFilterBG,     opts:["All",...BLOOD_GROUPS]},
               {val:filterUrgency,set:setFilterUrgency,opts:["All","Emergency","Urgent","Routine"]},
-              {val:filterStatus, set:setFilterStatus, opts:["All","VALID","PENDING","PARTIAL","REDEEMED","ADMINISTERED","EXPIRED"]},
+              {val:filterStatus, set:setFilterStatus, opts:["All","VALID","PENDING","PARTIAL","PARTIAL REDEEMED","REDEEMED","PARTIALLY ADMINISTERED","ADMINISTERED","CLOSED","EXPIRED"]},
               {val:sortBy,       set:setSortBy,       opts:["newest","urgency","validity"]},
             ].map((f,fi)=>(
               <select key={fi} value={f.val} onChange={e=>f.set(e.target.value)}
@@ -1551,9 +1855,12 @@ function RequestsView({
             const isV=isRequestValid(r); const sm=getStatusMeta(isV?r.status:"EXPIRED");
             const uc2=URGENCY_CONFIG[r.urgency||"Routine"]; const rem=getTimeRemaining(r);
             const pct=getValidityPct(r); const isExp=expanded===r.id;
-            const fulfPct=r.unitsRequired>0?(r.unitsFulfilled/r.unitsRequired)*100:0;
-            const canVerify=r.status==="REDEEMED"||r.status==="HOSPITAL VERIFIED";
-            const canComplete=r.status==="REDEEMED"||r.status==="HOSPITAL VERIFIED";
+            const fulfPct=r.unitsRequired>0?((r.unitsAdministered||0)/r.unitsRequired)*100:0;
+            // Fix 1: canVerify for all redeemed variants
+            const canVerify=["REDEEMED","PARTIAL REDEEMED","HOSPITAL VERIFIED"].includes(r.status);
+            // Fix 1+6: canComplete when any units have been redeemed but not yet fully administered
+            const pendingAdmin = (r.unitsFulfilled||0) - (r.unitsAdministered||0);
+            const canComplete = pendingAdmin > 0 || ["REDEEMED","PARTIAL REDEEMED","HOSPITAL VERIFIED","PARTIALLY ADMINISTERED"].includes(r.status);
 
             return (
               <div key={r.id} className="hd-card overflow-hidden" style={{animationDelay:`${i*0.04}s`}}>
@@ -1613,12 +1920,17 @@ function RequestsView({
                       {canVerify && (
                         <button onClick={e=>{e.stopPropagation();onConfirmReceipt(r.id,r);}} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all"><CheckCircle2 className="w-3.5 h-3.5"/>Confirm Receipt</button>
                       )}
-                      {canComplete && r.status!=="ADMINISTERED" && (
+                      {/* Fix 1+6: Show admin button for any redeemed/partial-redeemed units not yet administered */}
+                      {canComplete && r.status!=="ADMINISTERED" && r.status!=="CLOSED" && (
                         <button onClick={e=>{e.stopPropagation();onMarkComplete(r);}} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all">
-                          <HeartHandshake className="w-3.5 h-3.5"/>Mark Administered
+                          <HeartHandshake className="w-3.5 h-3.5"/>
+                          {r.unitsAdministered > 0 && r.unitsAdministered < r.unitsRequired
+                            ? `Record More (${r.unitsAdministered}/${r.unitsRequired})`
+                            : "Mark Administered"}
                         </button>
                       )}
-                      {r.status!=="REDEEMED"&&r.status!=="ADMINISTERED" && (
+                      {/* Fix 5: only show delete when status allows it */}
+                      {canDeleteRequest(r) && (
                         <button onClick={e=>{e.stopPropagation();onDelete(r.id);}} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-white border border-red-200 rounded-lg hover:bg-red-50 text-red-600 transition-all ml-auto"><Trash2 className="w-3.5 h-3.5"/>Delete</button>
                       )}
                     </div>
@@ -1627,6 +1939,117 @@ function RequestsView({
               </div>
             );
           })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FIX 4: TRANSFUSION HISTORY VIEW
+═══════════════════════════════════════════════════════════════ */
+function TransfusionHistoryView({ requests }: { requests:BloodRequest[] }) {
+  const [search, setSearch] = useState("");
+  const administered = useMemo(() =>
+    requests
+      .filter(r=>["ADMINISTERED","PARTIALLY ADMINISTERED","CLOSED"].includes(r.status)||r.unitsAdministered>0)
+      .filter(r => !search || r.patientName.toLowerCase().includes(search.toLowerCase()) || r.rtid.toLowerCase().includes(search.toLowerCase()))
+      .sort((a,b)=>(b.administeredAt?.getTime()||b.createdAt.getTime())-(a.administeredAt?.getTime()||a.createdAt.getTime()))
+  , [requests, search]);
+
+  const totalUnitsAdmin = administered.reduce((s,r)=>s+(r.unitsAdministered||0),0);
+
+  return (
+    <div className="space-y-5 hd-enter">
+      {/* Summary strip */}
+      <div className="grid grid-cols-3 gap-4">
+        {[
+          {icon:"💉",label:"Transfusions Done",  val:administered.length,   cls:"k-blue"},
+          {icon:"🩸",label:"Total Units Given",   val:totalUnitsAdmin,       cls:"k-red"},
+          {icon:"✅",label:"Fully Closed",        val:administered.filter(r=>r.status==="CLOSED").length, cls:"k-green"},
+        ].map(k=>(
+          <div key={k.label} className={`hd-kpi ${k.cls}`}>
+            <div className="text-2xl mb-1">{k.icon}</div>
+            <div className="hd-kpi-val">{k.val}</div>
+            <div className="hd-kpi-lbl">{k.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Search */}
+      <div className="hd-card p-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input className="hd-search" placeholder="Search patient, RTID…" value={search} onChange={e=>setSearch(e.target.value)} />
+        </div>
+      </div>
+
+      {administered.length === 0 ? (
+        <div className="hd-card p-12 text-center">
+          <div className="text-5xl opacity-20 mb-3">💉</div>
+          <p className="text-gray-500 font-medium">No transfusion records yet</p>
+          <p className="text-xs text-gray-400 mt-1">Records appear here after blood is administered to a patient</p>
+        </div>
+      ) : (
+        <div className="hd-card overflow-hidden">
+          <div className="p-4 border-b border-gray-100 flex items-center gap-2">
+            <HeartHandshake className="w-4 h-4 text-blue-600" />
+            <span className="hd-sec-title">All Transfusion Records</span>
+            <span className="text-xs text-gray-400 ml-auto">{administered.length} records</span>
+          </div>
+          <div className="divide-y divide-gray-50">
+            {administered.map((r,i)=>{
+              const sm = getStatusMeta(r.status);
+              const history = r.transfusionHistory || [];
+              return (
+                <div key={r.id} className="p-4 hd-enter" style={{animationDelay:`${i*0.04}s`}}>
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-lg flex-shrink-0">💉</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-semibold text-gray-900 text-sm">{r.patientName}</span>
+                        {r.age && <span className="text-xs text-gray-400">{r.age}y</span>}
+                        <span className="text-xs font-black px-1.5 py-0.5 rounded bg-red-50 text-red-700 border border-red-100">{r.bloodGroup}</span>
+                        <span className="hd-status border text-[11px]" style={{background:sm.bg,color:sm.text,borderColor:sm.border}}>{sm.label}</span>
+                      </div>
+                      <div className="text-[11px] text-gray-400 mt-0.5 flex items-center gap-2 flex-wrap">
+                        <span className="font-mono">{r.rtid}</span>
+                        <span>{r.componentType||"Whole Blood"}</span>
+                        <span className="text-blue-600 font-semibold">{r.unitsAdministered||0}/{r.unitsRequired} units administered</span>
+                        {r.wardDepartment && <span>· {r.wardDepartment}</span>}
+                        {r.bedNumber && <span>· Bed {r.bedNumber}</span>}
+                      </div>
+                      {/* Unit progress bar */}
+                      <div className="flex items-center gap-2 mt-1.5">
+                        <div className="hd-validity flex-1 h-2">
+                          <div className="hd-validity-fill" style={{width:`${r.unitsRequired>0?((r.unitsAdministered||0)/r.unitsRequired)*100:0}%`,background:"#3b82f6"}} />
+                        </div>
+                        <span className="text-[10px] text-gray-400">{Math.round(r.unitsRequired>0?((r.unitsAdministered||0)/r.unitsRequired)*100:0)}%</span>
+                      </div>
+                      {/* Transfusion history records */}
+                      {history.length > 0 && (
+                        <div className="mt-2 space-y-1">
+                          {history.map((h,hi)=>(
+                            <div key={hi} className="flex items-center gap-2 text-[11px] bg-blue-50 rounded-lg px-3 py-1.5 border border-blue-100">
+                              <span className="text-blue-600 font-bold">{h.unitsAdministered}u</span>
+                              <span className="text-gray-500">·</span>
+                              <span className="text-gray-600">{new Date(h.recordedAt).toLocaleString("en-IN",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit",hour12:true})}</span>
+                              {h.notes && <><span className="text-gray-400">·</span><span className="text-gray-500 truncate">{h.notes}</span></>}
+                              <span className="text-gray-400 ml-auto">{h.administeredBy}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <div className="text-[10px] text-gray-400">{r.administeredAt ? formatDate(r.administeredAt) : "—"}</div>
+                      <div className="text-[10px] text-gray-400">{r.administeredAt ? formatTime(r.administeredAt) : ""}</div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
@@ -1646,22 +2069,19 @@ const HospitalDashboard = ({ onLogout }: { onLogout:()=>void }) => {
   const [isProfileOpen,     setIsProfileOpen]     = useState(false);
   const [isCompleteOpen,    setIsCompleteOpen]    = useState(false);
   const [selectedRequest,   setSelectedRequest]   = useState<BloodRequest|null>(null);
-  const [requestToPrint,    setRequestToPrint]    = useState<BloodRequest|null>(null);
+  // Fix 3: in-app print overlay instead of popup
+  const [printOverlayReq,   setPrintOverlayReq]   = useState<BloodRequest|null>(null);
   const [completeTarget,    setCompleteTarget]    = useState<BloodRequest|null>(null);
   const [modalUrgency,      setModalUrgency]      = useState<UrgencyLevel>("Routine");
-  const [activeTab,         setActiveTab]         = useState<"overview"|"requests">("overview");
-  const [tabKey,            setTabKey]            = useState(0);
-  const [loading,           setLoading]           = useState(true);
+  // Fix 4: add history tab
+  const [activeTab, setActiveTab] = useState<"overview"|"requests"|"history">("overview");
+  const [tabKey,    setTabKey]    = useState(0);
+  const [loading,   setLoading]   = useState(true);
 
   const hospitalId = localStorage.getItem("userId");
 
-  /* Print → popup window (works on PC + mobile, no blank pages) */
-  useEffect(() => {
-    if (requestToPrint) {
-      openPrintWindow(requestToPrint, hospitalData);
-      setRequestToPrint(null);
-    }
-  }, [requestToPrint, hospitalData]);
+  /* Fix 3: Print via in-app overlay — no popup needed */
+  // printOverlayReq is set → PrintOverlay renders → user taps Print button
 
   /* CSV export */
   const handleExportCSV = useCallback(() => {
@@ -1707,41 +2127,81 @@ const HospitalDashboard = ({ onLogout }: { onLogout:()=>void }) => {
     setTimeout(() => window.location.reload(), 100);
   }, []);
 
-  /* Fetch data — same logic as original */
+  /* Fix 2: Real-time listener using onSnapshot */
   useEffect(() => {
     if (!hospitalId) { toast.error("Not logged in."); return; }
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const userSnap = await getDoc(doc(db,"users",hospitalId));
-        if (userSnap.exists()) setHospitalData(userSnap.data());
+    const parseT = (t:any): Date => { if(t?.toDate) return t.toDate(); if(typeof t==="string") return new Date(t); return new Date(); };
 
-        const snap = await getDocs(query(collection(db,"bloodRequests"),where("hospitalId","==",hospitalId)));
-        const fetched: BloodRequest[] = [];
+    // Load hospital profile once
+    getDoc(doc(db,"users",hospitalId)).then(snap => { if(snap.exists()) setHospitalData(snap.data()); });
+
+    setLoading(true);
+    const q = query(collection(db,"bloodRequests"), where("hospitalId","==",hospitalId));
+
+    // onSnapshot fires on initial load AND every subsequent DB write from any dashboard
+    const unsub = onSnapshot(q, async (snap) => {
+      try {
+        // Fetch linked donations for all RTIDs in this batch
         const rtids = snap.docs.map(d=>d.data().rtid||d.data().linkedRTID).filter(Boolean);
         let allLinkedDonations: any[] = [];
-        if (rtids.length>0) {
+        if (rtids.length > 0) {
           for (let i=0; i<rtids.length; i+=10) {
             try {
               const batch = rtids.slice(i,i+10);
               const ds = await getDocs(query(collection(db,"donations"),where("linkedHrtid","in",batch)));
-              allLinkedDonations.push(...ds.docs.map(d=>d.data()));
+              allLinkedDonations.push(...ds.docs.map(d=>({...d.data(), _docId:d.id})));
             } catch(_){}
           }
         }
-        const parseT = (t:any) => { if(t?.toDate) return t.toDate(); if(typeof t==="string") return new Date(t); return new Date(); };
+
+        const fetched: BloodRequest[] = [];
         snap.forEach(d => {
           const data = d.data();
-          const linkedDonors = allLinkedDonations.filter((ld:any)=>ld.linkedHrtid===data.linkedRTID||ld.linkedHrtid===data.rtid).map((ld:any)=>({dRtid:ld.rtidCode||ld.rtid||"N/A",name:ld.donorName||"Anonymous",date:parseT(ld.date).toISOString()}));
-          // Map old urgency values
+          const linkedDonors: DonorInfo[] = allLinkedDonations
+            .filter((ld:any)=>ld.linkedHrtid===data.linkedRTID||ld.linkedHrtid===data.rtid)
+            .map((ld:any)=>({
+              dRtid:ld.rtidCode||ld.rtid||"N/A",
+              name:ld.donorName||"Anonymous",
+              date:parseT(ld.date).toISOString(),
+              units:parseInt(ld.units)||1,
+              redeemed:ld.rtidStatus==="REDEEMED"||ld.redeemed||false,
+              administered:ld.rtidStatus==="ADMINISTERED"||ld.administered||false,
+              administeredAt:ld.administeredAt||undefined,
+            }));
+
           const raw = data.urgency as string;
           const u: UrgencyLevel = raw==="Critical"||raw==="Emergency" ? "Emergency" : raw==="High"||raw==="Urgent" ? "Urgent" : "Routine";
+
+          // Fix 1: compute fulfilledUnits from linked donations if not stored
+          const unitsFulfilled = data.fulfilled ? parseInt(data.fulfilled) :
+            linkedDonors.reduce((s,ld)=>s+(ld.redeemed||ld.administered?ld.units||1:0), 0);
+
+          // Fix 1: compute unitsAdministered
+          const unitsAdministered = data.unitsAdministered ? parseInt(data.unitsAdministered) :
+            linkedDonors.reduce((s,ld)=>s+(ld.administered?ld.units||1:0), 0);
+
+          // Fix 1: auto-derive status if Firestore has an older value
+          let status = data.status as RequestStatus;
+          const required = parseInt(data.units)||0;
+          if (!["EXPIRED","CANCELLED","CREATED","PENDING","CLOSED"].includes(status)) {
+            if (unitsAdministered >= required && required > 0) {
+              status = "CLOSED";
+            } else if (unitsAdministered > 0 && unitsAdministered < required) {
+              status = "PARTIALLY ADMINISTERED";
+            } else if (unitsFulfilled >= required && required > 0 && unitsAdministered === 0) {
+              status = "REDEEMED";
+            } else if (unitsFulfilled > 0 && unitsFulfilled < required) {
+              status = "PARTIAL";
+            }
+          }
+
           fetched.push({
             id:d.id, rtid:data.linkedRTID||data.rtid, serialNumber:data.serialNumber,
             patientName:data.patientName, bloodGroup:data.bloodGroup,
             componentType:data.componentType, transfusionIndication:data.transfusionIndication,
-            unitsRequired:parseInt(data.units)||0, unitsFulfilled:data.fulfilled?parseInt(data.fulfilled):linkedDonors.length,
-            requiredBy:parseT(data.requiredBy), status:data.status,
+            unitsRequired:required, unitsFulfilled,
+            unitsAdministered,
+            requiredBy:parseT(data.requiredBy), status,
             city:data.city, createdAt:parseT(data.createdAt),
             patientMobile:data.patientMobile, patientAadhaar:data.patientAadhaar, pincode:data.pincode,
             age:data.age?parseInt(data.age):undefined, urgency:u,
@@ -1752,40 +2212,42 @@ const HospitalDashboard = ({ onLogout }: { onLogout:()=>void }) => {
             redeemedAt:data.redeemedAt?parseT(data.redeemedAt):undefined,
             administeredAt:data.administeredAt?parseT(data.administeredAt):undefined,
             generatedBy:data.generatedBy, systemVersion:data.systemVersion,
+            transfusionHistory:(data.transfusionHistory||[]) as TransfusionRecord[],
           });
         });
         fetched.sort((a,b)=>b.createdAt.getTime()-a.createdAt.getTime());
 
         // Auto-expire
         const toExpire: string[] = [];
-        fetched.forEach(r=>{
-          if(r.validityHours&&r.createdAt){
-            const valid=new Date(r.createdAt.getTime()+r.validityHours*3600000);
-            if(new Date()>valid&&!["REDEEMED","HOSPITAL VERIFIED","ADMINISTERED","CLOSED","EXPIRED","CANCELLED"].includes(r.status)){
-              toExpire.push(r.id); r.status="EXPIRED";
+        fetched.forEach(r => {
+          if (r.validityHours && r.createdAt) {
+            const valid = new Date(r.createdAt.getTime() + r.validityHours * 3600000);
+            if (new Date() > valid && !["REDEEMED","HOSPITAL VERIFIED","ADMINISTERED","PARTIALLY ADMINISTERED","CLOSED","EXPIRED","CANCELLED"].includes(r.status)) {
+              toExpire.push(r.id); r.status = "EXPIRED";
             }
           }
         });
-        if(toExpire.length>0){
-          await Promise.all(toExpire.map(id=>updateDoc(doc(db,"bloodRequests",id),{status:"EXPIRED"}).catch(()=>{})));
+        if (toExpire.length > 0) {
+          await Promise.all(toExpire.map(id => updateDoc(doc(db,"bloodRequests",id),{status:"EXPIRED"}).catch(()=>{})));
         }
         setRequests(fetched);
-        // FIX 5: No "system connected" notification — add only real notifications
-        toast.success("Dashboard loaded");
       } catch(err:any) {
-        toast.error("Failed to load", {description:err?.message});
+        toast.error("Real-time sync error", {description:err?.message});
       } finally { setLoading(false); }
-    };
-    fetchData();
+    }, (err) => {
+      toast.error("Failed to connect to database"); setLoading(false);
+    });
+
+    return () => unsub(); // cleanup listener on unmount
   }, [hospitalId]);
 
   const kpis = useMemo(()=>({
-    totalRequests:    requests.length,
-    activeRequests:   requests.filter(r=>["PENDING","PARTIAL","PLEDGED"].includes(r.status)&&isRequestValid(r)).length,
-    totalUnits:       requests.reduce((s,r)=>s+r.unitsRequired,0),
-    donationsReceived:requests.filter(r=>["REDEEMED","HOSPITAL VERIFIED","ADMINISTERED"].includes(r.status)).length,
-    requestsRedeemed: requests.filter(r=>["REDEEMED","HOSPITAL VERIFIED","ADMINISTERED","CLOSED"].includes(r.status)).length,
-    administered:     requests.filter(r=>r.status==="ADMINISTERED").length,
+    totalRequests:     requests.length,
+    activeRequests:    requests.filter(r=>["PENDING","PARTIAL","PARTIAL REDEEMED","PLEDGED","PROCESSING"].includes(r.status)&&isRequestValid(r)).length,
+    totalUnits:        requests.reduce((s,r)=>s+r.unitsRequired,0),
+    donationsReceived: requests.filter(r=>["REDEEMED","HOSPITAL VERIFIED","ADMINISTERED","PARTIALLY ADMINISTERED","CLOSED"].includes(r.status)).length,
+    requestsRedeemed:  requests.filter(r=>["REDEEMED","HOSPITAL VERIFIED","ADMINISTERED","PARTIALLY ADMINISTERED","CLOSED"].includes(r.status)).length,
+    administered:      requests.filter(r=>["ADMINISTERED","PARTIALLY ADMINISTERED","CLOSED"].includes(r.status)).length,
   }), [requests]);
 
   /* ── Handlers ── */
@@ -1803,6 +2265,7 @@ const HospitalDashboard = ({ onLogout }: { onLogout:()=>void }) => {
       bloodGroup:data.bloodGroup, componentType:data.componentType||"Whole Blood",
       transfusionIndication:data.transfusionIndication||"Anemia",
       units:String(data.unitsRequired), fulfilled:"0",
+      unitsAdministered:0, transfusionHistory:[],
       age:String(data.age), city:data.city, pincode:data.pincode,
       requiredBy:reqDateTime.toISOString(), urgency:data.urgency||"Routine",
       status:"CREATED", linkedRTID:newHrtid, rtid:newHrtid,
@@ -1812,12 +2275,13 @@ const HospitalDashboard = ({ onLogout }: { onLogout:()=>void }) => {
       generatedBy:hospitalData?.fullName||"Hospital", systemVersion:SYSTEM_VERSION,
     };
     const ref = await addDoc(collection(db,"bloodRequests"),reqData);
+    // onSnapshot will pick this up automatically — no manual state push needed
     const newReq: BloodRequest = {
       id:ref.id, rtid:newHrtid, serialNumber:serial,
       patientName:data.patientName, bloodGroup:data.bloodGroup as BloodGroup,
       componentType:data.componentType as BloodComponentType,
       transfusionIndication:data.transfusionIndication as TransfusionIndication,
-      unitsRequired:data.unitsRequired, unitsFulfilled:0,
+      unitsRequired:data.unitsRequired, unitsFulfilled:0, unitsAdministered:0,
       requiredBy:reqDateTime, status:"CREATED",
       city:data.city, createdAt:now,
       patientMobile:data.mobile, patientAadhaar:data.aadhaar, pincode:data.pincode,
@@ -1825,73 +2289,101 @@ const HospitalDashboard = ({ onLogout }: { onLogout:()=>void }) => {
       donors:[], doctorName:data.doctorName, doctorRegNo:data.doctorRegNo,
       wardDepartment:data.wardDepartment, bedNumber:data.bedNumber,
       validityHours:validityH, generatedBy:hospitalData?.fullName, systemVersion:SYSTEM_VERSION,
+      transfusionHistory:[],
     };
-    setRequests(prev=>[newReq,...prev]);
     toast.success(`Request Created · RTID: ${newHrtid}`, {description:`Valid for ${validityH} hours`});
-    // FIX 5: Add real notification
     addNotif(`New ${data.urgency} request for ${data.patientName} (${data.bloodGroup})`, "new");
-    setRequestToPrint(newReq);
+    // Fix 3: show print overlay
+    setPrintOverlayReq(newReq);
   };
 
   const handleConfirmReceipt = async (reqId:string, request:BloodRequest) => {
     try {
-      const newStatus = request.status==="REDEEMED"?"HOSPITAL VERIFIED":request.status==="HOSPITAL VERIFIED"?"CLOSED":"REDEEMED";
-      await updateDoc(doc(db,"bloodRequests",reqId),{status:newStatus,redeemedAt:new Date().toISOString(),scannedLocation:hospitalData?.fullName||"Hospital"});
-      setRequests(prev=>prev.map(r=>r.id===reqId?{...r,status:newStatus as RequestStatus,redeemedAt:new Date()}:r));
+      // Fix 6: only set CLOSED if all units have been administered
+      const allDone = request.unitsAdministered >= request.unitsRequired;
+      const newStatus: RequestStatus = allDone ? "CLOSED" : "HOSPITAL VERIFIED";
+      await updateDoc(doc(db,"bloodRequests",reqId),{
+        status:newStatus,
+        redeemedAt:new Date().toISOString(),
+        scannedLocation:hospitalData?.fullName||"Hospital"
+      });
       toast.success(`Status → ${newStatus}`);
     } catch { toast.error("Failed to update"); }
   };
 
-  /* FIX 6: Mark blood as administered — writes to bloodRequests + donations + user (donor) */
-  const handleMarkComplete = async (reqId:string, notes:string) => {
-    const r = requests.find(x=>x.id===reqId);
+  /* Fix 1+6: handleMarkComplete — partial-unit aware, appends to transfusion history */
+  const handleMarkComplete = async (reqId: string, unitsNow: number, notes: string) => {
+    const r = requests.find(x => x.id === reqId);
     if (!r) return;
     const now = new Date();
-    // 1. Update bloodRequest status
-    await updateDoc(doc(db,"bloodRequests",reqId),{
-      status:"ADMINISTERED",
-      administeredAt:now.toISOString(),
-      administrationNotes:notes||"",
-      administeredBy:hospitalData?.fullName||"Hospital",
+    const already = r.unitsAdministered ?? 0;
+    const newTotal = already + unitsNow;
+    const allDone  = newTotal >= r.unitsRequired;
+
+    // Fix 6: CLOSED only when ALL units administered
+    const newStatus: RequestStatus = allDone ? "CLOSED" : "PARTIALLY ADMINISTERED";
+
+    // Build new history record
+    const newRecord: TransfusionRecord = {
+      recordedAt:    now.toISOString(),
+      unitsAdministered: unitsNow,
+      notes:         notes || "",
+      administeredBy:hospitalData?.fullName || "Hospital",
+      donorRtids:    (r.donors||[]).slice(0, unitsNow).map(d=>d.dRtid),
+    };
+
+    const updatedHistory = [...(r.transfusionHistory||[]), newRecord];
+
+    // 1. Update bloodRequests document
+    await updateDoc(doc(db,"bloodRequests",reqId), {
+      status:              newStatus,
+      unitsAdministered:   newTotal,
+      administeredAt:      now.toISOString(),
+      administrationNotes: notes || "",
+      administeredBy:      hospitalData?.fullName || "Hospital",
+      transfusionHistory:  updatedHistory.map(h=>({...h})),
     });
-    // 2. Update all linked donor donations
-    if (r.donors && r.donors.length>0) {
-      await Promise.all(r.donors.map(async (donor) => {
+
+    // 2. Update linked donations (all, since they all relate to this request)
+    const donorUpdatePayload = {
+      administeredAt:      now.toISOString(),
+      rtidStatus:          allDone ? "ADMINISTERED" : "PARTIALLY ADMINISTERED",
+      patientAdministered: r.patientName,
+      hospitalAdministered:hospitalData?.fullName || "Hospital",
+    };
+    if (r.donors && r.donors.length > 0) {
+      await Promise.all(r.donors.map(async donor => {
         try {
           const donQ = await getDocs(query(collection(db,"donations"),where("rtidCode","==",donor.dRtid)));
-          donQ.forEach(async (donDoc) => {
-            await updateDoc(donDoc.ref,{
-              administeredAt:now.toISOString(),
-              rtidStatus:"ADMINISTERED",
-              patientAdministered:r.patientName,
-              hospitalAdministered:hospitalData?.fullName||"Hospital",
-            });
-          });
+          donQ.forEach(async donDoc => { await updateDoc(donDoc.ref, donorUpdatePayload); });
         } catch(_){}
       }));
     }
-    // 3. Also update by linkedHrtid in donations collection
     try {
       const byHrtid = await getDocs(query(collection(db,"donations"),where("linkedHrtid","==",r.rtid)));
-      byHrtid.forEach(async (d) => {
-        await updateDoc(d.ref,{
-          administeredAt:now.toISOString(),
-          rtidStatus:"ADMINISTERED",
-          patientAdministered:r.patientName,
-          hospitalAdministered:hospitalData?.fullName||"Hospital",
-        });
-      });
+      byHrtid.forEach(async d => { await updateDoc(d.ref, donorUpdatePayload); });
     } catch(_){}
-    setRequests(prev=>prev.map(x=>x.id===reqId?{...x,status:"ADMINISTERED",administeredAt:now}:x));
-    toast.success("Blood marked as administered", {description:"Donor and Blood Bank dashboards updated"});
-    addNotif(`Blood administered to ${r.patientName} · RTID ${r.rtid}`, "update");
+
+    // onSnapshot will push update back → no manual setRequests needed
+    const label = allDone ? "All units administered — request CLOSED" : `${unitsNow} unit(s) administered (${newTotal}/${r.unitsRequired} total)`;
+    toast.success(label, {description:"Blood Bank & Donor dashboards updated in real time"});
+    addNotif(`${newTotal}/${r.unitsRequired} units administered for ${r.patientName} · RTID ${r.rtid}`, "update");
   };
 
+  // Fix 5: canDeleteRequest uses helper — no locked statuses
   const handleDelete = (id:string) => {
-    const r=requests.find(x=>x.id===id);
-    if(r?.status==="REDEEMED"||r?.status==="ADMINISTERED"){Swal.fire("Cannot Delete","Completed requests cannot be deleted.","warning");return;}
+    const r = requests.find(x=>x.id===id);
+    if (!r || !canDeleteRequest(r)) {
+      Swal.fire("Cannot Delete","Requests that have donations, redemptions, or administrations cannot be deleted.","warning");
+      return;
+    }
     Swal.fire({title:"Delete Request?",text:"This cannot be undone.",icon:"warning",showCancelButton:true,confirmButtonColor:"#8B0000",confirmButtonText:"Yes, delete"})
-      .then(async res=>{ if(res.isConfirmed){try{await deleteDoc(doc(db,"bloodRequests",id));setRequests(prev=>prev.filter(r=>r.id!==id));toast.success("Deleted");}catch{toast.error("Failed");}} });
+      .then(async res => {
+        if (res.isConfirmed) {
+          try { await deleteDoc(doc(db,"bloodRequests",id)); toast.success("Deleted"); }
+          catch { toast.error("Failed"); }
+        }
+      });
   };
 
   const handleLogout = () => {
@@ -1899,7 +2391,6 @@ const HospitalDashboard = ({ onLogout }: { onLogout:()=>void }) => {
       .then(res=>{ if(res.isConfirmed) onLogout(); });
   };
 
-  /* FIX 5: notification helpers */
   const addNotif = (message:string, type:Notification["type"]) => {
     setNotifications(prev=>[{id:Date.now().toString(),message,time:"Just now",type,read:false},...prev]);
   };
@@ -1907,9 +2398,10 @@ const HospitalDashboard = ({ onLogout }: { onLogout:()=>void }) => {
   const markAllRead = ()          => setNotifications(prev=>prev.map(n=>({...n,read:true})));
   const clearNotifs = ()          => setNotifications([]);
 
-  const openNewRequest = (urg:UrgencyLevel) => { setModalUrgency(urg); setIsRequestModalOpen(true); };
-  const openComplete   = (r:BloodRequest)   => { setCompleteTarget(r); setIsCompleteOpen(true); };
-  const handleTabChange= (tab:"overview"|"requests") => { setActiveTab(tab); setTabKey(k=>k+1); };
+  const openNewRequest  = (urg:UrgencyLevel) => { setModalUrgency(urg); setIsRequestModalOpen(true); };
+  const openComplete    = (r:BloodRequest)   => { setCompleteTarget(r); setIsCompleteOpen(true); };
+  // Fix 4: history tab included
+  const handleTabChange = (tab:"overview"|"requests"|"history") => { setActiveTab(tab); setTabKey(k=>k+1); };
 
   const unreadCount = notifications.filter(n=>!n.read).length;
 
@@ -1933,6 +2425,12 @@ const HospitalDashboard = ({ onLogout }: { onLogout:()=>void }) => {
                 <div className="flex items-baseline gap-1.5">
                   <span className="hd-brand text-[1.1rem] sm:text-[1.25rem]">RaktPort</span>
                   <span className="text-[9px] text-red-200/40 uppercase tracking-widest font-semibold hidden sm:inline">Hospital Portal</span>
+                  {/* Live sync dot */}
+                  {!loading && (
+                    <span className="flex items-center gap-1 text-[9px] text-green-300/70 hidden sm:flex" title="Real-time sync active">
+                      <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse inline-block"/>Live
+                    </span>
+                  )}
                 </div>
                 {hospitalData?.fullName && (
                   <div className="hd-hosp-name">
@@ -1990,8 +2488,9 @@ const HospitalDashboard = ({ onLogout }: { onLogout:()=>void }) => {
           <div className="container mx-auto max-w-7xl">
             <div className="hd-nav-inner">
               {([
-                {id:"overview",  label:"Dashboard",    icon:"🏥"},
-                {id:"requests",  label:"All Requests",  icon:"📋", badge:requests.length},
+                {id:"overview",  label:"Dashboard",          icon:"🏥"},
+                {id:"requests",  label:"All Requests",        icon:"📋", badge:requests.length},
+                {id:"history",   label:"Transfusion History", icon:"💉", badge:requests.filter(r=>r.unitsAdministered>0).length||undefined},
               ] as any[]).map(t=>(
                 <button key={t.id} onClick={()=>handleTabChange(t.id)}
                   className={`hd-nav-tab ${activeTab===t.id?"hd-nav-active":""}`}>
@@ -2025,17 +2524,17 @@ const HospitalDashboard = ({ onLogout }: { onLogout:()=>void }) => {
           onMarkRead={markRead} onMarkAllRead={markAllRead} onClear={clearNotifs}
         />
 
-        {/* FIX 4: Profile Modal */}
+        {/* Profile Modal */}
         <ProfileModal isOpen={isProfileOpen} onClose={()=>setIsProfileOpen(false)} hospital={hospitalData} />
 
-        {/* FIX 6: Complete Modal */}
+        {/* Complete Modal — partial unit aware */}
         <CompleteModal
           isOpen={isCompleteOpen} onClose={()=>setIsCompleteOpen(false)}
           request={completeTarget}
-          onConfirm={(id,notes)=>handleMarkComplete(id,notes)}
+          onConfirm={(id, unitsNow, notes) => handleMarkComplete(id, unitsNow, notes)}
         />
 
-        {/* ── MAIN ── */}
+        {/* ── MAIN CONTENT ── */}
         <main className="container mx-auto px-3 sm:px-5 py-5 sm:py-7 max-w-7xl">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-24 gap-4">
@@ -2044,6 +2543,7 @@ const HospitalDashboard = ({ onLogout }: { onLogout:()=>void }) => {
                 <Droplet className="absolute inset-0 m-auto w-5 h-5 text-[#8B0000] fill-[#8B0000]" />
               </div>
               <p className="text-sm text-gray-400 font-medium animate-pulse">Loading dashboard…</p>
+              <p className="text-xs text-gray-300">Live sync enabled</p>
             </div>
           ) : (
             <div key={tabKey}>
@@ -2052,7 +2552,8 @@ const HospitalDashboard = ({ onLogout }: { onLogout:()=>void }) => {
                   requests={requests} hospitalData={hospitalData} kpis={kpis}
                   onNewRequest={openNewRequest}
                   onViewQR={r=>{setSelectedRequest(r);setIsQRModalOpen(true);}}
-                  onDelete={handleDelete} onPrint={r=>setRequestToPrint(r)}
+                  onDelete={handleDelete}
+                  onPrint={r=>setPrintOverlayReq(r)}
                   onConfirmReceipt={handleConfirmReceipt}
                   onMarkComplete={openComplete}
                   onWhatsAppShare={handleWhatsAppShare}
@@ -2064,50 +2565,47 @@ const HospitalDashboard = ({ onLogout }: { onLogout:()=>void }) => {
                   requests={requests}
                   onViewQR={r=>{setSelectedRequest(r);setIsQRModalOpen(true);}}
                   onCopyRTID={rtid=>{navigator.clipboard.writeText(rtid).catch(()=>{}); toast.success("RTID copied!");}}
-                  onDelete={handleDelete} onPrint={r=>setRequestToPrint(r)}
+                  onDelete={handleDelete}
+                  onPrint={r=>setPrintOverlayReq(r)}
                   onConfirmReceipt={handleConfirmReceipt}
                   onNewRequest={openNewRequest}
                   onMarkComplete={openComplete}
                   onWhatsAppShare={handleWhatsAppShare}
                 />
               )}
+              {activeTab==="history" && (
+                <TransfusionHistoryView requests={requests} />
+              )}
             </div>
           )}
         </main>
 
-        {/* ── FAB — desktop only ── */}
+        {/* FAB — desktop only */}
         <button className="hd-fab no-print hidden sm:flex" onClick={()=>openNewRequest("Routine")}>
           <Plus className="w-5 h-5"/><span>New Request</span>
         </button>
 
-        {/* ── MOBILE BOTTOM NAV ── */}
+        {/* Mobile Bottom Nav */}
         <nav className="hd-bottom-nav no-print sm:hidden">
           <button className={`hd-bnav-btn ${activeTab==="overview"?"active":""}`} onClick={()=>handleTabChange("overview")}>
-            <span className="bnav-icon">🏥</span>
-            <span className="hd-bnav-lbl">Dashboard</span>
+            <span className="bnav-icon">🏥</span><span className="hd-bnav-lbl">Home</span>
           </button>
-          <button className={`hd-bnav-btn ${activeTab==="requests"?"active":""}`} onClick={()=>handleTabChange("requests")}>
-            <span className="bnav-icon">📋</span>
-            <span className="hd-bnav-lbl">Requests</span>
-            {requests.length>0 && (
-              <span className="absolute -top-1 -right-1 bg-[#8B0000] text-white text-[9px] font-bold rounded-full px-1 min-w-[14px] text-center leading-4">{requests.length}</span>
-            )}
+          <button className={`hd-bnav-btn ${activeTab==="requests"?"active":""} relative`} onClick={()=>handleTabChange("requests")}>
+            <span className="bnav-icon">📋</span><span className="hd-bnav-lbl">Requests</span>
+            {requests.length>0 && <span className="absolute -top-1 right-1 bg-[#8B0000] text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center leading-none">{requests.length>9?"9+":requests.length}</span>}
           </button>
           <button className="hd-bnav-btn" onClick={()=>openNewRequest("Emergency")} style={{color:"#b91c1c"}}>
-            <span className="bnav-icon">🚨</span>
-            <span className="hd-bnav-lbl">Emergency</span>
+            <span className="bnav-icon">🚨</span><span className="hd-bnav-lbl">Emergency</span>
           </button>
-          <button className="hd-bnav-btn" onClick={()=>openNewRequest("Routine")}>
-            <span className="bnav-icon">➕</span>
-            <span className="hd-bnav-lbl">New Req.</span>
+          <button className={`hd-bnav-btn ${activeTab==="history"?"active":""}`} onClick={()=>handleTabChange("history")}>
+            <span className="bnav-icon">💉</span><span className="hd-bnav-lbl">History</span>
           </button>
           <button className="hd-bnav-btn" onClick={()=>setIsProfileOpen(true)}>
-            <span className="bnav-icon">👤</span>
-            <span className="hd-bnav-lbl">Profile</span>
+            <span className="bnav-icon">👤</span><span className="hd-bnav-lbl">Profile</span>
           </button>
         </nav>
 
-        {/* Modals */}
+        {/* Request + QR Modals */}
         <NewRequestModal
           isOpen={isRequestModalOpen} onClose={()=>setIsRequestModalOpen(false)}
           onSubmit={handleNewRequest}
@@ -2116,7 +2614,15 @@ const HospitalDashboard = ({ onLogout }: { onLogout:()=>void }) => {
         />
         <QRModal isOpen={isQRModalOpen} onClose={()=>setIsQRModalOpen(false)} request={selectedRequest} />
       </div>
-      {/* PrintableRequest renders null — print is handled via popup window */}
+
+      {/* Fix 3: In-app print overlay — works on all mobile browsers, no popup needed */}
+      {printOverlayReq && (
+        <PrintOverlay
+          request={printOverlayReq}
+          hospital={hospitalData}
+          onClose={()=>setPrintOverlayReq(null)}
+        />
+      )}
       <PrintableRequest request={null} hospital={null} />
     </>
   );
