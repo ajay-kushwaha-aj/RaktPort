@@ -280,9 +280,9 @@ const PrintableDonation = ({donation,donorData}:{donation:Donation|null;donorDat
   const nextEligible=donation.component&&COOLDOWN_DAYS[donation.component]?new Date(donation.date.getTime()+COOLDOWN_DAYS[donation.component][donorData.gender?.toLowerCase()==='female'?'female':'male']*86400000):null;
   const consentId = `CID-${donation.rtidCode.split('-').pop()}`;
   return createPortal(<>
-    <style>{`@media print{@page{size:A4 portrait;margin:10mm}body>*:not(#pd-portal){display:none!important}#pd-portal{display:flex!important;position:fixed;inset:0;background:white;z-index:99999;align-items:start;justify-content:center;padding:10mm;box-sizing:border-box}.no-print{display:none!important}}@media screen{#pd-portal{display:none!important}}`}</style>
+    <style>{`@media print{@page{size:A4 portrait;margin:5mm 10mm}body>*:not(#pd-portal){display:none!important}#pd-portal{display:flex!important;position:fixed;inset:0;background:white;z-index:99999;align-items:start;justify-content:center;padding:5mm;box-sizing:border-box}.no-print{display:none!important}}@media screen{#pd-portal{display:none!important}}`}</style>
     <div id="pd-portal">
-      <div style={{width:'190mm',height:'277mm',border:'2px solid #1a0505',padding:'8mm',fontFamily:'Georgia,serif',color:'#1a0505',position:'relative',boxSizing:'border-box',display:'flex',flexDirection:'column'}}>
+      <div style={{width:'190mm',height:'265mm',border:'2px solid #1a0505',padding:'6mm 8mm',fontFamily:'Georgia,serif',color:'#1a0505',position:'relative',boxSizing:'border-box',display:'flex',flexDirection:'column'}}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:'2px solid #8B0000',paddingBottom:'4mm',marginBottom:'4mm'}}>
           <div style={{display:'flex',alignItems:'center',gap:'4mm'}}>
             <img src={logo} alt="" style={{width:'14mm',height:'14mm',objectFit:'contain'}}/>
@@ -312,16 +312,29 @@ const PrintableDonation = ({donation,donorData}:{donation:Donation|null;donorDat
         {/* Consent Section - NACO Guidelines */}
         <div style={{flex:1,border:'1px solid #8B0000',padding:'4mm',borderRadius:'2mm',backgroundColor:'#fffdfd',marginBottom:'4mm'}}>
           <div style={{fontSize:'9pt',fontWeight:'bold',color:'#8B0000',borderBottom:'1px solid #8B0000',paddingBottom:'1.5mm',marginBottom:'3mm',textAlign:'center'}}>DONOR CONSENT DECLARATION (As per NACO Guidelines)</div>
-          <div style={{fontSize:'7.5pt',lineHeight:'1.6',textAlign:'justify',marginBottom:'3mm',color:'#333'}}>
+          <div style={{fontSize:'7.5pt',lineHeight:'1.6',textAlign:'justify',marginBottom:'2mm',color:'#333'}}>
             I declare that I have truthfully answered all questions to the best of my knowledge and fully understood the information provided to me about blood donation. I consent to donate blood/components voluntarily and without any expectation of remuneration.<br/><br/>
-            I have been explained about the potential risks and benefits of blood donation, including the remote risk of adverse reactions. I authorize the <b>{donation.hospitalName}</b> blood bank to test my blood for TTI (Transfusion Transmissible Infections) marker tests including HIV, Hepatitis B, Hepatitis C, Syphilis, and Malaria, and I agree to be informed of abnormal results. I understand that my blood may be used for patient treatment, research, or quality control.
+            I have been explained about the risks and benefits of blood donation, including the remote risk of adverse reactions. I authorize the <b>{donation.hospitalName}</b> blood bank to test my blood for TTI markers (HIV, Hepatitis B/C, Syphilis, Malaria). I understand my blood may be used for patient treatment, research, or quality control.
           </div>
+          
+          <div style={{fontSize:'7.5pt', marginBottom:'3mm',color:'#333'}}>
+            <div style={{fontWeight:'bold', marginBottom:'1mm'}}>Pre-donation Confirmation:</div>
+            <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1mm'}}>
+              {['No high-risk behavior', 'No recent illness/surgery', 'No medication conflicts', 'No recent vaccination/pregnancy etc.'].map(lbl => (
+                <div key={lbl} style={{display:'flex', alignItems:'center', gap:'1.5mm'}}>
+                  <div style={{width:'2.5mm',height:'2.5mm',border:'1px solid #333',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'6pt'}}>✓</div>
+                  <span>{lbl}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div style={{fontSize:'8pt',fontWeight:'bold',marginBottom:'4mm',display:'flex',alignItems:'center',gap:'2mm'}}>
             <div style={{width:'3mm',height:'3mm',border:'1px solid #333',display:'flex',alignItems:'center',justifyContent:'center'}}>✓</div>
             <span>I confirm my voluntary consent digitally.</span>
           </div>
           
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-end',marginTop:'5mm'}}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-end',marginTop:'auto'}}>
             <div>
               <div style={{fontSize:'7pt',color:'#555',marginBottom:'1mm'}}>Digital Consent ID</div>
               <div style={{fontFamily:'monospace',fontSize:'9pt',fontWeight:'bold',color:'#333'}}>{consentId}</div>
@@ -654,6 +667,9 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
   const [bookingForm, setBookingForm] = useState({
     date: '', time: '09:00 AM', component: 'Whole Blood' as DonationComponent,
   });
+  const [bookingConsent, setBookingConsent] = useState({
+    highRisk: false, illness: false, medication: false, vaccination: false
+  });
   const [rescheduleForm,   setRescheduleForm]   = useState({ date: '', time: '09:00 AM' });
   const [apptToReschedule, setApptToReschedule] = useState<Donation | null>(null);
 
@@ -864,6 +880,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
     setSelectedCenter(c);
     const tomorrow=new Date();tomorrow.setDate(tomorrow.getDate()+1);
     setBookingForm({date:tomorrow.toISOString().split('T')[0],time:'09:00 AM',component:'Whole Blood'});
+    setBookingConsent({highRisk: false, illness: false, medication: false, vaccination: false});
     setBookingOpen(true);
   };
 
@@ -1524,10 +1541,32 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                 </SelectContent>
               </Select>
             </div>
+            
+            <div className="mt-3 p-3 bg-red-50/50 border border-red-100 rounded-xl space-y-2">
+              <Label className="text-[11px] font-bold text-red-800">Pre-donation Questionnaire (NACO)</Label>
+              <p className="text-[10px] text-red-600/80 leading-tight mb-2">Please confirm you meet the following baseline requirements:</p>
+              {[
+                {key:'highRisk', label:'No high-risk behavior'},
+                {key:'illness', label:'No recent illness, infection, or major surgery'},
+                {key:'medication', label:'No medication conflicts'},
+                {key:'vaccination', label:'No recent vaccination, tattoo, or pregnancy etc.'}
+              ].map(q => (
+                <div key={q.key} className="flex items-start gap-2">
+                  <input 
+                    type="checkbox" 
+                    id={`consent-${q.key}`} 
+                    checked={bookingConsent[q.key as keyof typeof bookingConsent]} 
+                    onChange={(e)=>setBookingConsent(s=>({...s, [q.key]: e.target.checked}))}
+                    className="mt-0.5 w-3 h-3 text-red-600 border-red-300 rounded focus:ring-red-500 cursor-pointer"
+                  />
+                  <Label htmlFor={`consent-${q.key}`} className="text-[10px] sm:text-xs font-medium leading-tight cursor-pointer text-gray-700">{q.label}</Label>
+                </div>
+              ))}
+            </div>
           </div>
           <DialogFooter className="gap-2">
             <Button variant="outline" size="sm" onClick={()=>setBookingOpen(false)}>Cancel</Button>
-            <Button size="sm" onClick={handleBookAppointment} disabled={apiLoading||!bookingForm.date}>
+            <Button size="sm" onClick={handleBookAppointment} disabled={apiLoading||!bookingForm.date||!Object.values(bookingConsent).every(Boolean)}>
               {apiLoading?<Loader2 className="w-3.5 h-3.5 animate-spin mr-1"/>:null} Confirm
             </Button>
           </DialogFooter>
