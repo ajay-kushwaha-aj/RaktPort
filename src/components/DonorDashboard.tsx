@@ -8,6 +8,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { ModeToggle } from './mode-toggle';
 import { createPortal } from 'react-dom';
 import { Button }  from './ui/button';
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from './ui/card';
@@ -1045,7 +1046,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
     <div className="min-h-screen bg-background pb-10">
 
       {/* ═══ HEADER ════════════════════════════════════════════ */}
-      <header className="bg-[#8B0000] text-white py-3 shadow-lg no-print sticky top-0 z-40">
+      <header className="bg-[#8B0000] dark:bg-[#3a0000] text-white py-3 shadow-lg no-print sticky top-0 z-40">
         <div className="container mx-auto px-4 max-w-6xl flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <img src={logo} alt="RaktPort" className="w-10 h-10 rounded-full border-2 border-white/40 shadow flex-shrink-0"/>
@@ -1061,7 +1062,8 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
             </div>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
-            <Button variant="secondary" size="sm" className="bg-white text-[#8B0000] hover:bg-gray-100 text-xs px-3" onClick={()=>setProfileOpen(true)}>
+            <ModeToggle />
+            <Button variant="secondary" size="sm" className="bg-white text-[#8B0000] hover:bg-gray-100 dark:bg-white/10 dark:text-white dark:hover:bg-white/20 text-xs px-3" onClick={()=>setProfileOpen(true)}>
               <User className="w-3.5 h-3.5 mr-1"/> Profile
             </Button>
             <button onClick={handleLogoutConfirm} className="text-xs font-medium opacity-80 hover:opacity-100 px-1">Logout</button>
@@ -1070,8 +1072,8 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
       </header>
 
       {/* ═══ MOTIVATION BANNER ═════════════════════════════════ */}
-      <div className="bg-gradient-to-r from-orange-50 to-amber-50 border-b border-orange-100 py-2 no-print">
-        <p className="text-xs sm:text-sm text-center text-orange-800 font-medium px-4 flex items-center justify-center gap-2">
+      <div className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30 border-b border-orange-100 dark:border-orange-900/40 py-2 no-print">
+        <p className="text-xs sm:text-sm text-center text-orange-800 dark:text-orange-300 font-medium px-4 flex items-center justify-center gap-2">
           <Star className="w-3.5 h-3.5 fill-orange-500 text-orange-500 flex-shrink-0"/>
           <em>"{motivationQuote}"</em>
         </p>
@@ -1095,9 +1097,9 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
       <main className="container mx-auto px-4 max-w-6xl py-5 space-y-5">
 
         {error && (
-          <div className="bg-red-50 border-l-4 border-red-500 p-3 rounded-md flex gap-2 no-print">
+          <div className="bg-red-50 dark:bg-red-950/30 border-l-4 border-red-500 p-3 rounded-md flex gap-2 no-print">
             <AlertCircle className="text-red-500 w-4 h-4 mt-0.5 flex-shrink-0"/>
-            <p className="text-sm text-red-700">{error}</p>
+            <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
           </div>
         )}
 
@@ -1105,16 +1107,16 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
         <Card className={`shadow-md border-l-4 no-print ${isEligible?'border-l-green-500':'border-l-red-500'}`}>
           <CardContent className="p-4">
             <div className="flex items-center gap-4">
-              <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl flex-shrink-0 ${isEligible?'bg-green-100':'bg-red-100'}`}>{isEligible?'🩸':'🚫'}</div>
+              <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl flex-shrink-0 ${isEligible?'bg-green-100 dark:bg-green-900/40':'bg-red-100 dark:bg-red-900/40'}`}>{isEligible?'🩸':'🚫'}</div>
               <div className="flex-1 min-w-0">
-                <p className={`font-bold text-sm ${isEligible?'text-green-700':'text-red-600'}`}>{eligibilityMsg}</p>
+                <p className={`font-bold text-sm ${isEligible?'text-green-700 dark:text-green-400':'text-red-600 dark:text-red-400'}`}>{eligibilityMsg}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">Last donation: {lastDonationDisplay}</p>
                 {!isEligible&&nextEligibleDate&&nextEligibleDate>new Date()&&(
-                  <div className="mt-2 p-2 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
                     <div className="flex items-center gap-2">
-                      <AlarmClock className="w-3.5 h-3.5 text-blue-600 flex-shrink-0"/>
+                      <AlarmClock className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 flex-shrink-0"/>
                       <div>
-                        <p className="text-xs font-semibold text-blue-700">Next eligible: {nextEligibleDisplay}</p>
+                        <p className="text-xs font-semibold text-blue-700 dark:text-blue-300">Next eligible: {nextEligibleDisplay}</p>
                         <CountdownTimer targetDate={nextEligibleDate} compact label="Time remaining"/>
                       </div>
                     </div>
@@ -1145,7 +1147,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
             {icon:<Heart   className="w-5 h-5 text-pink-500 fill-pink-400 mx-auto mb-1"/>,val:(donorData.donationsCount||0)*3,label:'Lives'},
           ].map(({icon,val,label})=>(
             <Card key={label} className="shadow-sm hover:shadow-md transition-shadow">
-              <CardContent className="p-3 sm:p-4 text-center">{icon}<p className="text-2xl font-black text-gray-800">{val}</p><p className="text-xs text-gray-500">{label}</p></CardContent>
+              <CardContent className="p-3 sm:p-4 text-center">{icon}<p className="text-2xl font-black text-gray-800 dark:text-gray-100">{val}</p><p className="text-xs text-gray-500 dark:text-gray-400">{label}</p></CardContent>
             </Card>
           ))}
         </div>
@@ -1153,26 +1155,26 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
         {/* ── QUICK ACTIONS ─────────────────────────────────── */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 no-print">
           {[
-            {icon:'🏆',label:'Certificate', action:()=>setCertOpen(true),       color:'from-amber-50 to-yellow-50 border-amber-200'},
-            {icon:'🩸',label:'Compatibility',action:()=>setCompatOpen(true),    color:'from-red-50 to-rose-50 border-red-200'},
-            {icon:'💡',label:'Health Tips',  action:()=>setHealthTipsOpen(true),color:'from-blue-50 to-indigo-50 border-blue-200'},
-            {icon:'📤',label:'Share',        action:()=>setShareOpen(true),     color:'from-purple-50 to-pink-50 border-purple-200'},
+            {icon:'🏆',label:'Certificate', action:()=>setCertOpen(true),       color:'from-amber-50 to-yellow-50 border-amber-200 dark:from-amber-950/30 dark:to-yellow-950/30 dark:border-amber-800'},
+            {icon:'🩸',label:'Compatibility',action:()=>setCompatOpen(true),    color:'from-red-50 to-rose-50 border-red-200 dark:from-red-950/30 dark:to-rose-950/30 dark:border-red-800'},
+            {icon:'💡',label:'Health Tips',  action:()=>setHealthTipsOpen(true),color:'from-blue-50 to-indigo-50 border-blue-200 dark:from-blue-950/30 dark:to-indigo-950/30 dark:border-blue-800'},
+            {icon:'📤',label:'Share',        action:()=>setShareOpen(true),     color:'from-purple-50 to-pink-50 border-purple-200 dark:from-purple-950/30 dark:to-pink-950/30 dark:border-purple-800'},
           ].map(({icon,label,action,color})=>(
             <button key={label} onClick={action} className={`bg-gradient-to-br ${color} border rounded-2xl p-4 flex flex-col items-center gap-2 hover:shadow-md active:scale-95 transition-all touch-manipulation`}>
-              <span className="text-2xl">{icon}</span><span className="text-xs font-semibold text-gray-700">{label}</span>
+              <span className="text-2xl">{icon}</span><span className="text-xs font-semibold text-gray-700 dark:text-gray-200">{label}</span>
             </button>
           ))}
         </div>
 
         {/* ── HEALTH TIP BANNER ─────────────────────────────── */}
-        <div className="no-print bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 border border-blue-100 flex items-start gap-3 cursor-pointer" onClick={()=>setHealthTipsOpen(true)}>
+        <div className="no-print bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-2xl p-4 border border-blue-100 dark:border-blue-800 flex items-start gap-3 cursor-pointer" onClick={()=>setHealthTipsOpen(true)}>
           <span className="text-2xl flex-shrink-0">{HEALTH_TIPS[currentHealthTip].icon}</span>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1 mb-0.5">
-              <p className="text-xs font-bold text-blue-800">{HEALTH_TIPS[currentHealthTip].title}</p>
-              <Badge variant="outline" className="text-[9px] px-1 py-0 border-blue-200 text-blue-600 ml-auto">Health Tip</Badge>
+              <p className="text-xs font-bold text-blue-800 dark:text-blue-300">{HEALTH_TIPS[currentHealthTip].title}</p>
+              <Badge variant="outline" className="text-[9px] px-1 py-0 border-blue-200 dark:border-blue-700 text-blue-600 dark:text-blue-400 ml-auto">Health Tip</Badge>
             </div>
-            <p className="text-xs text-blue-600 line-clamp-2">{HEALTH_TIPS[currentHealthTip].tip}</p>
+            <p className="text-xs text-blue-600 dark:text-blue-400 line-clamp-2">{HEALTH_TIPS[currentHealthTip].tip}</p>
           </div>
           <ChevronRight className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5"/>
         </div>
@@ -1180,7 +1182,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
         {/* ── IMPACT SECTION ────────────────────────────────── */}
         <div className="no-print">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-base font-bold text-gray-800 flex items-center gap-2"><Award className="w-4 h-4 text-yellow-500"/> Your Impact</h3>
+            <h3 className="text-base font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2"><Award className="w-4 h-4 text-yellow-500"/> Your Impact</h3>
             <button onClick={()=>setCompatOpen(true)} className="text-xs text-primary flex items-center gap-1 font-semibold hover:underline">{donorData.bloodGroup} Compatibility <ChevronRight className="w-3 h-3"/></button>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -1188,10 +1190,10 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
               {icon:<Droplet className="w-5 h-5 text-blue-500 mx-auto mb-1"/>,   val:donorData.donationsCount||0,           label:'Total Donations', border:'border-t-blue-500'},
               {icon:<Award   className="w-5 h-5 text-amber-500 mx-auto mb-1"/>, val:<span className={`text-xs font-bold px-2 py-0.5 rounded-full text-white ${badgeBg(donorData.donationsCount||0)}`}>{computeBadge(donorData.donationsCount||0)}</span>, label:'Current Rank', border:'border-t-amber-500'},
               {icon:<Heart   className="w-5 h-5 text-pink-500 fill-pink-400 mx-auto mb-1"/>, val:(donorData.donationsCount||0)*3, label:'Lives Impacted', border:'border-t-pink-500'},
-              {icon:<CalendarCheck className="w-5 h-5 text-green-500 mx-auto mb-1"/>, val:<span className="text-sm font-bold text-gray-800 leading-tight">{nextEligibleDisplay}</span>, label:'Next Eligible', border:'border-t-green-500'},
+              {icon:<CalendarCheck className="w-5 h-5 text-green-500 mx-auto mb-1"/>, val:<span className="text-sm font-bold text-gray-800 dark:text-gray-100 leading-tight">{nextEligibleDisplay}</span>, label:'Next Eligible', border:'border-t-green-500'},
             ].map(({icon,val,label,border})=>(
-              <Card key={label} className={`bg-white hover:shadow-md transition-shadow border-t-4 ${border}`}>
-                <CardContent className="p-4 text-center">{icon}<p className="text-2xl font-black">{val}</p><p className="text-xs text-gray-500 mt-0.5">{label}</p></CardContent>
+              <Card key={label} className={`bg-white dark:bg-gray-900 hover:shadow-md transition-shadow border-t-4 ${border}`}>
+                <CardContent className="p-4 text-center">{icon}<p className="text-2xl font-black dark:text-gray-100">{val}</p><p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{label}</p></CardContent>
               </Card>
             ))}
           </div>
@@ -1203,11 +1205,11 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
         {upcomingAppointments.length>0&&(
           <div className="no-print">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-base font-bold text-gray-800 flex items-center gap-2">
-                <CalendarCheck className="w-4 h-4 text-blue-600"/> Upcoming Appointments
+              <h3 className="text-base font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+                <CalendarCheck className="w-4 h-4 text-blue-600 dark:text-blue-400"/> Upcoming Appointments
                 <Badge className="bg-blue-600 text-white text-[10px] px-1.5 py-0.5">{upcomingAppointments.length}</Badge>
               </h3>
-              <Button size="sm" variant="outline" className="text-xs border-blue-300 text-blue-700 hover:bg-blue-50" onClick={()=>setScheduleOpen(true)}>+ Book New</Button>
+              <Button size="sm" variant="outline" className="text-xs border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/40" onClick={()=>setScheduleOpen(true)}>+ Book New</Button>
             </div>
             <div className="space-y-3">
               {upcomingAppointments.map((appt,i)=>{
@@ -1230,7 +1232,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                             <ComponentBadge component={appt.component||'Whole Blood'}/>
                             <Badge variant="outline" className="border-blue-300 text-blue-700 bg-blue-50 text-[10px]">{appt.status}</Badge>
                           </div>
-                          <p className="text-sm font-semibold text-gray-900 truncate">{appt.hospitalName}</p>
+                          <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{appt.hospitalName}</p>
                           <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5">
                             <span className="text-xs text-gray-500 flex items-center gap-1"><Clock className="w-3 h-3"/>{appt.time||'N/A'}</span>
                             <span className="text-xs text-gray-500 flex items-center gap-1"><MapPin className="w-3 h-3"/>{appt.city||'N/A'}</span>
@@ -1262,9 +1264,9 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
             DONATION HISTORY TABLE
             FIX: D-RTID column — full text, larger font, no truncation
         ════════════════════════════════════════════════════ */}
-        <Card className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
-          <CardHeader className="bg-gray-50/50 border-b border-gray-100 p-4">
-            <CardTitle className="text-sm text-gray-800 flex items-center gap-2">
+        <Card className="bg-white dark:bg-gray-900 rounded-xl shadow-md border border-gray-100 dark:border-gray-800 overflow-hidden">
+          <CardHeader className="bg-gray-50/50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-700 p-4">
+            <CardTitle className="text-sm text-gray-800 dark:text-gray-100 flex items-center gap-2">
               <List className="w-4 h-4 text-primary"/> Donation History &amp; Credits
             </CardTitle>
             <CardDescription className="text-xs mt-0.5">
@@ -1315,8 +1317,8 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                             <div className="flex items-center gap-1.5 flex-wrap">
                               <span className={`font-mono text-xs px-2 py-1 rounded-md border font-semibold whitespace-nowrap select-all ${
                                 isUpcoming
-                                  ? 'bg-blue-100 text-blue-900 border-blue-300'
-                                  : 'bg-gray-100 text-gray-800 border-gray-300'
+                                  ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-900 dark:text-blue-200 border-blue-300 dark:border-blue-700'
+                                  : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600'
                               }`}>
                                 {r.rtidCode}
                               </span>
@@ -1615,9 +1617,9 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
           <DialogHeader><DialogTitle>Linked Patient Request</DialogTitle><DialogDescription>This donation was linked to a specific patient need</DialogDescription></DialogHeader>
           {hrtidLoading?<div className="flex justify-center p-6"><Loader2 className="w-7 h-7 animate-spin text-primary"/></div>:hrtidDetails?(
             <div className="space-y-3">
-              <div className="p-4 bg-blue-50 rounded-xl border border-blue-100 space-y-2 text-sm">
+              <div className="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-xl border border-blue-100 dark:border-blue-800 space-y-2 text-sm">
                 {[['H-RTID',hrtidDetails.rtidCode],['Patient',hrtidDetails.patientName],['Hospital',hrtidDetails.hospital],['Blood Group',hrtidDetails.bloodGroup],['Units',String(hrtidDetails.units)],['Required By',hrtidDetails.requiredBy||'N/A']].map(([k,v])=>(
-                  <div key={k} className="flex justify-between gap-2"><span className="text-xs text-gray-500 font-medium">{k}</span><span className="text-xs font-bold text-gray-900 text-right max-w-[55%] truncate" title={v}>{v}</span></div>
+                  <div key={k} className="flex justify-between gap-2"><span className="text-xs text-gray-500 dark:text-gray-400 font-medium">{k}</span><span className="text-xs font-bold text-gray-900 dark:text-gray-100 text-right max-w-[55%] truncate" title={v}>{v}</span></div>
                 ))}
               </div>
               {hrtidDetails.impactTimeline&&<ImpactTimelineView timeline={hrtidDetails.impactTimeline}/>}

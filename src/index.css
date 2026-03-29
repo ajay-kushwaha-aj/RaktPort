@@ -93,6 +93,23 @@ All colors MUST be HSL.
     --border: 0 0% 17%;
     --input: 0 0% 17%;
     --ring: 0 100% 35%;
+    
+    /* Status colors — dark mode */
+    --status-pending-bg: 40 30% 14%;
+    --status-pending-fg: 35 90% 65%;
+    --status-pending-border: 40 60% 30%;
+    
+    --status-donated-bg: 199 40% 12%;
+    --status-donated-fg: 199 80% 65%;
+    --status-donated-border: 199 50% 30%;
+    
+    --status-redeemed-bg: 120 30% 12%;
+    --status-redeemed-fg: 122 50% 60%;
+    --status-redeemed-border: 153 40% 30%;
+    
+    --status-expired-bg: 220 10% 14%;
+    --status-expired-fg: 0 0% 60%;
+    --status-expired-border: 220 10% 25%;
   }
 }
 

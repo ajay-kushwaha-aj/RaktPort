@@ -1,37 +1,36 @@
 import { Moon, Sun } from "lucide-react"
-
-import { Button } from "@/components/ui/button"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { useTheme } from "@/components/theme-provider"
 
 export function ModeToggle() {
-    const { setTheme } = useTheme()
+    const { theme, setTheme } = useTheme()
+
+    // Resolve actual theme (handle "system")
+    const isDark =
+        theme === "dark" ||
+        (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches)
+
+    const toggle = () => setTheme(isDark ? "light" : "dark")
 
     return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon">
-                    <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                    <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                    <span className="sr-only">Toggle theme</span>
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setTheme("light")}>
-                    Light
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("dark")}>
-                    Dark
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("system")}>
-                    System
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
+        <button
+            onClick={toggle}
+            aria-label="Toggle dark mode"
+            className="relative inline-flex h-8 w-14 items-center rounded-full transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            style={{ background: isDark ? '#4a1a1a' : '#f3e8e8' }}
+        >
+            {/* Sliding knob */}
+            <span
+                className="inline-flex h-6 w-6 items-center justify-center rounded-full shadow-md transition-transform duration-300"
+                style={{
+                    transform: isDark ? 'translateX(26px)' : 'translateX(4px)',
+                    background: isDark ? '#1a1a2e' : '#fff',
+                }}
+            >
+                {isDark
+                    ? <Moon className="h-3.5 w-3.5 text-yellow-300" />
+                    : <Sun className="h-3.5 w-3.5 text-orange-500" />
+                }
+            </span>
+        </button>
     )
 }
