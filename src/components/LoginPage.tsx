@@ -492,7 +492,7 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
                           <input key={idx} id={`lp-otp-${uid}-${idx}`} type="text" inputMode="numeric" maxLength={1}
                             value={digit} onChange={e => changeOtpDigit(idx, e.target.value)} onKeyDown={e => otpKeyDown(idx, e)}
                             disabled={verifyLoading} aria-label={`OTP digit ${idx + 1}`}
-                            className={`text-center text-xl sm:text-2xl font-bold border-2 rounded-xl outline-none transition-all touch-manipulation ${
+                            className={`text-center text-xl sm:text-2xl font-bold border-2 rounded-xl outline-none transition-all touch-manipulation text-gray-900 ${
                               digit ? 'bg-white border-gray-500' : 'bg-white/60 border-gray-300 focus:border-gray-500 focus:ring-4 focus:ring-gray-200/50'
                             } disabled:opacity-50`} style={{ width: 44, height: 52 }} />
                         ))}

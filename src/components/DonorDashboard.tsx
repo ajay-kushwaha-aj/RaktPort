@@ -274,30 +274,91 @@ const HistoryQRModal = ({isOpen,onClose,data}:{isOpen:boolean;onClose:()=>void;d
 const PrintableDonation = ({donation,donorData}:{donation:Donation|null;donorData:DonorData}) => {
   const qrRef = useRef<HTMLCanvasElement>(null);
   useEffect(()=>{
-    if(donation&&qrRef.current){const payload=`${donorData.fullName}|${donorData.bloodGroup}|${donation.rtidCode}|${donation.hospitalName}|${donation.city}|${donation.component||'Whole Blood'}`;try{new QRious({element:qrRef.current,value:payload,size:150,level:'H'});}catch(_){}}
+    if(donation&&qrRef.current){const payload=`${donorData.fullName}|${donorData.bloodGroup}|${donation.rtidCode}|${donation.hospitalName}|${donation.city}|${donation.component||'Whole Blood'}`;try{new QRious({element:qrRef.current,value:payload,size:120,level:'H'});}catch(_){}}
   },[donation,donorData]);
   if(!donation) return null;
   const nextEligible=donation.component&&COOLDOWN_DAYS[donation.component]?new Date(donation.date.getTime()+COOLDOWN_DAYS[donation.component][donorData.gender?.toLowerCase()==='female'?'female':'male']*86400000):null;
+  const consentId = `CID-${donation.rtidCode.split('-').pop()}`;
   return createPortal(<>
-    <style>{`@media print{@page{size:A4;margin:10mm}body>*:not(#pd-portal){display:none!important}#pd-portal{display:flex!important;position:fixed;inset:0;background:white;z-index:99999;align-items:start;justify-content:center;padding:10mm}.no-print{display:none!important}}@media screen{#pd-portal{display:none!important}}`}</style>
+    <style>{`@media print{@page{size:A4 portrait;margin:10mm}body>*:not(#pd-portal){display:none!important}#pd-portal{display:flex!important;position:fixed;inset:0;background:white;z-index:99999;align-items:start;justify-content:center;padding:10mm;box-sizing:border-box}.no-print{display:none!important}}@media screen{#pd-portal{display:none!important}}`}</style>
     <div id="pd-portal">
-      <div style={{width:'190mm',border:'2px solid #1a0505',padding:'8mm',fontFamily:'Georgia,serif',color:'#1a0505'}}>
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:'2px solid #8B0000',paddingBottom:'4mm',marginBottom:'5mm'}}>
-          <div style={{display:'flex',alignItems:'center',gap:'4mm'}}><img src={logo} alt="" style={{width:'14mm',height:'14mm',objectFit:'contain'}}/><div><div style={{fontSize:'14pt',fontWeight:'bold',color:'#8B0000'}}>RaktPort</div><div style={{fontSize:'7pt',color:'#555'}}>National Blood Management System</div></div></div>
+      <div style={{width:'190mm',height:'277mm',border:'2px solid #1a0505',padding:'8mm',fontFamily:'Georgia,serif',color:'#1a0505',position:'relative',boxSizing:'border-box',display:'flex',flexDirection:'column'}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:'2px solid #8B0000',paddingBottom:'4mm',marginBottom:'4mm'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'4mm'}}>
+            <img src={logo} alt="" style={{width:'14mm',height:'14mm',objectFit:'contain'}}/>
+            <div>
+              <div style={{fontSize:'14pt',fontWeight:'bold',color:'#8B0000'}}>RaktPort</div>
+              <div style={{fontSize:'7pt',color:'#555',textTransform:'uppercase'}}>National Blood Management System</div>
+            </div>
+          </div>
           <div style={{textAlign:'right'}}>
-            <div style={{fontSize:'7pt',color:'#555',marginBottom:'1mm'}}>DONATION SLIP</div>
-            {/* RTID highlighted */}
-            <div style={{fontFamily:'monospace',fontWeight:'bold',fontSize:'11pt',color:'#8B0000',background:'#fff0f0',padding:'2mm 5mm',borderRadius:'3mm',border:'2.5px solid #8B0000',letterSpacing:'0.05em',display:'inline-block'}}>{donation.rtidCode}</div>
-            <div style={{fontSize:'7pt',color:'#555',marginTop:'1mm'}}>Generated: {formatDateDMY(new Date())}</div>
+            <div style={{fontSize:'8pt',fontWeight:'bold',color:'#555',marginBottom:'1mm'}}>DONATION SLIP & CONSENT</div>
+            <div style={{fontFamily:'monospace',fontWeight:'bold',fontSize:'11pt',color:'#8B0000',background:'#fff0f0',padding:'1mm 3mm',borderRadius:'2mm',border:'2px solid #8B0000',letterSpacing:'0.05em',display:'inline-block'}}>{donation.rtidCode}</div>
           </div>
         </div>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'4mm',marginBottom:'4mm'}}>
-          <div><div style={{fontSize:'8pt',fontWeight:'bold',color:'#8B0000',marginBottom:'2mm',borderBottom:'1px solid #ddd',paddingBottom:'1mm'}}>DONOR DETAILS</div>{[['Name',donorData.fullName],['ID',donorData.internalId||donorData.donorId||'N/A'],['Blood Group',donorData.bloodGroup],['City',donorData.city]].map(([k,v])=><div key={k} style={{fontSize:'8pt',marginBottom:'1mm'}}><b>{k}:</b> {v}</div>)}</div>
-          <div><div style={{fontSize:'8pt',fontWeight:'bold',color:'#8B0000',marginBottom:'2mm',borderBottom:'1px solid #ddd',paddingBottom:'1mm'}}>DONATION DETAILS</div>{[['Date',formatDateDMY(donation.date)],['Time',donation.time||'N/A'],['Centre',donation.hospitalName],['Component',donation.component||'Whole Blood'],['Status',donation.status]].map(([k,v])=><div key={k} style={{fontSize:'8pt',marginBottom:'1mm'}}><b>{k}:</b> {v}</div>)}</div>
+
+        <div style={{display:'flex',gap:'4mm',marginBottom:'4mm'}}>
+          <div style={{flex:1,border:'1px solid #ccc',padding:'3mm',borderRadius:'2mm'}}>
+            <div style={{fontSize:'8pt',fontWeight:'bold',color:'#8B0000',borderBottom:'1px solid #ddd',paddingBottom:'1mm',marginBottom:'2mm'}}>DONOR DETAILS</div>
+            {[['Name',donorData.fullName],['ID',donorData.internalId||donorData.donorId||'N/A'],['Blood Group',donorData.bloodGroup],['City',donorData.city]].map(([k,v])=><div key={k} style={{fontSize:'8pt',marginBottom:'1.5mm',display:'flex',justifyContent:'space-between'}}><b>{k}:</b> <span>{v}</span></div>)}
+          </div>
+          <div style={{flex:1,border:'1px solid #ccc',padding:'3mm',borderRadius:'2mm'}}>
+            <div style={{fontSize:'8pt',fontWeight:'bold',color:'#8B0000',borderBottom:'1px solid #ddd',paddingBottom:'1mm',marginBottom:'2mm'}}>DONATION DETAILS</div>
+            {[['Date',formatDateDMY(donation.date)],['Time',donation.time||'N/A'],['Centre',donation.hospitalName],['Component',donation.component||'Whole Blood']].map(([k,v])=><div key={k} style={{fontSize:'8pt',marginBottom:'1.5mm',display:'flex',justifyContent:'space-between'}}><b>{k}:</b> <span>{v}</span></div>)}
+            {nextEligible&&<div style={{fontSize:'7.5pt',marginTop:'2mm',padding:'1mm 2mm',background:'#fff9f0',borderRadius:'1mm',border:'1px solid #ffe4b5'}}><b>Next eligible:</b> {formatDateDMY(nextEligible)} ({donation.component||'Whole Blood'})</div>}
+          </div>
         </div>
-        {nextEligible&&<div style={{background:'#fff9f0',border:'1px solid #f0d0a0',borderRadius:'3mm',padding:'3mm',marginBottom:'4mm',fontSize:'8pt'}}><b>Next eligible:</b> {formatDateDMY(nextEligible)} ({donation.component||'Whole Blood'})</div>}
-        <div style={{display:'flex',justifyContent:'center',marginBottom:'4mm'}}><div style={{textAlign:'center'}}><div style={{fontSize:'7pt',fontWeight:'bold',marginBottom:'2mm'}}>SCAN TO VERIFY</div><canvas ref={qrRef}/></div></div>
-        <div style={{borderTop:'1px solid #ccc',paddingTop:'3mm',fontSize:'7pt',color:'#777',textAlign:'center'}}>Computer-generated document valid across all RaktPort partner networks. • www.raktport.in</div>
+
+        {/* Consent Section - NACO Guidelines */}
+        <div style={{flex:1,border:'1px solid #8B0000',padding:'4mm',borderRadius:'2mm',backgroundColor:'#fffdfd',marginBottom:'4mm'}}>
+          <div style={{fontSize:'9pt',fontWeight:'bold',color:'#8B0000',borderBottom:'1px solid #8B0000',paddingBottom:'1.5mm',marginBottom:'3mm',textAlign:'center'}}>DONOR CONSENT DECLARATION (As per NACO Guidelines)</div>
+          <div style={{fontSize:'7.5pt',lineHeight:'1.6',textAlign:'justify',marginBottom:'3mm',color:'#333'}}>
+            I declare that I have truthfully answered all questions to the best of my knowledge and fully understood the information provided to me about blood donation. I consent to donate blood/components voluntarily and without any expectation of remuneration.<br/><br/>
+            I have been explained about the potential risks and benefits of blood donation, including the remote risk of adverse reactions. I authorize the <b>{donation.hospitalName}</b> blood bank to test my blood for TTI (Transfusion Transmissible Infections) marker tests including HIV, Hepatitis B, Hepatitis C, Syphilis, and Malaria, and I agree to be informed of abnormal results. I understand that my blood may be used for patient treatment, research, or quality control.
+          </div>
+          <div style={{fontSize:'8pt',fontWeight:'bold',marginBottom:'4mm',display:'flex',alignItems:'center',gap:'2mm'}}>
+            <div style={{width:'3mm',height:'3mm',border:'1px solid #333',display:'flex',alignItems:'center',justifyContent:'center'}}>✓</div>
+            <span>I confirm my voluntary consent digitally.</span>
+          </div>
+          
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-end',marginTop:'5mm'}}>
+            <div>
+              <div style={{fontSize:'7pt',color:'#555',marginBottom:'1mm'}}>Digital Consent ID</div>
+              <div style={{fontFamily:'monospace',fontSize:'9pt',fontWeight:'bold',color:'#333'}}>{consentId}</div>
+            </div>
+            <div style={{textAlign:'center'}}>
+              <div style={{fontSize:'7pt',color:'#555',marginBottom:'1mm'}}>Donor Signature</div>
+              <div style={{width:'40mm',borderBottom:'1px dashed #333',height:'6mm',marginBottom:'1mm'}}/>
+              <div style={{fontSize:'7.5pt',fontWeight:'bold'}}>{donorData.fullName?.toUpperCase()}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Authorization Section */}
+        <div style={{display:'flex',gap:'4mm',marginBottom:'auto'}}>
+          <div style={{flex:1,border:'1px solid #ccc',padding:'4mm',borderRadius:'2mm',display:'flex',flexDirection:'column',justifyContent:'space-between'}}>
+            <div>
+              <div style={{fontSize:'8pt',fontWeight:'bold',color:'#333',marginBottom:'3mm'}}>AUTHORIZATION</div>
+              <div style={{fontSize:'7pt',color:'#555'}}>Medical Officer In-charge</div>
+              <div style={{width:'100%',borderBottom:'1px dashed #999',height:'6mm',marginBottom:'2mm'}}/>
+              <div style={{fontSize:'7pt'}}>Name: _______________________</div>
+            </div>
+          </div>
+          <div style={{flex:1,border:'1px solid #ccc',padding:'4mm',borderRadius:'2mm',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column'}}>
+            <div style={{width:'30mm',height:'30mm',border:'2px dashed #ccc',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',opacity:0.6}}>
+              <span style={{fontSize:'7pt',color:'#999',textAlign:'center'}}>BLOOD<br/>BANK<br/>SEAL</span>
+            </div>
+          </div>
+          <div style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center'}}>
+            <div style={{fontSize:'7pt',fontWeight:'bold',marginBottom:'1mm',color:'#555'}}>SCAN TO VERIFY</div>
+            <canvas ref={qrRef} style={{border:'1px solid #eee',padding:'1mm',background:'#fff'}}/>
+            <div style={{fontSize:'6pt',color:'#777',marginTop:'1mm'}}>Timestamp: {formatDateTimeDMY(new Date())}</div>
+          </div>
+        </div>
+
+        <div style={{borderTop:'1px solid #ccc',paddingTop:'2.5mm',fontSize:'6.5pt',color:'#777',textAlign:'center',marginTop:'4mm'}}>
+          Computer-generated authorized consent and donation slip document. Valid across all RaktPort partner networks. • www.raktport.in
+        </div>
       </div>
     </div>
   </>,document.body);

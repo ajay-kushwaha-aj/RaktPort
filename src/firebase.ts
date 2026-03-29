@@ -29,7 +29,7 @@ const missingVars = [
 if (missingVars.length > 0) {
   console.error(
     `Missing required Firebase environment variables: ${missingVars.join(", ")}. ` +
-      "Please copy .env.example to .env and fill in the values."
+    "Please copy .env.example to .env and fill in the values."
   );
 }
 
