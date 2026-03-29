@@ -14,6 +14,8 @@ import HospitalDashboard from './components/HospitalDashboard';
 import BloodBankDashboard from './components/BloodBankDashboard';
 import AdminDashboard from './components/AdminDashboard';
 import { Button } from './components/ui/button';
+import { PWAInstallPrompt } from './components/PWAInstallPrompt';
+import { CookieConsent } from './components/CookieConsent';
 
 // --- Error Boundary to prevent blank page on runtime errors ---
 class ErrorBoundary extends React.Component<
@@ -261,6 +263,10 @@ function AppContent() {
             }
           />
         </Routes>
+
+        {/* Global overlays */}
+        <PWAInstallPrompt />
+        <CookieConsent />
       </TooltipProvider>
     </QueryClientProvider>
   );

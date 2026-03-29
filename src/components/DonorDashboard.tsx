@@ -7,7 +7,7 @@
 //   • PrintableDonation: RTID highlighted with red border
 // ═══════════════════════════════════════════════════════════════
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Button }  from './ui/button';
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from './ui/card';
@@ -735,12 +735,12 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
   // Trigger print for donation slip
   useEffect(()=>{ if(donationToPrint){const t=setTimeout(()=>window.print(),500);return()=>clearTimeout(t);} },[donationToPrint]);
 
-  // QR for booking confirm dialog
-  useEffect(()=>{
-    if(bookingConfirmOpen&&bookingDetails.qrPayload&&qrCanvasRef.current){
-      setTimeout(()=>{ if(qrCanvasRef.current) try{new QRious({element:qrCanvasRef.current,value:bookingDetails.qrPayload,size:200,foreground:'#8b0000'});}catch(_){} },80);
+  // QR for booking confirm dialog — ref callback ensures canvas is mounted
+  const confirmQrRef = useCallback((canvas: HTMLCanvasElement | null) => {
+    if (canvas && bookingDetails.qrPayload) {
+      try { new QRious({ element: canvas, value: bookingDetails.qrPayload, size: 200, foreground: '#8b0000' }); } catch (_) {}
     }
-  },[bookingConfirmOpen,bookingDetails.qrPayload]);
+  }, [bookingDetails.qrPayload]);
 
   // ── Computed ───────────────────────────────────────────────
   const lastDonationDisplay = useMemo(()=>{
@@ -880,7 +880,6 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
       toast.success('Appointment booked!',{description:`RTID: ${rtid}`});
       setBookingOpen(false);setScheduleOpen(false);
       setBookingConfirmOpen(true);
-      setTimeout(()=>window.location.reload(),1500);
     }catch(e:any){toast.error('Booking failed',{description:e.message});}
     finally{setApiLoading(false);}
   };
@@ -1483,10 +1482,10 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
           </DialogHeader>
           <div className="py-4 flex flex-col items-center gap-3 bg-gray-50 rounded-xl border border-dashed border-gray-300">
             <p className="text-xs text-gray-500 font-medium">Show this QR at the centre</p>
-            <canvas ref={qrCanvasRef} className="border-4 border-white shadow rounded-lg"/>
+            <canvas ref={confirmQrRef} className="border-4 border-white shadow rounded-lg"/>
             <p className="font-mono font-bold text-sm tracking-wider bg-white px-3 py-1 rounded border">{bookingDetails.rtid}</p>
           </div>
-          <Button className="w-full mt-2" onClick={()=>setBookingConfirmOpen(false)}>Done</Button>
+          <Button className="w-full mt-2" onClick={()=>{setBookingConfirmOpen(false);window.location.reload();}}>Done</Button>
         </DialogContent>
       </Dialog>
 
