@@ -1,7 +1,8 @@
 // src/components/SignupPage.tsx
 // Enhanced: Blood Bank inventory step, Google signup profile completion, password strength, better UX
+// Updated: @rakt username system + internal ID generation
 
-import { useState, useEffect, useCallback, useId } from 'react';
+import { useState, useEffect, useCallback, useId, useRef } from 'react';
 import {
   initRecaptcha,
   sendRegistrationOTP,
@@ -9,13 +10,18 @@ import {
   registerUserWithPhone,
   signInWithGoogle,
 } from '../lib/auth';
+import {
+  isValidUsername,
+  checkUsernameAvailable,
+  formatUsername,
+} from '../lib/identity';
 import { toast } from 'sonner';
 import {
   ArrowLeft, Eye, EyeOff, Upload, X, CheckCircle2,
   User, Mail, Phone, Lock, MapPin, Calendar, Droplet,
   FileText, Building2, Heart, Shield, AlertCircle, Loader2,
   ChevronRight, ChevronLeft, Home, Smartphone, KeyRound,
-  Package, Clock, Zap, Check, Info,
+  Package, Clock, Zap, Check, Info, AtSign,
 } from 'lucide-react';
 import logo from '../assets/raktport-logo.png';
 import type { ConfirmationResult, RecaptchaVerifier } from 'firebase/auth';
@@ -455,6 +461,7 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
   /* Form data */
   const [form, setForm] = useState({
     fullName: '', email: '', mobile: '', password: '', confirmPassword: '',
+    username: '',
     address: '', district: '', state: '', pincode: '', aadhar: '',
     bloodGroup: '', gender: '', dob: '', lastDonationDate: '',
     dontRemember: false, licenseNo: '', registrationNo: '',
@@ -462,10 +469,31 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
     inventory: Object.fromEntries(BLOOD_GROUPS.map(bg => [bg, 0])) as Record<string, number>,
     acceptTerms: false,
   });
+
   const [docs, setDocs] = useState<File[]>([]);
 
   const set = useCallback((field: string, value: unknown) =>
     setForm(prev => ({ ...prev, [field]: value })), []);
+
+  /* Username availability checking */
+  const [usernameStatus, setUsernameStatus] = useState<'idle'|'checking'|'available'|'taken'|'invalid'>('idle');
+  const usernameTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleUsernameChange = useCallback((val: string) => {
+    const clean = val.toLowerCase().replace(/[^a-z0-9.]/g, '').slice(0, 20);
+    set('username', clean);
+    if (usernameTimerRef.current) clearTimeout(usernameTimerRef.current);
+    if (!clean || clean.length < 3) { setUsernameStatus('idle'); return; }
+    const check = isValidUsername(clean);
+    if (!check.valid) { setUsernameStatus('invalid'); return; }
+    setUsernameStatus('checking');
+    usernameTimerRef.current = setTimeout(async () => {
+      try {
+        const avail = await checkUsernameAvailable(clean);
+        setUsernameStatus(avail ? 'available' : 'taken');
+      } catch { setUsernameStatus('idle'); }
+    }, 600);
+  }, [set]);
 
   /* Init reCAPTCHA */
   useEffect(() => {
@@ -589,6 +617,7 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
 
       const res = await registerUserWithPhone(form.email, form.password, {
         role, fullName: form.fullName, mobile: `+91${form.mobile}`,
+        ...(form.username && { username: form.username }),
         address: form.address, district: form.district, state: form.state, pincode: form.pincode,
         isVerified: role === 'donor',
         ...(role === 'donor'     && { aadhar: form.aadhar, bloodGroup: form.bloodGroup, gender: form.gender, dob: form.dob, lastDonationDate: form.dontRemember ? null : form.lastDonationDate, credits: 0 }),
@@ -796,6 +825,40 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                         <p className="mt-1 text-[10px] text-amber-600 font-medium flex items-center gap-1">
                           <AlertCircle className="w-3 h-3" /> {10 - form.mobile.length} more digits needed
                         </p>
+                      )}
+                    </Field>
+
+                    {/* @rakt Username */}
+                    <Field
+                      label={`Choose your @rakt username${role === 'hospital' || role === 'bloodbank' ? '' : ' (optional)'}`}
+                      required={role === 'hospital' || role === 'bloodbank'}
+                      hint="3-20 chars: lowercase letters, numbers, dots. E.g. ajay.kumar"
+                    >
+                      <div className="relative group">
+                        <AtSign className="absolute left-3 sm:left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-focus-within:text-gray-600 transition-colors pointer-events-none" />
+                        <input
+                          type="text"
+                          value={form.username}
+                          onChange={e => handleUsernameChange(e.target.value)}
+                          placeholder="yourname"
+                          maxLength={20}
+                          className="w-full pl-9 sm:pl-11 pr-24 py-3 sm:py-3.5 bg-white/60 border-2 border-gray-200 rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none transition-all text-gray-800 placeholder-gray-400 text-sm"
+                        />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-gray-400 pointer-events-none select-none">@rakt</span>
+                      </div>
+                      {/* Status indicator */}
+                      {form.username.length >= 3 && (
+                        <div className={`mt-1.5 flex items-center gap-1.5 text-[11px] font-medium ${
+                          usernameStatus === 'checking'  ? 'text-gray-500' :
+                          usernameStatus === 'available' ? 'text-green-600' :
+                          usernameStatus === 'taken'     ? 'text-red-600' :
+                          usernameStatus === 'invalid'   ? 'text-amber-600' : 'text-gray-500'
+                        }`}>
+                          {usernameStatus === 'checking'  && <><Loader2 className="w-3 h-3 animate-spin" /> Checking availability…</>}
+                          {usernameStatus === 'available' && <><CheckCircle2 className="w-3 h-3" /> <strong>{formatUsername(form.username)}</strong> is available!</>}
+                          {usernameStatus === 'taken'     && <><AlertCircle className="w-3 h-3" /> This username is taken</>}
+                          {usernameStatus === 'invalid'   && <><AlertCircle className="w-3 h-3" /> {isValidUsername(form.username).error}</>}
+                        </div>
                       )}
                     </Field>
                   </div>

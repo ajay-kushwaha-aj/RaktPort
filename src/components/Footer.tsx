@@ -160,7 +160,6 @@ export function Footer() {
               <ul style={{ listStyle:'none', margin:0, padding:0, display:'flex', flexDirection:'column', gap:10 }}>
                 {[
                   { label:'Donate Blood', href:'#' },
-                  { label:'Request Blood', href:'#' },
                   { label:'Find Blood Bank', href:'/bloodcenter.html' },
                 ].map(item => (
                   <li key={item.label}><a href={item.href} className="rp-flink">{item.label}</a></li>

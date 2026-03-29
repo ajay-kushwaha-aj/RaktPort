@@ -47,6 +47,8 @@ import {
   doc, getDoc, collection, query, where, getDocs,
   addDoc, setDoc, updateDoc, Timestamp,
 } from 'firebase/firestore';
+import { generateDonorId } from '../lib/auth';
+import { formatUsername } from '../lib/identity';
 
 // ─────────────────────────────────────────────────────────────
 // HELPERS
@@ -80,12 +82,7 @@ const formatDateTimeDMY = (d: Date | string | null | undefined): string => {
   } catch { return 'N/A'; }
 };
 
-export const generateDonorId = (): string => {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let id = 'RKT-';
-  for (let i = 0; i < 6; i++) id += chars[Math.floor(Math.random() * chars.length)];
-  return id;
-};
+// generateDonorId is now imported from '../lib/auth'
 
 const generateUniqueAppointmentRtid = async (dateStr: string): Promise<string> => {
   const d = new Date(dateStr);
@@ -146,6 +143,7 @@ interface DonorData {
   fullName?:string; bloodGroup?:string; gender?:string; lastDonationDate?:string;
   city?:string; pincode?:string; donationsCount?:number; credits?:number;
   email?:string; mobile?:string; dob?:string; donorId?:string;
+  internalId?:string; username?:string;
   availabilityMode?:'available'|'weekends'|'unavailable';
 }
 interface Donation {
@@ -294,7 +292,7 @@ const PrintableDonation = ({donation,donorData}:{donation:Donation|null;donorDat
           </div>
         </div>
         <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'4mm',marginBottom:'4mm'}}>
-          <div><div style={{fontSize:'8pt',fontWeight:'bold',color:'#8B0000',marginBottom:'2mm',borderBottom:'1px solid #ddd',paddingBottom:'1mm'}}>DONOR DETAILS</div>{[['Name',donorData.fullName],['Donor ID',donorData.donorId||'N/A'],['Blood Group',donorData.bloodGroup],['City',donorData.city]].map(([k,v])=><div key={k} style={{fontSize:'8pt',marginBottom:'1mm'}}><b>{k}:</b> {v}</div>)}</div>
+          <div><div style={{fontSize:'8pt',fontWeight:'bold',color:'#8B0000',marginBottom:'2mm',borderBottom:'1px solid #ddd',paddingBottom:'1mm'}}>DONOR DETAILS</div>{[['Name',donorData.fullName],['ID',donorData.internalId||donorData.donorId||'N/A'],['Blood Group',donorData.bloodGroup],['City',donorData.city]].map(([k,v])=><div key={k} style={{fontSize:'8pt',marginBottom:'1mm'}}><b>{k}:</b> {v}</div>)}</div>
           <div><div style={{fontSize:'8pt',fontWeight:'bold',color:'#8B0000',marginBottom:'2mm',borderBottom:'1px solid #ddd',paddingBottom:'1mm'}}>DONATION DETAILS</div>{[['Date',formatDateDMY(donation.date)],['Time',donation.time||'N/A'],['Centre',donation.hospitalName],['Component',donation.component||'Whole Blood'],['Status',donation.status]].map(([k,v])=><div key={k} style={{fontSize:'8pt',marginBottom:'1mm'}}><b>{k}:</b> {v}</div>)}</div>
         </div>
         {nextEligible&&<div style={{background:'#fff9f0',border:'1px solid #f0d0a0',borderRadius:'3mm',padding:'3mm',marginBottom:'4mm',fontSize:'8pt'}}><b>Next eligible:</b> {formatDateDMY(nextEligible)} ({donation.component||'Whole Blood'})</div>}
@@ -316,8 +314,10 @@ const CertificateModal = ({isOpen,onClose,donorData,donationHistory}:CertModalPr
   const firstDate  = completed.length>0 ? completed[completed.length-1].date : null;
   const lastDate   = completed.length>0 ? completed[0].date : null;
   const lives      = (donorData.donationsCount||0)*3;
-  const certNo     = `CERT-${donorData.donorId?.replace('RKT-','')||'XXXXXX'}-${new Date().getFullYear()}`;
-  const qrValue    = `${donorData.donorId||'N/A'}|${certNo}|${donorData.bloodGroup}|${donorData.donationsCount||0}`;
+  const displayId = donorData.internalId || donorData.donorId || 'N/A';
+  const certDonorId = donorData.internalId || donorData.donorId || 'XXXXXX';
+  const certNo     = `CERT-${certDonorId.replace(/^(DON|RKT)-/,'')}--${new Date().getFullYear()}`;
+  const qrValue    = `${displayId}|${certNo}|${donorData.bloodGroup}|${donorData.donationsCount||0}`;
 
   // Render preview QR
   useEffect(()=>{
@@ -382,7 +382,7 @@ body{font-family:Georgia,'Times New Roman',serif;background:#fff}
   <div style="font-size:9pt;color:#666;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:5mm;text-align:center">This is to certify that</div>
 
   <div style="font-size:26pt;font-weight:bold;color:#1a0505;letter-spacing:-0.01em;margin-bottom:1mm;text-align:center">${(donorData.fullName||'Donor Name').toUpperCase()}</div>
-  <div style="font-size:10pt;color:#8B0000;font-style:italic;margin-bottom:5mm;text-align:center">Donor ID: ${donorData.donorId||'RKT-XXXXXX'} &nbsp;·&nbsp; Blood Group: ${donorData.bloodGroup||'N/A'}</div>
+  <div style="font-size:10pt;color:#8B0000;font-style:italic;margin-bottom:5mm;text-align:center">ID: ${donorData.internalId || donorData.donorId || 'N/A'} &nbsp;·&nbsp; Blood Group: ${donorData.bloodGroup||'N/A'}</div>
 
   <div style="font-size:10pt;color:#444;line-height:1.7;text-align:center;max-width:200mm;margin-bottom:6mm">
     has generously donated blood <strong style="color:#8B0000">${donorData.donationsCount||0} time${(donorData.donationsCount||0)!==1?'s':''}</strong>
@@ -452,7 +452,7 @@ else{imgs.forEach(function(img){if(img.complete)tryPrint();else{img.onload=tryPr
               <p className="text-[11px] tracking-[0.2em] text-gray-500 uppercase mb-1">Certificate of Appreciation</p>
               <p className="text-[11px] text-gray-400 mb-2">This is to certify that</p>
               <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-wide">{(donorData.fullName||'Donor Name').toUpperCase()}</h2>
-              <p className="text-sm text-[#8B0000] font-medium mt-1.5 italic">Donor ID: {donorData.donorId||'RKT-XXXXXX'} &nbsp;·&nbsp; Blood Group: {donorData.bloodGroup||'N/A'}</p>
+              <p className="text-sm text-[#8B0000] font-medium mt-1.5 italic">ID: {donorData.internalId || donorData.donorId || 'N/A'} &nbsp;·&nbsp; Blood Group: {donorData.bloodGroup||'N/A'}</p>
             </div>
             <p className="text-sm text-gray-600 leading-relaxed max-w-md mx-auto">has donated blood <strong className="text-[#8B0000]">{donorData.donationsCount||0} time{(donorData.donationsCount||0)!==1?'s':''}</strong> through RaktPort, potentially saving up to <strong className="text-[#8B0000]">~{lives} lives</strong>.</p>
             <div className="flex flex-wrap justify-center gap-2">
@@ -519,7 +519,9 @@ const HealthTipsSection = ({isOpen,onClose}:{isOpen:boolean;onClose:()=>void}) =
 };
 
 const ShareCardModal = ({isOpen,onClose,donorData}:{isOpen:boolean;onClose:()=>void;donorData:DonorData}) => {
-  const text=`🩸 I'm a blood donor with RaktPort!\nDonor ID: ${donorData.donorId||'RKT-XXXXXX'} | Blood Group: ${donorData.bloodGroup}\nTotal Donations: ${donorData.donationsCount||0} | Lives Impacted: ~${(donorData.donationsCount||0)*3}\nJoin me in saving lives: raktport.in`;
+  const shareId = donorData.internalId || donorData.donorId || 'RaktPort Donor';
+  const shareUsername = donorData.username ? ` | ${formatUsername(donorData.username)}` : '';
+  const text=`🩸 I'm a blood donor with RaktPort!\nID: ${shareId}${shareUsername} | Blood Group: ${donorData.bloodGroup}\nTotal Donations: ${donorData.donationsCount||0} | Lives Impacted: ~${(donorData.donationsCount||0)*3}\nJoin me in saving lives: raktport.in`;
   const handleShare=()=>{if(navigator.share)navigator.share({title:'I am a RaktPort Donor!',text,url:'https://raktport.in'}).catch(()=>{});else{navigator.clipboard.writeText(text);toast.success('Copied to clipboard!');}};
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -530,7 +532,8 @@ const ShareCardModal = ({isOpen,onClose,donorData}:{isOpen:boolean;onClose:()=>v
           <div className="text-xl font-bold">{donorData.fullName}</div>
           <div className="text-3xl font-black text-red-200">{donorData.bloodGroup}</div>
           <div className="flex justify-center gap-6 py-2 bg-white/10 rounded-xl">{[['Donations',donorData.donationsCount||0],['Lives',`~${(donorData.donationsCount||0)*3}`]].map(([l,v])=><div key={l as string} className="text-center"><div className="text-xl font-black">{v}</div><div className="text-xs opacity-70">{l}</div></div>)}</div>
-          <div className="text-xs opacity-60">{donorData.donorId||'RKT-XXXXXX'}</div>
+          <div className="text-xs opacity-60">{donorData.internalId || donorData.donorId || 'RaktPort Donor'}</div>
+          {donorData.username && <div className="text-[10px] opacity-50 mt-0.5">{formatUsername(donorData.username)}</div>}
         </div>
         <Button className="w-full bg-primary gap-2" onClick={handleShare}><Share2 className="w-4 h-4"/> Share</Button>
       </DialogContent>
@@ -643,6 +646,8 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
             mobile:          d.mobile || 'Not Set',
             dob:             d.dob || null,
             donorId,
+            internalId:      d.internalId || undefined,
+            username:        d.username || undefined,
             availabilityMode:d.availabilityMode || 'available',
           });
           setScheduleCity(d.district || d.city || '');
@@ -972,7 +977,10 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                 Hello, {(donorData.fullName||'Donor').split(' ')[0]}! 👋
                 {donorData.bloodGroup && <span className="ml-2 bg-white/20 text-xs px-2 py-0.5 rounded-full">{donorData.bloodGroup}</span>}
               </h1>
-              <p className="text-xs text-red-200 opacity-80 truncate">{donorData.donorId||'RaktPort Donor'}</p>
+              <p className="text-xs text-red-200 opacity-80 truncate">
+                {donorData.internalId || donorData.donorId || 'RaktPort Donor'}
+                {donorData.username && <span className="ml-1.5 opacity-70">· {formatUsername(donorData.username)}</span>}
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
@@ -1302,14 +1310,16 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
             <div className="w-full sm:w-[200px] sm:flex-shrink-0 bg-gradient-to-br from-[#8B0000] to-[#5a0000] text-white p-5 flex flex-col items-center justify-center text-center">
               <div className="w-20 h-20 rounded-full border-4 border-white/30 bg-white/10 flex items-center justify-center text-3xl font-black mb-3">{initials(donorData.fullName||'D')}</div>
               <h2 className="text-lg font-bold mb-0.5">{donorData.fullName}</h2>
-              <p className="text-xs text-red-200 mb-3 font-mono">{donorData.donorId||'RKT-XXXXXX'}</p>
+              <p className="text-xs text-red-200 mb-1 font-mono">{donorData.internalId || donorData.donorId || 'N/A'}</p>
+              {donorData.username && <p className="text-xs text-red-300 mb-3">{formatUsername(donorData.username)}</p>}
+              {!donorData.username && <div className="mb-3" />}
               <div className="bg-white/10 rounded-xl p-3 w-full border border-white/10 mb-3">
                 <div className="flex justify-around">
                   <div className="text-center"><p className="text-[10px] text-red-200 uppercase">Blood</p><p className="text-2xl font-black">{donorData.bloodGroup}</p></div>
                   <div className="text-center"><p className="text-[10px] text-red-200 uppercase">Age</p><p className="text-lg font-bold">{calculateAge(donorData.dob)} yr</p></div>
                 </div>
               </div>
-              <QRCodeCanvas data={`Profile:${donorData.donorId||userId}`} size={80} className="rounded-lg bg-white p-1"/>
+              <QRCodeCanvas data={`Profile:${donorData.internalId || donorData.donorId || userId}`} size={80} className="rounded-lg bg-white p-1"/>
               <p className="text-[9px] text-red-300 mt-1.5">Scan to verify</p>
             </div>
             <div className="flex-1 bg-white p-4 overflow-y-auto">
@@ -1322,7 +1332,9 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                 <TabsContent value="overview" className="space-y-2.5">
                   {[
                     {icon:MapPin,      label:'Location',     value:`${donorData.city||'—'}${donorData.pincode?', '+donorData.pincode:''}`},
-                    {icon:BadgeCheck,  label:'Donor ID',     value:donorData.donorId||'RKT-XXXXXX'},
+                    {icon:BadgeCheck,  label:'Internal ID',  value:donorData.internalId || '—'},
+                    ...(donorData.donorId ? [{icon:BadgeCheck, label:'Legacy ID', value:donorData.donorId}] : []),
+                    ...(donorData.username ? [{icon:BadgeCheck, label:'@rakt Username', value:formatUsername(donorData.username)}] : []),
                     {icon:Mail,        label:'Email',        value:donorData.email||'—'},
                     {icon:Phone,       label:'Mobile',       value:donorData.mobile||'—'},
                     {icon:CalendarCheck,label:'Last Donation',value:lastDonationDisplay},
