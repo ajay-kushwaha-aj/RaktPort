@@ -10,7 +10,7 @@ import { AdminSignupPage } from './components/AdminSignupPage';
 import { DonorDashboard } from './components/DonorDashboard';
 
 // --- Import the dashboards with CONSISTENT DEFAULT IMPORTS ---
-import HospitalDashboard from './components/HospitalDashboard';
+import HospitalDashboard from './components/hospital/HospitalDashboard';
 import BloodBankDashboard from './components/BloodBankDashboard';
 import AdminDashboard from './components/AdminDashboard';
 import { Button } from './components/ui/button';

@@ -1,0 +1,66 @@
+// hospital/NotifDrawer.tsx
+import { Bell, BellOff, CheckCheck, Trash, X } from "lucide-react";
+import type { Notification } from "./types";
+
+export const NotifDrawer = ({
+  isOpen, notifs, onClose, onMarkRead, onMarkAllRead, onClear,
+}: {
+  isOpen: boolean; notifs: Notification[];
+  onClose: () => void; onMarkRead: (id: string) => void;
+  onMarkAllRead: () => void; onClear: () => void;
+}) => {
+  if (!isOpen) return null;
+  const unread = notifs.filter(n => !n.read).length;
+  return (
+    <>
+      <div className="fixed inset-0 bg-black/15 z-40" onClick={onClose} />
+      <div className="fixed top-[70px] right-4 w-80 max-h-[75vh] overflow-hidden z-50 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex flex-col hd-enter-sm">
+        <div className="p-4 border-b dark:border-gray-700 flex items-center justify-between flex-shrink-0">
+          <h3 className="font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2 text-sm">
+            <Bell className="w-4 h-4 text-[#8B0000]" /> Notifications
+            {unread > 0 && <span className="bg-[#8B0000] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">{unread}</span>}
+          </h3>
+          <div className="flex items-center gap-1">
+            {unread > 0 && (
+              <button onClick={onMarkAllRead} title="Mark all read"
+                className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-green-100 dark:hover:bg-green-900/30 hover:text-green-700 text-gray-500 dark:text-gray-400 flex items-center justify-center transition-colors">
+                <CheckCheck className="w-3.5 h-3.5" />
+              </button>
+            )}
+            <button onClick={onClear} title="Clear all"
+              className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 text-gray-500 dark:text-gray-400 flex items-center justify-center transition-colors">
+              <Trash className="w-3.5 h-3.5" />
+            </button>
+            <button onClick={onClose} className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center">
+              <X className="w-3.5 h-3.5 text-gray-600 dark:text-gray-300" />
+            </button>
+          </div>
+        </div>
+        <div className="overflow-y-auto flex-1 divide-y divide-gray-50 dark:divide-gray-800">
+          {notifs.length === 0 ? (
+            <div className="p-8 text-center">
+              <BellOff className="w-8 h-8 text-gray-200 dark:text-gray-700 mx-auto mb-2" />
+              <p className="text-sm text-gray-400 dark:text-gray-500">No notifications</p>
+            </div>
+          ) : notifs.map(n => (
+            <div key={n.id}
+              className={`px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-colors flex items-start gap-2 ${n.read ? "opacity-60" : ""}`}
+              onClick={() => onMarkRead(n.id)}>
+              <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${n.type === "alert" ? "bg-red-500" : n.type === "update" ? "bg-blue-500" : n.type === "system" ? "bg-gray-400" : "bg-green-500"}`} />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-gray-700 dark:text-gray-300 leading-snug">{n.message}</p>
+                <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{n.time}</p>
+              </div>
+              {!n.read && <div className="w-1.5 h-1.5 rounded-full bg-[#8B0000] mt-2 flex-shrink-0" />}
+            </div>
+          ))}
+        </div>
+        {notifs.length > 0 && (
+          <div className="p-3 border-t dark:border-gray-700 flex-shrink-0 bg-gray-50 dark:bg-gray-800/50">
+            <p className="text-[11px] text-gray-400 dark:text-gray-500 text-center">Click notification to mark as read</p>
+          </div>
+        )}
+      </div>
+    </>
+  );
+};
