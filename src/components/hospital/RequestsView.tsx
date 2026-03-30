@@ -2,7 +2,7 @@
 import { useState, useMemo } from "react";
 import {
   Search, QrCode, Copy, Trash2, Printer, ChevronDown,
-  CheckCircle2, HeartHandshake, Pencil, CopyPlus, ChevronLeft, ChevronRight, Calendar
+  HeartHandshake, Pencil, CopyPlus, ChevronLeft, ChevronRight, Calendar
 } from "lucide-react";
 // @ts-ignore
 import { BLOOD_GROUPS } from "@/lib/bloodbank-utils";
@@ -20,7 +20,6 @@ interface RequestsViewProps {
   onCopyRTID: (rtid: string) => void;
   onDelete: (id: string) => void;
   onPrint: (r: BloodRequest) => void;
-  onConfirmReceipt: (id: string, r: BloodRequest) => void;
   onNewRequest: (u: UrgencyLevel) => void;
   onMarkComplete: (r: BloodRequest) => void;
   onWhatsAppShare: (r: BloodRequest) => void;
@@ -30,7 +29,7 @@ interface RequestsViewProps {
 
 export function RequestsView({
   requests, onViewQR, onCopyRTID, onDelete, onPrint,
-  onConfirmReceipt, onNewRequest, onMarkComplete, onWhatsAppShare, onEditRequest, onDuplicate,
+  onNewRequest, onMarkComplete, onWhatsAppShare, onEditRequest, onDuplicate,
 }: RequestsViewProps) {
   const [search, setSearch] = useState("");
   const [filterBG, setFilterBG] = useState("All");
@@ -112,9 +111,8 @@ export function RequestsView({
             const uc2 = URGENCY_CONFIG[r.urgency || "Routine"]; const rem = getTimeRemaining(r);
             const pct = getValidityPct(r); const isExp = expanded === r.id;
             const fulfPct = r.unitsRequired > 0 ? ((r.unitsAdministered || 0) / r.unitsRequired) * 100 : 0;
-            const canVerify = ["REDEEMED", "PARTIAL REDEEMED"].includes(r.status);
-            const pendingAdmin = (r.unitsFulfilled || 0) - (r.unitsAdministered || 0);
-            const canComplete = pendingAdmin > 0 || ["REDEEMED", "PARTIAL REDEEMED", "HOSPITAL VERIFIED", "PARTIALLY ADMINISTERED"].includes(r.status);
+            const redeemedAvailable = Math.max(0, (r.unitsFulfilled || 0) - (r.unitsAdministered || 0));
+            const canComplete = redeemedAvailable > 0 && ["REDEEMED", "PARTIAL REDEEMED", "HOSPITAL VERIFIED", "PARTIALLY ADMINISTERED"].includes(r.status);
 
             return (
               <div key={r.id} className="hd-card overflow-hidden" style={{ animationDelay: `${i * 0.04}s` }}>
@@ -192,9 +190,7 @@ export function RequestsView({
                       {onDuplicate && (
                         <button onClick={e => { e.stopPropagation(); onDuplicate(r); }} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-white dark:bg-gray-800 border border-violet-200 dark:border-violet-800 rounded-lg hover:bg-violet-50 dark:hover:bg-violet-950/30 text-violet-700 dark:text-violet-400 transition-all"><CopyPlus className="w-3.5 h-3.5" />Duplicate</button>
                       )}
-                      {canVerify && (
-                        <button onClick={e => { e.stopPropagation(); onConfirmReceipt(r.id, r); }} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all"><CheckCircle2 className="w-3.5 h-3.5" />Confirm Receipt</button>
-                      )}
+
                       {canComplete && r.status !== "ADMINISTERED" && r.status !== "CLOSED" && (
                         <button onClick={e => { e.stopPropagation(); onMarkComplete(r); }} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all">
                           <HeartHandshake className="w-3.5 h-3.5" />

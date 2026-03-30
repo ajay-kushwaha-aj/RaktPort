@@ -22,14 +22,14 @@ export const CompleteModal = ({
   const already = request?.unitsAdministered ?? 0;
   const redeemed = request?.unitsFulfilled ?? 0;
   const required = request?.unitsRequired ?? 1;
-  const pendingRedeemed = Math.max(0, redeemed - already);
+  // STRICT: can only administer units that have been redeemed/donated
+  const maxNow = Math.max(0, redeemed - already);
   const pendingRequired = Math.max(0, required - already);
-  const maxNow = Math.max(pendingRedeemed, pendingRequired);
 
   useEffect(() => {
     if (isOpen) {
       setNotes(""); setAdministered(false); setNoReaction(false); setConsentDone(false);
-      setUnitsNow(Math.max(1, Math.min(pendingRequired, maxNow)));
+      setUnitsNow(maxNow > 0 ? Math.min(maxNow, pendingRequired || maxNow) : 0);
       setShowConfirmation(false);
     }
   }, [isOpen, maxNow, pendingRequired]);

@@ -8,7 +8,6 @@ const TIMELINE_STEPS = [
   { status: "PLEDGED", label: "Pledged", emoji: "🤝" },
   { status: "PARTIAL", label: "Donated", emoji: "🩸" },
   { status: "REDEEMED", label: "Redeemed", emoji: "✅" },
-  { status: "HOSPITAL VERIFIED", label: "Verified", emoji: "🏥" },
   { status: "ADMINISTERED", label: "Administered", emoji: "💉" },
   { status: "CLOSED", label: "Closed", emoji: "🎉" },
 ];
@@ -16,8 +15,8 @@ const TIMELINE_STEPS = [
 const STATUS_ORDER: Record<string, number> = {
   CREATED: 0, PENDING: 1, PROCESSING: 1, PLEDGED: 2,
   PARTIAL: 3, "PARTIAL REDEEMED": 4, REDEEMED: 4,
-  "HOSPITAL VERIFIED": 5, "PARTIALLY ADMINISTERED": 6,
-  ADMINISTERED: 6, CLOSED: 7, EXPIRED: -1, CANCELLED: -2,
+  "HOSPITAL VERIFIED": 5, "PARTIALLY ADMINISTERED": 5,
+  ADMINISTERED: 5, CLOSED: 6, EXPIRED: -1, CANCELLED: -2,
 };
 
 export function StatusTimeline({ request }: { request: BloodRequest }) {
@@ -27,8 +26,7 @@ export function StatusTimeline({ request }: { request: BloodRequest }) {
   const getTimestamp = (step: string): string | null => {
     switch (step) {
       case "CREATED": return request.createdAt ? `${formatDate(request.createdAt)} ${formatTime(request.createdAt)}` : null;
-      case "REDEEMED":
-      case "HOSPITAL VERIFIED": return request.redeemedAt ? `${formatDate(request.redeemedAt)} ${formatTime(request.redeemedAt)}` : null;
+      case "REDEEMED": return request.redeemedAt ? `${formatDate(request.redeemedAt)} ${formatTime(request.redeemedAt)}` : null;
       case "ADMINISTERED":
       case "CLOSED": return request.administeredAt ? `${formatDate(request.administeredAt)} ${formatTime(request.administeredAt)}` : null;
       default: return null;

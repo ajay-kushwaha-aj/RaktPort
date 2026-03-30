@@ -253,27 +253,6 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
     logAuditAction(hospitalId, hospitalData?.fullName || "Hospital", "REQUEST_CREATED", `Created ${data.urgency} request for ${data.patientName} (${data.bloodGroup}, ${data.unitsRequired}u)`, newHrtid);
   };
 
-  const handleConfirmReceipt = async (reqId: string, request: BloodRequest) => {
-    const result = await Swal.fire({
-      title: "Confirm Receipt?",
-      html: `<p style="font-size:13px;line-height:1.6">Verify blood receipt for <strong>${request.patientName}</strong> (${request.bloodGroup})?<br/><br/>Status will update to <strong>HOSPITAL VERIFIED</strong>.</p>`,
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonColor: "#16a34a",
-      confirmButtonText: "✅ Confirm Verified",
-      cancelButtonText: "Cancel",
-    });
-    if (!result.isConfirmed) return;
-    try {
-      const allDone = request.unitsAdministered >= request.unitsRequired;
-      const newStatus: RequestStatus = allDone ? "CLOSED" : "HOSPITAL VERIFIED";
-      await updateDoc(doc(db, "bloodRequests", reqId), { status: newStatus, redeemedAt: new Date().toISOString(), scannedLocation: hospitalData?.fullName || "Hospital" });
-      toast.success(`✅ Status → ${newStatus}`, { description: `${request.patientName} verified successfully` });
-      addNotif(`Receipt confirmed for ${request.patientName} · Status: ${newStatus}`, "update");
-      if (hospitalId) logAuditAction(hospitalId, hospitalData?.fullName || "Hospital", "RECEIPT_CONFIRMED", `Confirmed receipt for ${request.patientName} → ${newStatus}`, request.rtid);
-    } catch { toast.error("Failed to update status"); }
-  };
-
   const handleMarkComplete = async (reqId: string, unitsNow: number, notes: string) => {
     const r = requests.find((x: BloodRequest) => x.id === reqId);
     if (!r) return;
@@ -284,14 +263,28 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
     const newStatus: RequestStatus = allDone ? "CLOSED" : "PARTIALLY ADMINISTERED";
     const newRecord: TransfusionRecord = { recordedAt: now.toISOString(), unitsAdministered: unitsNow, notes: notes || "", administeredBy: hospitalData?.fullName || "Hospital", donorRtids: (r.donors || []).slice(0, unitsNow).map((d: DonorInfo) => d.dRtid) };
     const updatedHistory = [...(r.transfusionHistory || []), newRecord];
-    await updateDoc(doc(db, "bloodRequests", reqId), { status: newStatus, unitsAdministered: newTotal, administeredAt: now.toISOString(), administrationNotes: notes || "", administeredBy: hospitalData?.fullName || "Hospital", transfusionHistory: updatedHistory.map(h => ({ ...h })) });
+    // Single Firestore write: Verify + Administer in one shot
+    await updateDoc(doc(db, "bloodRequests", reqId), {
+      status: newStatus,
+      unitsAdministered: newTotal,
+      administeredAt: now.toISOString(),
+      administrationNotes: notes || "",
+      administeredBy: hospitalData?.fullName || "Hospital",
+      transfusionHistory: updatedHistory.map(h => ({ ...h })),
+      // Hospital Verified fields (combined into same write)
+      redeemedAt: r.redeemedAt || now.toISOString(),
+      scannedLocation: hospitalData?.fullName || "Hospital",
+      hospitalVerified: true,
+      hospitalVerifiedAt: now.toISOString(),
+    });
+    // Update all linked donor/donation records
     const donorUpdatePayload = { administeredAt: now.toISOString(), rtidStatus: allDone ? "ADMINISTERED" : "PARTIALLY ADMINISTERED", patientAdministered: r.patientName, hospitalAdministered: hospitalData?.fullName || "Hospital" };
     if (r.donors && r.donors.length > 0) { await Promise.all(r.donors.map(async (donor: DonorInfo) => { try { const donQ = await getDocs(query(collection(db, "donations"), where("rtidCode", "==", donor.dRtid))); donQ.forEach(async donDoc => { await updateDoc(donDoc.ref, donorUpdatePayload); }); } catch (_) { } })); }
     try { const byHrtid = await getDocs(query(collection(db, "donations"), where("linkedHrtid", "==", r.rtid))); byHrtid.forEach(async d => { await updateDoc(d.ref, donorUpdatePayload); }); } catch (_) { }
-    const label = allDone ? "All units administered — request CLOSED" : `${unitsNow} unit(s) administered (${newTotal}/${r.unitsRequired} total)`;
-    toast.success(label, { description: "Blood Bank & Donor dashboards updated in real time" });
-    addNotif(`${newTotal}/${r.unitsRequired} units administered for ${r.patientName} · RTID ${r.rtid}`, "update");
-    if (hospitalId) logAuditAction(hospitalId, hospitalData?.fullName || "Hospital", "BLOOD_ADMINISTERED", `${unitsNow}u administered to ${r.patientName} (${newTotal}/${r.unitsRequired} total)`, r.rtid);
+    const label = allDone ? "✅ All units administered — request CLOSED" : `💉 ${unitsNow} unit(s) verified & administered (${newTotal}/${r.unitsRequired} total)`;
+    toast.success(label, { description: "Status, Donor & Blood Bank dashboards updated" });
+    addNotif(`${newTotal}/${r.unitsRequired} units verified & administered for ${r.patientName} · RTID ${r.rtid}`, "update");
+    if (hospitalId) logAuditAction(hospitalId, hospitalData?.fullName || "Hospital", "BLOOD_ADMINISTERED", `Verified & administered ${unitsNow}u to ${r.patientName} (${newTotal}/${r.unitsRequired} total)`, r.rtid);
   };
 
   const handleDelete = (id: string) => {
@@ -434,7 +427,7 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
                   <PremiumDashboard requests={requests} hospitalData={hospitalData} kpis={kpis}
                     onNewRequest={openNewRequest} onViewQR={(r: BloodRequest) => { setSelectedRequest(r); setIsQRModalOpen(true); }}
                     onDelete={handleDelete} onPrint={handlePrint}
-                    onConfirmReceipt={handleConfirmReceipt} onMarkComplete={openComplete}
+                    onMarkComplete={openComplete}
                     onWhatsAppShare={handleWhatsAppShare} onExportCSV={handleExportCSV} />
                 )}
                 {activeTab === "requests" && (
@@ -442,7 +435,7 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
                     onViewQR={(r: BloodRequest) => { setSelectedRequest(r); setIsQRModalOpen(true); }}
                     onCopyRTID={(rtid: string) => { navigator.clipboard.writeText(rtid).catch(() => { }); toast.success("RTID copied!"); }}
                     onDelete={handleDelete} onPrint={handlePrint}
-                    onConfirmReceipt={handleConfirmReceipt} onNewRequest={openNewRequest}
+                    onNewRequest={openNewRequest}
                     onMarkComplete={openComplete} onWhatsAppShare={handleWhatsAppShare}
                     onEditRequest={handleEditRequest} onDuplicate={handleDuplicate} />
                 )}

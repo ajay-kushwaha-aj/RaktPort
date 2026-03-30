@@ -18,7 +18,6 @@ interface PremiumDashboardProps {
   onViewQR: (r: BloodRequest) => void;
   onDelete: (id: string) => void;
   onPrint: (r: BloodRequest) => void;
-  onConfirmReceipt: (id: string, r: BloodRequest) => void;
   onMarkComplete: (r: BloodRequest) => void;
   onWhatsAppShare: (r: BloodRequest) => void;
   onExportCSV: () => void;
@@ -26,7 +25,7 @@ interface PremiumDashboardProps {
 
 export function PremiumDashboard({
   requests, hospitalData, kpis, onNewRequest, onViewQR, onDelete, onPrint,
-  onConfirmReceipt, onMarkComplete, onWhatsAppShare, onExportCSV,
+  onMarkComplete, onWhatsAppShare, onExportCSV,
 }: PremiumDashboardProps) {
   const now = new Date();
   const hour = now.getHours();
