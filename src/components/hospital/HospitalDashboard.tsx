@@ -254,13 +254,24 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
   };
 
   const handleConfirmReceipt = async (reqId: string, request: BloodRequest) => {
+    const result = await Swal.fire({
+      title: "Confirm Receipt?",
+      html: `<p style="font-size:13px;line-height:1.6">Verify blood receipt for <strong>${request.patientName}</strong> (${request.bloodGroup})?<br/><br/>Status will update to <strong>HOSPITAL VERIFIED</strong>.</p>`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#16a34a",
+      confirmButtonText: "✅ Confirm Verified",
+      cancelButtonText: "Cancel",
+    });
+    if (!result.isConfirmed) return;
     try {
       const allDone = request.unitsAdministered >= request.unitsRequired;
       const newStatus: RequestStatus = allDone ? "CLOSED" : "HOSPITAL VERIFIED";
       await updateDoc(doc(db, "bloodRequests", reqId), { status: newStatus, redeemedAt: new Date().toISOString(), scannedLocation: hospitalData?.fullName || "Hospital" });
-      toast.success(`Status → ${newStatus}`);
+      toast.success(`✅ Status → ${newStatus}`, { description: `${request.patientName} verified successfully` });
+      addNotif(`Receipt confirmed for ${request.patientName} · Status: ${newStatus}`, "update");
       if (hospitalId) logAuditAction(hospitalId, hospitalData?.fullName || "Hospital", "RECEIPT_CONFIRMED", `Confirmed receipt for ${request.patientName} → ${newStatus}`, request.rtid);
-    } catch { toast.error("Failed to update"); }
+    } catch { toast.error("Failed to update status"); }
   };
 
   const handleMarkComplete = async (reqId: string, unitsNow: number, notes: string) => {

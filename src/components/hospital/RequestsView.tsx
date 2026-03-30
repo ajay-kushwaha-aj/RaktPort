@@ -112,7 +112,7 @@ export function RequestsView({
             const uc2 = URGENCY_CONFIG[r.urgency || "Routine"]; const rem = getTimeRemaining(r);
             const pct = getValidityPct(r); const isExp = expanded === r.id;
             const fulfPct = r.unitsRequired > 0 ? ((r.unitsAdministered || 0) / r.unitsRequired) * 100 : 0;
-            const canVerify = ["REDEEMED", "PARTIAL REDEEMED", "HOSPITAL VERIFIED"].includes(r.status);
+            const canVerify = ["REDEEMED", "PARTIAL REDEEMED"].includes(r.status);
             const pendingAdmin = (r.unitsFulfilled || 0) - (r.unitsAdministered || 0);
             const canComplete = pendingAdmin > 0 || ["REDEEMED", "PARTIAL REDEEMED", "HOSPITAL VERIFIED", "PARTIALLY ADMINISTERED"].includes(r.status);
 

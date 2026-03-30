@@ -1,5 +1,4 @@
-// hospital/StatusTimeline.tsx — Visual status timeline for blood requests (Phase 2)
-import { CheckCircle2, Circle, Clock } from "lucide-react";
+// hospital/StatusTimeline.tsx — Horizontal status timeline with modern animation
 import { formatDate, formatTime } from "./utils";
 import type { BloodRequest } from "./types";
 
@@ -7,7 +6,7 @@ const TIMELINE_STEPS = [
   { status: "CREATED", label: "Created", emoji: "📝" },
   { status: "PENDING", label: "Pending", emoji: "⏳" },
   { status: "PLEDGED", label: "Pledged", emoji: "🤝" },
-  { status: "PARTIAL", label: "Partial Donated", emoji: "🩸" },
+  { status: "PARTIAL", label: "Donated", emoji: "🩸" },
   { status: "REDEEMED", label: "Redeemed", emoji: "✅" },
   { status: "HOSPITAL VERIFIED", label: "Verified", emoji: "🏥" },
   { status: "ADMINISTERED", label: "Administered", emoji: "💉" },
@@ -48,58 +47,74 @@ export function StatusTimeline({ request }: { request: BloodRequest }) {
         </div>
       )}
 
-      <div className="relative">
-        {TIMELINE_STEPS.map((step, i) => {
-          const stepOrder = STATUS_ORDER[step.status] ?? i;
-          const isCompleted = !isTerminal && currentOrder >= stepOrder;
-          const isCurrent = !isTerminal && currentOrder === stepOrder;
-          const timestamp = isCompleted ? getTimestamp(step.status) : null;
+      {/* Horizontal Timeline */}
+      <div className="overflow-x-auto pb-1 -mx-1 px-1">
+        <div className="flex items-start min-w-0" style={{ minWidth: "520px" }}>
+          {TIMELINE_STEPS.map((step, i) => {
+            const stepOrder = STATUS_ORDER[step.status] ?? i;
+            const isCompleted = !isTerminal && currentOrder >= stepOrder;
+            const isCurrent = !isTerminal && currentOrder === stepOrder;
+            const isPast = isCompleted && !isCurrent;
+            const timestamp = isCompleted ? getTimestamp(step.status) : null;
 
-          return (
-            <div key={step.status} className="flex items-start gap-3 relative" style={{ minHeight: "36px" }}>
-              {/* Line connector */}
-              {i < TIMELINE_STEPS.length - 1 && (
-                <div
-                  className="absolute left-[11px] top-[22px] w-0.5 transition-colors duration-300"
-                  style={{
-                    height: "calc(100% - 10px)",
-                    background: isCompleted && !isCurrent ? "#22c55e" : "var(--hd-border)",
-                  }}
-                />
-              )}
-              {/* Circle / Check */}
-              <div className="relative z-10 flex-shrink-0 mt-0.5">
-                {isCompleted && !isCurrent ? (
-                  <CheckCircle2 className="w-[22px] h-[22px] text-green-500" />
-                ) : isCurrent ? (
-                  <div className="w-[22px] h-[22px] rounded-full bg-[#8B0000] flex items-center justify-center shadow-md" style={{ boxShadow: "0 0 0 3px rgba(139,0,0,0.15)" }}>
-                    <Clock className="w-3 h-3 text-white" />
+            return (
+              <div key={step.status} className="flex items-start flex-1 min-w-0 relative group">
+                {/* Connector line BEFORE the node (not on first) */}
+                {i > 0 && (
+                  <div className="absolute top-[13px] right-1/2 h-[3px] w-full -translate-x-0"
+                    style={{ left: "-50%", width: "100%" }}>
+                    <div
+                      className="h-full rounded-full transition-all duration-500"
+                      style={{
+                        background: isPast || isCurrent
+                          ? "linear-gradient(90deg, #22c55e, #16a34a)"
+                          : "var(--hd-border, #e5e7eb)",
+                        width: isPast || isCurrent ? "100%" : "100%",
+                        opacity: isPast || isCurrent ? 1 : 0.4,
+                      }}
+                    />
                   </div>
-                ) : (
-                  <Circle className="w-[22px] h-[22px] text-gray-300 dark:text-gray-600" />
                 )}
-              </div>
-              {/* Label */}
-              <div className="flex-1 pb-2">
-                <div className="flex items-center gap-2">
-                  <span className={`text-xs font-semibold ${
-                    isCurrent ? "text-[#8B0000] dark:text-red-400" :
-                    isCompleted ? "text-gray-800 dark:text-gray-200" :
-                    "text-gray-400 dark:text-gray-600"
+                {/* Node + Label column */}
+                <div className="flex flex-col items-center w-full relative z-10">
+                  {/* Circle node */}
+                  <div
+                    className={`w-[28px] h-[28px] rounded-full flex items-center justify-center text-[11px] font-bold transition-all duration-400 flex-shrink-0 ${
+                      isCurrent
+                        ? "bg-[#8B0000] text-white shadow-lg ring-[3px] ring-[#8B0000]/20 scale-110"
+                        : isPast
+                        ? "bg-green-500 text-white shadow-sm"
+                        : "bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-600 border-2 border-gray-200 dark:border-gray-700"
+                    }`}
+                    style={isCurrent ? { animation: "pulse 2s ease-in-out infinite" } : {}}
+                  >
+                    {isPast ? "✓" : isCurrent ? "●" : (i + 1)}
+                  </div>
+                  {/* Label */}
+                  <p className={`text-[10px] font-semibold mt-1.5 text-center leading-tight whitespace-nowrap ${
+                    isCurrent ? "text-[#8B0000] dark:text-red-400"
+                    : isPast ? "text-green-700 dark:text-green-400"
+                    : "text-gray-400 dark:text-gray-600"
                   }`}>
-                    {step.emoji} {step.label}
-                  </span>
+                    {step.label}
+                  </p>
+                  {/* Current badge */}
                   {isCurrent && (
-                    <span className="text-[9px] font-bold bg-[#8B0000] text-white px-1.5 py-0.5 rounded-full">CURRENT</span>
+                    <span className="text-[8px] font-extrabold bg-[#8B0000] text-white px-1.5 py-0.5 rounded-full mt-0.5 tracking-wide animate-pulse">
+                      NOW
+                    </span>
+                  )}
+                  {/* Timestamp */}
+                  {timestamp && (
+                    <p className="text-[8px] text-gray-400 dark:text-gray-500 mt-0.5 text-center leading-tight whitespace-nowrap">
+                      {timestamp}
+                    </p>
                   )}
                 </div>
-                {timestamp && (
-                  <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{timestamp}</p>
-                )}
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </div>
   );
