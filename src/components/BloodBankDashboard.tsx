@@ -848,8 +848,9 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
         }
       }
       if (!reqData) throw new Error('Blood request not found.');
+      
+      let donRef: any=null, donData: any=null;
       if (dRtid) {
-        let donRef: any=null, donData: any=null;
         let donSnap = await getDoc(doc(db,'donations',dRtid));
         if (donSnap.exists()){donRef=donSnap.ref;donData=donSnap.data();}
         else {
@@ -860,6 +861,49 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
         if (!donData) throw new Error('Donation not found.');
         if (!['AVAILABLE','Donated'].includes(donData.status)) throw new Error(`Donation not available. Status: ${donData.status}`);
         if (donData.otp && donData.otp!==otp) throw new Error('Invalid OTP.');
+      }
+
+      setActionLoading(false);
+
+      const confirmText = donData 
+        ? `<div class="text-left text-sm space-y-3 mt-4">
+             <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
+               <p class="text-xs text-gray-500 uppercase font-bold mb-1">Patient Info</p>
+               <p class="font-bold text-gray-800">${reqData.patientName}</p>
+               <p class="text-xs text-gray-600 mt-1">Hospital: ${reqData.hospitalName || bloodBankData?.fullName || 'Hospital'}</p>
+               <p class="text-xs text-gray-600">Request: <span class="font-bold text-red-600">${reqData.bloodGroup}</span></p>
+             </div>
+             <div class="bg-blue-50 p-3 rounded-lg border border-blue-200">
+               <p class="text-xs text-blue-600/70 uppercase font-bold mb-1">Donor Source</p>
+               <p class="font-bold text-blue-900">${donData.donorName || 'Anonymous'}</p>
+               <p class="text-xs text-blue-700 mt-1">D-RTID: <span class="font-mono">${donData.dRtid || donData.rtid}</span></p>
+               <p class="text-xs text-blue-700">Donated: <span class="font-bold text-red-600">${donData.bloodGroup}</span></p>
+             </div>
+           </div>`
+        : `<div class="text-left text-sm space-y-3 mt-4">
+             <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
+               <p class="text-xs text-gray-500 uppercase font-bold mb-1">Patient Info</p>
+               <p class="font-bold text-gray-800">${reqData.patientName}</p>
+               <p class="text-xs text-gray-600 mt-1">Hospital: ${reqData.hospitalName || bloodBankData?.fullName || 'Hospital'}</p>
+             </div>
+           </div>`;
+
+      const result = await Swal.fire({
+        title: 'Confirm Redemption',
+        html: confirmText,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#10b981',
+        cancelButtonColor: '#d1d5db',
+        confirmButtonText: 'Yes, Complete Transfer',
+        cancelButtonText: 'Cancel'
+      });
+
+      if (!result.isConfirmed) return;
+
+      setActionLoading(true);
+
+      if (donData) {
         await updateDoc(donRef,{status:'REDEEMED',hRtid,linkedHrtid:hRtid,redemptionDate:Timestamp.now(),redeemedAt:Timestamp.now(),patientName:reqData.patientName||'Patient',hospitalName:reqData.hospitalName||bloodBankData?.fullName||'Hospital',linkedDate:Timestamp.now(),usedDate:Timestamp.now()});
         const bg = donData.bloodGroup as BloodGroup;
         const cbi = inventory && inventory[bg] ? inventory[bg] : {total:0,available:0};

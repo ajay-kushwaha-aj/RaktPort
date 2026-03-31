@@ -1051,9 +1051,9 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
           <div className="flex items-center gap-3 min-w-0">
             <img src={logo} alt="RaktPort" className="w-10 h-10 rounded-full border-2 border-white/40 shadow flex-shrink-0"/>
             <div className="min-w-0">
-              <h1 className="text-base sm:text-lg font-bold leading-tight truncate">
-                Hello, {(donorData.fullName||'Donor').split(' ')[0]}! 👋
-                {donorData.bloodGroup && <span className="ml-2 bg-white/20 text-xs px-2 py-0.5 rounded-full">{donorData.bloodGroup}</span>}
+              <h1 className="text-base sm:text-lg font-bold leading-tight flex flex-wrap items-center gap-1.5">
+                <span className="truncate max-w-[150px] sm:max-w-[300px]">Hello, {(donorData.fullName||'Donor').split(' ')[0]}! 👋</span>
+                {donorData.bloodGroup && <span className="bg-white/20 text-xs px-2 py-0.5 rounded-full flex-shrink-0">{donorData.bloodGroup}</span>}
               </h1>
               <p className="text-xs text-red-200 opacity-80 truncate">
                 {donorData.internalId || donorData.donorId || 'RaktPort Donor'}
@@ -1289,8 +1289,8 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                       {/* Wider columns so RTID fits */}
                       <TableHead className="text-xs font-semibold px-3 py-2 min-w-[110px]">Date</TableHead>
                       <TableHead className="text-xs font-semibold px-3 py-2 min-w-[200px]">D-RTID</TableHead>
-                      <TableHead className="text-xs font-semibold px-3 py-2 hidden sm:table-cell min-w-[120px]">Component</TableHead>
-                      <TableHead className="text-xs font-semibold px-3 py-2 hidden md:table-cell">OTP</TableHead>
+                      <TableHead className="text-xs font-semibold px-3 py-2 min-w-[120px]">Component</TableHead>
+                      <TableHead className="text-xs font-semibold px-3 py-2 min-w-[100px]">OTP</TableHead>
                       <TableHead className="text-xs font-semibold px-3 py-2 min-w-[100px]">Status</TableHead>
                       <TableHead className="text-xs font-semibold px-3 py-2 text-right min-w-[130px]">Actions</TableHead>
                     </TableRow>
@@ -1301,13 +1301,13 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                       const isFuture=r.date.getTime()>Date.now();
                       const isUpcoming=canCancel;
                       return (
-                        <TableRow key={i} className={`hover:bg-gray-50 transition-colors ${isUpcoming?'bg-blue-50/40 border-l-2 border-l-blue-400':''}`}>
+                        <TableRow key={i} className={`hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors ${isUpcoming?'bg-blue-50/40 dark:bg-blue-900/20 border-l-2 border-l-blue-400 dark:border-l-blue-500':''}`}>
 
                           {/* Date */}
                           <TableCell className="px-3 py-2.5">
                             <div>
-                              <p className="text-xs font-semibold text-gray-800">{formatDateDMY(r.date)}</p>
-                              {r.time&&<p className="text-[10px] text-gray-400">{r.time}</p>}
+                              <p className="text-xs font-semibold text-gray-800 dark:text-gray-200">{formatDateDMY(r.date)}</p>
+                              {r.time&&<p className="text-[10px] text-gray-400 dark:text-gray-500">{r.time}</p>}
                               {canCancel&&isFuture&&<CountdownTimer targetDate={r.date} compact label="In"/>}
                             </div>
                           </TableCell>
@@ -1331,12 +1331,12 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                           </TableCell>
 
                           {/* Component */}
-                          <TableCell className="px-3 py-2.5 hidden sm:table-cell">
+                          <TableCell className="px-3 py-2.5">
                             {r.component&&<ComponentBadge component={r.component}/>}
                           </TableCell>
 
                           {/* OTP */}
-                          <TableCell className="px-3 py-2.5 hidden md:table-cell">
+                          <TableCell className="px-3 py-2.5">
                             {['Donated','Verified'].includes(r.status)?(
                               <div className="flex items-center gap-1 text-green-700 font-bold text-xs bg-green-50 px-1.5 py-0.5 rounded w-fit">
                                 <KeyRound className="w-2.5 h-2.5"/> {r.otp}
