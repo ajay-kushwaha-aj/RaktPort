@@ -125,6 +125,17 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
           font-family:'Plus Jakarta Sans',sans-serif; text-decoration:none;
         }
         .rph-mob:hover { color:white; background:rgba(255,255,255,0.1); }
+
+        /* ══════ DARK MODE ══════ */
+        .dark .rph-brand-bar { background:#1a1a1a !important; border-color:#2a2a2a !important; }
+        .dark .rph-brand { color:#ff6b6b !important; }
+        .dark .rph-tagline { color:#9a8a82 !important; }
+        .dark .rph-lang { background:#2a2a2a !important; border-color:#3a3a3a !important; color:#c0a8a0 !important; }
+        .dark .rph-lang:hover { border-color:#8B0000 !important; color:#ff6b6b !important; }
+        .dark .rph-mwrap { background:#1c1a14 !important; border-color:#3a3520 !important; }
+        .dark .rph-mtrack { color:#b89a30 !important; }
+        .dark .rph-logo-wrap { border-color:#2a2a2a !important; background:#1a1a1a !important; }
+        .dark .rph-hamburger { border-color:#3a3a3a !important; color:#c0392b !important; background:#1e1e1e !important; }
       `}</style>
 
       <header className="rph" style={{ position:'sticky', top:0, zIndex:50, boxShadow:'0 2px 12px rgba(0,0,0,0.1)' }}>
@@ -135,12 +146,12 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
         </div>
 
         {/* ─ Brand bar ─ */}
-        <div style={{ background:'white', borderBottom:'1px solid #ede5e0' }}>
+        <div className="rph-brand-bar" style={{ background:'white', borderBottom:'1px solid #ede5e0' }}>
           <div className="container mx-auto" style={{ padding:'10px 16px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:12 }}>
 
             {/* Logo + Name */}
             <div style={{ display:'flex', alignItems:'center', gap:12, minWidth:0 }}>
-              <div style={{ width:44, height:44, borderRadius:12, overflow:'hidden', border:'1.5px solid #f0e4e0', boxShadow:'0 2px 8px rgba(0,0,0,0.07)', background:'white', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+              <div className="rph-logo-wrap" style={{ width:44, height:44, borderRadius:12, overflow:'hidden', border:'1.5px solid #f0e4e0', boxShadow:'0 2px 8px rgba(0,0,0,0.07)', background:'white', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
                 <img src={raktportLogo} alt="RaktPort" style={{ width:'100%', height:'100%', objectFit:'contain' }} />
               </div>
               <div style={{ minWidth:0 }}>
@@ -158,6 +169,7 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
               <ModeToggle />
               {isMobile && (
                 <button
+                  className="rph-hamburger"
                   onClick={() => setMobileMenuOpen(v => !v)}
                   aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
                   aria-expanded={mobileMenuOpen}
