@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 import logo from '../../assets/raktport-logo.png';
+import { db } from '../../firebase';
 import {
   collection, query, where, getDocs, addDoc, deleteDoc,
   doc, getDoc, updateDoc, onSnapshot
