@@ -10,11 +10,11 @@ import {
 } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 import logo from '../../assets/raktport-logo.png';
-import { db } from '../../firebase';
 import {
   collection, query, where, getDocs, addDoc, deleteDoc,
   doc, getDoc, updateDoc, onSnapshot
 } from 'firebase/firestore';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 // @ts-ignore
 import { BLOOD_GROUPS, generateRtid } from "@/lib/bloodbank-utils";
 
@@ -67,7 +67,10 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const [duplicateSource, setDuplicateSource] = useState<BloodRequest | null>(null);
 
-  const hospitalId = localStorage.getItem("userId");
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  // Resolve hospitalId: try localStorage first, then Firebase Auth uid
+  const [hospitalId, setHospitalId] = useState<string | null>(() => localStorage.getItem("userId") || localStorage.getItem("userUid") || null);
 
   /* CSV export */
   const handleExportCSV = useCallback(() => {
@@ -89,12 +92,12 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
   }, [hospitalData]);
 
-  /* Refresh — no full page reload */
+  /* Refresh — re-subscribe to Firestore listener */
   const handleRefresh = useCallback(() => {
-    setLoading(true);
-    setRequests([]);
-    setTabKey((k: number) => k + 1);
-    setTimeout(() => setLoading(false), 1000);
+    // Bump refreshKey to cause the useEffect to detach & re-attach the onSnapshot listener 
+    // without wiping the dashboard via setLoading(true)
+    setRefreshKey((k: number) => k + 1);
+    toast.info("Refreshing data...");
   }, []);
 
   /* Print helper */
@@ -129,83 +132,105 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
     return () => window.removeEventListener("keydown", handler);
   }, []);
 
-  /* Real-time listener */
+  /* Real-time listener — re-runs when hospitalId or refreshKey changes */
   useEffect(() => {
-    if (!hospitalId) { toast.error("Not logged in."); return; }
-    getDoc(doc(db, "users", hospitalId)).then(snap => { if (snap.exists()) setHospitalData(snap.data()); });
-    setLoading(true);
-    const q = query(collection(db, "bloodRequests"), where("hospitalId", "==", hospitalId));
-    const unsub = onSnapshot(q, async (snap) => {
-      try {
-        const rtids = snap.docs.map(d => d.data().rtid || d.data().linkedRTID).filter(Boolean);
-        let allLinkedDonations: any[] = [];
-        if (rtids.length > 0) {
-          for (let i = 0; i < rtids.length; i += 10) {
-            try {
-              const batch = rtids.slice(i, i + 10);
-              const ds = await getDocs(query(collection(db, "donations"), where("linkedHrtid", "in", batch)));
-              allLinkedDonations.push(...ds.docs.map(d => ({ ...d.data(), _docId: d.id })));
-            } catch (_) { }
-          }
-        }
-        const fetched: BloodRequest[] = [];
-        snap.forEach(d => {
-          const data = d.data();
-          const linkedDonors: DonorInfo[] = allLinkedDonations
-            .filter((ld: any) => ld.linkedHrtid === data.linkedRTID || ld.linkedHrtid === data.rtid)
-            .map((ld: any) => ({ dRtid: ld.rtidCode || ld.rtid || "N/A", name: ld.donorName || "Anonymous", date: parseTimestamp(ld.date).toISOString(), units: parseInt(ld.units) || 1, redeemed: ld.rtidStatus === "REDEEMED" || ld.status === "REDEEMED" || ld.redeemed || false, administered: ld.rtidStatus === "ADMINISTERED" || ld.status === "ADMINISTERED" || ld.administered || false, administeredAt: ld.administeredAt || undefined }));
-          const raw = data.urgency as string;
-          const u: UrgencyLevel = raw === "Critical" || raw === "Emergency" ? "Emergency" : raw === "High" || raw === "Urgent" ? "Urgent" : "Routine";
-          const fulfilledFromDoc = (data.fulfilled != null && data.fulfilled !== "" && data.fulfilled !== "0") ? parseInt(data.fulfilled) : 0;
-          const fulfilledFromDonors = linkedDonors.reduce((s: number, ld: DonorInfo) => s + (ld.redeemed || ld.administered ? ld.units || 1 : 0), 0);
-          const unitsFulfilledFromReqField = data.unitsFulfilled ? parseInt(data.unitsFulfilled) : 0;
-          const unitsFulfilled = Math.max(fulfilledFromDoc, fulfilledFromDonors, unitsFulfilledFromReqField);
-          const unitsAdministered = data.unitsAdministered ? parseInt(data.unitsAdministered) : linkedDonors.reduce((s: number, ld: DonorInfo) => s + (ld.administered ? ld.units || 1 : 0), 0);
-          let status = data.status as RequestStatus;
-          const required = parseInt(data.units) || 0;
-          if (!["EXPIRED", "CANCELLED", "CREATED", "PENDING", "CLOSED"].includes(status)) {
-            if (unitsAdministered >= required && required > 0) status = "CLOSED";
-            else if (unitsAdministered > 0 && unitsAdministered < required) status = "PARTIALLY ADMINISTERED";
-            else if (unitsFulfilled >= required && required > 0 && unitsAdministered === 0) status = "REDEEMED";
-            else if (unitsFulfilled > 0 && unitsFulfilled < required) status = "PARTIAL";
-          }
-          fetched.push({
-            id: d.id, rtid: data.linkedRTID || data.rtid, serialNumber: data.serialNumber,
-            patientName: data.patientName, bloodGroup: data.bloodGroup,
-            componentType: data.componentType, transfusionIndication: data.transfusionIndication,
-            unitsRequired: required, unitsFulfilled, unitsAdministered,
-            requiredBy: parseTimestamp(data.requiredBy), status,
-            city: data.city, createdAt: parseTimestamp(data.createdAt),
-            patientMobile: data.patientMobile, patientAadhaar: data.patientAadhaar, pincode: data.pincode,
-            age: data.age ? parseInt(data.age) : undefined, urgency: u,
-            donors: linkedDonors, doctorName: data.doctorName, doctorRegNo: data.doctorRegNo,
-            wardDepartment: data.wardDepartment, bedNumber: data.bedNumber,
-            validityHours: data.validityHours || URGENCY_CONFIG[u].validityHours,
-            scannedAt: data.scannedAt, scannedLocation: data.scannedLocation,
-            redeemedAt: data.redeemedAt ? parseTimestamp(data.redeemedAt) : undefined,
-            administeredAt: data.administeredAt ? parseTimestamp(data.administeredAt) : undefined,
-            generatedBy: data.generatedBy, systemVersion: data.systemVersion,
-            transfusionHistory: (data.transfusionHistory || []) as TransfusionRecord[],
-          });
-        });
-        fetched.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-        // Auto-expire
-        const toExpire: string[] = [];
-        fetched.forEach(r => {
-          if (r.validityHours && r.createdAt) {
-            const valid = new Date(r.createdAt.getTime() + r.validityHours * 3600000);
-            if (new Date() > valid && !["REDEEMED", "HOSPITAL VERIFIED", "ADMINISTERED", "PARTIALLY ADMINISTERED", "CLOSED", "EXPIRED", "CANCELLED"].includes(r.status)) {
-              toExpire.push(r.id); r.status = "EXPIRED";
+    const auth = getAuth();
+    let unsubDocs = () => {};
+
+    const unsubAuth = onAuthStateChanged(auth, async (user) => {
+      unsubDocs(); // clear any previous sub
+      const resolvedId = user?.uid || hospitalId || localStorage.getItem("userId") || localStorage.getItem("userUid");
+      
+      if (resolvedId && resolvedId !== hospitalId) setHospitalId(resolvedId);
+      if (!resolvedId) { toast.error("Not logged in."); setLoading(false); return; }
+      
+      getDoc(doc(db, "users", resolvedId)).then(snap => { if (snap.exists()) setHospitalData(snap.data()); });
+      
+      const q = query(collection(db, "bloodRequests"), where("hospitalId", "==", resolvedId));
+      unsubDocs = onSnapshot(q, async (snap) => {
+        try {
+          const rtids = snap.docs.map(d => d.data().rtid || d.data().linkedRTID).filter(Boolean);
+          let allLinkedDonations: any[] = [];
+          
+          if (rtids.length > 0) {
+            const uniqueRtids = Array.from(new Set(rtids));
+            for (let i = 0; i < uniqueRtids.length; i += 10) {
+              try {
+                const batch = uniqueRtids.slice(i, i + 10);
+                const ds = await getDocs(query(collection(db, "donations"), where("linkedHrtid", "in", batch)));
+                allLinkedDonations.push(...ds.docs.map(d => ({ ...d.data(), _docId: d.id })));
+              } catch (_) { }
             }
           }
-        });
-        if (toExpire.length > 0) await Promise.all(toExpire.map(id => updateDoc(doc(db, "bloodRequests", id), { status: "EXPIRED" }).catch(() => { })));
-        setRequests(fetched);
-      } catch (err: any) { toast.error("Real-time sync error", { description: err?.message }); }
-      finally { setLoading(false); }
-    }, () => { toast.error("Failed to connect to database"); setLoading(false); });
-    return () => unsub();
-  }, [hospitalId]);
+          const fetched: BloodRequest[] = [];
+          snap.forEach(d => {
+            const data = d.data();
+            const linkedDonors: DonorInfo[] = allLinkedDonations
+              .filter((ld: any) => ld.linkedHrtid === data.linkedRTID || ld.linkedHrtid === data.rtid)
+              .map((ld: any) => ({ dRtid: ld.rtidCode || ld.rtid || "N/A", name: ld.donorName || "Anonymous", date: parseTimestamp(ld.date).toISOString(), units: parseInt(ld.units) || 1, redeemed: ld.rtidStatus === "REDEEMED" || ld.status === "REDEEMED" || ld.redeemed || false, administered: ld.rtidStatus === "ADMINISTERED" || ld.status === "ADMINISTERED" || ld.administered || false, administeredAt: ld.administeredAt || undefined }));
+            const raw = data.urgency as string;
+            const u: UrgencyLevel = raw === "Critical" || raw === "Emergency" ? "Emergency" : raw === "High" || raw === "Urgent" ? "Urgent" : "Routine";
+            const fulfilledFromDoc = (data.fulfilled != null && data.fulfilled !== "" && data.fulfilled !== "0") ? parseInt(data.fulfilled) : 0;
+            const fulfilledFromDonors = linkedDonors.reduce((s: number, ld: DonorInfo) => s + (ld.redeemed || ld.administered ? ld.units || 1 : 0), 0);
+            const unitsFulfilledFromReqField = data.unitsFulfilled ? parseInt(data.unitsFulfilled) : 0;
+            const unitsFulfilled = Math.max(fulfilledFromDoc, fulfilledFromDonors, unitsFulfilledFromReqField);
+            const unitsAdministered = data.unitsAdministered ? parseInt(data.unitsAdministered) : linkedDonors.reduce((s: number, ld: DonorInfo) => s + (ld.administered ? ld.units || 1 : 0), 0);
+            let status = data.status as RequestStatus;
+            const required = parseInt(data.units) || 0;
+            if (!["EXPIRED", "CANCELLED", "CREATED", "PENDING", "CLOSED"].includes(status)) {
+              if (unitsAdministered >= required && required > 0) status = "CLOSED";
+              else if (unitsAdministered > 0 && unitsAdministered < required) status = "PARTIALLY ADMINISTERED";
+              else if (unitsFulfilled >= required && required > 0 && unitsAdministered === 0) status = "REDEEMED";
+              else if (unitsFulfilled > 0 && unitsFulfilled < required) status = "PARTIAL";
+            }
+            fetched.push({
+              id: d.id, rtid: data.linkedRTID || data.rtid, serialNumber: data.serialNumber,
+              patientName: data.patientName, bloodGroup: data.bloodGroup,
+              componentType: data.componentType, transfusionIndication: data.transfusionIndication,
+              unitsRequired: required, unitsFulfilled, unitsAdministered,
+              requiredBy: parseTimestamp(data.requiredBy), status,
+              city: data.city, createdAt: parseTimestamp(data.createdAt),
+              patientMobile: data.patientMobile, patientAadhaar: data.patientAadhaar, pincode: data.pincode,
+              age: data.age ? parseInt(data.age) : undefined, urgency: u,
+              donors: linkedDonors, doctorName: data.doctorName, doctorRegNo: data.doctorRegNo,
+              wardDepartment: data.wardDepartment, bedNumber: data.bedNumber,
+              validityHours: data.validityHours || URGENCY_CONFIG[u].validityHours,
+              scannedAt: data.scannedAt, scannedLocation: data.scannedLocation,
+              redeemedAt: data.redeemedAt ? parseTimestamp(data.redeemedAt) : undefined,
+              administeredAt: data.administeredAt ? parseTimestamp(data.administeredAt) : undefined,
+              generatedBy: data.generatedBy, systemVersion: data.systemVersion,
+              transfusionHistory: (data.transfusionHistory || []) as TransfusionRecord[],
+            });
+          });
+          fetched.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+          // Auto-expire
+          const toExpire: string[] = [];
+          fetched.forEach(r => {
+            if (r.validityHours && r.createdAt) {
+              const valid = new Date(r.createdAt.getTime() + r.validityHours * 3600000);
+              if (new Date() > valid && !["REDEEMED", "HOSPITAL VERIFIED", "ADMINISTERED", "PARTIALLY ADMINISTERED", "CLOSED", "EXPIRED", "CANCELLED"].includes(r.status)) {
+                toExpire.push(r.id); r.status = "EXPIRED";
+              }
+            }
+          });
+          if (toExpire.length > 0) await Promise.all(toExpire.map(id => updateDoc(doc(db, "bloodRequests", id), { status: "EXPIRED" }).catch(() => { })));
+          setRequests(fetched);
+        } catch (err: any) { 
+          toast.error("Real-time sync error", { description: err?.message }); 
+        } finally { 
+          setLoading(false); 
+        }
+      }, () => { 
+        toast.error("Failed to connect to database"); 
+        setLoading(false); 
+      });
+    });
+
+    return () => {
+      unsubAuth();
+      unsubDocs();
+    };
+  }, [hospitalId, refreshKey]);
 
   const kpis = useMemo(() => ({
     totalRequests: requests.length,
