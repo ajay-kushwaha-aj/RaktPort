@@ -150,7 +150,11 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
           <div className="container mx-auto" style={{ padding:'10px 16px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:12 }}>
 
             {/* Logo + Name */}
-            <div style={{ display:'flex', alignItems:'center', gap:12, minWidth:0 }}>
+            <div 
+              style={{ display:'flex', alignItems:'center', gap:12, minWidth:0, cursor:'pointer' }}
+              onClick={() => window.location.href = '/'}
+              title="Go to Home"
+            >
               <div className="rph-logo-wrap" style={{ width:44, height:44, borderRadius:12, overflow:'hidden', border:'1.5px solid #f0e4e0', boxShadow:'0 2px 8px rgba(0,0,0,0.07)', background:'white', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
                 <img src={raktportLogo} alt="RaktPort" style={{ width:'100%', height:'100%', objectFit:'contain' }} />
               </div>
