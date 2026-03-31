@@ -153,10 +153,13 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
           const data = d.data();
           const linkedDonors: DonorInfo[] = allLinkedDonations
             .filter((ld: any) => ld.linkedHrtid === data.linkedRTID || ld.linkedHrtid === data.rtid)
-            .map((ld: any) => ({ dRtid: ld.rtidCode || ld.rtid || "N/A", name: ld.donorName || "Anonymous", date: parseTimestamp(ld.date).toISOString(), units: parseInt(ld.units) || 1, redeemed: ld.rtidStatus === "REDEEMED" || ld.redeemed || false, administered: ld.rtidStatus === "ADMINISTERED" || ld.administered || false, administeredAt: ld.administeredAt || undefined }));
+            .map((ld: any) => ({ dRtid: ld.rtidCode || ld.rtid || "N/A", name: ld.donorName || "Anonymous", date: parseTimestamp(ld.date).toISOString(), units: parseInt(ld.units) || 1, redeemed: ld.rtidStatus === "REDEEMED" || ld.status === "REDEEMED" || ld.redeemed || false, administered: ld.rtidStatus === "ADMINISTERED" || ld.status === "ADMINISTERED" || ld.administered || false, administeredAt: ld.administeredAt || undefined }));
           const raw = data.urgency as string;
           const u: UrgencyLevel = raw === "Critical" || raw === "Emergency" ? "Emergency" : raw === "High" || raw === "Urgent" ? "Urgent" : "Routine";
-          const unitsFulfilled = data.fulfilled ? parseInt(data.fulfilled) : linkedDonors.reduce((s: number, ld: DonorInfo) => s + (ld.redeemed || ld.administered ? ld.units || 1 : 0), 0);
+          const fulfilledFromDoc = (data.fulfilled != null && data.fulfilled !== "" && data.fulfilled !== "0") ? parseInt(data.fulfilled) : 0;
+          const fulfilledFromDonors = linkedDonors.reduce((s: number, ld: DonorInfo) => s + (ld.redeemed || ld.administered ? ld.units || 1 : 0), 0);
+          const unitsFulfilledFromReqField = data.unitsFulfilled ? parseInt(data.unitsFulfilled) : 0;
+          const unitsFulfilled = Math.max(fulfilledFromDoc, fulfilledFromDonors, unitsFulfilledFromReqField);
           const unitsAdministered = data.unitsAdministered ? parseInt(data.unitsAdministered) : linkedDonors.reduce((s: number, ld: DonorInfo) => s + (ld.administered ? ld.units || 1 : 0), 0);
           let status = data.status as RequestStatus;
           const required = parseInt(data.units) || 0;
@@ -349,10 +352,22 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
       let liveRedeemedCredit = 0;
       donQ.forEach(docSnap => {
         const d = docSnap.data();
-        if (d.rtidStatus === "REDEEMED" || d.redeemed === true || d.rtidStatus === "ADMINISTERED" || d.administered === true || d.rtidStatus === "PARTIALLY ADMINISTERED") {
+        // Check both 'status' (set by blood bank) and 'rtidStatus' (legacy) fields
+        const st = (d.status || "").toUpperCase();
+        const rst = (d.rtidStatus || "").toUpperCase();
+        if (st === "REDEEMED" || st === "ADMINISTERED" || st === "PARTIALLY ADMINISTERED" ||
+            rst === "REDEEMED" || rst === "ADMINISTERED" || rst === "PARTIALLY ADMINISTERED" ||
+            d.redeemed === true || d.administered === true) {
           liveRedeemedCredit += (parseInt(d.units) || 1);
         }
       });
+      
+      // Also consider the blood request's own fulfilled count as a fallback
+      // (the blood bank updates both the donation doc AND the request doc)
+      const requestFulfilled = r.unitsFulfilled || 0;
+      if (["REDEEMED", "HOSPITAL VERIFIED", "PARTIALLY ADMINISTERED", "PARTIAL"].includes(r.status) && requestFulfilled > liveRedeemedCredit) {
+        liveRedeemedCredit = requestFulfilled;
+      }
       
       const alreadyAdministered = r.unitsAdministered || 0;
       
