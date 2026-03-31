@@ -155,7 +155,7 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
               <button onClick={toggleLanguage} className="rph-lang" aria-label="Toggle language">
                 <Globe size={12}/>{language === 'EN' ? 'हिंदी' : 'EN'}
               </button>
-              {!isMobile && <ModeToggle />}
+              <ModeToggle />
               {isMobile && (
                 <button
                   onClick={() => setMobileMenuOpen(v => !v)}
