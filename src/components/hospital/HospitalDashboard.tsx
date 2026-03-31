@@ -1,4 +1,4 @@
-// hospital/HospitalDashboard.tsx — v6.0.0 (Phase 3-4)
+// hospital/HospitalDashboard.tsx
 // Main dashboard controller — all sub-components imported from sibling modules
 
 import React, { useState, useMemo, useEffect, useCallback } from "react";
@@ -333,7 +333,52 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
   const markAllRead = () => setNotifications((prev: Notification[]) => prev.map((n: Notification) => ({ ...n, read: true })));
   const clearNotifs = () => setNotifications([]);
   const openNewRequest = (urg: UrgencyLevel) => { setModalUrgency(urg); setIsRequestModalOpen(true); };
-  const openComplete = (r: BloodRequest) => { setCompleteTarget(r); setIsCompleteOpen(true); };
+  const openComplete = async (r: BloodRequest) => { 
+    Swal.fire({
+      title: 'Verifying Credits...',
+      text: 'Checking if redeemed credits are available...',
+      allowOutsideClick: false,
+      didOpen: () => { Swal.showLoading(); }
+    });
+
+    try {
+      const linkedRtids = [r.rtid];
+      if (r.linkedRTID && r.linkedRTID !== r.rtid) linkedRtids.push(r.linkedRTID);
+      
+      const donQ = await getDocs(query(collection(db, "donations"), where("linkedHrtid", "in", linkedRtids)));
+      let liveRedeemedCredit = 0;
+      donQ.forEach(docSnap => {
+        const d = docSnap.data();
+        if (d.rtidStatus === "REDEEMED" || d.redeemed === true || d.rtidStatus === "ADMINISTERED" || d.administered === true || d.rtidStatus === "PARTIALLY ADMINISTERED") {
+          liveRedeemedCredit += (parseInt(d.units) || 1);
+        }
+      });
+      
+      const alreadyAdministered = r.unitsAdministered || 0;
+      
+      if (liveRedeemedCredit <= alreadyAdministered) {
+         Swal.fire({
+           icon: 'error',
+           title: 'Verification Failed',
+           text: 'No redeemed credit available for this patient. Please wait for Blood Bank to process donations first.',
+           confirmButtonColor: "#8B0000"
+         });
+         return;
+      }
+      
+      const updatedReq = { ...r, unitsFulfilled: Math.max(r.unitsFulfilled || 0, liveRedeemedCredit) };
+      Swal.close();
+      setCompleteTarget(updatedReq); 
+      setIsCompleteOpen(true); 
+    } catch (err) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to verify credits. Please try again.',
+        confirmButtonColor: "#8B0000"
+      });
+    }
+  };
   const handleTabChange = (tab: TabId) => { setActiveTab(tab); setTabKey((k: number) => k + 1); };
   const unreadCount = notifications.filter((n: Notification) => !n.read).length;
 

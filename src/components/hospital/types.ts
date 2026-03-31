@@ -60,6 +60,7 @@ export interface BloodRequest {
   generatedBy?: string;
   systemVersion?: string;
   transfusionHistory?: TransfusionRecord[];
+  linkedRTID?: string;
 }
 
 export interface Notification {
