@@ -757,9 +757,9 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
 
           const timeline: ImpactTimeline = {
             donated:         safeDate(d.date),
-            linkedToRequest: d.linkedDate ? safeDate(d.linkedDate) : (linked !== 'N/A' ? safeDate(d.date) : undefined),
-            usedByPatient:   d.usedDate ? safeDate(d.usedDate) : (d.status === 'REDEEMED' ? safeDate(d.redeemedAt || d.date) : undefined),
-            creditIssued:    d.creditIssuedDate ? safeDate(d.creditIssuedDate) : (['Donated','AVAILABLE'].includes(d.status) ? safeDate(d.date) : undefined),
+            linkedToRequest: d.linkedDate ? safeDate(d.linkedDate) : (linked !== 'N/A' && linked !== null && linked !== '' ? safeDate(d.date) : undefined),
+            usedByPatient:   d.usedDate ? safeDate(d.usedDate) : (['Redeemed-Credit','Completed'].includes(status) ? safeDate(d.redeemedAt || d.date) : undefined),
+            creditIssued:    d.creditIssuedDate ? safeDate(d.creditIssuedDate) : (['Donated','Verified','Credited','Redeemed-Credit','Completed'].includes(status) ? safeDate(d.creditIssuedDate || d.redeemedAt || d.date) : undefined),
           };
 
           history.push({
@@ -1389,7 +1389,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
             <div className="w-full sm:w-[200px] sm:flex-shrink-0 bg-gradient-to-br from-[#8B0000] to-[#5a0000] text-white p-5 flex flex-col items-center justify-center text-center">
               <div className="w-20 h-20 rounded-full border-4 border-white/30 bg-white/10 flex items-center justify-center text-3xl font-black mb-3">{initials(donorData.fullName||'D')}</div>
               <h2 className="text-lg font-bold mb-0.5">{donorData.fullName}</h2>
-              <p className="text-xs text-red-200 mb-1 font-mono">{donorData.internalId || donorData.donorId || 'N/A'}</p>
+              <p className="text-xs text-red-200 mb-1 font-mono">{donorData.internalId || 'N/A'}</p>
               {donorData.username && <p className="text-xs text-red-300 mb-3">{formatUsername(donorData.username)}</p>}
               {!donorData.username && <div className="mb-3" />}
               <div className="bg-white/10 rounded-xl p-3 w-full border border-white/10 mb-3">
@@ -1398,7 +1398,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                   <div className="text-center"><p className="text-[10px] text-red-200 uppercase">Age</p><p className="text-lg font-bold">{calculateAge(donorData.dob)} yr</p></div>
                 </div>
               </div>
-              <QRCodeCanvas data={`Profile:${donorData.internalId || donorData.donorId || userId}`} size={80} className="rounded-lg bg-white p-1"/>
+              <QRCodeCanvas data={`Profile:${donorData.internalId || userId}`} size={80} className="rounded-lg bg-white p-1"/>
               <p className="text-[9px] text-red-300 mt-1.5">Scan to verify</p>
             </div>
             <div className="flex-1 bg-white p-4 overflow-y-auto">
@@ -1412,7 +1412,6 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                   {[
                     {icon:MapPin,      label:'Location',     value:`${donorData.city||'—'}${donorData.pincode?', '+donorData.pincode:''}`},
                     {icon:BadgeCheck,  label:'Internal ID',  value:donorData.internalId || '—'},
-                    ...(donorData.donorId ? [{icon:BadgeCheck, label:'Legacy ID', value:donorData.donorId}] : []),
                     ...(donorData.username ? [{icon:BadgeCheck, label:'@rakt Username', value:formatUsername(donorData.username)}] : []),
                     {icon:Mail,        label:'Email',        value:donorData.email||'—'},
                     {icon:Phone,       label:'Mobile',       value:donorData.mobile||'—'},
@@ -1619,7 +1618,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
             <div className="space-y-3">
               <div className="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-xl border border-blue-100 dark:border-blue-800 space-y-2 text-sm">
                 {[['H-RTID',hrtidDetails.rtidCode],['Patient',hrtidDetails.patientName],['Hospital',hrtidDetails.hospital],['Blood Group',hrtidDetails.bloodGroup],['Units',String(hrtidDetails.units)],['Required By',hrtidDetails.requiredBy||'N/A']].map(([k,v])=>(
-                  <div key={k} className="flex justify-between gap-2"><span className="text-xs text-gray-500 dark:text-gray-400 font-medium">{k}</span><span className="text-xs font-bold text-gray-900 dark:text-gray-100 text-right max-w-[55%] truncate" title={v}>{v}</span></div>
+                  <div key={k} className="flex justify-between gap-2"><span className="text-xs text-gray-500 dark:text-gray-400 font-medium">{k}</span><span className="text-xs font-bold text-gray-900 dark:text-gray-100 text-right leading-tight max-w-[65%] break-words">{v}</span></div>
                 ))}
               </div>
               {hrtidDetails.impactTimeline&&<ImpactTimelineView timeline={hrtidDetails.impactTimeline}/>}
