@@ -4,8 +4,6 @@ import type { BloodRequest } from "./types";
 
 const TIMELINE_STEPS = [
   { status: "CREATED", label: "Created", emoji: "📝" },
-  { status: "PENDING", label: "Pending", emoji: "⏳" },
-  { status: "PLEDGED", label: "Pledged", emoji: "🤝" },
   { status: "PARTIAL", label: "Donated", emoji: "🩸" },
   { status: "REDEEMED", label: "Redeemed", emoji: "✅" },
   { status: "ADMINISTERED", label: "Administered", emoji: "💉" },
