@@ -8,14 +8,53 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* New Global Color Variables */
-    --clr-navy: #1A2332;
+    /* ============================
+    RaktPort Design Token System
+    v2.0 — Production Ready
+    ============================ */
+
+    /* — Brand */
     --clr-brand: #B81C2E;
-    --clr-bg-page: #F5F7FA;
+    --clr-brand-dark: #8C1221;
     --clr-brand-tint: #FEE2E6;
+
+    /* — Neutrals */
+    --clr-navy: #1A2332;
+    --clr-slate: #4A5568;
+    --clr-muted: #8B9CB5;
+    --clr-bg-page: #F5F7FA;
+    --clr-bg-card: #FFFFFF;
+    --clr-border: #E8ECF2;
+
+    /* — Semantic */
     --clr-emergency: #DC4E0A;
-    --clr-info: #1E4DA1;
     --clr-success: #1A6B3C;
+    --clr-info: #1E4DA1;
+    --clr-warning: #92400E;
+
+    /* — Typography */
+    --txt-heading: #1A2332;
+    --txt-body: #4A5568;
+    --txt-inverse: #FFFFFF;
+
+    /* — Header */
+    --header-bg: #1A2332;
+    --header-accent: #B81C2E;
+    --header-cta: #B81C2E;
+
+    /* — Stats Bar */
+    --stats-bg: #B81C2E;
+    --stats-divider: #8C1221;
+
+    /* — RTID Tracker Section */
+    --rtid-bg: #1A2332;
+    --rtid-badge: #1E4DA1;
+    --rtid-btn: #B81C2E;
+
+    /* — Footer */
+    --footer-bg: #1A2332;
+    --footer-accent: #B81C2E;
+    --footer-txt: #8B9CB5;
 
     /* RaktPort Theme Colors */
     --maroon: 0 100% 27%;         /* Primary Brand - var(--clr-brand) */

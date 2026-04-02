@@ -318,7 +318,7 @@ export default function MedicalEligibilityDemo() {
     ];
 
     return (
-        <div className="p-8 space-y-6 bg-gray-50 min-h-screen">
+        <div className="p-8 space-y-6 bg-[var(--clr-bg-page)] min-h-screen">
             <div className="max-w-6xl mx-auto">
                 <Card>
                     <CardHeader>
@@ -360,7 +360,7 @@ export default function MedicalEligibilityDemo() {
                                                 <div className="flex-1">
                                                     <h3 className="font-bold text-lg mb-2">{testCase.name}</h3>
 
-                                                    <div className="grid grid-cols-2 gap-2 text-sm mb-3 text-gray-600">
+                                                    <div className="grid grid-cols-2 gap-2 text-sm mb-3 text-[var(--txt-body)]">
                                                         <div>Gender: <span className="font-semibold">{testCase.gender}</span></div>
                                                         <div>Requested: <span className="font-semibold">{testCase.donationType}</span></div>
                                                         <div>Hemoglobin: <span className="font-semibold">{testCase.hemoglobin} g / dL</span></div>

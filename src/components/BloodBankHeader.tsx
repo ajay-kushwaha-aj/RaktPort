@@ -23,7 +23,7 @@ export const BloodBankHeader = ({
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap');
-        .bbh-wrap { font-family:'DM Sans',sans-serif; background:linear-gradient(135deg,#6b0000 0%,var(--clr-brand) 55%,#9e0000 100%); position:relative; overflow:hidden; }
+        .bbh-wrap { font-family:'DM Sans',sans-serif; background:linear-gradient(135deg,#6b0000 0%,var(--header-cta) 55%,#9e0000 100%); position:relative; overflow:hidden; }
         .bbh-wrap::before { content:''; position:absolute; inset:0; background-image:radial-gradient(circle at 20% 50%, rgba(255,255,255,0.05) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.04) 0%, transparent 40%); pointer-events:none; }
         .bbh-wrap::after  { content:''; position:absolute; bottom:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent); }
         .bbh-brand { font-family:'Outfit',sans-serif; font-weight:800; font-size:1.3rem; color:#fff; letter-spacing:-0.025em; line-height:1; }
@@ -34,7 +34,7 @@ export const BloodBankHeader = ({
         .bbh-loc   { display:flex; align-items:center; gap:4px; font-size:0.7rem; color:rgba(255,255,255,0.55); font-weight:500; letter-spacing:0.05em; }
         .bbh-icon-btn { width:38px; height:38px; border-radius:10px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.18); display:flex; align-items:center; justify-content:center; cursor:pointer; color:#fff; transition:all 0.2s; position:relative; flex-shrink:0; }
         .bbh-icon-btn:hover { background:rgba(255,255,255,0.2); transform:translateY(-1px); }
-        .bbh-notif-dot { position:absolute; top:-5px; right:-5px; min-width:17px; height:17px; padding:0 3px; background:#ff3737; border:2px solid var(--clr-brand); border-radius:999px; font-size:8px; font-weight:800; color:#fff; display:flex; align-items:center; justify-content:center; animation:bbhb 1.4s ease-in-out infinite; }
+        .bbh-notif-dot { position:absolute; top:-5px; right:-5px; min-width:17px; height:17px; padding:0 3px; background:#ff3737; border:2px solid var(--header-cta); border-radius:999px; font-size:8px; font-weight:800; color:#fff; display:flex; align-items:center; justify-content:center; animation:bbhb 1.4s ease-in-out infinite; }
         @keyframes bbhb { 0%,100%{transform:scale(1);} 50%{transform:scale(1.2);} }
         .bbh-req-pill { display:flex; align-items:center; gap:5px; background:rgba(255,60,60,0.2); border:1px solid rgba(255,130,100,0.3); border-radius:999px; padding:3px 10px 3px 5px; font-size:0.7rem; color:#ffc4b4; font-weight:600; animation:bbhglow 2s ease-in-out infinite; }
         @keyframes bbhglow { 0%,100%{box-shadow:0 0 0 0 rgba(255,80,60,0);} 50%{box-shadow:0 0 0 3px rgba(255,80,60,0.15);} }
@@ -75,7 +75,7 @@ export const BloodBankHeader = ({
             {/* Pending requests */}
             {bloodRequestsCount > 0 && (
               <div className="bbh-req-pill hidden sm:flex">
-                <span className="w-5 h-5 bg-[var(--clr-emergency)] rounded-full flex items-center justify-center text-[9px] font-black text-white flex-shrink-0">
+                <span className="w-5 h-5 bg-[var(--clr-emergency)] rounded-full flex items-center justify-center text-[9px] font-black text-[var(--txt-inverse)] flex-shrink-0">
                   {bloodRequestsCount > 9 ? '9+' : bloodRequestsCount}
                 </span>
                 Blood Requests

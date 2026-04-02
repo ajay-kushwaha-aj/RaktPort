@@ -92,7 +92,7 @@ export function PatientHistoryModal({ isOpen, onClose, requests }: Props) {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-semibold text-gray-800 dark:text-gray-200 text-sm">{p.name}</span>
+                        <span className="font-semibold text-[var(--txt-heading)] dark:text-gray-200 text-sm">{p.name}</span>
                         {bloodGroups.map(bg => (
                           <span key={bg} className="text-[10px] font-black px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-[var(--clr-emergency)] border border-red-100 dark:border-red-800">{bg}</span>
                         ))}
@@ -114,12 +114,12 @@ export function PatientHistoryModal({ isOpen, onClose, requests }: Props) {
               {/* Patient summary card */}
               <div className="bg-red-50 dark:bg-red-950/30 rounded-xl p-4 border border-red-100 dark:border-red-900/40">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-12 h-12 rounded-xl bg-[var(--clr-brand)] flex items-center justify-center text-white text-xl font-black" style={{ fontFamily: "Outfit,sans-serif" }}>
+                  <div className="w-12 h-12 rounded-xl bg-[var(--clr-brand)] flex items-center justify-center text-[var(--txt-inverse)] text-xl font-black" style={{ fontFamily: "Outfit,sans-serif" }}>
                     {activePatient.name[0]?.toUpperCase()}
                   </div>
                   <div>
-                    <p className="font-bold text-gray-900 dark:text-gray-100">{activePatient.name}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{activePatient.mobile || "No mobile"}</p>
+                    <p className="font-bold text-[var(--txt-heading)] dark:text-gray-100">{activePatient.name}</p>
+                    <p className="text-xs text-[var(--txt-body)] dark:text-gray-400">{activePatient.mobile || "No mobile"}</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-4 gap-3">
@@ -131,7 +131,7 @@ export function PatientHistoryModal({ isOpen, onClose, requests }: Props) {
                   ].map(s => (
                     <div key={s.label} className="text-center">
                       <div className="text-lg">{s.icon}</div>
-                      <div className="text-sm font-black text-gray-800 dark:text-gray-200" style={{ fontFamily: "Outfit,sans-serif" }}>{s.val}</div>
+                      <div className="text-sm font-black text-[var(--txt-heading)] dark:text-gray-200" style={{ fontFamily: "Outfit,sans-serif" }}>{s.val}</div>
                       <div className="text-[9px] text-gray-400 font-medium">{s.label}</div>
                     </div>
                   ))}
@@ -140,7 +140,7 @@ export function PatientHistoryModal({ isOpen, onClose, requests }: Props) {
 
               {/* Request timeline */}
               <div className="space-y-2">
-                <p className="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wide flex items-center gap-1.5">
+                <p className="text-xs font-bold text-[var(--txt-body)] dark:text-gray-400 uppercase tracking-wide flex items-center gap-1.5">
                   <Activity className="w-3.5 h-3.5 text-[var(--clr-brand)]" /> Request History
                 </p>
                 {activePatient.requests.map((r, i) => {
@@ -155,7 +155,7 @@ export function PatientHistoryModal({ isOpen, onClose, requests }: Props) {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="text-xs font-black px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-[var(--clr-emergency)] border border-red-100 dark:border-red-800">{r.bloodGroup}</span>
-                            <span className="text-xs text-gray-600 dark:text-gray-400">{r.componentType || "Whole Blood"} × {r.unitsRequired}u</span>
+                            <span className="text-xs text-[var(--txt-body)] dark:text-gray-400">{r.componentType || "Whole Blood"} × {r.unitsRequired}u</span>
                             <span className="hd-status border text-[10px]" style={{ background: sm.bg, color: sm.text, borderColor: sm.border }}>{sm.label}</span>
                           </div>
                           <div className="text-[11px] text-gray-400 mt-0.5 flex items-center gap-2">

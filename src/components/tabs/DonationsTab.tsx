@@ -30,7 +30,7 @@ export const DonationsTab = ({ donations }: DonationsTabProps) => {
     }
 
     if (s === 'COMPLETED') {
-      return 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200';
+      return 'bg-[var(--clr-bg-page)] text-gray-700 border-[var(--clr-border)] hover:bg-gray-200';
     }
 
     if (s === 'EXPIRED') {
@@ -41,7 +41,7 @@ export const DonationsTab = ({ donations }: DonationsTabProps) => {
       return 'bg-yellow-100 text-yellow-700 border-yellow-300 hover:bg-yellow-200';
     }
 
-    return 'bg-gray-100 text-gray-600 border-gray-200';
+    return 'bg-[var(--clr-bg-page)] text-[var(--txt-body)] border-[var(--clr-border)]';
   };
 
   const getStatusText = (status: string) => {
@@ -116,7 +116,7 @@ export const DonationsTab = ({ donations }: DonationsTabProps) => {
 
                   {/* OTP REMOVED - Security measure */}
                   {(donation.status === 'AVAILABLE' || donation.status === 'Donated') && (
-                    <Badge variant="outline" className="text-xs bg-gray-50 border-gray-200 text-gray-600">
+                    <Badge variant="outline" className="text-xs bg-[var(--clr-bg-page)] border-[var(--clr-border)] text-[var(--txt-body)]">
                       <Shield className="h-3 w-3 mr-1" />
                       OTP: Sent to Donor
                     </Badge>
@@ -247,7 +247,7 @@ export const DonationsTab = ({ donations }: DonationsTabProps) => {
                       )}
                     </div>
 
-                    <div className="mt-3 p-2 bg-white rounded border border-purple-100">
+                    <div className="mt-3 p-2 bg-[var(--clr-bg-card)] rounded border border-purple-100">
                       <p className="text-xs text-purple-800 font-medium flex items-center gap-2">
                         <span>🎉</span>
                         <span>This donation directly saved <strong>{donation.patientName || 'a patient'}</strong>'s life!</span>
@@ -262,7 +262,7 @@ export const DonationsTab = ({ donations }: DonationsTabProps) => {
                   <p className="text-xs text-blue-800 flex items-center gap-2">
                     <Calendar className="h-3 w-3" />
                     <span className="font-medium">Linked Appointment:</span>
-                    <code className="font-mono font-bold bg-white px-2 py-0.5 rounded border border-blue-100">
+                    <code className="font-mono font-bold bg-[var(--clr-bg-card)] px-2 py-0.5 rounded border border-blue-100">
                       {donation.appointmentRtid}
                     </code>
                   </p>

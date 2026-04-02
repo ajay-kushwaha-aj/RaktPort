@@ -13,16 +13,16 @@ interface ReportsTabProps {
 
 const Bar = ({ height, label, color = "bg-[var(--clr-info)]", value }: any) => (
     <div className="flex flex-col items-center gap-2 group cursor-pointer">
-        <div className="relative w-12 bg-gray-100 dark:bg-gray-800 rounded-t-lg h-48 flex items-end overflow-hidden">
+        <div className="relative w-12 bg-[var(--clr-bg-page)] dark:bg-gray-800 rounded-t-lg h-48 flex items-end overflow-hidden">
             <div
                 className={`w-full ${color} transition-all duration-500 group-hover:opacity-80`}
                 style={{ height: `${Math.min(height, 100)}%` }}
             />
-            <div className="absolute top-2 w-full text-center text-xs font-bold text-gray-500 dark:text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute top-2 w-full text-center text-xs font-bold text-[var(--txt-body)] dark:text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
                 {value}
             </div>
         </div>
-        <span className="text-xs font-medium text-gray-600 dark:text-gray-300">{label}</span>
+        <span className="text-xs font-medium text-[var(--txt-body)] dark:text-gray-300">{label}</span>
     </div>
 );
 
@@ -278,13 +278,13 @@ export const ReportsTab = ({ inventory, donations, redemptions, criticalGroups }
                                                 style={{ width: `${(item.in / maxVal) * 100}%` }}
                                                 className="h-6 bg-[var(--clr-info)] rounded-l-full flex items-center justify-end pr-2"
                                             >
-                                                <span className="text-xs text-white font-bold">{item.in}</span>
+                                                <span className="text-xs text-[var(--txt-inverse)] font-bold">{item.in}</span>
                                             </div>
                                             <div
                                                 style={{ width: `${(item.out / maxVal) * 100}%` }}
                                                 className="h-6 bg-[var(--clr-emergency)] rounded-r-full flex items-center justify-end pr-2"
                                             >
-                                                <span className="text-xs text-white font-bold">{item.out}</span>
+                                                <span className="text-xs text-[var(--txt-inverse)] font-bold">{item.out}</span>
                                             </div>
                                         </div>
                                     </div>

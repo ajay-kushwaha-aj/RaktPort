@@ -32,10 +32,10 @@ export class ErrorBoundary extends React.Component<Props, State> {
           <div className="w-14 h-14 rounded-2xl bg-red-100 dark:bg-red-950/40 flex items-center justify-center mb-4">
             <AlertTriangle className="w-7 h-7 text-[var(--clr-emergency)] dark:text-[var(--clr-emergency)]" />
           </div>
-          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100" style={{ fontFamily: "Outfit,sans-serif" }}>
+          <h3 className="text-lg font-bold text-[var(--txt-heading)] dark:text-gray-100" style={{ fontFamily: "Outfit,sans-serif" }}>
             {this.props.fallbackTitle || "Something went wrong"}
           </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 max-w-md">
+          <p className="text-sm text-[var(--txt-body)] dark:text-gray-400 mt-1 max-w-md">
             An unexpected error occurred in the dashboard. This has been logged automatically.
           </p>
           {this.state.error && (
@@ -45,7 +45,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
           )}
           <button
             onClick={() => { this.setState({ hasError: false, error: undefined }); }}
-            className="mt-4 flex items-center gap-2 px-4 py-2 bg-[var(--clr-brand)] text-white rounded-xl text-sm font-semibold hover:bg-[#6b0000] transition-colors"
+            className="mt-4 flex items-center gap-2 px-4 py-2 bg-[var(--clr-brand)] text-[var(--txt-inverse)] rounded-xl text-sm font-semibold hover:bg-[#6b0000] transition-colors"
           >
             <RefreshCw className="w-4 h-4" /> Try Again
           </button>

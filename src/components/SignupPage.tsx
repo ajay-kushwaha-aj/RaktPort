@@ -101,7 +101,7 @@ function GoogleIcon({ size = 18 }: { size?: number }) {
 }
 
 function Spinner({ white = false }: { white?: boolean }) {
-  return <span className={`inline-block w-4 h-4 border-2 rounded-full animate-spin flex-shrink-0 ${white ? 'border-white/30 border-t-white' : 'border-gray-200 border-t-gray-600'}`} aria-hidden="true" />;
+  return <span className={`inline-block w-4 h-4 border-2 rounded-full animate-spin flex-shrink-0 ${white ? 'border-white/30 border-t-white' : 'border-[var(--clr-border)] border-t-gray-600'}`} aria-hidden="true" />;
 }
 
 function Field({ label, required, hint, children }: {
@@ -113,7 +113,7 @@ function Field({ label, required, hint, children }: {
         {label}{required && <span className="text-[var(--clr-emergency)] ml-0.5">*</span>}
       </label>
       {children}
-      {hint && <p className="mt-1 text-[10px] sm:text-xs text-gray-500">{hint}</p>}
+      {hint && <p className="mt-1 text-[10px] sm:text-xs text-[var(--txt-body)]">{hint}</p>}
     </div>
   );
 }
@@ -130,8 +130,8 @@ function TInput({
   const padL = iconLeft ? (prefix ? 'pl-24 sm:pl-28' : 'pl-9 sm:pl-11') : (prefix ? 'pl-14' : 'pl-3 sm:pl-4');
   return (
     <div className="relative group">
-      {iconLeft && <span className="absolute left-3 sm:left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-gray-600 transition-colors pointer-events-none">{iconLeft}</span>}
-      {prefix && <span className={`absolute ${iconLeft ? 'left-9 sm:left-11' : 'left-3'} top-1/2 -translate-y-1/2 text-gray-600 font-medium text-sm pointer-events-none select-none`}>{prefix}</span>}
+      {iconLeft && <span className="absolute left-3 sm:left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[var(--txt-body)] transition-colors pointer-events-none">{iconLeft}</span>}
+      {prefix && <span className={`absolute ${iconLeft ? 'left-9 sm:left-11' : 'left-3'} top-1/2 -translate-y-1/2 text-[var(--txt-body)] font-medium text-sm pointer-events-none select-none`}>{prefix}</span>}
       <input
         id={id}
         type={type}
@@ -142,7 +142,7 @@ function TInput({
         max={max}
         maxLength={maxLength}
         disabled={disabled}
-        className={`w-full ${padL} pr-3 sm:pr-4 py-3 sm:py-3.5 bg-white/60 border-2 border-gray-200 rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none transition-all text-gray-800 placeholder-gray-400 text-sm disabled:opacity-50 disabled:cursor-not-allowed`}
+        className={`w-full ${padL} pr-3 sm:pr-4 py-3 sm:py-3.5 bg-[var(--clr-bg-card)]/60 border-2 border-[var(--clr-border)] rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none transition-all text-[var(--txt-heading)] placeholder-gray-400 text-sm disabled:opacity-50 disabled:cursor-not-allowed`}
       />
     </div>
   );
@@ -157,17 +157,17 @@ function DocUpload({ inputId, docs, onUpload, onRemove }: {
     <Field label="Upload Documents">
       <label
         htmlFor={inputId}
-        className="flex flex-col items-center gap-2 px-4 py-5 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-gray-400 transition-colors text-center touch-manipulation"
+        className="flex flex-col items-center gap-2 px-4 py-5 border-2 border-dashed border-[var(--clr-border)] rounded-xl cursor-pointer hover:border-gray-400 transition-colors text-center touch-manipulation"
       >
         <Upload className="w-6 h-6 sm:w-7 sm:h-7 text-gray-400" />
-        <span className="text-xs sm:text-sm text-gray-600">Tap to upload documents</span>
+        <span className="text-xs sm:text-sm text-[var(--txt-body)]">Tap to upload documents</span>
         <span className="text-[10px] sm:text-xs text-gray-400">PDF, JPG, PNG · max 5 MB each</span>
       </label>
       <input id={inputId} type="file" multiple accept=".pdf,.jpg,.jpeg,.png" onChange={onUpload} className="sr-only" />
       {docs.length > 0 && (
         <ul className="mt-2.5 space-y-1.5">
           {docs.map((f, i) => (
-            <li key={i} className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg">
+            <li key={i} className="flex items-center gap-2 px-3 py-2 bg-[var(--clr-bg-page)] rounded-lg">
               <FileText className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
               <span className="text-xs sm:text-sm text-gray-700 truncate flex-1">{f.name}</span>
               <button type="button" onClick={() => onRemove(i)} className="flex-shrink-0 text-[var(--clr-emergency)] hover:text-[var(--clr-emergency)] transition-colors touch-manipulation">
@@ -191,7 +191,7 @@ function InventoryInput({
   value: number;
   onChange: (val: number) => void;
 }) {
-  const colors = BLOOD_GROUP_COLORS[bloodGroup] || { bg: 'bg-gray-50', text: 'text-gray-700', border: 'border-gray-200' };
+  const colors = BLOOD_GROUP_COLORS[bloodGroup] || { bg: 'bg-[var(--clr-bg-page)]', text: 'text-gray-700', border: 'border-[var(--clr-border)]' };
   return (
     <div className={`${colors.bg} ${colors.border} border-2 rounded-xl p-3 flex flex-col items-center gap-2`}>
       <span className={`text-lg font-black ${colors.text}`}>{bloodGroup}</span>
@@ -199,7 +199,7 @@ function InventoryInput({
         <button
           type="button"
           onClick={() => onChange(Math.max(0, value - 5))}
-          className="w-7 h-7 rounded-lg bg-white/80 border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-100 active:scale-95 transition-all font-bold text-sm touch-manipulation"
+          className="w-7 h-7 rounded-lg bg-[var(--clr-bg-card)]/80 border border-[var(--clr-border)] flex items-center justify-center text-[var(--txt-body)] hover:bg-[var(--clr-bg-page)] active:scale-95 transition-all font-bold text-sm touch-manipulation"
         >−</button>
         <input
           type="number"
@@ -207,12 +207,12 @@ function InventoryInput({
           max="9999"
           value={value}
           onChange={e => onChange(Math.max(0, Math.min(9999, parseInt(e.target.value) || 0)))}
-          className={`w-14 text-center py-1 rounded-lg border-2 ${colors.border} bg-white/80 text-sm font-bold ${colors.text} outline-none focus:ring-2 focus:ring-purple-300`}
+          className={`w-14 text-center py-1 rounded-lg border-2 ${colors.border} bg-[var(--clr-bg-card)]/80 text-sm font-bold ${colors.text} outline-none focus:ring-2 focus:ring-purple-300`}
         />
         <button
           type="button"
           onClick={() => onChange(Math.min(9999, value + 5))}
-          className="w-7 h-7 rounded-lg bg-white/80 border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-100 active:scale-95 transition-all font-bold text-sm touch-manipulation"
+          className="w-7 h-7 rounded-lg bg-[var(--clr-bg-card)]/80 border border-[var(--clr-border)] flex items-center justify-center text-[var(--txt-body)] hover:bg-[var(--clr-bg-page)] active:scale-95 transition-all font-bold text-sm touch-manipulation"
         >+</button>
       </div>
       <span className="text-[10px] text-gray-400 font-medium">units</span>
@@ -294,11 +294,11 @@ function GoogleProfileCompletion({
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+      <div className="bg-[var(--clr-bg-card)] rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className={`p-5 bg-gradient-to-r ${cfg.gradient} text-white rounded-t-2xl`}>
+        <div className={`p-5 bg-gradient-to-r ${cfg.gradient} text-[var(--txt-inverse)] rounded-t-2xl`}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-[var(--clr-bg-card)]/20 flex items-center justify-center">
               <GoogleIcon size={20} />
             </div>
             <div>
@@ -309,7 +309,7 @@ function GoogleProfileCompletion({
           {/* Steps */}
           <div className="flex gap-2 mt-4">
             {Array.from({ length: totalSteps }).map((_, i) => (
-              <div key={i} className={`flex-1 h-1.5 rounded-full transition-all ${i < step ? 'bg-white' : 'bg-white/30'}`} />
+              <div key={i} className={`flex-1 h-1.5 rounded-full transition-all ${i < step ? 'bg-[var(--clr-bg-card)]' : 'bg-[var(--clr-bg-card)]/30'}`} />
             ))}
           </div>
         </div>
@@ -318,7 +318,7 @@ function GoogleProfileCompletion({
           {/* Step 1: Org details */}
           {step === 1 && (
             <div className="space-y-4 animate-fadein">
-              <h3 className="font-bold text-gray-800">Organization Details</h3>
+              <h3 className="font-bold text-[var(--txt-heading)]">Organization Details</h3>
               {role === 'hospital' && (
                 <Field label="Hospital Registration No." required>
                   <TInput value={registrationNo} onChange={setRegistrationNo} placeholder="HOSP-2024-XXXXX"
@@ -345,9 +345,9 @@ function GoogleProfileCompletion({
             <div className="space-y-4 animate-fadein">
               <div className="flex items-center gap-2">
                 <Droplet className="w-5 h-5 text-purple-600" />
-                <h3 className="font-bold text-gray-800">Initial Blood Inventory</h3>
+                <h3 className="font-bold text-[var(--txt-heading)]">Initial Blood Inventory</h3>
               </div>
-              <p className="text-xs text-gray-500">Enter current stock levels (you can update later from dashboard)</p>
+              <p className="text-xs text-[var(--txt-body)]">Enter current stock levels (you can update later from dashboard)</p>
               <div className="grid grid-cols-4 gap-2">
                 {BLOOD_GROUPS.map(bg => (
                   <InventoryInput key={bg} bloodGroup={bg} value={inventory[bg] || 0}
@@ -364,23 +364,23 @@ function GoogleProfileCompletion({
           {/* Address step */}
           {((step === 2 && role !== 'bloodbank') || (step === 3 && role === 'bloodbank')) && (
             <div className="space-y-4 animate-fadein">
-              <h3 className="font-bold text-gray-800">Address Details</h3>
+              <h3 className="font-bold text-[var(--txt-heading)]">Address Details</h3>
               <Field label="Complete Address" required>
                 <div className="relative">
                   <Home className="absolute left-3 top-3 w-4 h-4 text-gray-400 pointer-events-none" />
                   <textarea rows={2} value={address} onChange={e => setAddress(e.target.value)}
                     placeholder="Street, Building, Landmark…"
-                    className="w-full pl-9 pr-3 py-3 bg-white/60 border-2 border-gray-200 rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none text-sm text-gray-800 placeholder-gray-400 resize-none transition-all" />
+                    className="w-full pl-9 pr-3 py-3 bg-[var(--clr-bg-card)]/60 border-2 border-[var(--clr-border)] rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none text-sm text-[var(--txt-heading)] placeholder-gray-400 resize-none transition-all" />
                 </div>
               </Field>
               <div className="grid grid-cols-2 gap-3">
                 <Field label="District" required>
                   <input value={district} onChange={e => setDistrict(e.target.value)} placeholder="District"
-                    className="w-full px-3 py-3 bg-white/60 border-2 border-gray-200 rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none text-sm text-gray-800 placeholder-gray-400 transition-all" />
+                    className="w-full px-3 py-3 bg-[var(--clr-bg-card)]/60 border-2 border-[var(--clr-border)] rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none text-sm text-[var(--txt-heading)] placeholder-gray-400 transition-all" />
                 </Field>
                 <Field label="State" required>
                   <select value={state} onChange={e => setState(e.target.value)}
-                    className="w-full px-3 py-3 bg-white/60 border-2 border-gray-200 rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none text-sm text-gray-800 transition-all">
+                    className="w-full px-3 py-3 bg-[var(--clr-bg-card)]/60 border-2 border-[var(--clr-border)] rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none text-sm text-[var(--txt-heading)] transition-all">
                     <option value="">Select</option>
                     {INDIAN_STATES.map(s => <option key={s}>{s}</option>)}
                   </select>
@@ -398,12 +398,12 @@ function GoogleProfileCompletion({
           <div className="flex gap-3 pt-2">
             {step > 1 ? (
               <button type="button" onClick={() => setStep(s => s - 1)}
-                className="px-4 py-2.5 bg-white border-2 border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 active:scale-95 transition-all">
+                className="px-4 py-2.5 bg-[var(--clr-bg-card)] border-2 border-[var(--clr-border)] rounded-xl text-sm font-semibold text-gray-700 hover:bg-[var(--clr-bg-page)] active:scale-95 transition-all">
                 ← Back
               </button>
             ) : (
               <button type="button" onClick={onCancel}
-                className="px-4 py-2.5 bg-white border-2 border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 active:scale-95 transition-all">
+                className="px-4 py-2.5 bg-[var(--clr-bg-card)] border-2 border-[var(--clr-border)] rounded-xl text-sm font-semibold text-[var(--txt-body)] hover:bg-[var(--clr-bg-page)] active:scale-95 transition-all">
                 Cancel
               </button>
             )}
@@ -415,12 +415,12 @@ function GoogleProfileCompletion({
                 }
                 setStep(s => s + 1);
               }}
-                className={`flex-1 py-2.5 bg-gradient-to-r ${cfg.gradient} text-white rounded-xl text-sm font-semibold hover:shadow-lg active:scale-95 transition-all`}>
+                className={`flex-1 py-2.5 bg-gradient-to-r ${cfg.gradient} text-[var(--txt-inverse)] rounded-xl text-sm font-semibold hover:shadow-lg active:scale-95 transition-all`}>
                 Continue →
               </button>
             ) : (
               <button type="button" onClick={handleSubmit} disabled={loading}
-                className={`flex-1 py-2.5 bg-gradient-to-r ${cfg.gradient} text-white rounded-xl text-sm font-bold hover:shadow-lg active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2`}>
+                className={`flex-1 py-2.5 bg-gradient-to-r ${cfg.gradient} text-[var(--txt-inverse)] rounded-xl text-sm font-bold hover:shadow-lg active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2`}>
                 {loading ? <><Spinner white />Saving…</> : <><CheckCircle2 className="w-4 h-4" />Complete Profile</>}
               </button>
             )}
@@ -758,7 +758,7 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
 
       {/* Sticky top-bar */}
       <div className="sticky top-0 z-30 flex items-center px-3 pt-3 pb-2 sm:px-6 sm:pt-5 sm:pb-0 pointer-events-none">
-        <button onClick={onBack} className="pointer-events-auto inline-flex items-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 bg-white/85 backdrop-blur-md rounded-full shadow-md hover:shadow-lg hover:bg-white active:scale-95 transition-all touch-manipulation">
+        <button onClick={onBack} className="pointer-events-auto inline-flex items-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 bg-[var(--clr-bg-card)]/85 backdrop-blur-md rounded-full shadow-md hover:shadow-lg hover:bg-[var(--clr-bg-card)] active:scale-95 transition-all touch-manipulation">
           <ArrowLeft className="w-4 h-4" />
           <span className="text-xs sm:text-sm font-medium">Back to Home</span>
         </button>
@@ -767,7 +767,7 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
       {/* Content */}
       <div className="relative flex justify-center px-3 pb-10 pt-2 sm:px-4 sm:pt-4">
         <div className="w-full max-w-xl sm:max-w-2xl">
-          <div className="bg-white/80 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-2xl border border-white/30 overflow-hidden">
+          <div className="bg-[var(--clr-bg-card)]/80 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-2xl border border-white/30 overflow-hidden">
 
             {/* Header */}
             <div className="pt-5 pb-4 px-4 sm:pt-8 sm:pb-6 sm:px-8 bg-gradient-to-br from-white/50 to-white/20 flex flex-col items-center text-center">
@@ -776,9 +776,9 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
               </div>
               <div className="flex items-center gap-2 mb-0.5">
                 <RoleIcon className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
-                <h1 className="text-lg sm:text-2xl font-bold text-gray-800">{cfg.title}</h1>
+                <h1 className="text-lg sm:text-2xl font-bold text-[var(--txt-heading)]">{cfg.title}</h1>
               </div>
-              <p className="text-[11px] sm:text-sm text-gray-500">{cfg.subtitle}</p>
+              <p className="text-[11px] sm:text-sm text-[var(--txt-body)]">{cfg.subtitle}</p>
             </div>
 
             {/* Progress */}
@@ -791,9 +791,9 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                   return (
                     <div key={s} className="flex items-center flex-1">
                       <div className={`relative w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-bold text-[11px] sm:text-sm transition-all duration-200 flex-shrink-0 ${
-                        done   ? `bg-gradient-to-r ${cfg.gradient} text-white` :
-                        active ? `bg-gradient-to-r ${cfg.gradient} text-white ring-4 ring-white shadow-md scale-110` :
-                                 'bg-gray-200 text-gray-500'
+                        done   ? `bg-gradient-to-r ${cfg.gradient} text-[var(--txt-inverse)]` :
+                        active ? `bg-gradient-to-r ${cfg.gradient} text-[var(--txt-inverse)] ring-4 ring-white shadow-md scale-110` :
+                                 'bg-gray-200 text-[var(--txt-body)]'
                       }`}>
                         {done ? <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : s}
                       </div>
@@ -816,14 +816,14 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                 {/* ══ STEP 1: Basic Info ══ */}
                 {step === 1 && (
                   <div className="space-y-4 animate-fadein">
-                    <h2 className="text-base sm:text-xl font-bold text-gray-800">Basic Information</h2>
+                    <h2 className="text-base sm:text-xl font-bold text-[var(--txt-heading)]">Basic Information</h2>
 
                     {/* Google quick sign-up */}
                     <button
                       type="button"
                       onClick={handleGoogle}
                       disabled={gLoading || loading}
-                      className="w-full flex items-center justify-center gap-2.5 min-h-[50px] px-4 py-3 sm:py-3.5 bg-white border-2 border-gray-200 rounded-xl hover:border-gray-300 hover:shadow-md active:scale-[0.98] transition-all font-semibold text-sm text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+                      className="w-full flex items-center justify-center gap-2.5 min-h-[50px] px-4 py-3 sm:py-3.5 bg-[var(--clr-bg-card)] border-2 border-[var(--clr-border)] rounded-xl hover:border-[var(--clr-border)] hover:shadow-md active:scale-[0.98] transition-all font-semibold text-sm text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
                     >
                       {gLoading ? <Spinner /> : <GoogleIcon size={18} />}
                       <span>{gLoading ? 'Continuing…' : 'Continue with Google'}</span>
@@ -872,24 +872,24 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                       hint="3-20 chars: lowercase letters, numbers, dots. E.g. ajay.kumar"
                     >
                       <div className="relative group">
-                        <AtSign className="absolute left-3 sm:left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-focus-within:text-gray-600 transition-colors pointer-events-none" />
+                        <AtSign className="absolute left-3 sm:left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-focus-within:text-[var(--txt-body)] transition-colors pointer-events-none" />
                         <input
                           type="text"
                           value={form.username}
                           onChange={e => handleUsernameChange(e.target.value)}
                           placeholder="yourname"
                           maxLength={20}
-                          className="w-full pl-9 sm:pl-11 pr-24 py-3 sm:py-3.5 bg-white/60 border-2 border-gray-200 rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none transition-all text-gray-800 placeholder-gray-400 text-sm"
+                          className="w-full pl-9 sm:pl-11 pr-24 py-3 sm:py-3.5 bg-[var(--clr-bg-card)]/60 border-2 border-[var(--clr-border)] rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none transition-all text-[var(--txt-heading)] placeholder-gray-400 text-sm"
                         />
                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-gray-400 pointer-events-none select-none">@rakt</span>
                       </div>
                       {/* Status indicator */}
                       {form.username.length >= 3 && (
                         <div className={`mt-1.5 flex items-center gap-1.5 text-[11px] font-medium ${
-                          usernameStatus === 'checking'  ? 'text-gray-500' :
+                          usernameStatus === 'checking'  ? 'text-[var(--txt-body)]' :
                           usernameStatus === 'available' ? 'text-[var(--clr-success)]' :
                           usernameStatus === 'taken'     ? 'text-[var(--clr-emergency)]' :
-                          usernameStatus === 'invalid'   ? 'text-amber-600' : 'text-gray-500'
+                          usernameStatus === 'invalid'   ? 'text-amber-600' : 'text-[var(--txt-body)]'
                         }`}>
                           {usernameStatus === 'checking'  && <><Loader2 className="w-3 h-3 animate-spin" /> Checking availability…</>}
                           {usernameStatus === 'available' && <><CheckCircle2 className="w-3 h-3" /> <strong>{formatUsername(form.username)}</strong> is available!</>}
@@ -906,11 +906,11 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                   <div className="space-y-5 animate-fadein">
                     <div className="flex flex-col items-center text-center gap-3">
                       <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-r ${cfg.gradient} flex items-center justify-center shadow-lg`}>
-                        <Mail className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                        <Mail className="w-8 h-8 sm:w-10 sm:h-10 text-[var(--txt-inverse)]" />
                       </div>
                       <div>
-                        <h2 className="text-base sm:text-xl font-bold text-gray-800 mb-1">Verify Email Address</h2>
-                        <p className="text-xs sm:text-sm text-gray-500">
+                        <h2 className="text-base sm:text-xl font-bold text-[var(--txt-heading)] mb-1">Verify Email Address</h2>
+                        <p className="text-xs sm:text-sm text-[var(--txt-body)]">
                           {otpSent
                             ? `Enter the 6-digit code sent to ${form.email}`
                             : `Click below to receive code on ${form.email}`}
@@ -920,7 +920,7 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
 
                     {!otpSent ? (
                       <button type="button" onClick={sendOTP} disabled={otpLoading}
-                        className={`w-full min-h-[50px] py-3.5 rounded-xl font-semibold text-white shadow-lg text-sm sm:text-base transition-all touch-manipulation bg-gradient-to-r ${cfg.gradient} hover:shadow-xl disabled:opacity-60`}>
+                        className={`w-full min-h-[50px] py-3.5 rounded-xl font-semibold text-[var(--txt-inverse)] shadow-lg text-sm sm:text-base transition-all touch-manipulation bg-gradient-to-r ${cfg.gradient} hover:shadow-xl disabled:opacity-60`}>
                         {otpLoading
                           ? <span className="flex items-center justify-center gap-2"><Spinner white /> Sending…</span>
                           : <span className="flex items-center justify-center gap-2"><KeyRound className="w-5 h-5" /> Send OTP</span>}
@@ -944,8 +944,8 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                                 otpVerified
                                   ? 'bg-green-50 border-[var(--clr-success)] text-green-700'
                                   : digit
-                                    ? 'bg-white border-gray-500'
-                                    : 'bg-white/60 border-gray-300 focus:border-gray-500 focus:ring-4 focus:ring-gray-200/50'
+                                    ? 'bg-[var(--clr-bg-card)] border-gray-500'
+                                    : 'bg-[var(--clr-bg-card)]/60 border-[var(--clr-border)] focus:border-gray-500 focus:ring-4 focus:ring-gray-200/50'
                               }`}
                               style={{ width: 44, height: 52 }}
                             />
@@ -959,17 +959,17 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                         ) : (
                           <>
                             <button type="button" onClick={verifyOTP} disabled={otpLoading || otp.join('').length !== 6}
-                              className={`w-full min-h-[50px] py-3.5 rounded-xl font-semibold text-white shadow-lg text-sm sm:text-base transition-all touch-manipulation ${
+                              className={`w-full min-h-[50px] py-3.5 rounded-xl font-semibold text-[var(--txt-inverse)] shadow-lg text-sm sm:text-base transition-all touch-manipulation ${
                                 otp.join('').length === 6
                                   ? `bg-gradient-to-r ${cfg.gradient} hover:shadow-xl active:scale-[0.99]`
                                   : 'bg-gray-300 cursor-not-allowed'
                               }`}>
                               {otpLoading ? <span className="flex items-center justify-center gap-2"><Spinner white />Verifying…</span> : 'Verify OTP'}
                             </button>
-                            <p className="text-center text-xs sm:text-sm text-gray-500">
+                            <p className="text-center text-xs sm:text-sm text-[var(--txt-body)]">
                               {resendTimer > 0
                                 ? <>Resend in <strong className="text-gray-700">{resendTimer}s</strong></>
-                                : <button type="button" onClick={async () => { setOtp(['','','','','','']); await sendOTP(); }} className="font-semibold text-gray-700 hover:text-gray-900 underline touch-manipulation">Resend OTP</button>}
+                                : <button type="button" onClick={async () => { setOtp(['','','','','','']); await sendOTP(); }} className="font-semibold text-gray-700 hover:text-[var(--txt-heading)] underline touch-manipulation">Resend OTP</button>}
                             </p>
                           </>
                         )}
@@ -981,7 +981,7 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                 {/* ══ STEP 3: Role Details ══ */}
                 {step === 3 && (
                   <div className="space-y-4 animate-fadein">
-                    <h2 className="text-base sm:text-xl font-bold text-gray-800">
+                    <h2 className="text-base sm:text-xl font-bold text-[var(--txt-heading)]">
                       {role === 'donor' ? 'Donor Details' : role === 'hospital' ? 'Hospital Details' : role === 'bloodbank' ? 'Blood Bank Details' : 'Admin Details'}
                     </h2>
 
@@ -1002,14 +1002,14 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                         <div className="grid grid-cols-2 gap-3">
                           <Field label="Blood Group" required>
                             <select value={form.bloodGroup} onChange={e => set('bloodGroup', e.target.value)}
-                              className="w-full px-3 py-3 sm:py-3.5 bg-white/60 border-2 border-gray-200 rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none text-sm text-gray-800 transition-all">
+                              className="w-full px-3 py-3 sm:py-3.5 bg-[var(--clr-bg-card)]/60 border-2 border-[var(--clr-border)] rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none text-sm text-[var(--txt-heading)] transition-all">
                               <option value="">Select</option>
                               {BLOOD_GROUPS.map(bg => <option key={bg}>{bg}</option>)}
                             </select>
                           </Field>
                           <Field label="Gender" required>
                             <select value={form.gender} onChange={e => set('gender', e.target.value)}
-                              className="w-full px-3 py-3 sm:py-3.5 bg-white/60 border-2 border-gray-200 rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none text-sm text-gray-800 transition-all">
+                              className="w-full px-3 py-3 sm:py-3.5 bg-[var(--clr-bg-card)]/60 border-2 border-[var(--clr-border)] rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none text-sm text-[var(--txt-heading)] transition-all">
                               <option value="">Select</option>
                               <option value="male">Male</option>
                               <option value="female">Female</option>
@@ -1027,9 +1027,9 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                             max={new Date().toISOString().split('T')[0]} disabled={form.dontRemember}
                             iconLeft={<Calendar className="w-4 h-4 sm:w-5 sm:h-5" />} />
                           <label className="flex items-center gap-2 mt-2 cursor-pointer touch-manipulation">
-                            <input type="checkbox" className="w-4 h-4 rounded border-gray-300 accent-gray-700" checked={form.dontRemember}
+                            <input type="checkbox" className="w-4 h-4 rounded border-[var(--clr-border)] accent-gray-700" checked={form.dontRemember}
                               onChange={e => { set('dontRemember', e.target.checked); if (e.target.checked) set('lastDonationDate', ''); }} />
-                            <span className="text-xs sm:text-sm text-gray-600">I don't remember</span>
+                            <span className="text-xs sm:text-sm text-[var(--txt-body)]">I don't remember</span>
                           </label>
                         </Field>
                       </>
@@ -1083,7 +1083,7 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Droplet className="w-5 h-5 text-purple-600" fill="currentColor" />
-                        <h2 className="text-base sm:text-xl font-bold text-gray-800">Initial Blood Inventory</h2>
+                        <h2 className="text-base sm:text-xl font-bold text-[var(--txt-heading)]">Initial Blood Inventory</h2>
                       </div>
                       {totalInventoryUnits > 0 && (
                         <span className="text-xs font-bold bg-purple-100 text-purple-700 px-3 py-1 rounded-full">
@@ -1091,7 +1091,7 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                         </span>
                       )}
                     </div>
-                    <p className="text-xs sm:text-sm text-gray-500">
+                    <p className="text-xs sm:text-sm text-[var(--txt-body)]">
                       Enter your current blood stock. Use +/− to adjust or type directly. You can update this anytime from the dashboard.
                     </p>
 
@@ -1108,7 +1108,7 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
 
                     {/* Quick fill presets */}
                     <div className="space-y-2">
-                      <p className="text-xs text-gray-500 font-medium">Quick presets:</p>
+                      <p className="text-xs text-[var(--txt-body)] font-medium">Quick presets:</p>
                       <div className="flex flex-wrap gap-2">
                         {[
                           { label: 'Skip (all 0)', values: Object.fromEntries(BLOOD_GROUPS.map(bg => [bg, 0])) },
@@ -1119,7 +1119,7 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                             key={preset.label}
                             type="button"
                             onClick={() => set('inventory', preset.values)}
-                            className="px-3 py-1.5 text-xs font-semibold bg-white border-2 border-purple-200 text-purple-700 rounded-xl hover:bg-purple-50 active:scale-95 transition-all touch-manipulation"
+                            className="px-3 py-1.5 text-xs font-semibold bg-[var(--clr-bg-card)] border-2 border-purple-200 text-purple-700 rounded-xl hover:bg-purple-50 active:scale-95 transition-all touch-manipulation"
                           >
                             {preset.label}
                           </button>
@@ -1146,25 +1146,25 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                 {/* ══ ADDRESS STEP ══ */}
                 {((step === 4 && role !== 'bloodbank') || (step === 5 && role === 'bloodbank')) && (
                   <div className="space-y-4 animate-fadein">
-                    <h2 className="text-base sm:text-xl font-bold text-gray-800">Address Details</h2>
+                    <h2 className="text-base sm:text-xl font-bold text-[var(--txt-heading)]">Address Details</h2>
 
                     <Field label="Complete Address" required>
                       <div className="relative group">
-                        <Home className="absolute left-3 sm:left-3.5 top-3 sm:top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-focus-within:text-gray-600 transition-colors pointer-events-none" />
+                        <Home className="absolute left-3 sm:left-3.5 top-3 sm:top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-focus-within:text-[var(--txt-body)] transition-colors pointer-events-none" />
                         <textarea rows={3} value={form.address} onChange={e => set('address', e.target.value)}
                           placeholder="Street, Building, Landmark…"
-                          className="w-full pl-9 sm:pl-11 pr-3 sm:pr-4 py-3 sm:py-3.5 bg-white/60 border-2 border-gray-200 rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none transition-all resize-none text-sm text-gray-800 placeholder-gray-400" />
+                          className="w-full pl-9 sm:pl-11 pr-3 sm:pr-4 py-3 sm:py-3.5 bg-[var(--clr-bg-card)]/60 border-2 border-[var(--clr-border)] rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none transition-all resize-none text-sm text-[var(--txt-heading)] placeholder-gray-400" />
                       </div>
                     </Field>
 
                     <div className="grid grid-cols-2 gap-3">
                       <Field label="District" required>
                         <input value={form.district} onChange={e => set('district', e.target.value)} placeholder="District"
-                          className="w-full px-3 py-3 sm:py-3.5 bg-white/60 border-2 border-gray-200 rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none text-sm text-gray-800 placeholder-gray-400 transition-all" />
+                          className="w-full px-3 py-3 sm:py-3.5 bg-[var(--clr-bg-card)]/60 border-2 border-[var(--clr-border)] rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none text-sm text-[var(--txt-heading)] placeholder-gray-400 transition-all" />
                       </Field>
                       <Field label="State" required>
                         <select value={form.state} onChange={e => set('state', e.target.value)}
-                          className="w-full px-3 py-3 sm:py-3.5 bg-white/60 border-2 border-gray-200 rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none text-sm text-gray-800 transition-all">
+                          className="w-full px-3 py-3 sm:py-3.5 bg-[var(--clr-bg-card)]/60 border-2 border-[var(--clr-border)] rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none text-sm text-[var(--txt-heading)] transition-all">
                           <option value="">Select</option>
                           {INDIAN_STATES.map(s => <option key={s}>{s}</option>)}
                         </select>
@@ -1182,16 +1182,16 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                 {/* ══ PASSWORD STEP ══ */}
                 {step === TOTAL_STEPS && (
                   <div className="space-y-4 animate-fadein">
-                    <h2 className="text-base sm:text-xl font-bold text-gray-800">Set Password &amp; Finish</h2>
+                    <h2 className="text-base sm:text-xl font-bold text-[var(--txt-heading)]">Set Password &amp; Finish</h2>
 
                     <Field label="Password" required>
                       <div className="relative group">
-                        <Lock className="absolute left-3 sm:left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-focus-within:text-gray-600 transition-colors pointer-events-none" />
+                        <Lock className="absolute left-3 sm:left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-focus-within:text-[var(--txt-body)] transition-colors pointer-events-none" />
                         <input type={showPassword ? 'text' : 'password'} value={form.password}
                           onChange={e => set('password', e.target.value)} placeholder="••••••••"
-                          className="w-full pl-9 sm:pl-11 pr-10 sm:pr-12 py-3 sm:py-3.5 bg-white/60 border-2 border-gray-200 rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none transition-all text-sm text-gray-800 placeholder-gray-400" />
+                          className="w-full pl-9 sm:pl-11 pr-10 sm:pr-12 py-3 sm:py-3.5 bg-[var(--clr-bg-card)]/60 border-2 border-[var(--clr-border)] rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none transition-all text-sm text-[var(--txt-heading)] placeholder-gray-400" />
                         <button type="button" tabIndex={-1} onClick={() => setShowPassword(v => !v)} aria-label={showPassword ? 'Hide' : 'Show'}
-                          className="absolute right-3 sm:right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors touch-manipulation p-0.5">
+                          className="absolute right-3 sm:right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[var(--txt-body)] transition-colors touch-manipulation p-0.5">
                           {showPassword ? <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Eye className="w-4 h-4 sm:w-5 sm:h-5" />}
                         </button>
                       </div>
@@ -1216,12 +1216,12 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
 
                     <Field label="Confirm Password" required>
                       <div className="relative group">
-                        <Lock className="absolute left-3 sm:left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-focus-within:text-gray-600 transition-colors pointer-events-none" />
+                        <Lock className="absolute left-3 sm:left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-focus-within:text-[var(--txt-body)] transition-colors pointer-events-none" />
                         <input type={showConfirm ? 'text' : 'password'} value={form.confirmPassword}
                           onChange={e => set('confirmPassword', e.target.value)} placeholder="••••••••"
-                          className="w-full pl-9 sm:pl-11 pr-10 sm:pr-12 py-3 sm:py-3.5 bg-white/60 border-2 border-gray-200 rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none transition-all text-sm text-gray-800 placeholder-gray-400" />
+                          className="w-full pl-9 sm:pl-11 pr-10 sm:pr-12 py-3 sm:py-3.5 bg-[var(--clr-bg-card)]/60 border-2 border-[var(--clr-border)] rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none transition-all text-sm text-[var(--txt-heading)] placeholder-gray-400" />
                         <button type="button" tabIndex={-1} onClick={() => setShowConfirm(v => !v)} aria-label={showConfirm ? 'Hide' : 'Show'}
-                          className="absolute right-3 sm:right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors touch-manipulation p-0.5">
+                          className="absolute right-3 sm:right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[var(--txt-body)] transition-colors touch-manipulation p-0.5">
                           {showConfirm ? <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Eye className="w-4 h-4 sm:w-5 sm:h-5" />}
                         </button>
                       </div>
@@ -1260,12 +1260,12 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                     <label className="flex items-start gap-3 cursor-pointer touch-manipulation">
                       <span className="relative flex-shrink-0 mt-0.5">
                         <input type="checkbox" checked={form.acceptTerms} onChange={e => set('acceptTerms', e.target.checked)} className="sr-only peer" />
-                        <span className="flex w-5 h-5 border-2 border-gray-300 rounded-md peer-checked:bg-gradient-to-br peer-checked:from-gray-700 peer-checked:to-gray-900 peer-checked:border-gray-700 transition-all items-center justify-center">
-                          {form.acceptTerms && <CheckCircle2 className="w-3 h-3 text-white" />}
+                        <span className="flex w-5 h-5 border-2 border-[var(--clr-border)] rounded-md peer-checked:bg-gradient-to-br peer-checked:from-gray-700 peer-checked:to-gray-900 peer-checked:border-gray-700 transition-all items-center justify-center">
+                          {form.acceptTerms && <CheckCircle2 className="w-3 h-3 text-[var(--txt-inverse)]" />}
                         </span>
                       </span>
                       <span className="text-xs sm:text-sm text-gray-700 leading-relaxed">
-                        I agree to the <strong className="text-gray-900">Terms &amp; Conditions</strong> and <strong className="text-gray-900">Privacy Policy</strong> of RaktPort
+                        I agree to the <strong className="text-[var(--txt-heading)]">Terms &amp; Conditions</strong> and <strong className="text-[var(--txt-heading)]">Privacy Policy</strong> of RaktPort
                       </span>
                     </label>
 
@@ -1292,7 +1292,7 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                 <div className="flex items-center justify-between pt-4 border-t border-gray-100 gap-3">
                   {step > 1 && (
                     <button type="button" onClick={goPrev} disabled={loading}
-                      className="flex items-center gap-1.5 px-4 sm:px-5 py-2.5 sm:py-3 min-h-[46px] bg-white border-2 border-gray-200 rounded-xl hover:bg-gray-50 active:scale-95 transition-all font-semibold text-sm text-gray-700 disabled:opacity-50 touch-manipulation">
+                      className="flex items-center gap-1.5 px-4 sm:px-5 py-2.5 sm:py-3 min-h-[46px] bg-[var(--clr-bg-card)] border-2 border-[var(--clr-border)] rounded-xl hover:bg-[var(--clr-bg-page)] active:scale-95 transition-all font-semibold text-sm text-gray-700 disabled:opacity-50 touch-manipulation">
                       <ChevronLeft className="w-4 h-4" /> Previous
                     </button>
                   )}
@@ -1300,20 +1300,20 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                   {step < TOTAL_STEPS ? (
                     <button type="button" onClick={goNext}
                       disabled={step === 2 && otpSent && !otpVerified}
-                      className={`ml-auto flex items-center gap-1.5 px-5 sm:px-6 py-2.5 sm:py-3 min-h-[46px] bg-gradient-to-r ${cfg.gradient} text-white rounded-xl hover:shadow-lg active:scale-95 transition-all font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation`}>
+                      className={`ml-auto flex items-center gap-1.5 px-5 sm:px-6 py-2.5 sm:py-3 min-h-[46px] bg-gradient-to-r ${cfg.gradient} text-[var(--txt-inverse)] rounded-xl hover:shadow-lg active:scale-95 transition-all font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation`}>
                       Next <ChevronRight className="w-4 h-4" />
                     </button>
                   ) : (
                     <button type="button" onClick={handleSubmit}
                       disabled={loading || !form.acceptTerms}
-                      className={`ml-auto flex items-center gap-2 px-5 sm:px-8 py-3 sm:py-3.5 min-h-[46px] bg-gradient-to-r ${cfg.gradient} text-white rounded-xl hover:shadow-xl active:scale-[0.99] transition-all font-bold text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation`}>
+                      className={`ml-auto flex items-center gap-2 px-5 sm:px-8 py-3 sm:py-3.5 min-h-[46px] bg-gradient-to-r ${cfg.gradient} text-[var(--txt-inverse)] rounded-xl hover:shadow-xl active:scale-[0.99] transition-all font-bold text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation`}>
                       {loading ? <><Spinner white />Registering…</> : <><CheckCircle2 className="w-4 h-4" />Complete Registration</>}
                     </button>
                   )}
                 </div>
 
                 {/* Login link */}
-                <p className="text-center text-xs sm:text-sm text-gray-600 pt-1">
+                <p className="text-center text-xs sm:text-sm text-[var(--txt-body)] pt-1">
                   Already have an account?{' '}
                   <button type="button" onClick={onLoginClick}
                     className={`font-semibold bg-gradient-to-r ${cfg.gradient} bg-clip-text text-transparent hover:underline touch-manipulation`}>

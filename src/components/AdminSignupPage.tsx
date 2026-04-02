@@ -426,16 +426,16 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
         </Button>
 
         <div className="max-w-2xl mx-auto">
-          <Card className="p-8 border-t-4 border-emerald-600 shadow-2xl bg-white/90 backdrop-blur-sm">
+          <Card className="p-8 border-t-4 border-emerald-600 shadow-2xl bg-[var(--clr-bg-card)]/90 backdrop-blur-sm">
             {/* Logo and Title */}
             <div className="text-center mb-8">
               <div className="flex justify-center mb-4">
                 <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg">
-                  <Shield className="w-12 h-12 text-white" />
+                  <Shield className="w-12 h-12 text-[var(--txt-inverse)]" />
                 </div>
               </div>
               <h2 className="text-3xl font-bold text-emerald-800 mb-2">Admin Registration</h2>
-              <p className="text-gray-600">RaktPort - Secure Admin Access</p>
+              <p className="text-[var(--txt-body)]">RaktPort - Secure Admin Access</p>
               <div className="mt-4 h-1 w-20 bg-gradient-to-r from-emerald-500 to-teal-500 mx-auto rounded-full"></div>
             </div>
 
@@ -443,9 +443,9 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
             <div className="flex items-center justify-between mb-8 px-4">
               {[1, 2, 3, 4].map((s) => (
                 <div key={s} className="flex items-center flex-1">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all ${s < step ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white scale-100' :
-                    s === step ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white scale-110 shadow-lg' :
-                      'bg-gray-200 text-gray-500'
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all ${s < step ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-[var(--txt-inverse)] scale-100' :
+                    s === step ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-[var(--txt-inverse)] scale-110 shadow-lg' :
+                      'bg-gray-200 text-[var(--txt-body)]'
                     }`}>
                     {s < step ? <CheckCircle2 className="w-6 h-6" /> : s}
                   </div>
@@ -477,8 +477,8 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
                     <div className="w-16 h-16 mx-auto rounded-full bg-emerald-100 flex items-center justify-center mb-4">
                       <KeyRound className="w-8 h-8 text-emerald-600" />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-800">Verify Admin Access</h3>
-                    <p className="text-sm text-gray-600 mt-2">
+                    <h3 className="text-xl font-bold text-[var(--txt-heading)]">Verify Admin Access</h3>
+                    <p className="text-sm text-[var(--txt-body)] mt-2">
                       Enter your admin registration key to continue
                     </p>
                   </div>
@@ -495,11 +495,11 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
                         placeholder="Enter admin registration key"
                         value={formData.adminKey}
                         onChange={handleChange}
-                        className="pl-10 border-2 border-gray-300 focus:border-emerald-500 focus:ring-emerald-200"
+                        className="pl-10 border-2 border-[var(--clr-border)] focus:border-emerald-500 focus:ring-emerald-200"
                         required
                       />
                     </div>
-                    <p className="text-xs text-gray-500 mt-2">
+                    <p className="text-xs text-[var(--txt-body)] mt-2">
                       <Shield className="w-3 h-3 inline mr-1" />
                       Contact your system administrator for the registration key
                     </p>
@@ -521,8 +521,8 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
                     <div className="w-16 h-16 mx-auto rounded-full bg-emerald-100 flex items-center justify-center mb-4">
                       <User className="w-8 h-8 text-emerald-600" />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-800">Personal Information</h3>
-                    <p className="text-sm text-gray-600 mt-2">
+                    <h3 className="text-xl font-bold text-[var(--txt-heading)]">Personal Information</h3>
+                    <p className="text-sm text-[var(--txt-body)] mt-2">
                       Enter your details for admin account creation
                     </p>
                   </div>
@@ -540,7 +540,7 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
                         placeholder="Enter your full name"
                         value={formData.fullName}
                         onChange={handleChange}
-                        className="pl-10 border-2 border-gray-300 focus:border-emerald-500 focus:ring-emerald-200"
+                        className="pl-10 border-2 border-[var(--clr-border)] focus:border-emerald-500 focus:ring-emerald-200"
                         required
                       />
                     </div>
@@ -560,7 +560,7 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
                           placeholder="admin@example.com"
                           value={formData.email}
                           onChange={handleChange}
-                          className="pl-10 border-2 border-gray-300 focus:border-emerald-500 focus:ring-emerald-200"
+                          className="pl-10 border-2 border-[var(--clr-border)] focus:border-emerald-500 focus:ring-emerald-200"
                           required
                         />
                       </div>
@@ -571,7 +571,7 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
                         Mobile Number *
                       </Label>
                       <div className="flex gap-2">
-                        <div className="flex items-center px-3 border-2 border-gray-300 rounded-md bg-gray-50 text-gray-600 font-semibold">
+                        <div className="flex items-center px-3 border-2 border-[var(--clr-border)] rounded-md bg-[var(--clr-bg-page)] text-[var(--txt-body)] font-semibold">
                           +91
                         </div>
                         <div className="relative flex-1">
@@ -582,20 +582,20 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
                             placeholder="10-digit number"
                             value={formData.mobile}
                             onChange={(e) => handleNumericChange(e, 'mobile', 10)}
-                            className="pl-10 border-2 border-gray-300 focus:border-emerald-500 focus:ring-emerald-200"
+                            className="pl-10 border-2 border-[var(--clr-border)] focus:border-emerald-500 focus:ring-emerald-200"
                             required
                           />
                         </div>
                       </div>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-[var(--txt-body)]">
                         OTP will be sent to this number for verification
                       </p>
                     </div>
                   </div>
 
                   {/* Location Details */}
-                  <div className="pt-4 border-t border-gray-200">
-                    <h4 className="text-lg font-semibold text-gray-800 mb-4">Location Details</h4>
+                  <div className="pt-4 border-t border-[var(--clr-border)]">
+                    <h4 className="text-lg font-semibold text-[var(--txt-heading)] mb-4">Location Details</h4>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="space-y-2">
@@ -606,7 +606,7 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
                           id="state"
                           value={formData.state}
                           onChange={handleChange}
-                          className="w-full px-3 py-2 border-2 border-gray-300 rounded-md focus:border-emerald-500 focus:ring-emerald-200 focus:outline-none"
+                          className="w-full px-3 py-2 border-2 border-[var(--clr-border)] rounded-md focus:border-emerald-500 focus:ring-emerald-200 focus:outline-none"
                           required
                         >
                           <option value="">Select State</option>
@@ -626,7 +626,7 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
                           placeholder="e.g., New Delhi"
                           value={formData.district}
                           onChange={handleChange}
-                          className="border-2 border-gray-300 focus:border-emerald-500 focus:ring-emerald-200"
+                          className="border-2 border-[var(--clr-border)] focus:border-emerald-500 focus:ring-emerald-200"
                           required
                         />
                       </div>
@@ -643,7 +643,7 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
                             placeholder="110001"
                             value={formData.pincode}
                             onChange={(e) => handleNumericChange(e, 'pincode', 6)}
-                            className="pl-10 border-2 border-gray-300 focus:border-emerald-500 focus:ring-emerald-200"
+                            className="pl-10 border-2 border-[var(--clr-border)] focus:border-emerald-500 focus:ring-emerald-200"
                             required
                           />
                         </div>
@@ -658,10 +658,10 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
                 <div className="space-y-6 animate-in fade-in duration-500">
                   <div className="text-center mb-6">
                     <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center mb-4 shadow-lg">
-                      <Smartphone className="w-10 h-10 text-white" />
+                      <Smartphone className="w-10 h-10 text-[var(--txt-inverse)]" />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-800">Verify Phone Number</h3>
-                    <p className="text-sm text-gray-600 mt-2">
+                    <h3 className="text-xl font-bold text-[var(--txt-heading)]">Verify Phone Number</h3>
+                    <p className="text-sm text-[var(--txt-body)] mt-2">
                       {otpSent
                         ? `Enter the 6-digit OTP sent to +91 ${formData.mobile}`
                         : `Click below to receive OTP on +91 ${formData.mobile}`
@@ -674,7 +674,7 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
                       type="button"
                       onClick={handleSendOTP}
                       disabled={otpLoading}
-                      className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white py-6 text-lg font-semibold shadow-lg"
+                      className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-[var(--txt-inverse)] py-6 text-lg font-semibold shadow-lg"
                     >
                       {otpLoading ? (
                         <div className="flex items-center justify-center gap-2">
@@ -705,7 +705,7 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
                             disabled={otpVerified}
                             className={`w-12 h-14 text-center text-xl font-bold border-2 rounded-xl transition-all outline-none ${otpVerified
                               ? 'bg-green-50 border-[var(--clr-success)] text-green-700'
-                              : 'bg-white border-gray-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-200'
+                              : 'bg-[var(--clr-bg-card)] border-[var(--clr-border)] focus:border-emerald-500 focus:ring-4 focus:ring-emerald-200'
                               }`}
                           />
                         ))}
@@ -723,8 +723,8 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
                             onClick={handleVerifyOTP}
                             disabled={otpLoading || otp.join('').length !== 6}
                             className={`w-full py-6 text-lg font-semibold shadow-lg ${otp.join('').length === 6
-                              ? 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white'
-                              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                              ? 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-[var(--txt-inverse)]'
+                              : 'bg-gray-300 text-[var(--txt-body)] cursor-not-allowed'
                               }`}
                           >
                             {otpLoading ? (
@@ -739,7 +739,7 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
 
                           <div className="text-center">
                             {resendTimer > 0 ? (
-                              <p className="text-sm text-gray-600">
+                              <p className="text-sm text-[var(--txt-body)]">
                                 Resend OTP in <span className="font-bold text-emerald-600">{resendTimer}s</span>
                               </p>
                             ) : (
@@ -766,8 +766,8 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
                     <div className="w-16 h-16 mx-auto rounded-full bg-emerald-100 flex items-center justify-center mb-4">
                       <Lock className="w-8 h-8 text-emerald-600" />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-800">Set Your Password</h3>
-                    <p className="text-sm text-gray-600 mt-2">
+                    <h3 className="text-xl font-bold text-[var(--txt-heading)]">Set Your Password</h3>
+                    <p className="text-sm text-[var(--txt-body)] mt-2">
                       Create a secure password for your admin account
                     </p>
                   </div>
@@ -785,13 +785,13 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
                           placeholder="Min 6 characters"
                           value={formData.password}
                           onChange={handleChange}
-                          className="pl-10 pr-10 border-2 border-gray-300 focus:border-emerald-500 focus:ring-emerald-200"
+                          className="pl-10 pr-10 border-2 border-[var(--clr-border)] focus:border-emerald-500 focus:ring-emerald-200"
                           required
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[var(--txt-body)]"
                         >
                           {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                         </button>
@@ -810,13 +810,13 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
                           placeholder="Re-enter password"
                           value={formData.confirmPassword}
                           onChange={handleChange}
-                          className="pl-10 pr-10 border-2 border-gray-300 focus:border-emerald-500 focus:ring-emerald-200"
+                          className="pl-10 pr-10 border-2 border-[var(--clr-border)] focus:border-emerald-500 focus:ring-emerald-200"
                           required
                         />
                         <button
                           type="button"
                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[var(--txt-body)]"
                         >
                           {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                         </button>
@@ -854,14 +854,14 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
               )}
 
               {/* Navigation Buttons */}
-              <div className="flex items-center justify-between pt-6 border-t border-gray-200">
+              <div className="flex items-center justify-between pt-6 border-t border-[var(--clr-border)]">
                 {step > 1 && (
                   <Button
                     type="button"
                     onClick={handleBack}
                     variant="outline"
                     disabled={loading || otpLoading}
-                    className="border-2 border-gray-300 hover:bg-gray-50"
+                    className="border-2 border-[var(--clr-border)] hover:bg-[var(--clr-bg-page)]"
                   >
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     Back
@@ -873,7 +873,7 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
                     type="button"
                     onClick={handleNext}
                     disabled={loading || otpLoading || (step === 3 && otpSent && !otpVerified)}
-                    className="ml-auto bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
+                    className="ml-auto bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-[var(--txt-inverse)]"
                   >
                     {step === 3 && !otpVerified ? 'Verify OTP First' : 'Next'}
                     <ArrowLeft className="w-4 h-4 ml-2 rotate-180" />
@@ -882,7 +882,7 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
                   <Button
                     type="submit"
                     disabled={loading}
-                    className="ml-auto bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white px-8 py-6 text-lg font-bold shadow-lg"
+                    className="ml-auto bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-[var(--txt-inverse)] px-8 py-6 text-lg font-bold shadow-lg"
                   >
                     {loading ? (
                       <div className="flex items-center gap-2">
@@ -900,8 +900,8 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
               </div>
 
               {/* Login Link */}
-              <div className="text-center pt-6 border-t border-gray-200">
-                <p className="text-gray-600 mb-3">Already have an admin account?</p>
+              <div className="text-center pt-6 border-t border-[var(--clr-border)]">
+                <p className="text-[var(--txt-body)] mb-3">Already have an admin account?</p>
                 <Button
                   type="button"
                   onClick={onLoginClick}

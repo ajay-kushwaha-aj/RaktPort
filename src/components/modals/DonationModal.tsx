@@ -246,13 +246,13 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
         <DialogHeader className="border-b border-red-100 pb-4">
           <div className="flex items-center gap-4">
             <div className="h-14 w-14 rounded-full bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-lg">
-              <Droplet className="h-7 w-7 text-white fill-white" />
+              <Droplet className="h-7 w-7 text-[var(--txt-inverse)] fill-white" />
             </div>
             <div>
-              <DialogTitle className="text-2xl font-bold text-gray-900">
+              <DialogTitle className="text-2xl font-bold text-[var(--txt-heading)]">
                 {isCheckIn ? 'Process Donation Check-In' : 'Record New Donation'}
               </DialogTitle>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-[var(--txt-body)] mt-1">
                 {isCheckIn ? 'Complete the donation process for scheduled appointment' : 'Register a walk-in blood donation'}
               </p>
             </div>
@@ -262,11 +262,11 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
         <div className="space-y-6 py-4">
 
           {/* DONOR INFORMATION CARD */}
-          <div className="bg-white rounded-xl border-2 border-blue-100 shadow-sm">
+          <div className="bg-[var(--clr-bg-card)] rounded-xl border-2 border-blue-100 shadow-sm">
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-3 border-b border-blue-100">
               <div className="flex items-center gap-2">
                 <User className="h-5 w-5 text-[var(--clr-info)]" />
-                <h3 className="font-bold text-gray-900">Donor Information</h3>
+                <h3 className="font-bold text-[var(--txt-heading)]">Donor Information</h3>
                 {isCheckIn && (
                   <Badge className="ml-auto bg-blue-100 text-blue-700 border-blue-200">
                     <Shield className="h-3 w-3 mr-1" />
@@ -288,7 +288,7 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
                   value={donorName}
                   onChange={(e) => setDonorName(e.target.value)}
                   disabled={isCheckIn}
-                  className={`mt-1.5 ${isCheckIn ? 'bg-blue-50 border-blue-200 cursor-not-allowed font-semibold text-gray-900' : ''}`}
+                  className={`mt-1.5 ${isCheckIn ? 'bg-blue-50 border-blue-200 cursor-not-allowed font-semibold text-[var(--txt-heading)]' : ''}`}
                 />
               </div>
 
@@ -323,7 +323,7 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
               {/* Mobile (Optional) */}
               <div>
                 <Label htmlFor="mobile" className="text-sm font-semibold text-gray-700">
-                  Mobile Number <span className="text-xs text-gray-500">(Optional)</span>
+                  Mobile Number <span className="text-xs text-[var(--txt-body)]">(Optional)</span>
                 </Label>
                 <Input
                   id="mobile"
@@ -331,18 +331,18 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
                   value={mobile}
                   onChange={(e) => setMobile(e.target.value)}
                   disabled={isCheckIn}
-                  className={`mt-1.5 ${isCheckIn ? 'bg-gray-50 border-gray-200 cursor-not-allowed' : ''}`}
+                  className={`mt-1.5 ${isCheckIn ? 'bg-[var(--clr-bg-page)] border-[var(--clr-border)] cursor-not-allowed' : ''}`}
                 />
               </div>
             </div>
           </div>
 
           {/* DONATION DETAILS CARD */}
-          <div className="bg-white rounded-xl border-2 border-red-100 shadow-sm">
+          <div className="bg-[var(--clr-bg-card)] rounded-xl border-2 border-red-100 shadow-sm">
             <div className="bg-gradient-to-r from-red-50 to-pink-50 px-6 py-3 border-b border-red-100">
               <div className="flex items-center gap-2">
                 <Droplet className="h-5 w-5 text-[var(--clr-emergency)]" />
-                <h3 className="font-bold text-gray-900">Donation Details</h3>
+                <h3 className="font-bold text-[var(--txt-heading)]">Donation Details</h3>
               </div>
             </div>
 
@@ -401,11 +401,11 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
 
           {/* H-RTID VALIDATION CARD */}
           {donationType === 'H-RTID-Linked Donation' && (
-            <div className="bg-white rounded-xl border-2 border-purple-200 shadow-lg">
+            <div className="bg-[var(--clr-bg-card)] rounded-xl border-2 border-purple-200 shadow-lg">
               <div className="bg-gradient-to-r from-purple-50 to-indigo-50 px-6 py-3 border-b border-purple-100">
                 <div className="flex items-center gap-2">
                   <Building2 className="h-5 w-5 text-purple-600" />
-                  <h3 className="font-bold text-gray-900">Patient Request Linking</h3>
+                  <h3 className="font-bold text-[var(--txt-heading)]">Patient Request Linking</h3>
                 </div>
               </div>
 
@@ -446,33 +446,33 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-white rounded-lg p-3 border border-green-100">
-                        <span className="text-xs text-gray-600 font-medium">Patient Name</span>
-                        <p className="font-bold text-gray-900 mt-1">{hRtidData.patientName}</p>
+                      <div className="bg-[var(--clr-bg-card)] rounded-lg p-3 border border-green-100">
+                        <span className="text-xs text-[var(--txt-body)] font-medium">Patient Name</span>
+                        <p className="font-bold text-[var(--txt-heading)] mt-1">{hRtidData.patientName}</p>
                       </div>
 
-                      <div className="bg-white rounded-lg p-3 border border-green-100">
-                        <span className="text-xs text-gray-600 font-medium">Blood Group</span>
+                      <div className="bg-[var(--clr-bg-card)] rounded-lg p-3 border border-green-100">
+                        <span className="text-xs text-[var(--txt-body)] font-medium">Blood Group</span>
                         <p className="font-bold text-[var(--clr-emergency)] text-xl mt-1">{hRtidData.bloodGroup}</p>
                       </div>
 
-                      <div className="bg-white rounded-lg p-3 border border-green-100">
-                        <span className="text-xs text-gray-600 font-medium">Component</span>
-                        <p className="font-bold text-gray-900 mt-1">{hRtidData.component}</p>
+                      <div className="bg-[var(--clr-bg-card)] rounded-lg p-3 border border-green-100">
+                        <span className="text-xs text-[var(--txt-body)] font-medium">Component</span>
+                        <p className="font-bold text-[var(--txt-heading)] mt-1">{hRtidData.component}</p>
                       </div>
 
-                      <div className="bg-white rounded-lg p-3 border border-green-100">
-                        <span className="text-xs text-gray-600 font-medium">Units Required</span>
-                        <p className="font-bold text-gray-900 mt-1">{hRtidData.unitsRequired}</p>
+                      <div className="bg-[var(--clr-bg-card)] rounded-lg p-3 border border-green-100">
+                        <span className="text-xs text-[var(--txt-body)] font-medium">Units Required</span>
+                        <p className="font-bold text-[var(--txt-heading)] mt-1">{hRtidData.unitsRequired}</p>
                       </div>
 
-                      <div className="bg-white rounded-lg p-3 border border-green-100 col-span-2">
-                        <span className="text-xs text-gray-600 font-medium">Hospital</span>
-                        <p className="font-bold text-gray-900 mt-1">{hRtidData.hospitalName}</p>
+                      <div className="bg-[var(--clr-bg-card)] rounded-lg p-3 border border-green-100 col-span-2">
+                        <span className="text-xs text-[var(--txt-body)] font-medium">Hospital</span>
+                        <p className="font-bold text-[var(--txt-heading)] mt-1">{hRtidData.hospitalName}</p>
                       </div>
 
-                      <div className="bg-white rounded-lg p-3 border border-green-100">
-                        <span className="text-xs text-gray-600 font-medium flex items-center gap-1">
+                      <div className="bg-[var(--clr-bg-card)] rounded-lg p-3 border border-green-100">
+                        <span className="text-xs text-[var(--txt-body)] font-medium flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
                           Required By
                         </span>
@@ -480,16 +480,16 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
                       </div>
 
                       {(hRtidData.district || hRtidData.state) && (
-                        <div className="bg-white rounded-lg p-3 border border-green-100">
-                          <span className="text-xs text-gray-600 font-medium">Location</span>
-                          <p className="font-bold text-gray-900 mt-1 text-sm">
+                        <div className="bg-[var(--clr-bg-card)] rounded-lg p-3 border border-green-100">
+                          <span className="text-xs text-[var(--txt-body)] font-medium">Location</span>
+                          <p className="font-bold text-[var(--txt-heading)] mt-1 text-sm">
                             {hRtidData.district}, {hRtidData.state}
                           </p>
                         </div>
                       )}
                     </div>
 
-                    <div className="mt-4 p-3 bg-white rounded-lg border border-green-200">
+                    <div className="mt-4 p-3 bg-[var(--clr-bg-card)] rounded-lg border border-green-200">
                       <p className="text-sm text-green-800 font-medium flex items-center gap-2">
                         <span>🎯</span>
                         <span>This donation will directly help <strong>{hRtidData.patientName}</strong></span>
@@ -504,13 +504,13 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
         </div>
 
         {/* FOOTER */}
-        <DialogFooter className="border-t border-gray-200 pt-4">
+        <DialogFooter className="border-t border-[var(--clr-border)] pt-4">
           <Button variant="outline" onClick={handleClose} className="px-6">
             Cancel
           </Button>
           <Button
             onClick={handleSubmit}
-            className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 shadow-lg"
+            className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-[var(--txt-inverse)] px-8 shadow-lg"
             disabled={donationType === 'H-RTID-Linked Donation' && !hRtidValid}
           >
             <CheckCircle2 className="h-4 w-4 mr-2" />

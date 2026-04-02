@@ -149,7 +149,7 @@ export const RtidVerifyTab = ({ onVerifyRtid }: RtidVerifyTabProps) => {
       </Card>
 
       {isScanning && (
-        <Card className="p-8 bg-black/90 text-white text-center animate-pulse">
+        <Card className="p-8 bg-black/90 text-[var(--txt-inverse)] text-center animate-pulse">
           <QrCode className="h-16 w-16 mx-auto mb-4 animate-spin" />
           <p className="text-lg font-semibold">Scanning QR Code...</p>
           <p className="text-sm opacity-75 mt-2">Position the code within the frame</p>

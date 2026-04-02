@@ -108,21 +108,21 @@ export const NewRequestModal = ({
   return (
     <Dialog open={isOpen} onOpenChange={o => { if (!o && !isSubmitting) { onClose(); } }}>
       <DialogContent className="sm:max-w-2xl max-h-[92vh] overflow-y-auto rounded-2xl p-0">
-        <div className="sticky top-0 z-10 bg-white dark:bg-gray-900 rounded-t-2xl border-b border-gray-100 dark:border-gray-800 p-5">
+        <div className="sticky top-0 z-10 bg-[var(--clr-bg-card)] dark:bg-gray-900 rounded-t-2xl border-b border-gray-100 dark:border-gray-800 p-5">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{ background: uc.bg }}>{uc.emoji}</div>
             <div className="flex-1">
-              <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100" style={{ fontFamily: "Outfit,sans-serif" }}>New Blood Requisition</h2>
-              <p className="text-xs text-gray-500 dark:text-gray-400">NACO/MoHFW Compliant · {hospitalName}</p>
+              <h2 className="text-lg font-bold text-[var(--txt-heading)] dark:text-gray-100" style={{ fontFamily: "Outfit,sans-serif" }}>New Blood Requisition</h2>
+              <p className="text-xs text-[var(--txt-body)] dark:text-gray-400">NACO/MoHFW Compliant · {hospitalName}</p>
             </div>
-            <button type="button" onClick={() => { if (!isSubmitting) onClose(); }} className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center">
-              <X className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+            <button type="button" onClick={() => { if (!isSubmitting) onClose(); }} className="w-8 h-8 rounded-lg bg-[var(--clr-bg-page)] dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center">
+              <X className="w-4 h-4 text-[var(--txt-body)] dark:text-gray-400" />
             </button>
           </div>
           <div className="flex items-center gap-1.5 mt-4">
             {["Patient Info", "Blood Details", "Doctor & Location"].map((s, i) => (
               <React.Fragment key={s}>
-                <div className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[11px] font-semibold transition-all ${step === i + 1 ? "bg-[var(--clr-brand)] text-white shadow" : step > i + 1 ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-[var(--clr-success)]" : "bg-gray-100 dark:bg-gray-800 text-gray-400"}`}>
+                <div className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[11px] font-semibold transition-all ${step === i + 1 ? "bg-[var(--clr-brand)] text-[var(--txt-inverse)] shadow" : step > i + 1 ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-[var(--clr-success)]" : "bg-[var(--clr-bg-page)] dark:bg-gray-800 text-gray-400"}`}>
                   {step > i + 1 ? <CheckCircle2 className="w-3 h-3" /> : <span className="w-3.5 h-3.5 rounded-full border-2 border-current flex items-center justify-center text-[9px]">{i + 1}</span>}
                   <span className="hidden sm:inline">{s}</span>
                 </div>
@@ -134,10 +134,10 @@ export const NewRequestModal = ({
 
         <form onSubmit={handleFinalSubmit} className="p-5 space-y-5">
           {/* Urgency */}
-          <div className="bg-gradient-to-r from-gray-50 dark:from-gray-800/50 to-white dark:to-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+          <div className="bg-gradient-to-r from-gray-50 dark:from-gray-800/50 to-white dark:to-gray-900 rounded-xl p-4 border border-[var(--clr-border)] dark:border-gray-700">
             <div className="flex items-center gap-2 mb-3">
               <Siren className="w-4 h-4 text-[var(--clr-emergency)]" />
-              <span className="text-sm font-bold text-gray-800 dark:text-gray-200">Urgency Level</span>
+              <span className="text-sm font-bold text-[var(--txt-heading)] dark:text-gray-200">Urgency Level</span>
               <span className="text-[10px] bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-[var(--clr-info)] px-2 py-0.5 rounded-full border border-blue-200 dark:border-blue-800 font-semibold">NACO Guideline</span>
             </div>
             <div className="hd-urg-selector">
@@ -167,7 +167,7 @@ export const NewRequestModal = ({
 
           {step === 1 && (
             <div className="space-y-4 hd-enter">
-              <div className="flex items-center gap-2"><User className="w-4 h-4 text-[var(--clr-info)]" /><span className="text-sm font-bold text-gray-800 dark:text-gray-200">Patient Information</span></div>
+              <div className="flex items-center gap-2"><User className="w-4 h-4 text-[var(--clr-info)]" /><span className="text-sm font-bold text-[var(--txt-heading)] dark:text-gray-200">Patient Information</span></div>
               <div><label className="hd-label">Patient Full Name <span className="hd-required">*</span></label><input className="hd-input" value={patientName} onChange={e => setPatientName(e.target.value)} placeholder="As per ID proof" /></div>
               <div className="grid grid-cols-2 gap-3">
                 <div><label className="hd-label">Age (Years) <span className="hd-required">*</span></label><input className="hd-input" type="number" min="1" max="120" value={age} onChange={e => setAge(e.target.value)} placeholder="e.g. 35" /></div>
@@ -185,12 +185,12 @@ export const NewRequestModal = ({
 
           {step === 2 && (
             <div className="space-y-4 hd-enter">
-              <div className="flex items-center gap-2"><Droplet className="w-4 h-4 text-[var(--clr-emergency)]" /><span className="text-sm font-bold text-gray-800 dark:text-gray-200">Blood Component Details</span></div>
+              <div className="flex items-center gap-2"><Droplet className="w-4 h-4 text-[var(--clr-emergency)]" /><span className="text-sm font-bold text-[var(--txt-heading)] dark:text-gray-200">Blood Component Details</span></div>
               <div><label className="hd-label">Blood Group <span className="hd-required">*</span></label>
                 <div className="grid grid-cols-4 gap-2 mt-1">
                   {BLOOD_GROUPS.map((bg: string) => (
                     <button key={bg} type="button" onClick={() => setBloodGroup(bg as BloodGroup)}
-                      className={`py-2.5 rounded-xl text-sm font-black border-2 transition-all ${bloodGroup === bg ? "bg-[var(--clr-brand)] text-white border-[var(--clr-brand)] scale-105 shadow-md" : "bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-[var(--clr-brand)]/40"}`}>
+                      className={`py-2.5 rounded-xl text-sm font-black border-2 transition-all ${bloodGroup === bg ? "bg-[var(--clr-brand)] text-[var(--txt-inverse)] border-[var(--clr-brand)] scale-105 shadow-md" : "bg-[var(--clr-bg-page)] dark:bg-gray-800 text-[var(--txt-body)] dark:text-gray-400 border-[var(--clr-border)] dark:border-gray-700 hover:border-[var(--clr-brand)]/40"}`}>
                       {bg}
                     </button>
                   ))}
@@ -200,9 +200,9 @@ export const NewRequestModal = ({
                 <div><label className="hd-label">Component Type</label><select className="hd-input" value={componentType} onChange={e => setComponentType(e.target.value as BloodComponentType)}>{BLOOD_COMPONENT_TYPES.map(c => <option key={c}>{c}</option>)}</select></div>
                 <div><label className="hd-label">Units Required <span className="hd-required">*</span></label>
                   <div className="flex items-center gap-2">
-                    <button type="button" onClick={() => setUnitsRequired(u => Math.max(1, u - 1))} className="w-9 h-9 rounded-lg border-2 border-gray-200 dark:border-gray-700 font-bold text-gray-600 dark:text-gray-400 hover:border-[var(--clr-brand)] transition-colors flex items-center justify-center">−</button>
+                    <button type="button" onClick={() => setUnitsRequired(u => Math.max(1, u - 1))} className="w-9 h-9 rounded-lg border-2 border-[var(--clr-border)] dark:border-gray-700 font-bold text-[var(--txt-body)] dark:text-gray-400 hover:border-[var(--clr-brand)] transition-colors flex items-center justify-center">−</button>
                     <input className="hd-input text-center font-bold text-base" type="number" min="1" max="20" value={unitsRequired} onChange={e => setUnitsRequired(+e.target.value || 1)} />
-                    <button type="button" onClick={() => setUnitsRequired(u => Math.min(20, u + 1))} className="w-9 h-9 rounded-lg border-2 border-gray-200 dark:border-gray-700 font-bold text-gray-600 dark:text-gray-400 hover:border-[var(--clr-brand)] transition-colors flex items-center justify-center">+</button>
+                    <button type="button" onClick={() => setUnitsRequired(u => Math.min(20, u + 1))} className="w-9 h-9 rounded-lg border-2 border-[var(--clr-border)] dark:border-gray-700 font-bold text-[var(--txt-body)] dark:text-gray-400 hover:border-[var(--clr-brand)] transition-colors flex items-center justify-center">+</button>
                   </div>
                 </div>
               </div>
@@ -210,7 +210,7 @@ export const NewRequestModal = ({
                 <div className="grid grid-cols-4 gap-1.5">
                   {TRANSFUSION_INDICATIONS.map(ind => (
                     <button key={ind} type="button" onClick={() => setTransfusionIndication(ind)}
-                      className={`py-2 rounded-xl text-[11px] font-semibold border-2 transition-all ${transfusionIndication === ind ? "bg-[var(--clr-info)] text-white border-[var(--clr-info)]" : "bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-blue-300"}`}>
+                      className={`py-2 rounded-xl text-[11px] font-semibold border-2 transition-all ${transfusionIndication === ind ? "bg-[var(--clr-info)] text-[var(--txt-inverse)] border-[var(--clr-info)]" : "bg-[var(--clr-bg-page)] dark:bg-gray-800 text-[var(--txt-body)] dark:text-gray-400 border-[var(--clr-border)] dark:border-gray-700 hover:border-blue-300"}`}>
                       {ind}
                     </button>
                   ))}
@@ -225,7 +225,7 @@ export const NewRequestModal = ({
 
           {step === 3 && (
             <div className="space-y-4 hd-enter">
-              <div className="flex items-center gap-2"><Stethoscope className="w-4 h-4 text-[var(--clr-success)]" /><span className="text-sm font-bold text-gray-800 dark:text-gray-200">Doctor & Location Details</span></div>
+              <div className="flex items-center gap-2"><Stethoscope className="w-4 h-4 text-[var(--clr-success)]" /><span className="text-sm font-bold text-[var(--txt-heading)] dark:text-gray-200">Doctor & Location Details</span></div>
               <div className="grid grid-cols-2 gap-3">
                 <div><label className="hd-label">Doctor Name</label><input className="hd-input" value={doctorName} onChange={e => setDoctorName(e.target.value)} placeholder="Dr. Full Name" /></div>
                 <div><label className="hd-label">MCI Registration No.</label><input className="hd-input" value={doctorRegNo} onChange={e => setDoctorRegNo(e.target.value)} placeholder="MCI/SMC Reg. No." /></div>
@@ -234,11 +234,11 @@ export const NewRequestModal = ({
                 <div><label className="hd-label">City <span className="hd-required">*</span></label><input className="hd-input" value={city} onChange={e => setCity(e.target.value)} /></div>
                 <div><label className="hd-label">Pincode <span className="hd-required">*</span></label><input className="hd-input" value={pincode} onChange={numOnly(setPincode, 6)} maxLength={6} /></div>
               </div>
-              <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-                <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">Request Summary</p>
+              <div className="bg-[var(--clr-bg-page)] dark:bg-gray-800/50 rounded-xl p-4 border border-[var(--clr-border)] dark:border-gray-700">
+                <p className="text-xs font-bold text-[var(--txt-body)] dark:text-gray-400 uppercase tracking-wide mb-3">Request Summary</p>
                 <div className="grid grid-cols-2 gap-3">
                   {[["Patient", patientName || "—"], ["Age", age ? `${age} yrs` : "—"], ["Blood Group", bloodGroup || "—"], ["Component", componentType], ["Units", String(unitsRequired)], ["Urgency", urgency], ["Valid for", `${uc.validityHours} hours`], ["Indication", transfusionIndication]].map(([k, v]) => (
-                    <div key={k}><p className="text-[10px] text-gray-400 font-semibold uppercase">{k}</p><p className="text-xs font-semibold text-gray-800 dark:text-gray-200">{v}</p></div>
+                    <div key={k}><p className="text-[10px] text-gray-400 font-semibold uppercase">{k}</p><p className="text-xs font-semibold text-[var(--txt-heading)] dark:text-gray-200">{v}</p></div>
                   ))}
                 </div>
               </div>
@@ -251,14 +251,14 @@ export const NewRequestModal = ({
 
           <div className="flex gap-3 pt-2 border-t border-gray-100 dark:border-gray-800">
             {step > 1 ? (
-              <button type="button" onClick={handleBack} className="flex-1 py-2.5 border-2 border-gray-200 dark:border-gray-700 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">← Back</button>
+              <button type="button" onClick={handleBack} className="flex-1 py-2.5 border-2 border-[var(--clr-border)] dark:border-gray-700 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-400 hover:bg-[var(--clr-bg-page)] dark:hover:bg-gray-800 transition-all">← Back</button>
             ) : (
-              <button type="button" onClick={() => onClose()} className="flex-1 py-2.5 border-2 border-gray-200 dark:border-gray-700 rounded-xl text-sm font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">Cancel</button>
+              <button type="button" onClick={() => onClose()} className="flex-1 py-2.5 border-2 border-[var(--clr-border)] dark:border-gray-700 rounded-xl text-sm font-semibold text-[var(--txt-body)] dark:text-gray-400 hover:bg-[var(--clr-bg-page)] dark:hover:bg-gray-800 transition-all">Cancel</button>
             )}
             {step < TOTAL ? (
-              <button type="button" onClick={handleNext} className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white transition-all" style={{ background: "linear-gradient(135deg,var(--clr-brand),#b30000)" }}>Continue →</button>
+              <button type="button" onClick={handleNext} className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-[var(--txt-inverse)] transition-all" style={{ background: "linear-gradient(135deg,var(--clr-brand),#b30000)" }}>Continue →</button>
             ) : (
-              <button type="submit" disabled={isSubmitting} className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white transition-all flex items-center justify-center gap-2" style={{ background: isSubmitting ? "#d1d5db" : `linear-gradient(135deg,${uc.color},var(--clr-brand))` }}>
+              <button type="submit" disabled={isSubmitting} className="flex-1 py-2.5 rounded-xl text-sm font-bold text-[var(--txt-inverse)] transition-all flex items-center justify-center gap-2" style={{ background: isSubmitting ? "#d1d5db" : `linear-gradient(135deg,${uc.color},var(--clr-brand))` }}>
                 {isSubmitting ? <><Clock className="w-4 h-4 animate-spin" /> Creating…</> : <><FileText className="w-4 h-4" /> Generate RTID & Print</>}
               </button>
             )}

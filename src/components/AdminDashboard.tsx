@@ -69,17 +69,17 @@ const getStatusClasses = (status: string): string => {
   switch (status?.toLowerCase()) {
     case 'pending': return 'bg-yellow-100 text-yellow-700 border border-yellow-300';
     case 'verified': case 'completed': case 'available': return 'bg-green-100 text-green-700 border border-green-300';
-    case 'rejected': case 'cancelled': return 'bg-red-100 text-red-700 border border-red-300';
+    case 'rejected': case 'cancelled': return 'bg-[var(--stats-divider)] text-red-700 border border-red-300';
     case 'redeemed': return 'bg-blue-100 text-blue-700 border border-blue-300';
-    default: return 'bg-gray-100 text-gray-700 border border-gray-300';
+    default: return 'bg-[var(--clr-bg-page)] text-gray-700 border border-[var(--clr-border)]';
   }
 };
 
 const getInventoryLevel = (units: number): { label: string; color: string; bg: string; bar: string } => {
   if (units >= 50) return { label: 'Excellent', color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200', bar: 'bg-emerald-500' };
-  if (units >= 20) return { label: 'Good', color: 'text-blue-700', bg: 'bg-blue-50 border-blue-200', bar: 'bg-[var(--clr-info)]' };
+  if (units >= 20) return { label: 'Good', color: 'text-blue-700', bg: 'bg-blue-50 border-blue-200', bar: 'bg-[var(--rtid-badge)]' };
   if (units >= 10) return { label: 'Low', color: 'text-amber-700', bg: 'bg-amber-50 border-amber-200', bar: 'bg-amber-500' };
-  return { label: 'Critical', color: 'text-red-700', bg: 'bg-red-50 border-red-200', bar: 'bg-[var(--clr-emergency)]' };
+  return { label: 'Critical', color: 'text-red-700', bg: 'bg-red-50 border-red-200', bar: 'bg-[var(--stats-bg)]' };
 };
 
 const downloadCSV = (data: any[], filename: string) => {
@@ -140,15 +140,15 @@ const OrgListModal = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[85vh] flex flex-col">
+      <div className="bg-[var(--clr-bg-card)] rounded-2xl shadow-2xl max-w-4xl w-full max-h-[85vh] flex flex-col">
         {/* Header */}
-        <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+        <div className="p-6 border-b border-[var(--clr-border)] flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-gray-900">{title}</h2>
-            <p className="text-sm text-gray-500 mt-1">{filtered.length} organization(s)</p>
+            <h2 className="text-xl font-bold text-[var(--txt-heading)]">{title}</h2>
+            <p className="text-sm text-[var(--txt-body)] mt-1">{filtered.length} organization(s)</p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-xl">
-            <X className="w-5 h-5 text-gray-500" />
+          <button onClick={onClose} className="p-2 hover:bg-[var(--clr-bg-page)] rounded-xl">
+            <X className="w-5 h-5 text-[var(--txt-body)]" />
           </button>
         </div>
 
@@ -159,7 +159,7 @@ const OrgListModal = ({
             <input
               type="text" placeholder="Search organizations..."
               value={search} onChange={e => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-[var(--clr-info)] outline-none text-sm"
+              className="w-full pl-9 pr-4 py-2.5 border-2 border-[var(--clr-border)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm"
             />
           </div>
         </div>
@@ -173,20 +173,20 @@ const OrgListModal = ({
             </div>
           ) : (
             filtered.map(org => (
-              <div key={org.id} className="bg-gray-50 rounded-xl p-4 border border-gray-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all">
+              <div key={org.id} className="bg-[var(--clr-bg-page)] rounded-xl p-4 border border-gray-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-3 flex-1 min-w-0">
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
                       org.type === 'Hospital' ? 'bg-blue-100' : 'bg-purple-100'
                     }`}>
                       {org.type === 'Hospital'
-                        ? <Building2 className="w-5 h-5 text-[var(--clr-info)]" />
+                        ? <Building2 className="w-5 h-5 text-[var(--rtid-badge)]" />
                         : <Droplet className="w-5 h-5 text-purple-600" />
                       }
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="font-bold text-gray-900 text-sm">{org.name}</h3>
+                        <h3 className="font-bold text-[var(--txt-heading)] text-sm">{org.name}</h3>
                         <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                           org.type === 'Hospital' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'
                         }`}>{org.type}</span>
@@ -195,18 +195,18 @@ const OrgListModal = ({
                         </span>
                       </div>
                       <div className="mt-2 space-y-1">
-                        <p className="text-xs text-gray-500 flex items-center gap-1.5">
+                        <p className="text-xs text-[var(--txt-body)] flex items-center gap-1.5">
                           <Mail className="w-3 h-3" /> {org.email}
                         </p>
-                        <p className="text-xs text-gray-500 flex items-center gap-1.5">
+                        <p className="text-xs text-[var(--txt-body)] flex items-center gap-1.5">
                           <MapPin className="w-3 h-3" /> {org.address}
                         </p>
                         {org.contact !== 'N/A' && (
-                          <p className="text-xs text-gray-500 flex items-center gap-1.5">
+                          <p className="text-xs text-[var(--txt-body)] flex items-center gap-1.5">
                             <Phone className="w-3 h-3" /> {org.contact}
                           </p>
                         )}
-                        <p className="text-xs text-gray-500 flex items-center gap-1.5">
+                        <p className="text-xs text-[var(--txt-body)] flex items-center gap-1.5">
                           <FileText className="w-3 h-3" /> License: {org.license}
                         </p>
                         {org.verifiedAt && (
@@ -219,11 +219,11 @@ const OrgListModal = ({
                   </div>
                   {org.type === 'Hospital' && org.totalBeds && org.totalBeds !== 'N/A' && (
                     <div className="text-right flex-shrink-0">
-                      <div className="text-xs text-gray-500">Total Beds</div>
+                      <div className="text-xs text-[var(--txt-body)]">Total Beds</div>
                       <div className="text-sm font-bold text-gray-700">{org.totalBeds}</div>
                       {org.icuBeds && org.icuBeds !== 'N/A' && (
                         <>
-                          <div className="text-xs text-gray-500 mt-1">ICU</div>
+                          <div className="text-xs text-[var(--txt-body)] mt-1">ICU</div>
                           <div className="text-sm font-bold text-gray-700">{org.icuBeds}</div>
                         </>
                       )}
@@ -242,11 +242,11 @@ const OrgListModal = ({
               Name: o.name, Type: o.type, License: o.license,
               Status: o.status, Address: o.address, Email: o.email, Contact: o.contact
             })), 'organizations')}
-            className="px-4 py-2 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl flex items-center gap-2"
+            className="px-4 py-2 text-sm text-gray-700 bg-[var(--clr-bg-page)] hover:bg-gray-200 rounded-xl flex items-center gap-2"
           >
             <Download className="w-4 h-4" /> Export CSV
           </button>
-          <button onClick={onClose} className="px-4 py-2 text-sm font-semibold text-white bg-[var(--clr-info)] hover:bg-blue-700 rounded-xl">
+          <button onClick={onClose} className="px-4 py-2 text-sm font-semibold text-[var(--txt-inverse)] bg-[var(--rtid-badge)] hover:bg-blue-700 rounded-xl">
             Close
           </button>
         </div>
@@ -265,17 +265,17 @@ const BloodGroupCard = ({ group, units, maxUnits }: { group: string; units: numb
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Droplet className="w-5 h-5 text-[var(--clr-emergency)]" fill="currentColor" />
-          <span className="text-2xl font-black text-gray-900">{group}</span>
+          <span className="text-2xl font-black text-[var(--txt-heading)]">{group}</span>
         </div>
-        <span className={`text-xs font-bold px-2 py-1 rounded-full ${level.color} bg-white/70`}>
+        <span className={`text-xs font-bold px-2 py-1 rounded-full ${level.color} bg-[var(--clr-bg-card)]/70`}>
           {level.label}
         </span>
       </div>
       <div className="text-center mb-3">
-        <p className="text-4xl font-extrabold text-gray-900">{units}</p>
-        <p className="text-xs text-gray-500 font-medium">units available</p>
+        <p className="text-4xl font-extrabold text-[var(--txt-heading)]">{units}</p>
+        <p className="text-xs text-[var(--txt-body)] font-medium">units available</p>
       </div>
-      <div className="w-full bg-white/60 rounded-full h-2">
+      <div className="w-full bg-[var(--clr-bg-card)]/60 rounded-full h-2">
         <div className={`${level.bar} h-2 rounded-full transition-all duration-500`} style={{ width: `${pct}%` }} />
       </div>
     </div>
@@ -807,7 +807,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
 
       {/* ── HEADER ── */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200 shadow-sm">
+      <header className="sticky top-0 z-50 bg-[var(--clr-bg-card)]/80 backdrop-blur-xl border-b border-[var(--clr-border)] shadow-sm">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-20">
             <div className="flex items-center gap-4">
@@ -818,43 +818,43 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                   RaktPort Admin
                 </h1>
-                <p className="text-xs text-gray-500 font-medium">National Blood Management System</p>
+                <p className="text-xs text-[var(--txt-body)] font-medium">National Blood Management System</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <button onClick={() => fetchData(true)} disabled={loading}
-                className="p-2.5 hover:bg-gray-100 rounded-xl transition-all group" title="Refresh">
-                <RefreshCw className={`w-5 h-5 text-gray-600 group-hover:text-[var(--clr-info)] ${loading ? 'animate-spin' : ''}`} />
+                className="p-2.5 hover:bg-[var(--clr-bg-page)] rounded-xl transition-all group" title="Refresh">
+                <RefreshCw className={`w-5 h-5 text-[var(--txt-body)] group-hover:text-[var(--rtid-badge)] ${loading ? 'animate-spin' : ''}`} />
               </button>
 
               {/* Notifications */}
               <div className="relative">
                 <button onClick={() => setShowNotifications(!showNotifications)}
-                  className="relative p-2.5 hover:bg-gray-100 rounded-xl transition-all">
-                  <Bell className="w-5 h-5 text-gray-600" />
+                  className="relative p-2.5 hover:bg-[var(--clr-bg-page)] rounded-xl transition-all">
+                  <Bell className="w-5 h-5 text-[var(--txt-body)]" />
                   {notifications.length > 0 && (
-                    <span className="absolute top-1 right-1 w-5 h-5 bg-[var(--clr-emergency)] text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
+                    <span className="absolute top-1 right-1 w-5 h-5 bg-[var(--stats-bg)] text-[var(--txt-inverse)] text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
                       {notifications.length}
                     </span>
                   )}
                 </button>
                 {showNotifications && (
-                  <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden z-50">
+                  <div className="absolute right-0 mt-2 w-80 bg-[var(--clr-bg-card)] rounded-2xl shadow-2xl border border-[var(--clr-border)] overflow-hidden z-50">
                     <div className="p-4 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
-                      <h3 className="font-bold text-gray-800 flex items-center gap-2">
+                      <h3 className="font-bold text-[var(--txt-heading)] flex items-center gap-2">
                         <Bell className="w-4 h-4" /> Notifications
-                        <span className="ml-auto text-xs bg-[var(--clr-info)] text-white px-2 py-0.5 rounded-full">{notifications.length}</span>
+                        <span className="ml-auto text-xs bg-[var(--rtid-badge)] text-[var(--txt-inverse)] px-2 py-0.5 rounded-full">{notifications.length}</span>
                       </h3>
                     </div>
                     <div className="max-h-64 overflow-y-auto">
                       {notifications.map(n => (
                         <div key={n.id} onClick={() => setShowNotifications(false)}
-                          className="p-4 border-b hover:bg-gray-50 cursor-pointer">
+                          className="p-4 border-b hover:bg-[var(--clr-bg-page)] cursor-pointer">
                           <div className="flex items-start gap-3">
-                            <div className={`w-2 h-2 rounded-full mt-2 ${n.type === 'warning' ? 'bg-yellow-400' : n.type === 'success' ? 'bg-[var(--clr-success)]' : 'bg-[var(--clr-info)]'}`} />
+                            <div className={`w-2 h-2 rounded-full mt-2 ${n.type === 'warning' ? 'bg-yellow-400' : n.type === 'success' ? 'bg-[var(--clr-success)]' : 'bg-[var(--rtid-badge)]'}`} />
                             <div>
-                              <p className="text-sm font-semibold text-gray-800">{n.title}</p>
-                              <p className="text-xs text-gray-500 mt-0.5">{n.message}</p>
+                              <p className="text-sm font-semibold text-[var(--txt-heading)]">{n.title}</p>
+                              <p className="text-xs text-[var(--txt-body)] mt-0.5">{n.message}</p>
                             </div>
                           </div>
                         </div>
@@ -868,17 +868,17 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
               </div>
 
               {/* Admin badge */}
-              <div className="flex items-center gap-3 pl-3 border-l border-gray-200">
+              <div className="flex items-center gap-3 pl-3 border-l border-[var(--clr-border)]">
                 <div className="text-right hidden sm:block">
-                  <p className="text-sm font-bold text-gray-800">{adminName}</p>
-                  <p className="text-xs text-gray-500">System Administrator</p>
+                  <p className="text-sm font-bold text-[var(--txt-heading)]">{adminName}</p>
+                  <p className="text-xs text-[var(--txt-body)]">System Administrator</p>
                 </div>
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-[var(--txt-inverse)] font-bold text-sm shadow-lg">
                   {adminName.charAt(0).toUpperCase()}
                 </div>
               </div>
               <button onClick={onLogout}
-                className="px-4 py-2.5 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl font-semibold transition-all shadow-lg flex items-center gap-2">
+                className="px-4 py-2.5 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-[var(--txt-inverse)] rounded-xl font-semibold transition-all shadow-lg flex items-center gap-2">
                 <LogOut className="w-4 h-4" />
                 <span className="hidden sm:inline">Logout</span>
               </button>
@@ -888,7 +888,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       </header>
 
       {/* ── NAV ── */}
-      <div className="sticky top-20 z-40 bg-white/90 backdrop-blur-lg border-b border-gray-200 shadow-sm">
+      <div className="sticky top-20 z-40 bg-[var(--clr-bg-card)]/90 backdrop-blur-lg border-b border-[var(--clr-border)] shadow-sm">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
           <nav className="flex gap-1 overflow-x-auto py-3 scrollbar-hide">
             {tabs.map(tab => {
@@ -898,13 +898,13 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 <button key={tab.id} onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold transition-all duration-200 whitespace-nowrap relative ${
                     isActive
-                      ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg scale-105'
-                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                      ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-[var(--txt-inverse)] shadow-lg scale-105'
+                      : 'text-[var(--txt-body)] hover:bg-[var(--clr-bg-page)] hover:text-[var(--txt-heading)]'
                   }`}>
                   <Icon className="w-4 h-4" />
                   <span className="text-sm">{tab.label}</span>
                   {(tab as any).badge > 0 && (
-                    <span className={`px-1.5 py-0.5 text-xs font-bold rounded-full ${isActive ? 'bg-white text-[var(--clr-info)]' : 'bg-[var(--clr-info)] text-white'}`}>
+                    <span className={`px-1.5 py-0.5 text-xs font-bold rounded-full ${isActive ? 'bg-[var(--clr-bg-card)] text-[var(--rtid-badge)]' : 'bg-[var(--rtid-badge)] text-[var(--txt-inverse)]'}`}>
                       {(tab as any).badge}
                     </span>
                   )}
@@ -918,9 +918,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       {/* Loading Overlay */}
       {loading && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-white rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-4">
-            <Loader2 className="w-12 h-12 text-[var(--clr-info)] animate-spin" />
-            <p className="text-gray-800 font-semibold">Loading Dashboard...</p>
+          <div className="bg-[var(--clr-bg-card)] rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-4">
+            <Loader2 className="w-12 h-12 text-[var(--rtid-badge)] animate-spin" />
+            <p className="text-[var(--txt-heading)] font-semibold">Loading Dashboard...</p>
           </div>
         </div>
       )}
@@ -942,7 +942,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     Groups with &lt;10 units nationally: <strong>{criticalGroups.join(', ')}</strong>
                   </p>
                 </div>
-                <button onClick={() => setActiveTab('inventory')} className="ml-auto px-4 py-2 bg-[var(--clr-emergency)] text-white rounded-xl text-sm font-bold hover:bg-red-700">
+                <button onClick={() => setActiveTab('inventory')} className="ml-auto px-4 py-2 bg-[var(--stats-bg)] text-[var(--txt-inverse)] rounded-xl text-sm font-bold hover:bg-red-700">
                   View Inventory
                 </button>
               </div>
@@ -958,17 +958,17 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
               ].map((m, i) => {
                 const Icon = m.icon;
                 return (
-                  <div key={i} className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border border-gray-100">
+                  <div key={i} className="bg-[var(--clr-bg-card)] rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border border-gray-100">
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">{m.title}</p>
-                        <p className="text-4xl font-black text-gray-900 mt-2">{m.value.toLocaleString()}</p>
-                        <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                        <p className="text-xs font-bold text-[var(--txt-body)] uppercase tracking-widest">{m.title}</p>
+                        <p className="text-4xl font-black text-[var(--txt-heading)] mt-2">{m.value.toLocaleString()}</p>
+                        <p className="text-xs text-[var(--txt-body)] mt-2 flex items-center gap-1">
                           <TrendingUp className="w-3 h-3" /> {m.change}
                         </p>
                       </div>
                       <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${m.gradient} flex items-center justify-center shadow-lg`}>
-                        <Icon className="w-7 h-7 text-white" />
+                        <Icon className="w-7 h-7 text-[var(--txt-inverse)]" />
                       </div>
                     </div>
                   </div>
@@ -1002,27 +1002,27 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 const pct = stat.total > 0 ? Math.round((stat.value / stat.total) * 100) : 0;
                 return (
                   <button key={i} onClick={stat.onClick}
-                    className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl hover:border-blue-200 hover:scale-[1.02] transition-all cursor-pointer text-left group">
+                    className="bg-[var(--clr-bg-card)] rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl hover:border-blue-200 hover:scale-[1.02] transition-all cursor-pointer text-left group">
                     <div className="flex items-center gap-4 mb-4">
                       <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center shadow-md`}>
-                        <Icon className="w-6 h-6 text-white" />
+                        <Icon className="w-6 h-6 text-[var(--txt-inverse)]" />
                       </div>
                       <div className="flex-1">
-                        <p className="text-2xl font-black text-gray-900">{stat.value}</p>
-                        <p className="text-sm text-gray-500">{stat.label}</p>
+                        <p className="text-2xl font-black text-[var(--txt-heading)]">{stat.value}</p>
+                        <p className="text-sm text-[var(--txt-body)]">{stat.label}</p>
                       </div>
-                      <ArrowRight className="w-5 h-5 text-gray-300 group-hover:text-[var(--clr-info)] group-hover:translate-x-1 transition-all" />
+                      <ArrowRight className="w-5 h-5 text-gray-300 group-hover:text-[var(--rtid-badge)] group-hover:translate-x-1 transition-all" />
                     </div>
                     <div className="space-y-1">
-                      <div className="flex justify-between text-xs text-gray-500">
+                      <div className="flex justify-between text-xs text-[var(--txt-body)]">
                         <span>{stat.value} of {stat.total}</span>
-                        <span className="font-semibold text-[var(--clr-info)]">{pct}% verified</span>
+                        <span className="font-semibold text-[var(--rtid-badge)]">{pct}% verified</span>
                       </div>
-                      <div className="w-full bg-gray-100 rounded-full h-2">
+                      <div className="w-full bg-[var(--clr-bg-page)] rounded-full h-2">
                         <div className={`bg-gradient-to-r ${stat.gradient} h-2 rounded-full transition-all`} style={{ width: `${pct}%` }} />
                       </div>
                     </div>
-                    <p className="text-xs text-[var(--clr-info)] font-semibold mt-3 group-hover:underline">
+                    <p className="text-xs text-[var(--rtid-badge)] font-semibold mt-3 group-hover:underline">
                       Click to view details →
                     </p>
                   </button>
@@ -1031,16 +1031,16 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             </div>
 
             {/* National Inventory Quick Summary */}
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+            <div className="bg-[var(--clr-bg-card)] rounded-2xl p-6 shadow-lg border border-gray-100">
               <div className="flex items-center justify-between mb-5">
                 <div>
-                  <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                  <h3 className="text-lg font-bold text-[var(--txt-heading)] flex items-center gap-2">
                     <Droplet className="w-5 h-5 text-[var(--clr-emergency)]" fill="currentColor" /> National Blood Inventory
                   </h3>
-                  <p className="text-sm text-gray-500 mt-0.5">{totalNatUnits.toLocaleString()} total units available across India</p>
+                  <p className="text-sm text-[var(--txt-body)] mt-0.5">{totalNatUnits.toLocaleString()} total units available across India</p>
                 </div>
                 <button onClick={() => setActiveTab('inventory')}
-                  className="px-4 py-2 bg-[var(--clr-info)] text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-all flex items-center gap-2">
+                  className="px-4 py-2 bg-[var(--rtid-badge)] text-[var(--txt-inverse)] rounded-xl text-sm font-semibold hover:bg-blue-700 transition-all flex items-center gap-2">
                   Full Inventory <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -1050,9 +1050,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   const level = getInventoryLevel(units);
                   return (
                     <div key={bg} className={`rounded-xl p-3 border-2 text-center ${level.bg}`}>
-                      <p className="text-lg font-black text-gray-900">{bg}</p>
+                      <p className="text-lg font-black text-[var(--txt-heading)]">{bg}</p>
                       <p className={`text-2xl font-extrabold ${level.color}`}>{units}</p>
-                      <p className="text-[10px] text-gray-500 mt-0.5">units</p>
+                      <p className="text-[10px] text-[var(--txt-body)] mt-0.5">units</p>
                     </div>
                   );
                 })}
@@ -1061,9 +1061,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
             {/* Charts Row */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-                <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
-                  <PieChart className="w-5 h-5 text-gray-500" /> Blood Group Distribution
+              <div className="bg-[var(--clr-bg-card)] rounded-2xl p-6 shadow-lg border border-gray-100">
+                <h3 className="text-lg font-bold text-[var(--txt-heading)] mb-6 flex items-center gap-2">
+                  <PieChart className="w-5 h-5 text-[var(--txt-body)]" /> Blood Group Distribution
                 </h3>
                 <ResponsiveContainer width="100%" height={280}>
                   <RechartsPie>
@@ -1076,9 +1076,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   </RechartsPie>
                 </ResponsiveContainer>
               </div>
-              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-                <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
-                  <BarChart3 className="w-5 h-5 text-gray-500" /> 6-Month Trends
+              <div className="bg-[var(--clr-bg-card)] rounded-2xl p-6 shadow-lg border border-gray-100">
+                <h3 className="text-lg font-bold text-[var(--txt-heading)] mb-6 flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-[var(--txt-body)]" /> 6-Month Trends
                 </h3>
                 <ResponsiveContainer width="100%" height={280}>
                   <AreaChart data={monthlyTrends}>
@@ -1096,8 +1096,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
             {/* Today + Pending Actions */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <div className="bg-[var(--clr-bg-card)] rounded-2xl p-6 shadow-lg border border-gray-100">
+                <h3 className="text-lg font-bold text-[var(--txt-heading)] mb-4 flex items-center gap-2">
                   <Clock className="w-5 h-5" /> Today's Activity
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
@@ -1107,7 +1107,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   </div>
                   <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
                     <p className="text-sm font-semibold text-blue-800">Requests Today</p>
-                    <p className="text-3xl font-black text-[var(--clr-info)] mt-1">{todayRequests.length}</p>
+                    <p className="text-3xl font-black text-[var(--rtid-badge)] mt-1">{todayRequests.length}</p>
                   </div>
                 </div>
               </div>
@@ -1121,7 +1121,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       <strong>{metrics.pendingOrgs}</strong> organization(s) awaiting verification.
                     </p>
                     <button onClick={() => setActiveTab('verify')}
-                      className="mt-3 px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg text-sm font-semibold transition-colors">
+                      className="mt-3 px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-[var(--txt-inverse)] rounded-lg text-sm font-semibold transition-colors">
                       Review Now
                     </button>
                   </div>
@@ -1138,17 +1138,17 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             {/* Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                <h2 className="text-2xl font-bold text-[var(--txt-heading)] flex items-center gap-2">
                   <Droplet className="w-7 h-7 text-[var(--clr-emergency)]" fill="currentColor" /> National Blood Inventory
                 </h2>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-[var(--txt-body)] mt-1">
                   Real-time inventory across all registered blood banks
                 </p>
               </div>
               <button onClick={() => downloadCSV(
                 BLOOD_GROUPS.map(bg => ({ 'Blood Group': bg, 'National Units': nationalInventory[bg] || 0, 'Status': getInventoryLevel(nationalInventory[bg] || 0).label })),
                 'national_inventory'
-              )} className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg flex items-center gap-2">
+              )} className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-[var(--txt-inverse)] rounded-xl text-sm font-semibold hover:shadow-lg flex items-center gap-2">
                 <Download className="w-4 h-4" /> Export Inventory
               </button>
             </div>
@@ -1169,7 +1169,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
               <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-5 border border-emerald-200">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center shadow">
-                    <Package className="w-6 h-6 text-white" />
+                    <Package className="w-6 h-6 text-[var(--txt-inverse)]" />
                   </div>
                   <div>
                     <p className="text-sm text-emerald-700">Total Available</p>
@@ -1179,8 +1179,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
               </div>
               <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-5 border border-blue-200">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-[var(--clr-info)] rounded-xl flex items-center justify-center shadow">
-                    <Globe className="w-6 h-6 text-white" />
+                  <div className="w-12 h-12 bg-[var(--rtid-badge)] rounded-xl flex items-center justify-center shadow">
+                    <Globe className="w-6 h-6 text-[var(--txt-inverse)]" />
                   </div>
                   <div>
                     <p className="text-sm text-blue-700">Cities Reporting</p>
@@ -1191,7 +1191,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
               <div className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-2xl p-5 border border-rose-200">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-rose-500 rounded-xl flex items-center justify-center shadow">
-                    <AlertTriangle className="w-6 h-6 text-white" />
+                    <AlertTriangle className="w-6 h-6 text-[var(--txt-inverse)]" />
                   </div>
                   <div>
                     <p className="text-sm text-rose-700">Critical Groups</p>
@@ -1202,12 +1202,12 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             </div>
 
             {/* ── NATIONAL INVENTORY ── */}
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-              <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+            <div className="bg-[var(--clr-bg-card)] rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+              <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-[var(--clr-border)]">
+                <h3 className="text-lg font-bold text-[var(--txt-heading)] flex items-center gap-2">
                   🇮🇳 National Blood Inventory
                 </h3>
-                <p className="text-sm text-gray-500 mt-0.5">Aggregated from all registered blood banks</p>
+                <p className="text-sm text-[var(--txt-body)] mt-0.5">Aggregated from all registered blood banks</p>
               </div>
               <div className="p-6">
                 <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
@@ -1235,14 +1235,14 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             </div>
 
             {/* ── CITY-WISE INVENTORY ── */}
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-              <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
+            <div className="bg-[var(--clr-bg-card)] rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+              <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-[var(--clr-border)]">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
-                    <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <h3 className="text-lg font-bold text-[var(--txt-heading)] flex items-center gap-2">
                       <MapPin className="w-5 h-5 text-indigo-600" /> City-wise Blood Inventory
                     </h3>
-                    <p className="text-sm text-gray-500 mt-0.5">Select a city to view detailed inventory</p>
+                    <p className="text-sm text-[var(--txt-body)] mt-0.5">Select a city to view detailed inventory</p>
                   </div>
                   <div className="flex items-center gap-3">
                     {/* City search */}
@@ -1250,11 +1250,11 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                       <input type="text" placeholder="Search city..."
                         value={inventorySearchTerm} onChange={e => setInventorySearchTerm(e.target.value)}
-                        className="pl-9 pr-4 py-2 border-2 border-gray-200 rounded-xl text-sm focus:border-[var(--clr-info)] outline-none w-44" />
+                        className="pl-9 pr-4 py-2 border-2 border-[var(--clr-border)] rounded-xl text-sm focus:border-[var(--clr-info)] outline-none w-44" />
                     </div>
                     {/* City dropdown */}
                     <select value={selectedCity} onChange={e => setSelectedCity(e.target.value)}
-                      className="px-4 py-2 border-2 border-gray-200 rounded-xl text-sm font-medium focus:border-[var(--clr-info)] outline-none bg-white min-w-[160px]">
+                      className="px-4 py-2 border-2 border-[var(--clr-border)] rounded-xl text-sm font-medium focus:border-[var(--clr-info)] outline-none bg-[var(--clr-bg-card)] min-w-[160px]">
                       <option value="">— Select City —</option>
                       {cityInvFiltered.map(city => (
                         <option key={city} value={city}>{city}</option>
@@ -1272,8 +1272,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       <button key={city} onClick={() => setSelectedCity(city)}
                         className={`px-3 py-1.5 rounded-full text-xs font-semibold border-2 transition-all ${
                           selectedCity === city
-                            ? 'bg-indigo-600 text-white border-indigo-600 shadow-md scale-105'
-                            : 'border-gray-200 text-gray-600 hover:border-indigo-300 hover:text-indigo-600'
+                            ? 'bg-indigo-600 text-[var(--txt-inverse)] border-indigo-600 shadow-md scale-105'
+                            : 'border-[var(--clr-border)] text-[var(--txt-body)] hover:border-indigo-300 hover:text-indigo-600'
                         }`}>
                         <MapPin className="w-3 h-3 inline mr-1" />{city}
                         <span className="ml-1 opacity-70">
@@ -1296,8 +1296,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           <MapPin className="w-5 h-5 text-indigo-600" />
                         </div>
                         <div>
-                          <h4 className="text-xl font-bold text-gray-900">{selectedCity}</h4>
-                          <p className="text-sm text-gray-500">
+                          <h4 className="text-xl font-bold text-[var(--txt-heading)]">{selectedCity}</h4>
+                          <p className="text-sm text-[var(--txt-body)]">
                             {BLOOD_GROUPS.reduce((s, bg) => s + (cityInventory[selectedCity]?.[bg] || 0), 0)} total units
                           </p>
                         </div>
@@ -1309,9 +1309,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         const level = getInventoryLevel(units);
                         return (
                           <div key={bg} className={`rounded-xl border-2 p-4 text-center ${level.bg}`}>
-                            <p className="text-xl font-black text-gray-900">{bg}</p>
+                            <p className="text-xl font-black text-[var(--txt-heading)]">{bg}</p>
                             <p className={`text-3xl font-extrabold ${level.color} mt-1`}>{units}</p>
-                            <p className="text-[10px] text-gray-500 mt-1">units</p>
+                            <p className="text-[10px] text-[var(--txt-body)] mt-1">units</p>
                             <div className={`w-full h-1 rounded-full mt-2 ${level.bar} opacity-50`} />
                           </div>
                         );
@@ -1347,12 +1347,12 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     <h4 className="text-sm font-bold text-gray-700 mb-3">All Cities Overview</h4>
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="bg-gray-50 rounded-xl">
-                          <th className="text-left px-3 py-2 text-xs font-bold text-gray-600 uppercase">City</th>
+                        <tr className="bg-[var(--clr-bg-page)] rounded-xl">
+                          <th className="text-left px-3 py-2 text-xs font-bold text-[var(--txt-body)] uppercase">City</th>
                           {BLOOD_GROUPS.map(bg => (
-                            <th key={bg} className="text-center px-2 py-2 text-xs font-bold text-gray-600">{bg}</th>
+                            <th key={bg} className="text-center px-2 py-2 text-xs font-bold text-[var(--txt-body)]">{bg}</th>
                           ))}
-                          <th className="text-center px-3 py-2 text-xs font-bold text-gray-600 uppercase">Total</th>
+                          <th className="text-center px-3 py-2 text-xs font-bold text-[var(--txt-body)] uppercase">Total</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
@@ -1361,7 +1361,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           return (
                             <tr key={city} onClick={() => setSelectedCity(city)}
                               className={`cursor-pointer hover:bg-indigo-50 transition-colors ${selectedCity === city ? 'bg-indigo-50' : ''}`}>
-                              <td className="px-3 py-2.5 font-semibold text-gray-800 flex items-center gap-1.5">
+                              <td className="px-3 py-2.5 font-semibold text-[var(--txt-heading)] flex items-center gap-1.5">
                                 <MapPin className="w-3 h-3 text-indigo-400" />{city}
                               </td>
                               {BLOOD_GROUPS.map(bg => {
@@ -1372,7 +1372,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                   }`}>{u || '—'}</td>
                                 );
                               })}
-                              <td className="text-center px-3 py-2.5 font-black text-gray-900">{total}</td>
+                              <td className="text-center px-3 py-2.5 font-black text-[var(--txt-heading)]">{total}</td>
                             </tr>
                           );
                         })}
@@ -1390,31 +1390,31 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
           <div className="space-y-6 animate-in fade-in duration-500">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Organization Verification</h2>
-                <p className="text-sm text-gray-500 mt-1">{filteredOrganizations.length} pending verification</p>
+                <h2 className="text-2xl font-bold text-[var(--txt-heading)]">Organization Verification</h2>
+                <p className="text-sm text-[var(--txt-body)] mt-1">{filteredOrganizations.length} pending verification</p>
               </div>
               <button onClick={() => setActiveTab('verify')}
-                className="px-4 py-2 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 flex items-center gap-2 text-sm font-semibold text-gray-700">
+                className="px-4 py-2 bg-[var(--clr-bg-card)] border border-[var(--clr-border)] rounded-xl hover:bg-[var(--clr-bg-page)] flex items-center gap-2 text-sm font-semibold text-gray-700">
                 <Download className="w-4 h-4" /> Export
               </button>
             </div>
 
-            <div className="bg-white rounded-2xl p-4 shadow-lg border border-gray-100">
+            <div className="bg-[var(--clr-bg-card)] rounded-2xl p-4 shadow-lg border border-gray-100">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input type="text" placeholder="Search..." value={orgSearchTerm} onChange={e => setOrgSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-[var(--clr-info)] outline-none text-sm" />
+                    className="w-full pl-10 pr-4 py-2.5 border-2 border-[var(--clr-border)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm" />
                 </div>
                 <select value={verifyFilter} onChange={e => setVerifyFilter(e.target.value)}
-                  className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
+                  className="px-4 py-2.5 border-2 border-[var(--clr-border)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
                   <option value="all">All Status</option>
                   <option value="pending">Pending</option>
                   <option value="verified">Verified</option>
                   <option value="rejected">Rejected</option>
                 </select>
                 <select value={verifySort} onChange={e => setVerifySort(e.target.value)}
-                  className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
+                  className="px-4 py-2.5 border-2 border-[var(--clr-border)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
                   <option value="name_asc">Name (A-Z)</option>
                   <option value="name_desc">Name (Z-A)</option>
                   <option value="type">By Type</option>
@@ -1425,21 +1425,21 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             {filteredOrganizations.length > 0 ? (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {filteredOrganizations.map(org => (
-                  <div key={org.id} className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all">
+                  <div key={org.id} className="bg-[var(--clr-bg-card)] rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
-                        <h3 className="text-lg font-bold text-gray-900">{org.name}</h3>
+                        <h3 className="text-lg font-bold text-[var(--txt-heading)]">{org.name}</h3>
                         <div className="flex items-center gap-2 mt-2">
                           <span className={`px-3 py-1 rounded-full text-xs font-semibold ${org.type === 'Hospital' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>{org.type}</span>
                           <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusClasses(org.status)}`}>{org.status}</span>
                         </div>
                       </div>
                       <button onClick={() => { setSelectedOrg(org); setShowOrgDetails(true); }}
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                        <Eye className="w-5 h-5 text-gray-500" />
+                        className="p-2 hover:bg-[var(--clr-bg-page)] rounded-lg transition-colors">
+                        <Eye className="w-5 h-5 text-[var(--txt-body)]" />
                       </button>
                     </div>
-                    <div className="space-y-2 text-sm text-gray-600">
+                    <div className="space-y-2 text-sm text-[var(--txt-body)]">
                       <div className="flex items-center gap-2"><Mail className="w-4 h-4 text-gray-400" />{org.email}</div>
                       <div className="flex items-center gap-2"><Phone className="w-4 h-4 text-gray-400" />{org.contact}</div>
                       <div className="flex items-center gap-2"><MapPin className="w-4 h-4 text-gray-400" />{org.address}</div>
@@ -1448,11 +1448,11 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     {org.status === 'pending' && (
                       <div className="mt-4 pt-4 border-t border-gray-100 flex gap-2">
                         <button onClick={() => verifyOrganization(org.id, 'rejected')} disabled={actionLoading}
-                          className="flex-1 px-4 py-2.5 bg-red-50 text-red-700 border border-red-200 rounded-xl font-semibold hover:bg-red-100 disabled:opacity-50 text-sm">
+                          className="flex-1 px-4 py-2.5 bg-red-50 text-red-700 border border-red-200 rounded-xl font-semibold hover:bg-[var(--stats-divider)] disabled:opacity-50 text-sm">
                           Reject
                         </button>
                         <button onClick={() => verifyOrganization(org.id, 'verified')} disabled={actionLoading}
-                          className="flex-1 px-4 py-2.5 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-semibold hover:from-green-600 disabled:opacity-50 text-sm shadow">
+                          className="flex-1 px-4 py-2.5 bg-gradient-to-r from-green-500 to-green-600 text-[var(--txt-inverse)] rounded-xl font-semibold hover:from-green-600 disabled:opacity-50 text-sm shadow">
                           Approve
                         </button>
                       </div>
@@ -1461,10 +1461,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 ))}
               </div>
             ) : (
-              <div className="bg-white rounded-2xl p-12 text-center shadow-lg border border-gray-100">
+              <div className="bg-[var(--clr-bg-card)] rounded-2xl p-12 text-center shadow-lg border border-gray-100">
                 <CheckCircle className="w-16 h-16 text-[var(--clr-success)] mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-gray-900 mb-2">All Caught Up!</h3>
-                <p className="text-gray-500">No organizations pending verification</p>
+                <h3 className="text-xl font-bold text-[var(--txt-heading)] mb-2">All Caught Up!</h3>
+                <p className="text-[var(--txt-body)]">No organizations pending verification</p>
               </div>
             )}
           </div>
@@ -1475,28 +1475,28 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
           <div className="space-y-6 animate-in fade-in duration-500">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">National Ledger</h2>
-                <p className="text-sm text-gray-500 mt-1">{filteredLedger.length} total entries</p>
+                <h2 className="text-2xl font-bold text-[var(--txt-heading)]">National Ledger</h2>
+                <p className="text-sm text-[var(--txt-body)] mt-1">{filteredLedger.length} total entries</p>
               </div>
               <button onClick={() => downloadCSV(filteredLedger.slice(0, 500).map(e => ({
                 RTID: e.rtid, Type: e.type, 'Blood Group': e.bloodGroup, Units: e.units,
                 Status: e.status, Location: e.hospital || e.bloodBank || e.city, Date: formatDate(e.createdAt)
               })), 'national_ledger')}
-                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl text-sm font-semibold flex items-center gap-2 hover:shadow-lg">
+                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-[var(--txt-inverse)] rounded-xl text-sm font-semibold flex items-center gap-2 hover:shadow-lg">
                 <Download className="w-4 h-4" /> Export
               </button>
             </div>
 
-            <div className="bg-white rounded-2xl p-4 shadow-lg border border-gray-100">
+            <div className="bg-[var(--clr-bg-card)] rounded-2xl p-4 shadow-lg border border-gray-100">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input type="text" placeholder="Search RTID, blood group, city..."
                     value={ledgerSearchTerm} onChange={e => setLedgerSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-[var(--clr-info)] outline-none text-sm" />
+                    className="w-full pl-10 pr-4 py-2.5 border-2 border-[var(--clr-border)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm" />
                 </div>
                 <select value={ledgerFilterStatus} onChange={e => setLedgerFilterStatus(e.target.value)}
-                  className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
+                  className="px-4 py-2.5 border-2 border-[var(--clr-border)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
                   <option value="all">All Status</option>
                   <option value="pending">Pending</option>
                   <option value="available">Available</option>
@@ -1504,7 +1504,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   <option value="completed">Completed</option>
                 </select>
                 <select value={ledgerSort} onChange={e => setLedgerSort(e.target.value)}
-                  className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
+                  className="px-4 py-2.5 border-2 border-[var(--clr-border)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
                   <option value="newest">Newest First</option>
                   <option value="oldest">Oldest First</option>
                   <option value="bloodgroup">By Blood Group</option>
@@ -1512,39 +1512,39 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+            <div className="bg-[var(--clr-bg-card)] rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+                  <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-[var(--clr-border)]">
                     <tr>
                       {['RTID','Type','Blood','Units','Status','Location','Date'].map(h => (
-                        <th key={h} className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">{h}</th>
+                        <th key={h} className="px-4 py-3 text-left text-xs font-bold text-[var(--txt-body)] uppercase">{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {filteredLedger.slice(0, 60).map((entry, i) => (
-                      <tr key={i} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 text-xs font-mono font-semibold text-gray-800">{entry.rtid}</td>
+                      <tr key={i} className="hover:bg-[var(--clr-bg-page)]">
+                        <td className="px-4 py-3 text-xs font-mono font-semibold text-[var(--txt-heading)]">{entry.rtid}</td>
                         <td className="px-4 py-3">
                           <span className={`px-2 py-1 rounded-full text-xs font-semibold ${entry.type === 'Donation' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
                             {entry.type}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-sm font-bold text-gray-900">{entry.bloodGroup}</td>
+                        <td className="px-4 py-3 text-sm font-bold text-[var(--txt-heading)]">{entry.bloodGroup}</td>
                         <td className="px-4 py-3 text-sm font-semibold text-gray-700">{entry.units}</td>
                         <td className="px-4 py-3">
                           <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusClasses(entry.status)}`}>{entry.status}</span>
                         </td>
-                        <td className="px-4 py-3 text-sm text-gray-600">{entry.city}</td>
-                        <td className="px-4 py-3 text-sm text-gray-500">{formatDate(entry.createdAt)}</td>
+                        <td className="px-4 py-3 text-sm text-[var(--txt-body)]">{entry.city}</td>
+                        <td className="px-4 py-3 text-sm text-[var(--txt-body)]">{formatDate(entry.createdAt)}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
               {filteredLedger.length > 60 && (
-                <div className="p-4 bg-gray-50 border-t text-center text-sm text-gray-500">
+                <div className="p-4 bg-[var(--clr-bg-page)] border-t text-center text-sm text-[var(--txt-body)]">
                   Showing 60 of {filteredLedger.length} entries. Export for complete data.
                 </div>
               )}
@@ -1556,16 +1556,16 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
         {activeTab === 'analytics' && (
           <div className="space-y-8 animate-in fade-in duration-500">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">Analytics & Reports</h2>
+              <h2 className="text-2xl font-bold text-[var(--txt-heading)]">Analytics & Reports</h2>
               <button onClick={() => downloadCSV(bloodGroupDistribution.map(d => ({ 'Blood Group': d.name, Count: d.value })), 'analytics')}
-                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl text-sm font-semibold flex items-center gap-2 hover:shadow-lg">
+                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-[var(--txt-inverse)] rounded-xl text-sm font-semibold flex items-center gap-2 hover:shadow-lg">
                 <Download className="w-4 h-4" /> Export
               </button>
             </div>
 
             {/* Monthly trends */}
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-              <h3 className="text-lg font-bold text-gray-800 mb-6">6-Month Activity Trends</h3>
+            <div className="bg-[var(--clr-bg-card)] rounded-2xl p-6 shadow-lg border border-gray-100">
+              <h3 className="text-lg font-bold text-[var(--txt-heading)] mb-6">6-Month Activity Trends</h3>
               <ResponsiveContainer width="100%" height={320}>
                 <AreaChart data={monthlyTrends}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -1582,8 +1582,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* City-wise */}
-              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-                <h3 className="text-lg font-bold text-gray-800 mb-6">Top Cities by Activity</h3>
+              <div className="bg-[var(--clr-bg-card)] rounded-2xl p-6 shadow-lg border border-gray-100">
+                <h3 className="text-lg font-bold text-[var(--txt-heading)] mb-6">Top Cities by Activity</h3>
                 <ResponsiveContainer width="100%" height={320}>
                   <BarChart data={cityWiseData} layout="vertical">
                     <CartesianGrid strokeDasharray="3 3" stroke="#f5f5f5" />
@@ -1598,8 +1598,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
               </div>
 
               {/* Status pie */}
-              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-                <h3 className="text-lg font-bold text-gray-800 mb-6">Status Distribution</h3>
+              <div className="bg-[var(--clr-bg-card)] rounded-2xl p-6 shadow-lg border border-gray-100">
+                <h3 className="text-lg font-bold text-[var(--txt-heading)] mb-6">Status Distribution</h3>
                 <ResponsiveContainer width="100%" height={320}>
                   <RechartsPie>
                     <Pie data={statusDistribution} cx="50%" cy="50%" outerRadius={110}
@@ -1617,7 +1617,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
                 { label: 'Fulfillment Rate', value: `${metrics.totalRequests > 0 ? Math.round((metrics.totalRedemptions / metrics.totalRequests) * 100) : 0}%`, icon: Target, color: 'text-[var(--clr-success)]', bg: 'bg-green-50' },
-                { label: 'Avg Daily Donations', value: Math.round(metrics.totalDonations / 30), icon: TrendingUp, color: 'text-[var(--clr-info)]', bg: 'bg-blue-50' },
+                { label: 'Avg Daily Donations', value: Math.round(metrics.totalDonations / 30), icon: TrendingUp, color: 'text-[var(--rtid-badge)]', bg: 'bg-blue-50' },
                 { label: 'Pending Requests', value: metrics.activeRTIDs, icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50' },
                 { label: 'Fraud Attempts', value: metrics.fraudAttempts, icon: Flag, color: 'text-[var(--clr-emergency)]', bg: 'bg-red-50' }
               ].map((m, i) => {
@@ -1626,7 +1626,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   <div key={i} className={`rounded-2xl p-5 ${m.bg} border border-white shadow-sm`}>
                     <Icon className={`w-6 h-6 ${m.color} mb-3`} />
                     <p className={`text-3xl font-black ${m.color}`}>{m.value}</p>
-                    <p className="text-sm text-gray-600 mt-1">{m.label}</p>
+                    <p className="text-sm text-[var(--txt-body)] mt-1">{m.label}</p>
                   </div>
                 );
               })}
@@ -1639,14 +1639,14 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
           <div className="space-y-6 animate-in fade-in duration-500">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Donor Management</h2>
-                <p className="text-sm text-gray-500 mt-1">{filteredDonors.length} donors found</p>
+                <h2 className="text-2xl font-bold text-[var(--txt-heading)]">Donor Management</h2>
+                <p className="text-sm text-[var(--txt-body)] mt-1">{filteredDonors.length} donors found</p>
               </div>
               <button onClick={() => downloadCSV(filteredDonors.map(d => ({
                 Name: d.fullName, 'Blood Group': d.bloodGroup, City: d.district || d.city,
                 Mobile: d.mobile, Donations: d.donationsCount || 0, Credits: d.credits || 0
               })), 'donors')}
-                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl text-sm font-semibold flex items-center gap-2">
+                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-[var(--txt-inverse)] rounded-xl text-sm font-semibold flex items-center gap-2">
                 <Download className="w-4 h-4" /> Export
               </button>
             </div>
@@ -1659,24 +1659,24 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 { label: 'Avg Donations', value: donors.length > 0 ? (donors.reduce((s, d) => s + (d.donationsCount || 0), 0) / donors.length).toFixed(1) : 0, color: 'from-green-500 to-green-600' },
                 { label: 'Active (30d)', value: donors.filter(d => d.lastDonationDate && new Date(d.lastDonationDate) > new Date(Date.now() - 30 * 86400000)).length, color: 'from-purple-500 to-purple-600' }
               ].map((s, i) => (
-                <div key={i} className="bg-white rounded-2xl p-5 shadow-lg border border-gray-100 text-center">
+                <div key={i} className="bg-[var(--clr-bg-card)] rounded-2xl p-5 shadow-lg border border-gray-100 text-center">
                   <p className={`text-3xl font-black bg-gradient-to-r ${s.color} bg-clip-text text-transparent`}>{s.value}</p>
-                  <p className="text-sm text-gray-500 mt-1">{s.label}</p>
+                  <p className="text-sm text-[var(--txt-body)] mt-1">{s.label}</p>
                 </div>
               ))}
             </div>
 
             {/* Filters */}
-            <div className="bg-white rounded-2xl p-4 shadow-lg border border-gray-100">
+            <div className="bg-[var(--clr-bg-card)] rounded-2xl p-4 shadow-lg border border-gray-100">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input type="text" placeholder="Search donors by name, blood group, city..."
                     value={donorSearch} onChange={e => setDonorSearch(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-[var(--clr-info)] outline-none text-sm" />
+                    className="w-full pl-10 pr-4 py-2.5 border-2 border-[var(--clr-border)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm" />
                 </div>
                 <select value={donorFilter} onChange={e => setDonorFilter(e.target.value)}
-                  className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
+                  className="px-4 py-2.5 border-2 border-[var(--clr-border)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
                   <option value="all">All Blood Groups</option>
                   {BLOOD_GROUPS.map(bg => <option key={bg} value={bg}>{bg}</option>)}
                 </select>
@@ -1684,44 +1684,44 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             </div>
 
             {/* Donor Table */}
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+            <div className="bg-[var(--clr-bg-card)] rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
+                  <thead className="bg-[var(--clr-bg-page)] border-b border-[var(--clr-border)]">
                     <tr>
                       {['Donor','Blood Group','City','Mobile','Donations','Credits','Last Donation'].map(h => (
-                        <th key={h} className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">{h}</th>
+                        <th key={h} className="px-4 py-3 text-left text-xs font-bold text-[var(--txt-body)] uppercase">{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {filteredDonors.slice(0, 50).map((d, i) => (
-                      <tr key={i} className="hover:bg-gray-50">
+                      <tr key={i} className="hover:bg-[var(--clr-bg-page)]">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-[var(--txt-inverse)] text-xs font-bold">
                               {(d.fullName || 'D').charAt(0).toUpperCase()}
                             </div>
                             <div>
-                              <p className="text-sm font-semibold text-gray-900">{d.fullName || 'Unknown'}</p>
+                              <p className="text-sm font-semibold text-[var(--txt-heading)]">{d.fullName || 'Unknown'}</p>
                               <p className="text-xs text-gray-400">{d.userId || d.email || d.id}</p>
                             </div>
                           </div>
                         </td>
                         <td className="px-4 py-3">
-                          <span className="px-3 py-1 rounded-full text-sm font-black text-red-700 bg-red-50 border border-red-100">
+                          <span className="px-3 py-1 rounded-full text-sm font-black text-red-700 bg-red-50 border border-[var(--clr-border)]">
                             {d.bloodGroup || '—'}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-sm text-gray-600">{d.district || d.city || '—'}</td>
-                        <td className="px-4 py-3 text-sm text-gray-600">{d.mobile || '—'}</td>
+                        <td className="px-4 py-3 text-sm text-[var(--txt-body)]">{d.district || d.city || '—'}</td>
+                        <td className="px-4 py-3 text-sm text-[var(--txt-body)]">{d.mobile || '—'}</td>
                         <td className="px-4 py-3">
-                          <span className="text-sm font-bold text-gray-900">{d.donationsCount || 0}</span>
+                          <span className="text-sm font-bold text-[var(--txt-heading)]">{d.donationsCount || 0}</span>
                         </td>
                         <td className="px-4 py-3">
                           <span className="text-sm font-bold text-[var(--clr-success)]">{d.credits || 0}</span>
                         </td>
-                        <td className="px-4 py-3 text-sm text-gray-500">
+                        <td className="px-4 py-3 text-sm text-[var(--txt-body)]">
                           {d.lastDonationDate ? formatDate(d.lastDonationDate) : '—'}
                         </td>
                       </tr>
@@ -1730,7 +1730,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 </table>
               </div>
               {filteredDonors.length > 50 && (
-                <div className="p-4 bg-gray-50 border-t text-center text-sm text-gray-500">
+                <div className="p-4 bg-[var(--clr-bg-page)] border-t text-center text-sm text-[var(--txt-body)]">
                   Showing 50 of {filteredDonors.length} donors.
                 </div>
               )}
@@ -1741,27 +1741,27 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
         {/* ══════════ RTID CHECK TAB ══════════ */}
         {activeTab === 'rtid' && (
           <div className="space-y-6 animate-in fade-in duration-500">
-            <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 max-w-2xl mx-auto">
+            <div className="bg-[var(--clr-bg-card)] rounded-2xl p-8 shadow-lg border border-gray-100 max-w-2xl mx-auto">
               <div className="text-center mb-8">
                 <div className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mb-4 shadow-lg">
-                  <Shield className="w-10 h-10 text-white" />
+                  <Shield className="w-10 h-10 text-[var(--txt-inverse)]" />
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">RTID Verification</h2>
-                <p className="text-gray-500">Verify RTIDs against the National Ledger</p>
+                <h2 className="text-3xl font-bold text-[var(--txt-heading)] mb-2">RTID Verification</h2>
+                <p className="text-[var(--txt-body)]">Verify RTIDs against the National Ledger</p>
               </div>
 
               <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
                   {(['D', 'H'] as const).map(p => (
                     <button key={p} onClick={() => setRtidPrefix(p)}
-                      className={`p-4 rounded-xl border-2 transition-all ${rtidPrefix === p ? (p === 'D' ? 'border-[var(--clr-success)] bg-green-50' : 'border-[var(--clr-info)] bg-blue-50') : 'border-gray-200 hover:border-gray-300'}`}>
+                      className={`p-4 rounded-xl border-2 transition-all ${rtidPrefix === p ? (p === 'D' ? 'border-[var(--clr-success)] bg-green-50' : 'border-[var(--clr-info)] bg-blue-50') : 'border-[var(--clr-border)] hover:border-[var(--clr-border)]'}`}>
                       <div className="flex items-center gap-3">
-                        {p === 'D' ? <Droplet className={`w-6 h-6 ${rtidPrefix === 'D' ? 'text-[var(--clr-success)]' : 'text-gray-400'}`} /> : <Building2 className={`w-6 h-6 ${rtidPrefix === 'H' ? 'text-[var(--clr-info)]' : 'text-gray-400'}`} />}
+                        {p === 'D' ? <Droplet className={`w-6 h-6 ${rtidPrefix === 'D' ? 'text-[var(--clr-success)]' : 'text-gray-400'}`} /> : <Building2 className={`w-6 h-6 ${rtidPrefix === 'H' ? 'text-[var(--rtid-badge)]' : 'text-gray-400'}`} />}
                         <div className="text-left">
                           <p className="font-bold text-sm">{p}-RTID</p>
-                          <p className="text-xs text-gray-500">{p === 'D' ? 'Donation' : 'Hospital Request'}</p>
+                          <p className="text-xs text-[var(--txt-body)]">{p === 'D' ? 'Donation' : 'Hospital Request'}</p>
                         </div>
-                        {rtidPrefix === p && <CheckCircle className={`w-4 h-4 ml-auto ${p === 'D' ? 'text-[var(--clr-success)]' : 'text-[var(--clr-info)]'}`} />}
+                        {rtidPrefix === p && <CheckCircle className={`w-4 h-4 ml-auto ${p === 'D' ? 'text-[var(--clr-success)]' : 'text-[var(--rtid-badge)]'}`} />}
                       </div>
                     </button>
                   ))}
@@ -1776,11 +1776,11 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   <input type="text" value={rtidCheckInput} onChange={e => setRtidCheckInput(e.target.value.toUpperCase())}
                     placeholder="Enter RTID code"
                     onKeyPress={e => e.key === 'Enter' && handleRTIDCheck()}
-                    className="w-full pl-36 pr-4 py-4 border-2 border-gray-300 rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-mono" />
+                    className="w-full pl-36 pr-4 py-4 border-2 border-[var(--clr-border)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-mono" />
                 </div>
 
                 <button onClick={handleRTIDCheck} disabled={rtidLoading || !rtidCheckInput.trim()}
-                  className="w-full py-4 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 text-white rounded-xl font-bold shadow-lg disabled:opacity-50 flex items-center justify-center gap-2">
+                  className="w-full py-4 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 text-[var(--txt-inverse)] rounded-xl font-bold shadow-lg disabled:opacity-50 flex items-center justify-center gap-2">
                   {rtidLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
                   {rtidLoading ? 'Verifying...' : 'Verify RTID'}
                 </button>
@@ -1794,7 +1794,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         <CheckCircle className="w-8 h-8 text-[var(--clr-success)]" />
                         <h3 className="text-lg font-bold text-green-900">RTID Verified ✓</h3>
                       </div>
-                      <div className="grid grid-cols-2 gap-3 bg-white/80 rounded-xl p-4 text-sm">
+                      <div className="grid grid-cols-2 gap-3 bg-[var(--clr-bg-card)]/80 rounded-xl p-4 text-sm">
                         {[
                           ['RTID', rtidCheckResult.fullRTID],
                           ['Type', rtidCheckResult.type],
@@ -1806,8 +1806,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           ['Created', rtidCheckResult.createdAt]
                         ].map(([k, v]) => (
                           <div key={k as string}>
-                            <p className="text-xs text-gray-500 uppercase font-semibold">{k as string}</p>
-                            <p className="font-bold text-gray-900">{v as string}</p>
+                            <p className="text-xs text-[var(--txt-body)] uppercase font-semibold">{k as string}</p>
+                            <p className="font-bold text-[var(--txt-heading)]">{v as string}</p>
                           </div>
                         ))}
                       </div>
@@ -1831,40 +1831,40 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
         {activeTab === 'fraud' && (
           <div className="space-y-6 animate-in fade-in duration-500">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <h2 className="text-2xl font-bold text-[var(--txt-heading)] flex items-center gap-2">
                 <AlertOctagon className="w-7 h-7 text-[var(--clr-emergency)]" /> Fraud Alerts
               </h2>
-              <p className="text-sm text-gray-500 mt-1">{fraudAlerts.length} suspicious activities detected</p>
+              <p className="text-sm text-[var(--txt-body)] mt-1">{fraudAlerts.length} suspicious activities detected</p>
             </div>
 
             {fraudAlerts.length === 0 ? (
-              <div className="bg-white rounded-2xl p-12 text-center shadow-lg border border-gray-100">
+              <div className="bg-[var(--clr-bg-card)] rounded-2xl p-12 text-center shadow-lg border border-gray-100">
                 <ShieldCheck className="w-16 h-16 text-[var(--clr-success)] mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-gray-900 mb-2">No Fraud Alerts</h3>
-                <p className="text-gray-500">System is operating normally. No suspicious activities detected.</p>
+                <h3 className="text-xl font-bold text-[var(--txt-heading)] mb-2">No Fraud Alerts</h3>
+                <p className="text-[var(--txt-body)]">System is operating normally. No suspicious activities detected.</p>
               </div>
             ) : (
               <div className="space-y-4">
                 {fraudAlerts.map(alert => (
-                  <div key={alert.id} className="bg-white rounded-2xl p-6 shadow-lg border-l-4 border-[var(--clr-emergency)]">
+                  <div key={alert.id} className="bg-[var(--clr-bg-card)] rounded-2xl p-6 shadow-lg border-l-4 border-[var(--clr-emergency)]">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-start gap-4">
-                        <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <div className="w-10 h-10 bg-[var(--stats-divider)] rounded-xl flex items-center justify-center flex-shrink-0">
                           <AlertOctagon className="w-5 h-5 text-[var(--clr-emergency)]" />
                         </div>
                         <div>
-                          <p className="font-bold text-gray-900">Suspicious Request: <span className="font-mono text-[var(--clr-emergency)]">{alert.rtid}</span></p>
-                          <p className="text-sm text-gray-500 mt-1">Hospital: {alert.hospital}</p>
-                          <p className="text-sm text-gray-500">Blood Group: <strong>{alert.bloodGroup}</strong></p>
+                          <p className="font-bold text-[var(--txt-heading)]">Suspicious Request: <span className="font-mono text-[var(--clr-emergency)]">{alert.rtid}</span></p>
+                          <p className="text-sm text-[var(--txt-body)] mt-1">Hospital: {alert.hospital}</p>
+                          <p className="text-sm text-[var(--txt-body)]">Blood Group: <strong>{alert.bloodGroup}</strong></p>
                           <p className="text-sm text-[var(--clr-emergency)] mt-2 font-medium">{alert.reason}</p>
                           <p className="text-xs text-gray-400 mt-1">{formatDateTime(alert.createdAt)}</p>
                         </div>
                       </div>
                       <div className="flex gap-2 flex-shrink-0">
-                        <button className="px-3 py-1.5 text-xs font-semibold bg-red-100 text-red-700 rounded-lg hover:bg-red-200">
+                        <button className="px-3 py-1.5 text-xs font-semibold bg-[var(--stats-divider)] text-red-700 rounded-lg hover:bg-red-200">
                           Block
                         </button>
-                        <button className="px-3 py-1.5 text-xs font-semibold bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">
+                        <button className="px-3 py-1.5 text-xs font-semibold bg-[var(--clr-bg-page)] text-gray-700 rounded-lg hover:bg-gray-200">
                           Dismiss
                         </button>
                       </div>
@@ -1880,41 +1880,41 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
         {activeTab === 'audit' && (
           <div className="space-y-6 animate-in fade-in duration-500">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Audit Log</h2>
-              <p className="text-sm text-gray-500 mt-1">Complete system activity trail</p>
+              <h2 className="text-2xl font-bold text-[var(--txt-heading)]">Audit Log</h2>
+              <p className="text-sm text-[var(--txt-body)] mt-1">Complete system activity trail</p>
             </div>
 
-            <div className="bg-white rounded-2xl p-4 shadow-lg border border-gray-100">
+            <div className="bg-[var(--clr-bg-card)] rounded-2xl p-4 shadow-lg border border-gray-100">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <select value={auditFilter} onChange={e => setAuditFilter(e.target.value)}
-                  className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
+                  className="px-4 py-2.5 border-2 border-[var(--clr-border)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
                   <option value="all">All Activities</option>
                   <option value="verification">Verifications</option>
                   <option value="donation">Donations</option>
                   <option value="request">Requests</option>
                 </select>
                 <select value={auditSort} onChange={e => setAuditSort(e.target.value)}
-                  className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
+                  className="px-4 py-2.5 border-2 border-[var(--clr-border)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
                   <option value="newest">Newest First</option>
                   <option value="oldest">Oldest First</option>
                 </select>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 max-h-[600px] overflow-y-auto">
+            <div className="bg-[var(--clr-bg-card)] rounded-2xl p-6 shadow-lg border border-gray-100 max-h-[600px] overflow-y-auto">
               <div className="space-y-3">
                 {filteredAuditLog.slice(0, 100).map((log, i) => (
-                  <div key={i} className="flex items-start gap-4 p-4 rounded-xl hover:bg-gray-50 border border-gray-100">
+                  <div key={i} className="flex items-start gap-4 p-4 rounded-xl hover:bg-[var(--clr-bg-page)] border border-gray-100">
                     <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
-                      log.type === 'verification' ? 'bg-green-100' : log.type === 'donation' ? 'bg-red-100' : 'bg-blue-100'
+                      log.type === 'verification' ? 'bg-green-100' : log.type === 'donation' ? 'bg-[var(--stats-divider)]' : 'bg-blue-100'
                     }`}>
                       {log.type === 'verification' ? <CheckSquare className="w-4 h-4 text-[var(--clr-success)]" />
                         : log.type === 'donation' ? <Droplet className="w-4 h-4 text-[var(--clr-emergency)]" />
-                        : <Activity className="w-4 h-4 text-[var(--clr-info)]" />}
+                        : <Activity className="w-4 h-4 text-[var(--rtid-badge)]" />}
                     </div>
                     <div className="flex-1">
-                      <p className="font-semibold text-gray-900 text-sm">{log.action}</p>
-                      <p className="text-xs text-gray-500 mt-0.5">{log.user} — {log.details}</p>
+                      <p className="font-semibold text-[var(--txt-heading)] text-sm">{log.action}</p>
+                      <p className="text-xs text-[var(--txt-body)] mt-0.5">{log.user} — {log.details}</p>
                       <p className="text-xs text-gray-400 mt-0.5">{formatDateTime(log.timestamp)}</p>
                     </div>
                   </div>
@@ -1927,14 +1927,14 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       </main>
 
       {/* ── FOOTER ── */}
-      <footer className="bg-gradient-to-r from-gray-900 to-gray-800 text-white py-8 mt-16">
+      <footer className="bg-gradient-to-r from-gray-900 to-gray-800 text-[var(--txt-inverse)] py-8 mt-16">
         <div className="max-w-[1400px] mx-auto px-6 text-center">
           <div className="flex justify-center items-center gap-2 mb-2">
             <Droplet className="text-[var(--clr-emergency)]" size={20} fill="var(--clr-emergency)" />
             <span className="font-bold">RaktPort Admin Dashboard</span>
           </div>
           <p className="text-sm text-gray-400">National Blood Management System | Government of India</p>
-          <div className="flex justify-center gap-4 mt-3 text-xs text-gray-500">
+          <div className="flex justify-center gap-4 mt-3 text-xs text-[var(--txt-body)]">
             <span>Secure Access</span>•<span>Real-time Monitoring</span>•<span>Fraud Prevention</span>•<span>Analytics</span>
           </div>
         </div>
@@ -1952,17 +1952,17 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       {/* ── ORG DETAILS MODAL ── */}
       {showOrgDetails && selectedOrg && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white p-6 border-b border-gray-200 flex justify-between items-center">
+          <div className="bg-[var(--clr-bg-card)] rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto">
+            <div className="sticky top-0 bg-[var(--clr-bg-card)] p-6 border-b border-[var(--clr-border)] flex justify-between items-center">
               <div>
-                <h2 className="text-xl font-bold text-gray-900">{selectedOrg.name}</h2>
+                <h2 className="text-xl font-bold text-[var(--txt-heading)]">{selectedOrg.name}</h2>
                 <div className="flex gap-2 mt-2">
                   <span className={`px-3 py-1 rounded-full text-xs font-semibold ${selectedOrg.type === 'Hospital' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>{selectedOrg.type}</span>
                   <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusClasses(selectedOrg.status)}`}>{selectedOrg.status}</span>
                 </div>
               </div>
-              <button onClick={() => setShowOrgDetails(false)} className="p-2 hover:bg-gray-100 rounded-xl">
-                <X className="w-5 h-5 text-gray-500" />
+              <button onClick={() => setShowOrgDetails(false)} className="p-2 hover:bg-[var(--clr-bg-page)] rounded-xl">
+                <X className="w-5 h-5 text-[var(--txt-body)]" />
               </button>
             </div>
             <div className="p-6 space-y-4">
@@ -1972,18 +1972,18 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 { icon: MapPin, label: 'Address', value: selectedOrg.address },
                 { icon: FileText, label: 'License No.', value: selectedOrg.license }
               ].map(({ icon: Icon, label, value }) => (
-                <div key={label} className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
+                <div key={label} className="flex items-start gap-3 p-3 bg-[var(--clr-bg-page)] rounded-xl">
                   <Icon className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="text-xs text-gray-400 font-medium">{label}</p>
-                    <p className="text-sm font-semibold text-gray-800">{value}</p>
+                    <p className="text-sm font-semibold text-[var(--txt-heading)]">{value}</p>
                   </div>
                 </div>
               ))}
               {selectedOrg.type === 'Hospital' && selectedOrg.totalBeds !== 'N/A' && (
                 <div className="grid grid-cols-2 gap-3">
                   <div className="p-3 bg-blue-50 rounded-xl text-center">
-                    <p className="text-xs text-[var(--clr-info)] font-medium">Total Beds</p>
+                    <p className="text-xs text-[var(--rtid-badge)] font-medium">Total Beds</p>
                     <p className="text-xl font-black text-blue-700">{selectedOrg.totalBeds}</p>
                   </div>
                   <div className="p-3 bg-cyan-50 rounded-xl text-center">
@@ -1993,14 +1993,14 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 </div>
               )}
             </div>
-            <div className="sticky bottom-0 bg-gray-50 p-6 border-t flex justify-end gap-3">
+            <div className="sticky bottom-0 bg-[var(--clr-bg-page)] p-6 border-t flex justify-end gap-3">
               <button onClick={() => setShowOrgDetails(false)} className="px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-xl text-sm font-semibold">Close</button>
               {selectedOrg.status === 'pending' && (
                 <>
                   <button onClick={() => { setShowOrgDetails(false); verifyOrganization(selectedOrg.id, 'rejected'); }} disabled={actionLoading}
-                    className="px-4 py-2 bg-red-100 text-red-700 rounded-xl text-sm font-semibold hover:bg-red-200">Reject</button>
+                    className="px-4 py-2 bg-[var(--stats-divider)] text-red-700 rounded-xl text-sm font-semibold hover:bg-red-200">Reject</button>
                   <button onClick={() => { setShowOrgDetails(false); verifyOrganization(selectedOrg.id, 'verified'); }} disabled={actionLoading}
-                    className="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl text-sm font-semibold hover:from-green-600 shadow">Approve</button>
+                    className="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-[var(--txt-inverse)] rounded-xl text-sm font-semibold hover:from-green-600 shadow">Approve</button>
                 </>
               )}
             </div>

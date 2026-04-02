@@ -175,13 +175,13 @@ function AppContent() {
 
       default:
         return (
-          <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="min-h-screen flex items-center justify-center bg-[var(--clr-bg-page)]">
             <div className="text-center">
               <h1 className="text-3xl text-[var(--clr-brand)] mb-4">Dashboard Not Found</h1>
-              <p className="text-gray-600 mb-6">Could not find dashboard for role: {selectedRole}</p>
+              <p className="text-[var(--txt-body)] mb-6">Could not find dashboard for role: {selectedRole}</p>
               <Button
                 onClick={handleLogout}
-                className="px-6 py-2 bg-[var(--clr-brand)] text-white rounded hover:bg-[#6B0000]"
+                className="px-6 py-2 bg-[var(--clr-brand)] text-[var(--txt-inverse)] rounded hover:bg-[#6B0000]"
               >
                 Logout
               </Button>

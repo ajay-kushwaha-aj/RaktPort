@@ -280,7 +280,7 @@ export const AppointmentModal = ({
                       type="button" 
                       disabled
                       variant="default"
-                      className="bg-[var(--clr-success)] hover:bg-green-700 text-white"
+                      className="bg-[var(--clr-success)] hover:bg-green-700 text-[var(--txt-inverse)]"
                     >
                       <CheckCircle className="w-4 h-4 mr-2" /> Verified
                     </Button>
@@ -346,7 +346,7 @@ export const AppointmentModal = ({
                       placeholder="Donor Name"
                       required
                       readOnly={!isNewDonor}
-                      className={!isNewDonor ? "bg-gray-100" : ""}
+                      className={!isNewDonor ? "bg-[var(--clr-bg-page)]" : ""}
                     />
                   </div>
                   <div>

@@ -24,22 +24,22 @@ export const QRModal = ({ isOpen, onClose, request }: { isOpen: boolean; onClose
           <DialogDescription>Scan at any blood bank to verify this requisition</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col items-center gap-4 py-2">
-          <div className={`p-3 rounded-xl border-2 bg-white ${!isV ? "opacity-50" : ""}`} style={{ borderColor: isV ? "#e5e7eb" : "#fca5a5" }}>
+          <div className={`p-3 rounded-xl border-2 bg-[var(--clr-bg-card)] ${!isV ? "opacity-50" : ""}`} style={{ borderColor: isV ? "#e5e7eb" : "#fca5a5" }}>
             <QRCanvas data={getQRPayload(request)} size={200} />
           </div>
           <div className="w-full space-y-1">
             <div className="flex justify-between text-xs">
-              <span className="text-gray-500 dark:text-gray-400 font-medium">Validity remaining</span>
+              <span className="text-[var(--txt-body)] dark:text-gray-400 font-medium">Validity remaining</span>
               <span className={`font-bold ${isV ? "text-[var(--clr-success)]" : "text-[var(--clr-emergency)]"}`}>{rem}</span>
             </div>
             <div className="hd-validity">
               <div className="hd-validity-fill" style={{ width: `${pct}%`, background: pct > 50 ? "#22c55e" : pct > 20 ? "#f59e0b" : "var(--clr-emergency)" }} />
             </div>
           </div>
-          <div className="w-full bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3 border dark:border-gray-700 text-sm space-y-2">
+          <div className="w-full bg-[var(--clr-bg-page)] dark:bg-gray-800/50 rounded-xl p-3 border dark:border-gray-700 text-sm space-y-2">
             <div className="grid grid-cols-2 gap-2">
               {[["Patient", request.patientName], ["Blood Group", request.bloodGroup], ["Component", request.componentType || "Whole Blood"], ["Units", String(request.unitsRequired)]].map(([k, v]) => (
-                <div key={k}><p className="text-[10px] text-gray-400 uppercase font-semibold">{k}</p><p className="font-semibold text-gray-800 dark:text-gray-200">{v}</p></div>
+                <div key={k}><p className="text-[10px] text-gray-400 uppercase font-semibold">{k}</p><p className="font-semibold text-[var(--txt-heading)] dark:text-gray-200">{v}</p></div>
               ))}
             </div>
             <div className="flex flex-wrap gap-2 pt-1">

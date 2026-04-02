@@ -282,9 +282,9 @@ const BG_COLORS: Record<string, { bg:string; text:string; border:string; bar:str
 
 function getLevel(units: number) {
   if (units >= 50) return { label:'Good',    cls:'text-emerald-600', barClass:'bg-emerald-500' };
-  if (units >= 30) return { label:'Moderate', cls:'text-[var(--clr-info)]',    barClass:'bg-[var(--clr-info)]'    };
+  if (units >= 30) return { label:'Moderate', cls:'text-[var(--rtid-badge)]',    barClass:'bg-[var(--rtid-badge)]'    };
   if (units >= 10) return { label:'Low',      cls:'text-amber-600',   barClass:'bg-amber-500'   };
-  return                    { label:'Critical', cls:'text-[var(--clr-emergency)]',    barClass:'bg-[var(--clr-emergency)]'     };
+  return                    { label:'Critical', cls:'text-[var(--clr-emergency)]',    barClass:'bg-[var(--stats-bg)]'     };
 }
 
 /* ─── Premium Overview ─────────────────────────────── */
@@ -347,14 +347,14 @@ function PremiumOverview({
       {/* Critical Alert */}
       {criticalGroups.length > 0 && (
         <div className="bbd-alert critical">
-          <div className="w-9 h-9 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0 text-lg">🚨</div>
+          <div className="w-9 h-9 rounded-xl bg-[var(--stats-divider)] flex items-center justify-center flex-shrink-0 text-lg">🚨</div>
           <div className="flex-1">
             <p className="text-sm font-bold text-red-800">Critical Blood Shortage</p>
             <p className="text-xs text-[var(--clr-emergency)] mt-0.5">
               {criticalGroups.join(', ')} below 10 units. Immediate procurement required.
             </p>
           </div>
-          <button onClick={() => onNavigate('inventory')} className="text-xs font-bold text-red-700 bg-red-100 px-3 py-1.5 rounded-lg hover:bg-red-200 transition-colors whitespace-nowrap flex-shrink-0">
+          <button onClick={() => onNavigate('inventory')} className="text-xs font-bold text-red-700 bg-[var(--stats-divider)] px-3 py-1.5 rounded-lg hover:bg-red-200 transition-colors whitespace-nowrap flex-shrink-0">
             View Inventory →
           </button>
         </div>
@@ -372,7 +372,7 @@ function PremiumOverview({
               <p className="bbd-welcome-date">{dateStr}</p>
               {upcomingToday.length > 0 && (
                 <div className="flex items-center gap-2 mt-3">
-                  <span className="inline-flex items-center gap-1.5 bg-white/15 text-white/90 text-xs font-semibold px-3 py-1.5 rounded-full border border-white/20">
+                  <span className="inline-flex items-center gap-1.5 bg-[var(--clr-bg-card)]/15 text-[var(--txt-inverse)]/90 text-xs font-semibold px-3 py-1.5 rounded-full border border-white/20">
                     <CalendarCheck className="w-3 h-3" />
                     {upcomingToday.length} appointment{upcomingToday.length > 1 ? 's' : ''} today
                   </span>
@@ -382,14 +382,14 @@ function PremiumOverview({
             <div className="flex gap-2 flex-wrap">
               <button
                 onClick={onAppointmentOpen}
-                className="flex items-center gap-2 bg-white/15 hover:bg-white/25 border border-white/25 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all hover:scale-105 active:scale-100"
+                className="flex items-center gap-2 bg-[var(--clr-bg-card)]/15 hover:bg-[var(--clr-bg-card)]/25 border border-white/25 text-[var(--txt-inverse)] text-sm font-semibold px-4 py-2 rounded-xl transition-all hover:scale-105 active:scale-100"
               >
                 <PlusCircle className="w-4 h-4" />
                 Quick Appointment
               </button>
               <button
                 onClick={onRefresh}
-                className="flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white/80 text-sm px-3 py-2 rounded-xl transition-all"
+                className="flex items-center gap-2 bg-[var(--clr-bg-card)]/10 hover:bg-[var(--clr-bg-card)]/20 border border-white/20 text-[var(--txt-inverse)]/80 text-sm px-3 py-2 rounded-xl transition-all"
               >
                 <RefreshCw className="w-4 h-4" />
               </button>
@@ -475,7 +475,7 @@ function PremiumOverview({
                 { label:'Moderate (<50)', color:'var(--clr-info)' },
                 { label:'Good (50+)',      color:'#22c55e' },
               ].map(l => (
-                <div key={l.label} className="flex items-center gap-1.5 text-xs text-gray-500">
+                <div key={l.label} className="flex items-center gap-1.5 text-xs text-[var(--txt-body)]">
                   <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{background:l.color}} />
                   {l.label}
                 </div>
@@ -554,7 +554,7 @@ function PremiumOverview({
                         d.status === 'AVAILABLE' ? 'bg-green-100 text-green-700' :
                         d.status === 'REDEEMED'  ? 'bg-purple-100 text-purple-700' :
                         d.status === 'SCHEDULED' ? 'bg-blue-100 text-blue-700' :
-                        'bg-gray-100 text-gray-500'
+                        'bg-[var(--clr-bg-page)] text-[var(--txt-body)]'
                       }`}>{d.status}</span>
                     </div>
                   </div>
@@ -570,7 +570,7 @@ function PremiumOverview({
           {/* Inventory Summary Card */}
           <div className="bbd-card p-5">
             <div className="bbd-section-hdr">
-              <span className="bbd-section-title"><Package className="w-4 h-4 text-[var(--clr-info)]" /> Stock Summary</span>
+              <span className="bbd-section-title"><Package className="w-4 h-4 text-[var(--rtid-badge)]" /> Stock Summary</span>
             </div>
             <div className="space-y-3">
               {[
@@ -580,7 +580,7 @@ function PremiumOverview({
                 { label:'Critical Groups', val: criticalGroups.length, color: criticalGroups.length > 0 ? 'var(--clr-emergency)' : '#6b7280', icon:'🚨' },
               ].map(s => (
                 <div key={s.label} className="flex items-center justify-between py-1.5 border-b border-gray-50 last:border-0">
-                  <span className="text-xs text-gray-500 flex items-center gap-2">
+                  <span className="text-xs text-[var(--txt-body)] flex items-center gap-2">
                     <span>{s.icon}</span>{s.label}
                   </span>
                   <span className="text-sm font-bold" style={{color:s.color}}>{s.val}</span>
@@ -589,7 +589,7 @@ function PremiumOverview({
             </div>
             <button
               onClick={() => onNavigate('inventory')}
-              className="w-full mt-4 py-2 text-xs font-semibold text-white bg-gradient-to-r from-red-800 to-red-600 rounded-xl hover:shadow-md transition-all hover:-translate-y-0.5"
+              className="w-full mt-4 py-2 text-xs font-semibold text-[var(--txt-inverse)] bg-gradient-to-r from-red-800 to-red-600 rounded-xl hover:shadow-md transition-all hover:-translate-y-0.5"
             >
               Manage Inventory →
             </button>
@@ -598,7 +598,7 @@ function PremiumOverview({
           {/* Today's Appointments */}
           <div className="bbd-card p-5">
             <div className="bbd-section-hdr">
-              <span className="bbd-section-title"><CalendarCheck className="w-4 h-4 text-[var(--clr-info)]" /> Today's Appointments</span>
+              <span className="bbd-section-title"><CalendarCheck className="w-4 h-4 text-[var(--rtid-badge)]" /> Today's Appointments</span>
               <button onClick={() => onNavigate('appointments')} className="bbd-section-link">
                 All <ChevronRight className="w-3.5 h-3.5" />
               </button>
@@ -607,7 +607,7 @@ function PremiumOverview({
               <div className="text-center py-6">
                 <div className="text-3xl opacity-25 mb-2">📅</div>
                 <p className="text-xs text-gray-400">No appointments today</p>
-                <button onClick={onAppointmentOpen} className="mt-2 text-xs text-[var(--clr-info)] font-semibold hover:underline">Schedule one →</button>
+                <button onClick={onAppointmentOpen} className="mt-2 text-xs text-[var(--rtid-badge)] font-semibold hover:underline">Schedule one →</button>
               </div>
             ) : (
               <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
@@ -621,13 +621,13 @@ function PremiumOverview({
                         <span className="bbd-appt-mo">{date.toLocaleString('default',{month:'short'})}</span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-gray-800 truncate">{a.donorName}</p>
+                        <p className="text-sm font-semibold text-[var(--txt-heading)] truncate">{a.donorName}</p>
                         <div className="flex items-center gap-1.5 mt-0.5">
                           <span className="text-[10px] font-black px-1.5 py-0.5 rounded" style={{background:bgc.bg, color:bgc.text}}>{a.bloodGroup}</span>
                           <span className="text-[10px] text-gray-400">{a.time || ''}</span>
                         </div>
                       </div>
-                      <span className="text-[10px] bg-blue-50 text-[var(--clr-info)] font-semibold px-2 py-1 rounded-full flex-shrink-0">Upcoming</span>
+                      <span className="text-[10px] bg-blue-50 text-[var(--rtid-badge)] font-semibold px-2 py-1 rounded-full flex-shrink-0">Upcoming</span>
                     </div>
                   );
                 })}
@@ -663,7 +663,7 @@ function PremiumOverview({
                         <span className="text-xl font-black" style={{color, fontFamily:'Outfit,sans-serif'}}>{rate}%</span>
                       </div>
                     </div>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-[var(--txt-body)]">
                       {kpi.totalRedemptions} of {kpi.totalBloodRequests} requests fulfilled
                     </p>
                   </>
@@ -867,24 +867,24 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
 
       const confirmText = donData 
         ? `<div class="text-left text-sm space-y-3 mt-4">
-             <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
-               <p class="text-xs text-gray-500 uppercase font-bold mb-1">Patient Info</p>
-               <p class="font-bold text-gray-800">${reqData.patientName}</p>
-               <p class="text-xs text-gray-600 mt-1">Hospital: ${reqData.hospitalName || bloodBankData?.fullName || 'Hospital'}</p>
-               <p class="text-xs text-gray-600">Request: <span class="font-bold text-[var(--clr-emergency)]">${reqData.bloodGroup}</span></p>
+             <div class="bg-[var(--clr-bg-page)] p-3 rounded-lg border border-[var(--clr-border)]">
+               <p class="text-xs text-[var(--txt-body)] uppercase font-bold mb-1">Patient Info</p>
+               <p class="font-bold text-[var(--txt-heading)]">${reqData.patientName}</p>
+               <p class="text-xs text-[var(--txt-body)] mt-1">Hospital: ${reqData.hospitalName || bloodBankData?.fullName || 'Hospital'}</p>
+               <p class="text-xs text-[var(--txt-body)]">Request: <span class="font-bold text-[var(--clr-emergency)]">${reqData.bloodGroup}</span></p>
              </div>
              <div class="bg-blue-50 p-3 rounded-lg border border-blue-200">
-               <p class="text-xs text-[var(--clr-info)]/70 uppercase font-bold mb-1">Donor Source</p>
+               <p class="text-xs text-[var(--rtid-badge)]/70 uppercase font-bold mb-1">Donor Source</p>
                <p class="font-bold text-blue-900">${donData.donorName || 'Anonymous'}</p>
                <p class="text-xs text-blue-700 mt-1">D-RTID: <span class="font-mono">${donData.dRtid || donData.rtid}</span></p>
                <p class="text-xs text-blue-700">Donated: <span class="font-bold text-[var(--clr-emergency)]">${donData.bloodGroup}</span></p>
              </div>
            </div>`
         : `<div class="text-left text-sm space-y-3 mt-4">
-             <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
-               <p class="text-xs text-gray-500 uppercase font-bold mb-1">Patient Info</p>
-               <p class="font-bold text-gray-800">${reqData.patientName}</p>
-               <p class="text-xs text-gray-600 mt-1">Hospital: ${reqData.hospitalName || bloodBankData?.fullName || 'Hospital'}</p>
+             <div class="bg-[var(--clr-bg-page)] p-3 rounded-lg border border-[var(--clr-border)]">
+               <p class="text-xs text-[var(--txt-body)] uppercase font-bold mb-1">Patient Info</p>
+               <p class="font-bold text-[var(--txt-heading)]">${reqData.patientName}</p>
+               <p class="text-xs text-[var(--txt-body)] mt-1">Hospital: ${reqData.hospitalName || bloodBankData?.fullName || 'Hospital'}</p>
              </div>
            </div>`;
 
@@ -944,11 +944,11 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
       await Swal.fire({
         title:'✅ Verified', icon:'success', confirmButtonColor:'var(--clr-success)',
         html:`<div class="text-left space-y-3 p-4">
-          <div class="bg-blue-50 p-3 rounded-lg border border-blue-200"><p class="text-sm text-gray-600 mb-1">Type</p><p class="font-bold text-lg">${type}</p></div>
-          <div class="bg-gray-50 p-3 rounded-lg border border-gray-200"><p class="text-sm text-gray-600 mb-1">ID</p><p class="font-mono font-bold">${data.rtid||rtid}</p></div>
-          <div class="bg-gray-50 p-3 rounded-lg border border-gray-200"><p class="text-sm text-gray-600 mb-1">Name</p><p class="font-semibold">${data.patientName||data.donorName||'N/A'}</p></div>
-          <div class="bg-gray-50 p-3 rounded-lg border border-gray-200"><p class="text-sm text-gray-600 mb-1">Blood Group</p><p class="font-bold text-[var(--clr-emergency)] text-xl">${data.bloodGroup||'N/A'}</p></div>
-          <div class="bg-gray-50 p-3 rounded-lg border border-gray-200"><p class="text-sm text-gray-600 mb-1">Status</p><p class="font-bold ${sc}">${data.status||'N/A'}</p></div>
+          <div class="bg-blue-50 p-3 rounded-lg border border-blue-200"><p class="text-sm text-[var(--txt-body)] mb-1">Type</p><p class="font-bold text-lg">${type}</p></div>
+          <div class="bg-[var(--clr-bg-page)] p-3 rounded-lg border border-[var(--clr-border)]"><p class="text-sm text-[var(--txt-body)] mb-1">ID</p><p class="font-mono font-bold">${data.rtid||rtid}</p></div>
+          <div class="bg-[var(--clr-bg-page)] p-3 rounded-lg border border-[var(--clr-border)]"><p class="text-sm text-[var(--txt-body)] mb-1">Name</p><p class="font-semibold">${data.patientName||data.donorName||'N/A'}</p></div>
+          <div class="bg-[var(--clr-bg-page)] p-3 rounded-lg border border-[var(--clr-border)]"><p class="text-sm text-[var(--txt-body)] mb-1">Blood Group</p><p class="font-bold text-[var(--clr-emergency)] text-xl">${data.bloodGroup||'N/A'}</p></div>
+          <div class="bg-[var(--clr-bg-page)] p-3 rounded-lg border border-[var(--clr-border)]"><p class="text-sm text-[var(--txt-body)] mb-1">Status</p><p class="font-bold ${sc}">${data.status||'N/A'}</p></div>
         </div>`
       });
     } catch(err:any){ toast.error(err.message); }
@@ -959,18 +959,18 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
   if (loading) return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
       <div className="relative">
-        <div className="w-16 h-16 rounded-full border-4 border-red-100 border-t-red-700 animate-spin" />
+        <div className="w-16 h-16 rounded-full border-4 border-[var(--clr-border)] border-t-red-700 animate-spin" />
         <Droplet className="absolute inset-0 m-auto w-6 h-6 text-red-700 fill-red-600" />
       </div>
-      <p className="text-sm text-gray-500 font-medium animate-pulse">Loading Blood Bank Dashboard…</p>
+      <p className="text-sm text-[var(--txt-body)] font-medium animate-pulse">Loading Blood Bank Dashboard…</p>
     </div>
   );
 
   if (!bloodBankId) return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
       <AlertTriangle className="w-16 h-16 text-destructive mb-4" />
-      <h2 className="text-2xl font-bold text-gray-800 mb-2">Access Denied</h2>
-      <p className="text-gray-500 mb-6 text-center max-w-sm">Your account could not be verified as a Blood Bank. Please contact the administrator.</p>
+      <h2 className="text-2xl font-bold text-[var(--txt-heading)] mb-2">Access Denied</h2>
+      <p className="text-[var(--txt-body)] mb-6 text-center max-w-sm">Your account could not be verified as a Blood Bank. Please contact the administrator.</p>
       <Button onClick={onLogout}>Back to Login</Button>
     </div>
   );
@@ -1001,7 +1001,7 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
         {/* Global Action Loading Overlay */}
         {actionLoading && (
           <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[100] flex items-center justify-center">
-            <div className="bg-white rounded-2xl p-6 shadow-2xl flex items-center gap-4">
+            <div className="bg-[var(--clr-bg-card)] rounded-2xl p-6 shadow-2xl flex items-center gap-4">
               <Loader2 className="w-7 h-7 animate-spin text-red-700" />
               <p className="text-sm font-semibold text-gray-700">Processing…</p>
             </div>
@@ -1062,7 +1062,7 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
             {activeTab === 'camps' && (
               <div className="text-center py-20">
                 <div className="text-6xl mb-4 opacity-30">⛺</div>
-                <h2 className="text-xl font-bold text-gray-500 mb-2">Blood Donation Camps</h2>
+                <h2 className="text-xl font-bold text-[var(--txt-body)] mb-2">Blood Donation Camps</h2>
                 <p className="text-sm text-gray-400">Coming soon — organize & manage camps</p>
               </div>
             )}

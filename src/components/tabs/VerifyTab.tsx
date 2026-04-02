@@ -136,7 +136,7 @@ export const VerifyTab = ({ onVerifyAndRedeem }: VerifyTabProps) => {
               <Button type="button" variant="outline" className="flex-1" onClick={handleClear}>
                 Reset Form
               </Button>
-              <Button type="submit" className="flex-[2] bg-success hover:bg-success/90 text-white font-bold shadow-md hover:shadow-lg transition-all">
+              <Button type="submit" className="flex-[2] bg-success hover:bg-success/90 text-[var(--txt-inverse)] font-bold shadow-md hover:shadow-lg transition-all">
                 ✅ Verify & Complete Transfer
               </Button>
             </div>

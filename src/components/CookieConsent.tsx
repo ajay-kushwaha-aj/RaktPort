@@ -54,19 +54,19 @@ export function CookieConsent() {
         }`}
     >
       <div className="max-w-2xl mx-auto p-4 pb-6 sm:pb-4">
-        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="bg-[var(--clr-bg-card)] dark:bg-gray-900 rounded-2xl shadow-2xl border border-[var(--clr-border)] dark:border-gray-700 overflow-hidden">
           {/* Main bar */}
           <div className="p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
             {/* Icon + Text */}
             <div className="flex items-start gap-3 flex-1">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0 shadow-md">
-                <Cookie className="w-5 h-5 text-white" />
+                <Cookie className="w-5 h-5 text-[var(--txt-inverse)]" />
               </div>
               <div className="min-w-0">
-                <h3 className="font-semibold text-sm text-gray-900 dark:text-white flex items-center gap-1.5">
+                <h3 className="font-semibold text-sm text-[var(--txt-heading)] dark:text-[var(--txt-inverse)] flex items-center gap-1.5">
                   🍪 We use cookies
                 </h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed">
+                <p className="text-xs text-[var(--txt-body)] dark:text-gray-400 mt-0.5 leading-relaxed">
                   We use cookies to improve your experience, remember your preferences, and keep you logged in securely.
                 </p>
               </div>
@@ -76,13 +76,13 @@ export function CookieConsent() {
             <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto">
               <button
                 onClick={() => handleAccept('essential')}
-                className="flex-1 sm:flex-initial text-xs font-medium px-3.5 py-2 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                className="flex-1 sm:flex-initial text-xs font-medium px-3.5 py-2 rounded-xl border border-[var(--clr-border)] dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-[var(--clr-bg-page)] dark:hover:bg-gray-800 transition"
               >
                 Essential Only
               </button>
               <button
                 onClick={() => handleAccept('all')}
-                className="flex-1 sm:flex-initial text-xs font-bold px-4 py-2 rounded-xl bg-gradient-to-r from-[var(--clr-brand)] to-[#a01010] text-white hover:from-[#7a0000] hover:to-[#900e0e] shadow-md transition active:scale-95"
+                className="flex-1 sm:flex-initial text-xs font-bold px-4 py-2 rounded-xl bg-gradient-to-r from-[var(--clr-brand)] to-[#a01010] text-[var(--txt-inverse)] hover:from-[#7a0000] hover:to-[#900e0e] shadow-md transition active:scale-95"
               >
                 Accept All
               </button>
@@ -92,7 +92,7 @@ export function CookieConsent() {
           {/* Expandable details */}
           <button
             onClick={() => setExpanded(!expanded)}
-            className="w-full px-4 py-2 flex items-center justify-center gap-1 text-[11px] text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition border-t border-gray-100 dark:border-gray-800"
+            className="w-full px-4 py-2 flex items-center justify-center gap-1 text-[11px] text-gray-400 hover:text-[var(--txt-body)] dark:hover:text-gray-300 transition border-t border-gray-100 dark:border-gray-800"
           >
             {expanded ? 'Hide' : 'Show'} details
             {expanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
@@ -123,7 +123,7 @@ export function CookieConsent() {
                 <div key={c.name} className="flex items-start gap-2.5 text-xs">
                   <div className="mt-0.5">{c.icon}</div>
                   <div>
-                    <span className="font-semibold text-gray-800 dark:text-gray-200">
+                    <span className="font-semibold text-[var(--txt-heading)] dark:text-gray-200">
                       {c.name}
                       {c.required && (
                         <span className="ml-1.5 text-[10px] bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-[var(--clr-success)] px-1.5 py-0.5 rounded-full">
@@ -131,7 +131,7 @@ export function CookieConsent() {
                         </span>
                       )}
                     </span>
-                    <p className="text-gray-500 dark:text-gray-400 mt-0.5">{c.desc}</p>
+                    <p className="text-[var(--txt-body)] dark:text-gray-400 mt-0.5">{c.desc}</p>
                   </div>
                 </div>
               ))}

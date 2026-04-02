@@ -59,7 +59,7 @@ export const InventoryTab = ({ inventory }: InventoryTabProps) => {
                   <div className="text-3xl font-bold text-primary mb-1">{bg}</div>
                   <div className="text-sm text-muted-foreground">Blood Group</div>
                 </div>
-                <div className={`px-2 py-1 rounded-md text-xs font-bold border flex items-center gap-1 bg-white/60 backdrop-blur-sm ${textColor} border-current`}>
+                <div className={`px-2 py-1 rounded-md text-xs font-bold border flex items-center gap-1 bg-[var(--clr-bg-card)]/60 backdrop-blur-sm ${textColor} border-current`}>
                   <span>{getStatusEmoji(status)}</span>
                   <span>{getStatusLabel(status)}</span>
                 </div>

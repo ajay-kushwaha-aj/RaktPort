@@ -8,26 +8,26 @@ export const HD_STYLES = `
    DESIGN TOKENS
 ════════════════════════════════════════ */
 :root {
-  --c-brand:         #C41C38;
+  --c-brand:         var(--clr-brand);
   --c-brand-dark:    var(--clr-brand);
-  --c-brand-mid:     #A31628;
+  --c-brand-mid:     var(--clr-brand-dark);
   --c-brand-soft:    #FFF0F2;
   --c-brand-glow:    rgba(196,28,56,0.12);
 
-  --c-bg:            #F4F6FB;
-  --c-surface:       #FFFFFF;
+  --c-bg:            var(--clr-bg-page);
+  --c-surface:       var(--clr-bg-card);
   --c-surface-2:     #F8F9FD;
   --c-surface-3:     #EEF1F8;
 
-  --c-border:        rgba(15,23,42,0.07);
+  --c-border:        var(--clr-border);
   --c-border-med:    rgba(15,23,42,0.12);
   --c-border-strong: rgba(15,23,42,0.2);
 
-  --c-text:          #0F172A;
-  --c-text-2:        #1E293B;
-  --c-text-3:        #475569;
+  --c-text:          var(--txt-heading);
+  --c-text-2:        var(--txt-heading);
+  --c-text-3:        var(--txt-body);
   --c-text-4:        #94A3B8;
-  --c-text-inv:      #FFFFFF;
+  --c-text-inv:      var(--txt-inverse);
 
   --c-success:       var(--clr-success);
   --c-success-bg:    #ECFDF5;
