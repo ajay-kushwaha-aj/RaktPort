@@ -1411,7 +1411,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                 <TabsContent value="overview" className="space-y-2.5">
                   {[
                     {icon:MapPin,      label:'Location',     value:`${donorData.city||'—'}${donorData.pincode?', '+donorData.pincode:''}`},
-                    {icon:BadgeCheck,  label:'Internal ID',  value:donorData.internalId || '—'},
+                    {icon:BadgeCheck,  label:'Donor ID',  value:donorData.internalId || '—'},
                     ...(donorData.username ? [{icon:BadgeCheck, label:'@rakt Username', value:formatUsername(donorData.username)}] : []),
                     {icon:Mail,        label:'Email',        value:donorData.email||'—'},
                     {icon:Phone,       label:'Mobile',       value:donorData.mobile||'—'},
