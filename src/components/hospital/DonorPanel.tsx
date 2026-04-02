@@ -1,7 +1,7 @@
-// hospital/DonorPanel.tsx — Linked Donor details panel (Phase 3)
-import { useMemo } from "react";
-import { Users, Heart, CheckCircle2, Clock, ExternalLink } from "lucide-react";
-import { formatDate, formatTime } from "./utils";
+// hospital/DonorPanel.tsx — v5.0
+// All original logic preserved. Visual upgrade only.
+import { Users, Heart, CheckCircle2, Clock } from "lucide-react";
+import { formatDate } from "./utils";
 import type { BloodRequest, DonorInfo } from "./types";
 
 interface DonorPanelProps {
@@ -16,87 +16,228 @@ export function DonorPanel({ request }: DonorPanelProps) {
 
   if (donors.length === 0) {
     return (
-      <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 border border-gray-200 dark:border-gray-700 text-center">
-        <Users className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-        <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">No linked donors yet</p>
-        <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">Donors will appear here once they pledge via the RaktPort app</p>
+      <div
+        style={{
+          padding: "20px",
+          background: "var(--c-surface-2)",
+          borderRadius: "var(--r-lg)",
+          border: "1px solid var(--c-border)",
+          textAlign: "center",
+        }}
+      >
+        <Users
+          size={26}
+          style={{ color: "var(--c-text-4)", margin: "0 auto 8px", display: "block" }}
+        />
+        <p
+          style={{ fontSize: "0.77rem", fontWeight: 600, color: "var(--c-text-3)" }}
+        >
+          No linked donors yet
+        </p>
+        <p
+          style={{ fontSize: "0.66rem", color: "var(--c-text-4)", marginTop: "3px" }}
+        >
+          Donors appear here once they pledge via the RaktPort app
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-      {/* Header */}
-      <div className="p-3 bg-gradient-to-r from-red-50 dark:from-red-950/30 to-white dark:to-gray-800/50 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Heart className="w-4 h-4 text-[#8B0000]" />
-          <span className="text-xs font-bold text-gray-800 dark:text-gray-200">Linked Donors</span>
-          <span className="text-[10px] bg-[#8B0000] text-white px-1.5 py-0.5 rounded-full font-bold">{donors.length}</span>
+    <div
+      style={{
+        background: "var(--c-surface)",
+        borderRadius: "var(--r-lg)",
+        border: "1px solid var(--c-border)",
+        overflow: "hidden",
+      }}
+    >
+      {/* ── Header ── */}
+      <div
+        style={{
+          padding: "10px 14px",
+          background: "var(--c-brand-soft)",
+          borderBottom: "1px solid var(--c-border)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
+          <Heart size={14} style={{ color: "var(--c-brand)" }} />
+          <span
+            style={{
+              fontSize: "0.75rem",
+              fontWeight: 700,
+              color: "var(--c-text)",
+              fontFamily: "var(--f-display)",
+            }}
+          >
+            Linked Donors
+          </span>
+          <span
+            style={{
+              fontSize: "0.62rem", fontWeight: 800,
+              background: "var(--c-brand)", color: "#fff",
+              padding: "1px 7px", borderRadius: "var(--r-pill)",
+            }}
+          >
+            {donors.length}
+          </span>
         </div>
-        <div className="flex gap-3 text-[10px] font-semibold">
-          <span className="text-green-600 dark:text-green-400">{redeemedCount} redeemed</span>
-          <span className="text-blue-600 dark:text-blue-400">{administeredCount} administered</span>
+        <div style={{ display: "flex", gap: "12px" }}>
+          <span style={{ fontSize: "0.65rem", fontWeight: 600, color: "var(--c-success)" }}>
+            {redeemedCount} redeemed
+          </span>
+          <span style={{ fontSize: "0.65rem", fontWeight: 600, color: "var(--c-info)" }}>
+            {administeredCount} administered
+          </span>
         </div>
       </div>
 
-      {/* Donor list */}
-      <div className="divide-y divide-gray-50 dark:divide-gray-800 max-h-[200px] overflow-y-auto">
+      {/* ── Donor list ── */}
+      <div style={{ maxHeight: "200px", overflowY: "auto" }}>
         {donors.map((donor, i) => (
-          <div key={donor.dRtid + i} className="px-3 py-2.5 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
+          <div
+            key={donor.dRtid + i}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              padding: "9px 14px",
+              borderBottom:
+                i < donors.length - 1
+                  ? "1px solid var(--c-border)"
+                  : "none",
+              transition: "background var(--t-fast)",
+            }}
+            onMouseEnter={e =>
+            ((e.currentTarget as HTMLElement).style.background =
+              "var(--c-surface-2)")
+            }
+            onMouseLeave={e =>
+              ((e.currentTarget as HTMLElement).style.background = "")
+            }
+          >
             {/* Status icon */}
-            <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 border ${
-              donor.administered
-                ? "bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800"
-                : donor.redeemed
-                  ? "bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800"
-                  : "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700"
-            }`}>
+            <div
+              style={{
+                width: "28px", height: "28px",
+                borderRadius: "var(--r-sm)", flexShrink: 0,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                background: donor.administered
+                  ? "var(--c-info-bg)"
+                  : donor.redeemed
+                    ? "var(--c-success-bg)"
+                    : "var(--c-surface-2)",
+                border: `1px solid ${donor.administered
+                  ? "var(--c-info-bdr)"
+                  : donor.redeemed
+                    ? "var(--c-success-bdr)"
+                    : "var(--c-border)"
+                  }`,
+              }}
+            >
               {donor.administered ? (
-                <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                <CheckCircle2 size={13} style={{ color: "var(--c-info)" }} />
               ) : donor.redeemed ? (
-                <CheckCircle2 className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
+                <CheckCircle2 size={13} style={{ color: "var(--c-success)" }} />
               ) : (
-                <Clock className="w-3.5 h-3.5 text-gray-400" />
+                <Clock size={13} style={{ color: "var(--c-text-4)" }} />
               )}
             </div>
 
             {/* Donor info */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-gray-800 dark:text-gray-200 truncate">{donor.name}</span>
-                <span className="text-[10px] font-mono bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-1.5 py-0.5 rounded">{donor.dRtid}</span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
+                <span
+                  style={{
+                    fontSize: "0.75rem", fontWeight: 600,
+                    color: "var(--c-text)",
+                    overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                  }}
+                >
+                  {donor.name}
+                </span>
+                <span className="hd-mono-pill">{donor.dRtid}</span>
               </div>
-              <div className="flex items-center gap-2 text-[10px] text-gray-400 mt-0.5">
-                <span>{donor.units || 1} unit{(donor.units || 1) > 1 ? "s" : ""}</span>
+              <div
+                style={{
+                  fontSize: "0.62rem", color: "var(--c-text-4)",
+                  marginTop: "2px", display: "flex", alignItems: "center", gap: "5px",
+                }}
+              >
+                <span>
+                  {donor.units || 1} unit{(donor.units || 1) > 1 ? "s" : ""}
+                </span>
                 <span>·</span>
                 <span>{formatDate(new Date(donor.date))}</span>
                 {donor.administeredAt && (
                   <>
                     <span>·</span>
-                    <span className="text-blue-500">Admin: {formatDate(new Date(donor.administeredAt))}</span>
+                    <span style={{ color: "var(--c-info)" }}>
+                      Admin: {formatDate(new Date(donor.administeredAt))}
+                    </span>
                   </>
                 )}
               </div>
             </div>
 
             {/* Status badge */}
-            <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${
-              donor.administered
-                ? "bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800"
+            <span
+              style={{
+                fontSize: "0.6rem", fontWeight: 800,
+                padding: "2px 8px", borderRadius: "var(--r-pill)",
+                border: "1px solid",
+                flexShrink: 0,
+                background: donor.administered
+                  ? "var(--c-info-bg)"
+                  : donor.redeemed
+                    ? "var(--c-success-bg)"
+                    : "var(--c-surface-2)",
+                borderColor: donor.administered
+                  ? "var(--c-info-bdr)"
+                  : donor.redeemed
+                    ? "var(--c-success-bdr)"
+                    : "var(--c-border)",
+                color: donor.administered
+                  ? "var(--c-info)"
+                  : donor.redeemed
+                    ? "var(--c-success)"
+                    : "var(--c-text-4)",
+              }}
+            >
+              {donor.administered
+                ? "ADMINISTERED"
                 : donor.redeemed
-                  ? "bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800"
-                  : "bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700"
-            }`}>
-              {donor.administered ? "ADMINISTERED" : donor.redeemed ? "REDEEMED" : "PLEDGED"}
+                  ? "REDEEMED"
+                  : "PLEDGED"}
             </span>
           </div>
         ))}
       </div>
 
-      {/* Summary footer */}
-      <div className="p-2.5 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
-        <span className="text-[10px] text-gray-400">Total donated: <strong className="text-gray-700 dark:text-gray-300">{totalDonated} units</strong></span>
-        <span className="text-[10px] text-gray-400">Fulfillment: <strong className="text-[#8B0000]">{totalDonated}/{request.unitsRequired}</strong></span>
+      {/* ── Summary footer ── */}
+      <div
+        style={{
+          padding: "8px 14px",
+          background: "var(--c-surface-2)",
+          borderTop: "1px solid var(--c-border)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <span style={{ fontSize: "0.65rem", color: "var(--c-text-4)" }}>
+          Total donated:{" "}
+          <strong style={{ color: "var(--c-text-2)" }}>{totalDonated} units</strong>
+        </span>
+        <span style={{ fontSize: "0.65rem", color: "var(--c-text-4)" }}>
+          Fulfillment:{" "}
+          <strong style={{ color: "var(--c-brand)" }}>
+            {totalDonated}/{request.unitsRequired}
+          </strong>
+        </span>
       </div>
     </div>
   );

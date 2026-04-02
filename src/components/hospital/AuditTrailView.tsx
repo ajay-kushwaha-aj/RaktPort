@@ -1,6 +1,7 @@
-// hospital/AuditTrailView.tsx — Audit log viewer (Phase 2)
+// hospital/AuditTrailView.tsx — v5.0
+// All original Firebase/logic preserved. UI upgraded.
 import { useState, useEffect, useMemo } from "react";
-import { Shield, Search, RefreshCw, Filter } from "lucide-react";
+import { Shield, Search, RefreshCw } from "lucide-react";
 import { collection, query, where, orderBy, limit, getDocs } from "firebase/firestore";
 import { db } from "../../firebase";
 import { AUDIT_ACTION_LABELS } from "./auditLog";
@@ -12,6 +13,7 @@ export function AuditTrailView({ hospitalId }: { hospitalId: string }) {
   const [search, setSearch] = useState("");
   const [filterAction, setFilterAction] = useState<string>("All");
 
+  // ── Original fetch logic ──
   const fetchLogs = async () => {
     setLoading(true);
     try {
@@ -53,19 +55,21 @@ export function AuditTrailView({ hospitalId }: { hospitalId: string }) {
     return f;
   }, [entries, filterAction, search]);
 
-  const actionTypes = useMemo(() =>
-    ["All", ...new Set(entries.map(e => e.action))],
+  const actionTypes = useMemo(
+    () => ["All", ...new Set(entries.map(e => e.action))],
     [entries]
   );
 
   const formatTs = (ts: string) => {
     try {
-      const d = new Date(ts);
-      return d.toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: true });
+      return new Date(ts).toLocaleString("en-IN", {
+        day: "2-digit", month: "short", year: "numeric",
+        hour: "2-digit", minute: "2-digit", hour12: true,
+      });
     } catch { return ts; }
   };
 
-  const timeAgo = (ts: string) => {
+  const tsAgo = (ts: string) => {
     try {
       const diff = Date.now() - new Date(ts).getTime();
       const m = Math.floor(diff / 60000);
@@ -76,88 +80,219 @@ export function AuditTrailView({ hospitalId }: { hospitalId: string }) {
   };
 
   return (
-    <div className="space-y-5 hd-enter">
-      {/* Summary strip */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }} className="hd-enter">
+
+      {/* ── KPI row ── */}
+      <div className="hd-kpi-grid">
         {[
           { icon: "📋", label: "Total Actions", val: entries.length, cls: "k-blue" },
           { icon: "📝", label: "Requests Created", val: entries.filter(e => e.action === "REQUEST_CREATED").length, cls: "k-green" },
           { icon: "✏️", label: "Edits Made", val: entries.filter(e => e.action === "REQUEST_EDITED").length, cls: "k-amber" },
           { icon: "💉", label: "Administrations", val: entries.filter(e => e.action === "BLOOD_ADMINISTERED").length, cls: "k-purple" },
-        ].map(k => (
-          <div key={k.label} className={`hd-kpi ${k.cls}`}>
-            <div className="text-2xl mb-1">{k.icon}</div>
+        ].map((k, i) => (
+          <div key={k.label} className={`hd-kpi ${k.cls} hd-enter hd-s${i + 1}`}>
+            <span style={{ fontSize: "1.35rem", display: "block", marginBottom: "8px" }}>{k.icon}</span>
             <div className="hd-kpi-val">{k.val}</div>
             <div className="hd-kpi-lbl">{k.label}</div>
           </div>
         ))}
       </div>
 
-      {/* Search & Filters */}
-      <div className="hd-card p-4">
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input className="hd-search" placeholder="Search audit logs…" value={search} onChange={e => setSearch(e.target.value)} />
+      {/* ── Filter bar ── */}
+      <div className="hd-card" style={{ padding: "14px 16px" }}>
+        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+          {/* Search */}
+          <div style={{ position: "relative", flex: 1, minWidth: "200px" }}>
+            <Search
+              size={14}
+              style={{
+                position: "absolute", left: "12px",
+                top: "50%", transform: "translateY(-50%)",
+                color: "var(--c-text-4)",
+              }}
+            />
+            <input
+              className="hd-search"
+              placeholder="Search audit logs…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
           </div>
-          <div className="flex gap-2 items-center">
-            <select
-              value={filterAction}
-              onChange={e => setFilterAction(e.target.value)}
-              className="text-xs border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-medium outline-none cursor-pointer"
-            >
-              {actionTypes.map(a => (
-                <option key={a} value={a}>
-                  {a === "All" ? "All Actions" : AUDIT_ACTION_LABELS[a as AuditAction]?.label || a}
-                </option>
-              ))}
-            </select>
-            <button onClick={fetchLogs} className="w-9 h-9 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors" title="Refresh">
-              <RefreshCw className={`w-3.5 h-3.5 text-gray-500 ${loading ? "animate-spin" : ""}`} />
-            </button>
-          </div>
+
+          {/* Action filter */}
+          <select
+            value={filterAction}
+            onChange={e => setFilterAction(e.target.value)}
+            style={{
+              fontSize: "0.74rem",
+              border: "1.5px solid var(--c-border)",
+              borderRadius: "var(--r-md)",
+              padding: "0 12px",
+              height: "38px",
+              background: "var(--c-surface)",
+              color: "var(--c-text-2)",
+              fontWeight: 500,
+              outline: "none",
+              cursor: "pointer",
+              fontFamily: "var(--f-body)",
+            }}
+          >
+            {actionTypes.map(a => (
+              <option key={a} value={a}>
+                {a === "All" ? "All Actions" : AUDIT_ACTION_LABELS[a as AuditAction]?.label || a}
+              </option>
+            ))}
+          </select>
+
+          {/* Refresh */}
+          <button
+            onClick={fetchLogs}
+            style={{
+              width: "38px", height: "38px", borderRadius: "var(--r-md)",
+              border: "1.5px solid var(--c-border)", background: "var(--c-surface)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              cursor: "pointer", color: "var(--c-text-3)",
+              transition: "all var(--t-fast)", flexShrink: 0,
+            }}
+            title="Refresh"
+            onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = "var(--c-surface-2)")}
+            onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = "var(--c-surface)")}
+          >
+            <RefreshCw
+              size={14}
+              style={{ animation: loading ? "hd-spin 0.8s linear infinite" : "none" }}
+            />
+          </button>
         </div>
-        <p className="text-xs text-gray-400 mt-2">{filtered.length} of {entries.length} entries</p>
+
+        <p style={{ fontSize: "0.7rem", color: "var(--c-text-4)", marginTop: "8px" }}>
+          {filtered.length} of {entries.length} entries
+        </p>
       </div>
 
-      {/* Log entries */}
+      {/* ── Log entries ── */}
       {loading ? (
-        <div className="hd-card p-12 text-center">
-          <div className="w-8 h-8 border-3 border-gray-200 dark:border-gray-700 border-t-[#8B0000] rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-sm text-gray-400">Loading audit logs…</p>
+        <div className="hd-card">
+          <div className="hd-empty">
+            <div
+              style={{
+                width: "36px", height: "36px",
+                border: "3px solid var(--c-surface-3)",
+                borderTopColor: "var(--c-brand)",
+                borderRadius: "50%",
+                animation: "hd-spin 0.7s linear infinite",
+                margin: "0 auto 16px",
+              }}
+            />
+            <p className="hd-empty-title">Loading audit logs…</p>
+          </div>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="hd-card p-12 text-center">
-          <div className="text-5xl opacity-20 mb-3">🛡️</div>
-          <p className="text-gray-500 dark:text-gray-400 font-medium">No audit entries found</p>
-          <p className="text-xs text-gray-400 mt-1">Actions will be logged here as you use the dashboard</p>
+        <div className="hd-card">
+          <div className="hd-empty">
+            <div className="hd-empty-icon">🛡️</div>
+            <p className="hd-empty-title">No audit entries found</p>
+            <p className="hd-empty-sub">Actions will be logged here as you use the dashboard</p>
+          </div>
         </div>
       ) : (
-        <div className="hd-card overflow-hidden">
-          <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex items-center gap-2">
-            <Shield className="w-4 h-4 text-[#8B0000]" />
+        <div className="hd-card" style={{ overflow: "hidden" }}>
+          {/* Header */}
+          <div
+            style={{
+              padding: "14px 18px",
+              borderBottom: "1px solid var(--c-border)",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+            }}
+          >
+            <Shield size={15} style={{ color: "var(--c-brand)" }} />
             <span className="hd-sec-title">Activity Log</span>
-            <span className="text-xs text-gray-400 ml-auto">{filtered.length} entries</span>
+            <span style={{ fontSize: "0.7rem", color: "var(--c-text-4)", marginLeft: "auto" }}>
+              {filtered.length} entries
+            </span>
           </div>
-          <div className="divide-y divide-gray-50 dark:divide-gray-800 max-h-[55vh] overflow-y-auto">
+
+          {/* Entries */}
+          <div style={{ maxHeight: "55vh", overflowY: "auto" }}>
             {filtered.map((entry, i) => {
-              const meta = AUDIT_ACTION_LABELS[entry.action as AuditAction] || { label: entry.action, emoji: "📄", color: "#6b7280" };
+              const meta =
+                AUDIT_ACTION_LABELS[entry.action as AuditAction] || {
+                  label: entry.action,
+                  emoji: "📄",
+                  color: "#6B7280",
+                };
+
               return (
-                <div key={entry.id || i} className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors hd-enter" style={{ animationDelay: `${Math.min(i, 15) * 0.03}s` }}>
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-base flex-shrink-0" style={{ background: `${meta.color}15`, border: `1px solid ${meta.color}30` }}>
-                      {meta.emoji}
+                <div
+                  key={entry.id || i}
+                  className="hd-enter"
+                  style={{
+                    padding: "12px 18px",
+                    borderBottom:
+                      i < filtered.length - 1
+                        ? "1px solid var(--c-border)"
+                        : "none",
+                    animationDelay: `${Math.min(i, 15) * 0.03}s`,
+                    transition: "background var(--t-fast)",
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: "12px",
+                  }}
+                  onMouseEnter={e =>
+                  ((e.currentTarget as HTMLElement).style.background =
+                    "var(--c-surface-2)")
+                  }
+                  onMouseLeave={e =>
+                    ((e.currentTarget as HTMLElement).style.background = "")
+                  }
+                >
+                  {/* Icon */}
+                  <div
+                    style={{
+                      width: "34px", height: "34px",
+                      borderRadius: "var(--r-sm)", flexShrink: 0,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: "1rem",
+                      background: `${meta.color}12`,
+                      border: `1px solid ${meta.color}28`,
+                    }}
+                  >
+                    {meta.emoji}
+                  </div>
+
+                  {/* Content */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div
+                      style={{
+                        display: "flex", alignItems: "center",
+                        gap: "8px", flexWrap: "wrap",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: "0.75rem", fontWeight: 700,
+                          color: meta.color, fontFamily: "var(--f-display)",
+                        }}
+                      >
+                        {meta.label}
+                      </span>
+                      {entry.affectedRtid && (
+                        <span className="hd-mono-pill">{entry.affectedRtid}</span>
+                      )}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-xs font-bold" style={{ color: meta.color }}>{meta.label}</span>
-                        {entry.affectedRtid && (
-                          <span className="text-[10px] font-mono bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-1.5 py-0.5 rounded">{entry.affectedRtid}</span>
-                        )}
-                      </div>
-                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5 leading-relaxed">{entry.details}</p>
-                      <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{formatTs(entry.timestamp)} · {timeAgo(entry.timestamp)}</p>
-                    </div>
+                    <p
+                      style={{
+                        fontSize: "0.71rem", color: "var(--c-text-3)",
+                        marginTop: "3px", lineHeight: 1.5,
+                      }}
+                    >
+                      {entry.details}
+                    </p>
+                    <p style={{ fontSize: "0.61rem", color: "var(--c-text-4)", marginTop: "3px" }}>
+                      {formatTs(entry.timestamp)} · {tsAgo(entry.timestamp)}
+                    </p>
                   </div>
                 </div>
               );

@@ -1,4 +1,6 @@
-// hospital/TransfusionHistoryView.tsx — History tab
+// ════════════════════════════════════════════════════════
+// hospital/TransfusionHistoryView.tsx — v5.0
+// ════════════════════════════════════════════════════════
 import { useState, useMemo } from "react";
 import { Search, HeartHandshake } from "lucide-react";
 import { getStatusMeta } from "./constants";
@@ -7,100 +9,274 @@ import type { BloodRequest } from "./types";
 
 export function TransfusionHistoryView({ requests }: { requests: BloodRequest[] }) {
   const [search, setSearch] = useState("");
+
   const administered = useMemo(() =>
     requests
-      .filter(r => ["ADMINISTERED", "PARTIALLY ADMINISTERED", "CLOSED"].includes(r.status) || r.unitsAdministered > 0)
-      .filter(r => !search || r.patientName.toLowerCase().includes(search.toLowerCase()) || r.rtid.toLowerCase().includes(search.toLowerCase()))
-      .sort((a, b) => (b.administeredAt?.getTime() || b.createdAt.getTime()) - (a.administeredAt?.getTime() || a.createdAt.getTime()))
-    , [requests, search]);
+      .filter(r =>
+        ["ADMINISTERED", "PARTIALLY ADMINISTERED", "CLOSED"].includes(r.status) ||
+        r.unitsAdministered > 0
+      )
+      .filter(r =>
+        !search ||
+        r.patientName.toLowerCase().includes(search.toLowerCase()) ||
+        r.rtid.toLowerCase().includes(search.toLowerCase())
+      )
+      .sort(
+        (a, b) =>
+          (b.administeredAt?.getTime() || b.createdAt.getTime()) -
+          (a.administeredAt?.getTime() || a.createdAt.getTime())
+      ),
+    [requests, search]
+  );
 
-  const totalUnitsAdmin = administered.reduce((s, r) => s + (r.unitsAdministered || 0), 0);
+  const totalUnitsAdmin = administered.reduce(
+    (s, r) => s + (r.unitsAdministered || 0),
+    0
+  );
 
   return (
-    <div className="space-y-5 hd-enter">
-      {/* Summary strip */}
-      <div className="grid grid-cols-3 gap-4">
+    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }} className="hd-enter">
+
+      {/* ── KPI row ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "12px" }}>
         {[
           { icon: "💉", label: "Transfusions Done", val: administered.length, cls: "k-blue" },
           { icon: "🩸", label: "Total Units Given", val: totalUnitsAdmin, cls: "k-red" },
           { icon: "✅", label: "Fully Closed", val: administered.filter(r => r.status === "CLOSED").length, cls: "k-green" },
-        ].map(k => (
-          <div key={k.label} className={`hd-kpi ${k.cls}`}>
-            <div className="text-2xl mb-1">{k.icon}</div>
+        ].map((k, i) => (
+          <div key={k.label} className={`hd-kpi ${k.cls} hd-enter hd-s${i + 1}`}>
+            <span style={{ fontSize: "1.35rem", display: "block", marginBottom: "8px" }}>{k.icon}</span>
             <div className="hd-kpi-val">{k.val}</div>
             <div className="hd-kpi-lbl">{k.label}</div>
           </div>
         ))}
       </div>
 
-      {/* Search */}
-      <div className="hd-card p-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input className="hd-search" placeholder="Search patient, RTID…" value={search} onChange={e => setSearch(e.target.value)} />
+      {/* ── Search ── */}
+      <div className="hd-card" style={{ padding: "14px 16px" }}>
+        <div style={{ position: "relative" }}>
+          <Search
+            size={14}
+            style={{
+              position: "absolute", left: "12px",
+              top: "50%", transform: "translateY(-50%)",
+              color: "var(--c-text-4)",
+            }}
+          />
+          <input
+            className="hd-search"
+            placeholder="Search patient name or RTID…"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
         </div>
       </div>
 
+      {/* ── Empty state ── */}
       {administered.length === 0 ? (
-        <div className="hd-card p-12 text-center">
-          <div className="text-5xl opacity-20 mb-3">💉</div>
-          <p className="text-gray-500 dark:text-gray-400 font-medium">No transfusion records yet</p>
-          <p className="text-xs text-gray-400 mt-1">Records appear here after blood is administered to a patient</p>
+        <div className="hd-card">
+          <div className="hd-empty">
+            <div className="hd-empty-icon">💉</div>
+            <p className="hd-empty-title">No transfusion records yet</p>
+            <p className="hd-empty-sub">
+              Records appear here after blood is administered to a patient
+            </p>
+          </div>
         </div>
       ) : (
-        <div className="hd-card overflow-hidden">
-          <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex items-center gap-2">
-            <HeartHandshake className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+        <div className="hd-card" style={{ overflow: "hidden" }}>
+          <div
+            style={{
+              padding: "14px 18px",
+              borderBottom: "1px solid var(--c-border)",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+            }}
+          >
+            <HeartHandshake size={15} style={{ color: "var(--c-info)" }} />
             <span className="hd-sec-title">All Transfusion Records</span>
-            <span className="text-xs text-gray-400 ml-auto">{administered.length} records</span>
+            <span style={{ fontSize: "0.7rem", color: "var(--c-text-4)", marginLeft: "auto" }}>
+              {administered.length} records
+            </span>
           </div>
-          <div className="divide-y divide-gray-50 dark:divide-gray-800">
+
+          <div>
             {administered.map((r, i) => {
               const sm = getStatusMeta(r.status);
               const history = r.transfusionHistory || [];
+              const adminPct =
+                r.unitsRequired > 0
+                  ? ((r.unitsAdministered || 0) / r.unitsRequired) * 100
+                  : 0;
+
               return (
-                <div key={r.id} className="p-4 hd-enter" style={{ animationDelay: `${i * 0.04}s` }}>
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-lg flex-shrink-0">💉</div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-semibold text-gray-900 dark:text-gray-100 text-sm">{r.patientName}</span>
-                        {r.age && <span className="text-xs text-gray-400">{r.age}y</span>}
-                        <span className="text-xs font-black px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 border border-red-100 dark:border-red-800">{r.bloodGroup}</span>
-                        <span className="hd-status border text-[11px]" style={{ background: sm.bg, color: sm.text, borderColor: sm.border }}>{sm.label}</span>
+                <div
+                  key={r.id}
+                  className="hd-enter"
+                  style={{
+                    padding: "16px 18px",
+                    borderBottom:
+                      i < administered.length - 1
+                        ? "1px solid var(--c-border)"
+                        : "none",
+                    animationDelay: `${i * 0.04}s`,
+                    transition: "background var(--t-fast)",
+                  }}
+                  onMouseEnter={e =>
+                  ((e.currentTarget as HTMLElement).style.background =
+                    "var(--c-surface-2)")
+                  }
+                  onMouseLeave={e =>
+                    ((e.currentTarget as HTMLElement).style.background = "")
+                  }
+                >
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
+                    {/* Icon */}
+                    <div
+                      style={{
+                        width: "38px", height: "38px", borderRadius: "10px",
+                        background: "var(--c-info-bg)", border: "1px solid var(--c-info-bdr)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: "1.1rem", flexShrink: 0,
+                      }}
+                    >
+                      💉
+                    </div>
+
+                    {/* Info */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                        <span
+                          style={{
+                            fontFamily: "var(--f-display)", fontWeight: 700,
+                            fontSize: "0.85rem", color: "var(--c-text)",
+                          }}
+                        >
+                          {r.patientName}
+                        </span>
+                        {r.age && (
+                          <span style={{ fontSize: "0.67rem", color: "var(--c-text-4)" }}>
+                            {r.age}y
+                          </span>
+                        )}
+                        <span
+                          style={{
+                            fontFamily: "var(--f-display)", fontWeight: 800,
+                            fontSize: "0.66rem", padding: "2px 7px",
+                            borderRadius: "var(--r-pill)", background: "var(--c-brand-soft)",
+                            color: "var(--c-brand)", border: "1px solid rgba(196,28,56,0.15)",
+                          }}
+                        >
+                          {r.bloodGroup}
+                        </span>
+                        <span
+                          className="hd-status"
+                          style={{
+                            background: sm.bg, color: sm.text,
+                            border: `1px solid ${sm.border}`,
+                          }}
+                        >
+                          {sm.label}
+                        </span>
                       </div>
-                      <div className="text-[11px] text-gray-400 mt-0.5 flex items-center gap-2 flex-wrap">
-                        <span className="font-mono">{r.rtid}</span>
-                        <span>{r.componentType || "Whole Blood"}</span>
-                        <span className="text-blue-600 dark:text-blue-400 font-semibold">{r.unitsAdministered || 0}/{r.unitsRequired} units administered</span>
-                        {r.wardDepartment && <span>· {r.wardDepartment}</span>}
-                        {r.bedNumber && <span>· Bed {r.bedNumber}</span>}
+
+                      <div
+                        style={{
+                          display: "flex", alignItems: "center", gap: "8px",
+                          marginTop: "4px", flexWrap: "wrap",
+                        }}
+                      >
+                        <span className="hd-mono-pill">{r.rtid}</span>
+                        <span style={{ fontSize: "0.67rem", color: "var(--c-text-4)" }}>
+                          {r.componentType || "Whole Blood"}
+                        </span>
+                        <span style={{ fontSize: "0.7rem", fontWeight: 700, color: "var(--c-info)" }}>
+                          {r.unitsAdministered || 0}/{r.unitsRequired} units
+                        </span>
+                        {r.wardDepartment && (
+                          <span style={{ fontSize: "0.67rem", color: "var(--c-text-4)" }}>
+                            · {r.wardDepartment}
+                          </span>
+                        )}
                       </div>
-                      {/* Unit progress bar */}
-                      <div className="flex items-center gap-2 mt-1.5">
-                        <div className="hd-validity flex-1 h-2">
-                          <div className="hd-validity-fill" style={{ width: `${r.unitsRequired > 0 ? ((r.unitsAdministered || 0) / r.unitsRequired) * 100 : 0}%`, background: "#3b82f6" }} />
+
+                      {/* Admin progress */}
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "6px" }}>
+                        <div className="hd-prog" style={{ flex: 1 }}>
+                          <div
+                            className="hd-prog-fill"
+                            style={{
+                              width: `${adminPct}%`,
+                              background: "linear-gradient(90deg,#2563EB,#60A5FA)",
+                            }}
+                          />
                         </div>
-                        <span className="text-[10px] text-gray-400">{Math.round(r.unitsRequired > 0 ? ((r.unitsAdministered || 0) / r.unitsRequired) * 100 : 0)}%</span>
+                        <span style={{ fontSize: "0.63rem", color: "var(--c-text-4)", flexShrink: 0 }}>
+                          {Math.round(adminPct)}%
+                        </span>
                       </div>
+
                       {/* Transfusion history records */}
                       {history.length > 0 && (
-                        <div className="mt-2 space-y-1">
+                        <div
+                          style={{
+                            marginTop: "8px",
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "4px",
+                          }}
+                        >
                           {history.map((h, hi) => (
-                            <div key={hi} className="flex items-center gap-2 text-[11px] bg-blue-50 dark:bg-blue-950/30 rounded-lg px-3 py-1.5 border border-blue-100 dark:border-blue-800">
-                              <span className="text-blue-600 dark:text-blue-400 font-bold">{h.unitsAdministered}u</span>
-                              <span className="text-gray-500 dark:text-gray-400">·</span>
-                              <span className="text-gray-600 dark:text-gray-400">{new Date(h.recordedAt).toLocaleString("en-IN", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", hour12: true })}</span>
-                              {h.notes && <><span className="text-gray-400">·</span><span className="text-gray-500 dark:text-gray-400 truncate">{h.notes}</span></>}
-                              <span className="text-gray-400 ml-auto">{h.administeredBy}</span>
+                            <div
+                              key={hi}
+                              style={{
+                                display: "flex", alignItems: "center", gap: "8px",
+                                padding: "6px 10px", background: "var(--c-info-bg)",
+                                border: "1px solid var(--c-info-bdr)",
+                                borderRadius: "var(--r-sm)", fontSize: "0.67rem",
+                              }}
+                            >
+                              <span style={{ fontWeight: 700, color: "var(--c-info)", flexShrink: 0 }}>
+                                {h.unitsAdministered}u
+                              </span>
+                              <span style={{ color: "var(--c-text-4)" }}>·</span>
+                              <span style={{ color: "var(--c-text-3)" }}>
+                                {new Date(h.recordedAt).toLocaleString("en-IN", {
+                                  day: "2-digit", month: "short",
+                                  hour: "2-digit", minute: "2-digit", hour12: true,
+                                })}
+                              </span>
+                              {h.notes && (
+                                <>
+                                  <span style={{ color: "var(--c-text-4)" }}>·</span>
+                                  <span
+                                    style={{
+                                      color: "var(--c-text-3)", overflow: "hidden",
+                                      textOverflow: "ellipsis", whiteSpace: "nowrap",
+                                    }}
+                                  >
+                                    {h.notes}
+                                  </span>
+                                </>
+                              )}
+                              <span style={{ color: "var(--c-text-4)", marginLeft: "auto", flexShrink: 0 }}>
+                                {h.administeredBy}
+                              </span>
                             </div>
                           ))}
                         </div>
                       )}
                     </div>
-                    <div className="text-right flex-shrink-0">
-                      <div className="text-[10px] text-gray-400">{r.administeredAt ? formatDate(r.administeredAt) : "—"}</div>
-                      <div className="text-[10px] text-gray-400">{r.administeredAt ? formatTime(r.administeredAt) : ""}</div>
+
+                    {/* Date */}
+                    <div style={{ textAlign: "right", flexShrink: 0 }}>
+                      <div style={{ fontSize: "0.7rem", fontWeight: 600, color: "var(--c-text-2)" }}>
+                        {r.administeredAt ? formatDate(r.administeredAt) : "—"}
+                      </div>
+                      <div style={{ fontSize: "0.64rem", color: "var(--c-text-4)", marginTop: "2px" }}>
+                        {r.administeredAt ? formatTime(r.administeredAt) : ""}
+                      </div>
                     </div>
                   </div>
                 </div>
