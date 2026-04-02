@@ -92,9 +92,9 @@ export function PatientHistoryModal({ isOpen, onClose, requests }: Props) {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-semibold text-[var(--txt-heading)] dark:text-gray-200 text-sm">{p.name}</span>
+                        <span className="font-semibold text-[var(--text-primary)] dark:text-gray-200 text-sm">{p.name}</span>
                         {bloodGroups.map(bg => (
-                          <span key={bg} className="text-[10px] font-black px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-[var(--clr-emergency)] border border-red-100 dark:border-red-800">{bg}</span>
+                          <span key={bg} className="text-[10px] font-black px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-[var(--clr-danger)] border border-red-100 dark:border-red-800">{bg}</span>
                         ))}
                       </div>
                       <div className="text-[11px] text-gray-400 mt-0.5">
@@ -109,7 +109,7 @@ export function PatientHistoryModal({ isOpen, onClose, requests }: Props) {
           ) : (
             /* Patient detail view */
             <div className="space-y-4">
-              <button onClick={() => setSelectedPatient(null)} className="text-xs text-[var(--clr-brand)] dark:text-[var(--clr-emergency)] font-semibold hover:underline">← Back to list</button>
+              <button onClick={() => setSelectedPatient(null)} className="text-xs text-[var(--clr-brand)] dark:text-[var(--clr-danger)] font-semibold hover:underline">← Back to list</button>
 
               {/* Patient summary card */}
               <div className="bg-red-50 dark:bg-red-950/30 rounded-xl p-4 border border-red-100 dark:border-red-900/40">
@@ -118,8 +118,8 @@ export function PatientHistoryModal({ isOpen, onClose, requests }: Props) {
                     {activePatient.name[0]?.toUpperCase()}
                   </div>
                   <div>
-                    <p className="font-bold text-[var(--txt-heading)] dark:text-gray-100">{activePatient.name}</p>
-                    <p className="text-xs text-[var(--txt-body)] dark:text-gray-400">{activePatient.mobile || "No mobile"}</p>
+                    <p className="font-bold text-[var(--text-primary)] dark:text-gray-100">{activePatient.name}</p>
+                    <p className="text-xs text-[var(--text-secondary)] dark:text-gray-400">{activePatient.mobile || "No mobile"}</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-4 gap-3">
@@ -131,7 +131,7 @@ export function PatientHistoryModal({ isOpen, onClose, requests }: Props) {
                   ].map(s => (
                     <div key={s.label} className="text-center">
                       <div className="text-lg">{s.icon}</div>
-                      <div className="text-sm font-black text-[var(--txt-heading)] dark:text-gray-200" style={{ fontFamily: "Outfit,sans-serif" }}>{s.val}</div>
+                      <div className="text-sm font-black text-[var(--text-primary)] dark:text-gray-200" style={{ fontFamily: "Outfit,sans-serif" }}>{s.val}</div>
                       <div className="text-[9px] text-gray-400 font-medium">{s.label}</div>
                     </div>
                   ))}
@@ -140,7 +140,7 @@ export function PatientHistoryModal({ isOpen, onClose, requests }: Props) {
 
               {/* Request timeline */}
               <div className="space-y-2">
-                <p className="text-xs font-bold text-[var(--txt-body)] dark:text-gray-400 uppercase tracking-wide flex items-center gap-1.5">
+                <p className="text-xs font-bold text-[var(--text-secondary)] dark:text-gray-400 uppercase tracking-wide flex items-center gap-1.5">
                   <Activity className="w-3.5 h-3.5 text-[var(--clr-brand)]" /> Request History
                 </p>
                 {activePatient.requests.map((r, i) => {
@@ -154,8 +154,8 @@ export function PatientHistoryModal({ isOpen, onClose, requests }: Props) {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-xs font-black px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-[var(--clr-emergency)] border border-red-100 dark:border-red-800">{r.bloodGroup}</span>
-                            <span className="text-xs text-[var(--txt-body)] dark:text-gray-400">{r.componentType || "Whole Blood"} × {r.unitsRequired}u</span>
+                            <span className="text-xs font-black px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-[var(--clr-danger)] border border-red-100 dark:border-red-800">{r.bloodGroup}</span>
+                            <span className="text-xs text-[var(--text-secondary)] dark:text-gray-400">{r.componentType || "Whole Blood"} × {r.unitsRequired}u</span>
                             <span className="hd-status border text-[10px]" style={{ background: sm.bg, color: sm.text, borderColor: sm.border }}>{sm.label}</span>
                           </div>
                           <div className="text-[11px] text-gray-400 mt-0.5 flex items-center gap-2">

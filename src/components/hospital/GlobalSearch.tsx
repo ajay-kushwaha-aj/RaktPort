@@ -87,20 +87,20 @@ export function GlobalSearch({ requests, onSelectRequest, onClose, isOpen }: Glo
 
       {/* Search panel */}
       <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-[10vh]">
-        <div className="w-full max-w-xl mx-4 bg-[var(--clr-bg-card)] dark:bg-gray-900 rounded-2xl shadow-2xl border border-[var(--clr-border)] dark:border-gray-700 overflow-hidden hd-enter-sm" style={{ maxHeight: "70vh" }}>
+        <div className="w-full max-w-xl mx-4 bg-[var(--bg-surface)] dark:bg-gray-900 rounded-2xl shadow-2xl border border-[var(--border-color)] dark:border-gray-700 overflow-hidden hd-enter-sm" style={{ maxHeight: "70vh" }}>
           {/* Search input */}
           <div className="flex items-center gap-3 p-4 border-b border-gray-100 dark:border-gray-800">
             <Search className="w-5 h-5 text-[var(--clr-brand)] flex-shrink-0" />
             <input
               ref={inputRef}
               type="text"
-              className="flex-1 bg-transparent outline-none text-sm text-[var(--txt-heading)] dark:text-gray-200 font-medium placeholder:text-gray-400"
+              className="flex-1 bg-transparent outline-none text-sm text-[var(--text-primary)] dark:text-gray-200 font-medium placeholder:text-gray-400"
               placeholder="Search patients, RTIDs, serial numbers, doctors…"
               value={query}
               onChange={e => setQuery(e.target.value)}
             />
-            <button onClick={onClose} className="w-7 h-7 rounded-lg bg-[var(--clr-bg-page)] dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center">
-              <X className="w-3.5 h-3.5 text-[var(--txt-body)] dark:text-gray-400" />
+            <button onClick={onClose} className="w-7 h-7 rounded-lg bg-[var(--bg-page)] dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center">
+              <X className="w-3.5 h-3.5 text-[var(--text-secondary)] dark:text-gray-400" />
             </button>
           </div>
 
@@ -109,13 +109,13 @@ export function GlobalSearch({ requests, onSelectRequest, onClose, isOpen }: Glo
             {query.length < 2 ? (
               <div className="p-8 text-center">
                 <Search className="w-8 h-8 text-gray-200 dark:text-gray-700 mx-auto mb-2" />
-                <p className="text-sm text-gray-400 dark:text-[var(--txt-body)]">Type at least 2 characters to search</p>
-                <p className="text-[11px] text-gray-300 dark:text-[var(--txt-body)] mt-1">Search across patients, RTIDs, serial numbers, doctors, and donors</p>
+                <p className="text-sm text-gray-400 dark:text-[var(--text-secondary)]">Type at least 2 characters to search</p>
+                <p className="text-[11px] text-gray-300 dark:text-[var(--text-secondary)] mt-1">Search across patients, RTIDs, serial numbers, doctors, and donors</p>
               </div>
             ) : results.length === 0 ? (
               <div className="p-8 text-center">
                 <div className="text-4xl opacity-20 mb-2">🔍</div>
-                <p className="text-sm text-gray-400 dark:text-[var(--txt-body)]">No results for "{query}"</p>
+                <p className="text-sm text-gray-400 dark:text-[var(--text-secondary)]">No results for "{query}"</p>
               </div>
             ) : (
               <div className="divide-y divide-gray-50 dark:divide-gray-800">
@@ -126,7 +126,7 @@ export function GlobalSearch({ requests, onSelectRequest, onClose, isOpen }: Glo
                   return (
                     <button
                       key={`${r.id}-${i}`}
-                      className="w-full px-4 py-3 hover:bg-[var(--clr-bg-page)] dark:hover:bg-gray-800/50 transition-colors flex items-start gap-3 text-left group"
+                      className="w-full px-4 py-3 hover:bg-[var(--bg-page)] dark:hover:bg-gray-800/50 transition-colors flex items-start gap-3 text-left group"
                       onClick={() => { onSelectRequest(r); onClose(); }}
                     >
                       <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0 border" style={{ background: uc.bg, borderColor: uc.border }}>
@@ -134,18 +134,18 @@ export function GlobalSearch({ requests, onSelectRequest, onClose, isOpen }: Glo
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-sm font-semibold text-[var(--txt-heading)] dark:text-gray-200 truncate">{r.patientName}</span>
-                          <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-[var(--clr-emergency)] border border-red-100 dark:border-red-800">{r.bloodGroup}</span>
+                          <span className="text-sm font-semibold text-[var(--text-primary)] dark:text-gray-200 truncate">{r.patientName}</span>
+                          <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-[var(--clr-danger)] border border-red-100 dark:border-red-800">{r.bloodGroup}</span>
                           <span className="hd-status border text-[10px]" style={{ background: sm.bg, color: sm.text, borderColor: sm.border }}>{sm.label}</span>
                         </div>
                         <div className="flex items-center gap-2 text-[11px] text-gray-400 mt-0.5">
                           <span className="font-mono">{r.rtid}</span>
                           <span>·</span>
-                          <span className="font-semibold text-[var(--clr-brand)] dark:text-[var(--clr-emergency)]">Matched: {result.matchField}</span>
-                          <span className="text-[var(--txt-body)] truncate">({result.matchValue})</span>
+                          <span className="font-semibold text-[var(--clr-brand)] dark:text-[var(--clr-danger)]">Matched: {result.matchField}</span>
+                          <span className="text-[var(--text-secondary)] truncate">({result.matchValue})</span>
                         </div>
                       </div>
-                      <ArrowRight className="w-3.5 h-3.5 text-gray-300 dark:text-[var(--txt-body)] mt-1.5 transition-transform group-hover:translate-x-1 flex-shrink-0" />
+                      <ArrowRight className="w-3.5 h-3.5 text-gray-300 dark:text-[var(--text-secondary)] mt-1.5 transition-transform group-hover:translate-x-1 flex-shrink-0" />
                     </button>
                   );
                 })}
@@ -154,8 +154,8 @@ export function GlobalSearch({ requests, onSelectRequest, onClose, isOpen }: Glo
           </div>
 
           {/* Footer hint */}
-          <div className="p-3 border-t border-gray-100 dark:border-gray-800 bg-[var(--clr-bg-page)] dark:bg-gray-800/50">
-            <p className="text-[10px] text-gray-400 dark:text-[var(--txt-body)] text-center">Press Esc to close · Click result to view in Requests tab</p>
+          <div className="p-3 border-t border-gray-100 dark:border-gray-800 bg-[var(--bg-page)] dark:bg-gray-800/50">
+            <p className="text-[10px] text-gray-400 dark:text-[var(--text-secondary)] text-center">Press Esc to close · Click result to view in Requests tab</p>
           </div>
         </div>
       </div>

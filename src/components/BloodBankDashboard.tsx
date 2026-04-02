@@ -83,7 +83,7 @@ const dashStyles = `
 }
 .dark .bbd-kpi-card { background:#1e0505; border-color:rgba(255,255,255,0.07); }
 
-.bbd-kpi-card.c-crimson::before { background:linear-gradient(90deg,var(--clr-brand),#c41e3a); }
+.bbd-kpi-card.c-crimson::before { background:linear-gradient(90deg,var(--clr-brand),var(--brand-primary)); }
 .bbd-kpi-card.c-emerald::before { background:linear-gradient(90deg,var(--clr-success),var(--clr-success)); }
 .bbd-kpi-card.c-blue::before    { background:linear-gradient(90deg,#0284c7,#38bdf8); }
 .bbd-kpi-card.c-amber::before   { background:linear-gradient(90deg,#d97706,#fbbf24); }
@@ -237,7 +237,7 @@ const dashStyles = `
 .bbd-fab {
   position:fixed; bottom:24px; right:24px; z-index:50;
   width:54px; height:54px; border-radius:50%;
-  background:linear-gradient(135deg,var(--clr-brand),#c41e3a);
+  background:linear-gradient(135deg,var(--clr-brand),var(--brand-primary));
   color:#fff; border:none; cursor:pointer;
   display:flex; align-items:center; justify-content:center;
   box-shadow:0 6px 20px rgba(139,0,0,0.4), 0 2px 6px rgba(0,0,0,0.15);
@@ -284,7 +284,7 @@ function getLevel(units: number) {
   if (units >= 50) return { label:'Good',    cls:'text-emerald-600', barClass:'bg-emerald-500' };
   if (units >= 30) return { label:'Moderate', cls:'text-[var(--rtid-badge)]',    barClass:'bg-[var(--rtid-badge)]'    };
   if (units >= 10) return { label:'Low',      cls:'text-amber-600',   barClass:'bg-amber-500'   };
-  return                    { label:'Critical', cls:'text-[var(--clr-emergency)]',    barClass:'bg-[var(--stats-bg)]'     };
+  return                    { label:'Critical', cls:'text-[var(--clr-danger)]',    barClass:'bg-[var(--stats-bg)]'     };
 }
 
 /* ─── Premium Overview ─────────────────────────────── */
@@ -350,7 +350,7 @@ function PremiumOverview({
           <div className="w-9 h-9 rounded-xl bg-[var(--stats-divider)] flex items-center justify-center flex-shrink-0 text-lg">🚨</div>
           <div className="flex-1">
             <p className="text-sm font-bold text-red-800">Critical Blood Shortage</p>
-            <p className="text-xs text-[var(--clr-emergency)] mt-0.5">
+            <p className="text-xs text-[var(--clr-danger)] mt-0.5">
               {criticalGroups.join(', ')} below 10 units. Immediate procurement required.
             </p>
           </div>
@@ -372,7 +372,7 @@ function PremiumOverview({
               <p className="bbd-welcome-date">{dateStr}</p>
               {upcomingToday.length > 0 && (
                 <div className="flex items-center gap-2 mt-3">
-                  <span className="inline-flex items-center gap-1.5 bg-[var(--clr-bg-card)]/15 text-[var(--txt-inverse)]/90 text-xs font-semibold px-3 py-1.5 rounded-full border border-white/20">
+                  <span className="inline-flex items-center gap-1.5 bg-[var(--bg-surface)]/15 text-[var(--txt-inverse)]/90 text-xs font-semibold px-3 py-1.5 rounded-full border border-white/20">
                     <CalendarCheck className="w-3 h-3" />
                     {upcomingToday.length} appointment{upcomingToday.length > 1 ? 's' : ''} today
                   </span>
@@ -382,14 +382,14 @@ function PremiumOverview({
             <div className="flex gap-2 flex-wrap">
               <button
                 onClick={onAppointmentOpen}
-                className="flex items-center gap-2 bg-[var(--clr-bg-card)]/15 hover:bg-[var(--clr-bg-card)]/25 border border-white/25 text-[var(--txt-inverse)] text-sm font-semibold px-4 py-2 rounded-xl transition-all hover:scale-105 active:scale-100"
+                className="flex items-center gap-2 bg-[var(--bg-surface)]/15 hover:bg-[var(--bg-surface)]/25 border border-white/25 text-[var(--txt-inverse)] text-sm font-semibold px-4 py-2 rounded-xl transition-all hover:scale-105 active:scale-100"
               >
                 <PlusCircle className="w-4 h-4" />
                 Quick Appointment
               </button>
               <button
                 onClick={onRefresh}
-                className="flex items-center gap-2 bg-[var(--clr-bg-card)]/10 hover:bg-[var(--clr-bg-card)]/20 border border-white/20 text-[var(--txt-inverse)]/80 text-sm px-3 py-2 rounded-xl transition-all"
+                className="flex items-center gap-2 bg-[var(--bg-surface)]/10 hover:bg-[var(--bg-surface)]/20 border border-white/20 text-[var(--txt-inverse)]/80 text-sm px-3 py-2 rounded-xl transition-all"
               >
                 <RefreshCw className="w-4 h-4" />
               </button>
@@ -475,7 +475,7 @@ function PremiumOverview({
                 { label:'Moderate (<50)', color:'var(--clr-info)' },
                 { label:'Good (50+)',      color:'#22c55e' },
               ].map(l => (
-                <div key={l.label} className="flex items-center gap-1.5 text-xs text-[var(--txt-body)]">
+                <div key={l.label} className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)]">
                   <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{background:l.color}} />
                   {l.label}
                 </div>
@@ -522,7 +522,7 @@ function PremiumOverview({
               <div className="text-center py-8">
                 <div className="text-4xl mb-2 opacity-30">🩸</div>
                 <p className="text-sm text-gray-400 font-medium">No donations yet</p>
-                <button onClick={onDonationOpen} className="mt-3 text-xs text-[var(--clr-emergency)] font-semibold hover:underline">Record first donation →</button>
+                <button onClick={onDonationOpen} className="mt-3 text-xs text-[var(--clr-danger)] font-semibold hover:underline">Record first donation →</button>
               </div>
             ) : (
               recentDonations.map((d, i) => {
@@ -554,7 +554,7 @@ function PremiumOverview({
                         d.status === 'AVAILABLE' ? 'bg-green-100 text-green-700' :
                         d.status === 'REDEEMED'  ? 'bg-purple-100 text-purple-700' :
                         d.status === 'SCHEDULED' ? 'bg-blue-100 text-blue-700' :
-                        'bg-[var(--clr-bg-page)] text-[var(--txt-body)]'
+                        'bg-[var(--bg-page)] text-[var(--text-secondary)]'
                       }`}>{d.status}</span>
                     </div>
                   </div>
@@ -580,7 +580,7 @@ function PremiumOverview({
                 { label:'Critical Groups', val: criticalGroups.length, color: criticalGroups.length > 0 ? 'var(--clr-emergency)' : '#6b7280', icon:'🚨' },
               ].map(s => (
                 <div key={s.label} className="flex items-center justify-between py-1.5 border-b border-gray-50 last:border-0">
-                  <span className="text-xs text-[var(--txt-body)] flex items-center gap-2">
+                  <span className="text-xs text-[var(--text-secondary)] flex items-center gap-2">
                     <span>{s.icon}</span>{s.label}
                   </span>
                   <span className="text-sm font-bold" style={{color:s.color}}>{s.val}</span>
@@ -621,7 +621,7 @@ function PremiumOverview({
                         <span className="bbd-appt-mo">{date.toLocaleString('default',{month:'short'})}</span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-[var(--txt-heading)] truncate">{a.donorName}</p>
+                        <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{a.donorName}</p>
                         <div className="flex items-center gap-1.5 mt-0.5">
                           <span className="text-[10px] font-black px-1.5 py-0.5 rounded" style={{background:bgc.bg, color:bgc.text}}>{a.bloodGroup}</span>
                           <span className="text-[10px] text-gray-400">{a.time || ''}</span>
@@ -663,7 +663,7 @@ function PremiumOverview({
                         <span className="text-xl font-black" style={{color, fontFamily:'Outfit,sans-serif'}}>{rate}%</span>
                       </div>
                     </div>
-                    <p className="text-xs text-[var(--txt-body)]">
+                    <p className="text-xs text-[var(--text-secondary)]">
                       {kpi.totalRedemptions} of {kpi.totalBloodRequests} requests fulfilled
                     </p>
                   </>
@@ -677,7 +677,7 @@ function PremiumOverview({
               </div>
               <div className="bg-red-50 rounded-xl p-3 text-center">
                 <div className="text-lg font-black text-red-700" style={{fontFamily:'Outfit,sans-serif'}}>{Math.max(0, kpi.totalBloodRequests - kpi.totalRedemptions)}</div>
-                <div className="text-[10px] text-[var(--clr-emergency)] font-medium">Pending</div>
+                <div className="text-[10px] text-[var(--clr-danger)] font-medium">Pending</div>
               </div>
             </div>
           </div>
@@ -867,24 +867,24 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
 
       const confirmText = donData 
         ? `<div class="text-left text-sm space-y-3 mt-4">
-             <div class="bg-[var(--clr-bg-page)] p-3 rounded-lg border border-[var(--clr-border)]">
-               <p class="text-xs text-[var(--txt-body)] uppercase font-bold mb-1">Patient Info</p>
-               <p class="font-bold text-[var(--txt-heading)]">${reqData.patientName}</p>
-               <p class="text-xs text-[var(--txt-body)] mt-1">Hospital: ${reqData.hospitalName || bloodBankData?.fullName || 'Hospital'}</p>
-               <p class="text-xs text-[var(--txt-body)]">Request: <span class="font-bold text-[var(--clr-emergency)]">${reqData.bloodGroup}</span></p>
+             <div class="bg-[var(--bg-page)] p-3 rounded-lg border border-[var(--border-color)]">
+               <p class="text-xs text-[var(--text-secondary)] uppercase font-bold mb-1">Patient Info</p>
+               <p class="font-bold text-[var(--text-primary)]">${reqData.patientName}</p>
+               <p class="text-xs text-[var(--text-secondary)] mt-1">Hospital: ${reqData.hospitalName || bloodBankData?.fullName || 'Hospital'}</p>
+               <p class="text-xs text-[var(--text-secondary)]">Request: <span class="font-bold text-[var(--clr-danger)]">${reqData.bloodGroup}</span></p>
              </div>
              <div class="bg-blue-50 p-3 rounded-lg border border-blue-200">
                <p class="text-xs text-[var(--rtid-badge)]/70 uppercase font-bold mb-1">Donor Source</p>
                <p class="font-bold text-blue-900">${donData.donorName || 'Anonymous'}</p>
                <p class="text-xs text-blue-700 mt-1">D-RTID: <span class="font-mono">${donData.dRtid || donData.rtid}</span></p>
-               <p class="text-xs text-blue-700">Donated: <span class="font-bold text-[var(--clr-emergency)]">${donData.bloodGroup}</span></p>
+               <p class="text-xs text-blue-700">Donated: <span class="font-bold text-[var(--clr-danger)]">${donData.bloodGroup}</span></p>
              </div>
            </div>`
         : `<div class="text-left text-sm space-y-3 mt-4">
-             <div class="bg-[var(--clr-bg-page)] p-3 rounded-lg border border-[var(--clr-border)]">
-               <p class="text-xs text-[var(--txt-body)] uppercase font-bold mb-1">Patient Info</p>
-               <p class="font-bold text-[var(--txt-heading)]">${reqData.patientName}</p>
-               <p class="text-xs text-[var(--txt-body)] mt-1">Hospital: ${reqData.hospitalName || bloodBankData?.fullName || 'Hospital'}</p>
+             <div class="bg-[var(--bg-page)] p-3 rounded-lg border border-[var(--border-color)]">
+               <p class="text-xs text-[var(--text-secondary)] uppercase font-bold mb-1">Patient Info</p>
+               <p class="font-bold text-[var(--text-primary)]">${reqData.patientName}</p>
+               <p class="text-xs text-[var(--text-secondary)] mt-1">Hospital: ${reqData.hospitalName || bloodBankData?.fullName || 'Hospital'}</p>
              </div>
            </div>`;
 
@@ -940,15 +940,15 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
         }
       }
       if (!data) throw new Error('RTID not found');
-      const sc=data.status==='AVAILABLE'?'text-[var(--clr-success)]':data.status==='REDEEMED'?'text-[var(--clr-emergency)]':'text-yellow-600';
+      const sc=data.status==='AVAILABLE'?'text-[var(--clr-success)]':data.status==='REDEEMED'?'text-[var(--clr-danger)]':'text-yellow-600';
       await Swal.fire({
         title:'✅ Verified', icon:'success', confirmButtonColor:'var(--clr-success)',
         html:`<div class="text-left space-y-3 p-4">
-          <div class="bg-blue-50 p-3 rounded-lg border border-blue-200"><p class="text-sm text-[var(--txt-body)] mb-1">Type</p><p class="font-bold text-lg">${type}</p></div>
-          <div class="bg-[var(--clr-bg-page)] p-3 rounded-lg border border-[var(--clr-border)]"><p class="text-sm text-[var(--txt-body)] mb-1">ID</p><p class="font-mono font-bold">${data.rtid||rtid}</p></div>
-          <div class="bg-[var(--clr-bg-page)] p-3 rounded-lg border border-[var(--clr-border)]"><p class="text-sm text-[var(--txt-body)] mb-1">Name</p><p class="font-semibold">${data.patientName||data.donorName||'N/A'}</p></div>
-          <div class="bg-[var(--clr-bg-page)] p-3 rounded-lg border border-[var(--clr-border)]"><p class="text-sm text-[var(--txt-body)] mb-1">Blood Group</p><p class="font-bold text-[var(--clr-emergency)] text-xl">${data.bloodGroup||'N/A'}</p></div>
-          <div class="bg-[var(--clr-bg-page)] p-3 rounded-lg border border-[var(--clr-border)]"><p class="text-sm text-[var(--txt-body)] mb-1">Status</p><p class="font-bold ${sc}">${data.status||'N/A'}</p></div>
+          <div class="bg-blue-50 p-3 rounded-lg border border-blue-200"><p class="text-sm text-[var(--text-secondary)] mb-1">Type</p><p class="font-bold text-lg">${type}</p></div>
+          <div class="bg-[var(--bg-page)] p-3 rounded-lg border border-[var(--border-color)]"><p class="text-sm text-[var(--text-secondary)] mb-1">ID</p><p class="font-mono font-bold">${data.rtid||rtid}</p></div>
+          <div class="bg-[var(--bg-page)] p-3 rounded-lg border border-[var(--border-color)]"><p class="text-sm text-[var(--text-secondary)] mb-1">Name</p><p class="font-semibold">${data.patientName||data.donorName||'N/A'}</p></div>
+          <div class="bg-[var(--bg-page)] p-3 rounded-lg border border-[var(--border-color)]"><p class="text-sm text-[var(--text-secondary)] mb-1">Blood Group</p><p class="font-bold text-[var(--clr-danger)] text-xl">${data.bloodGroup||'N/A'}</p></div>
+          <div class="bg-[var(--bg-page)] p-3 rounded-lg border border-[var(--border-color)]"><p class="text-sm text-[var(--text-secondary)] mb-1">Status</p><p class="font-bold ${sc}">${data.status||'N/A'}</p></div>
         </div>`
       });
     } catch(err:any){ toast.error(err.message); }
@@ -959,18 +959,18 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
   if (loading) return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
       <div className="relative">
-        <div className="w-16 h-16 rounded-full border-4 border-[var(--clr-border)] border-t-red-700 animate-spin" />
+        <div className="w-16 h-16 rounded-full border-4 border-[var(--border-color)] border-t-red-700 animate-spin" />
         <Droplet className="absolute inset-0 m-auto w-6 h-6 text-red-700 fill-red-600" />
       </div>
-      <p className="text-sm text-[var(--txt-body)] font-medium animate-pulse">Loading Blood Bank Dashboard…</p>
+      <p className="text-sm text-[var(--text-secondary)] font-medium animate-pulse">Loading Blood Bank Dashboard…</p>
     </div>
   );
 
   if (!bloodBankId) return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
       <AlertTriangle className="w-16 h-16 text-destructive mb-4" />
-      <h2 className="text-2xl font-bold text-[var(--txt-heading)] mb-2">Access Denied</h2>
-      <p className="text-[var(--txt-body)] mb-6 text-center max-w-sm">Your account could not be verified as a Blood Bank. Please contact the administrator.</p>
+      <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2">Access Denied</h2>
+      <p className="text-[var(--text-secondary)] mb-6 text-center max-w-sm">Your account could not be verified as a Blood Bank. Please contact the administrator.</p>
       <Button onClick={onLogout}>Back to Login</Button>
     </div>
   );
@@ -1001,7 +1001,7 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
         {/* Global Action Loading Overlay */}
         {actionLoading && (
           <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[100] flex items-center justify-center">
-            <div className="bg-[var(--clr-bg-card)] rounded-2xl p-6 shadow-2xl flex items-center gap-4">
+            <div className="bg-[var(--bg-surface)] rounded-2xl p-6 shadow-2xl flex items-center gap-4">
               <Loader2 className="w-7 h-7 animate-spin text-red-700" />
               <p className="text-sm font-semibold text-gray-700">Processing…</p>
             </div>
@@ -1021,7 +1021,7 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
           {/* Critical Alert Banner (non-overview tabs) */}
           {activeTab !== 'overview' && criticalGroups.length > 0 && (
             <div className="mb-5 p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 text-sm text-red-800">
-              <AlertTriangle className="w-4 h-4 text-[var(--clr-emergency)] flex-shrink-0" />
+              <AlertTriangle className="w-4 h-4 text-[var(--clr-danger)] flex-shrink-0" />
               <span><strong>Critical:</strong> {criticalGroups.join(', ')} below 30 units.</span>
               <button onClick={() => handleTabChange('inventory')} className="ml-auto text-xs font-bold text-red-700 hover:underline">View →</button>
             </div>
@@ -1062,7 +1062,7 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
             {activeTab === 'camps' && (
               <div className="text-center py-20">
                 <div className="text-6xl mb-4 opacity-30">⛺</div>
-                <h2 className="text-xl font-bold text-[var(--txt-body)] mb-2">Blood Donation Camps</h2>
+                <h2 className="text-xl font-bold text-[var(--text-secondary)] mb-2">Blood Donation Camps</h2>
                 <p className="text-sm text-gray-400">Coming soon — organize & manage camps</p>
               </div>
             )}

@@ -318,7 +318,7 @@ export default function MedicalEligibilityDemo() {
     ];
 
     return (
-        <div className="p-8 space-y-6 bg-[var(--clr-bg-page)] min-h-screen">
+        <div className="p-8 space-y-6 bg-[var(--bg-page)] min-h-screen">
             <div className="max-w-6xl mx-auto">
                 <Card>
                     <CardHeader>
@@ -354,13 +354,13 @@ export default function MedicalEligibilityDemo() {
                                                 {result.eligible ? (
                                                     <CheckCircle2 className="w-6 h-6 text-[var(--clr-success)] flex-shrink-0 mt-1" />
                                                 ) : (
-                                                    <XCircle className="w-6 h-6 text-[var(--clr-emergency)] flex-shrink-0 mt-1" />
+                                                    <XCircle className="w-6 h-6 text-[var(--clr-danger)] flex-shrink-0 mt-1" />
                                                 )}
 
                                                 <div className="flex-1">
                                                     <h3 className="font-bold text-lg mb-2">{testCase.name}</h3>
 
-                                                    <div className="grid grid-cols-2 gap-2 text-sm mb-3 text-[var(--txt-body)]">
+                                                    <div className="grid grid-cols-2 gap-2 text-sm mb-3 text-[var(--text-secondary)]">
                                                         <div>Gender: <span className="font-semibold">{testCase.gender}</span></div>
                                                         <div>Requested: <span className="font-semibold">{testCase.donationType}</span></div>
                                                         <div>Hemoglobin: <span className="font-semibold">{testCase.hemoglobin} g / dL</span></div>
@@ -377,7 +377,7 @@ export default function MedicalEligibilityDemo() {
                                                     ) : (
                                                         <div className="space-y-2">
                                                             <Alert className="bg-red-50 border-red-300">
-                                                                <XCircle className="h-4 w-4 text-[var(--clr-emergency)]" />
+                                                                <XCircle className="h-4 w-4 text-[var(--clr-danger)]" />
                                                                 <AlertDescription className="text-red-800">
                                                                     <strong>NOT ELIGIBLE</strong>
                                                                     <div className="mt-2 text-sm">{result.rejectionReason}</div>

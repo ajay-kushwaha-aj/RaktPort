@@ -249,10 +249,10 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
               <Droplet className="h-7 w-7 text-[var(--txt-inverse)] fill-white" />
             </div>
             <div>
-              <DialogTitle className="text-2xl font-bold text-[var(--txt-heading)]">
+              <DialogTitle className="text-2xl font-bold text-[var(--text-primary)]">
                 {isCheckIn ? 'Process Donation Check-In' : 'Record New Donation'}
               </DialogTitle>
-              <p className="text-sm text-[var(--txt-body)] mt-1">
+              <p className="text-sm text-[var(--text-secondary)] mt-1">
                 {isCheckIn ? 'Complete the donation process for scheduled appointment' : 'Register a walk-in blood donation'}
               </p>
             </div>
@@ -262,11 +262,11 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
         <div className="space-y-6 py-4">
 
           {/* DONOR INFORMATION CARD */}
-          <div className="bg-[var(--clr-bg-card)] rounded-xl border-2 border-blue-100 shadow-sm">
+          <div className="bg-[var(--bg-surface)] rounded-xl border-2 border-blue-100 shadow-sm">
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-3 border-b border-blue-100">
               <div className="flex items-center gap-2">
                 <User className="h-5 w-5 text-[var(--clr-info)]" />
-                <h3 className="font-bold text-[var(--txt-heading)]">Donor Information</h3>
+                <h3 className="font-bold text-[var(--text-primary)]">Donor Information</h3>
                 {isCheckIn && (
                   <Badge className="ml-auto bg-blue-100 text-blue-700 border-blue-200">
                     <Shield className="h-3 w-3 mr-1" />
@@ -288,7 +288,7 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
                   value={donorName}
                   onChange={(e) => setDonorName(e.target.value)}
                   disabled={isCheckIn}
-                  className={`mt-1.5 ${isCheckIn ? 'bg-blue-50 border-blue-200 cursor-not-allowed font-semibold text-[var(--txt-heading)]' : ''}`}
+                  className={`mt-1.5 ${isCheckIn ? 'bg-blue-50 border-blue-200 cursor-not-allowed font-semibold text-[var(--text-primary)]' : ''}`}
                 />
               </div>
 
@@ -323,7 +323,7 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
               {/* Mobile (Optional) */}
               <div>
                 <Label htmlFor="mobile" className="text-sm font-semibold text-gray-700">
-                  Mobile Number <span className="text-xs text-[var(--txt-body)]">(Optional)</span>
+                  Mobile Number <span className="text-xs text-[var(--text-secondary)]">(Optional)</span>
                 </Label>
                 <Input
                   id="mobile"
@@ -331,18 +331,18 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
                   value={mobile}
                   onChange={(e) => setMobile(e.target.value)}
                   disabled={isCheckIn}
-                  className={`mt-1.5 ${isCheckIn ? 'bg-[var(--clr-bg-page)] border-[var(--clr-border)] cursor-not-allowed' : ''}`}
+                  className={`mt-1.5 ${isCheckIn ? 'bg-[var(--bg-page)] border-[var(--border-color)] cursor-not-allowed' : ''}`}
                 />
               </div>
             </div>
           </div>
 
           {/* DONATION DETAILS CARD */}
-          <div className="bg-[var(--clr-bg-card)] rounded-xl border-2 border-red-100 shadow-sm">
+          <div className="bg-[var(--bg-surface)] rounded-xl border-2 border-red-100 shadow-sm">
             <div className="bg-gradient-to-r from-red-50 to-pink-50 px-6 py-3 border-b border-red-100">
               <div className="flex items-center gap-2">
-                <Droplet className="h-5 w-5 text-[var(--clr-emergency)]" />
-                <h3 className="font-bold text-[var(--txt-heading)]">Donation Details</h3>
+                <Droplet className="h-5 w-5 text-[var(--clr-danger)]" />
+                <h3 className="font-bold text-[var(--text-primary)]">Donation Details</h3>
               </div>
             </div>
 
@@ -401,11 +401,11 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
 
           {/* H-RTID VALIDATION CARD */}
           {donationType === 'H-RTID-Linked Donation' && (
-            <div className="bg-[var(--clr-bg-card)] rounded-xl border-2 border-purple-200 shadow-lg">
+            <div className="bg-[var(--bg-surface)] rounded-xl border-2 border-purple-200 shadow-lg">
               <div className="bg-gradient-to-r from-purple-50 to-indigo-50 px-6 py-3 border-b border-purple-100">
                 <div className="flex items-center gap-2">
                   <Building2 className="h-5 w-5 text-purple-600" />
-                  <h3 className="font-bold text-[var(--txt-heading)]">Patient Request Linking</h3>
+                  <h3 className="font-bold text-[var(--text-primary)]">Patient Request Linking</h3>
                 </div>
               </div>
 
@@ -427,10 +427,10 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
                     />
                     {hRtidLoading && <Loader2 className="w-6 h-6 animate-spin text-purple-600 mt-2" />}
                     {hRtidValid && <CheckCircle2 className="w-6 h-6 text-[var(--clr-success)] mt-2" />}
-                    {hRtidError && <AlertCircle className="w-6 h-6 text-[var(--clr-emergency)] mt-2" />}
+                    {hRtidError && <AlertCircle className="w-6 h-6 text-[var(--clr-danger)] mt-2" />}
                   </div>
                   {hRtidError && (
-                    <p className="text-sm text-[var(--clr-emergency)] mt-2 flex items-center gap-1">
+                    <p className="text-sm text-[var(--clr-danger)] mt-2 flex items-center gap-1">
                       <AlertCircle className="h-4 w-4" />
                       {hRtidError}
                     </p>
@@ -446,50 +446,50 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-[var(--clr-bg-card)] rounded-lg p-3 border border-green-100">
-                        <span className="text-xs text-[var(--txt-body)] font-medium">Patient Name</span>
-                        <p className="font-bold text-[var(--txt-heading)] mt-1">{hRtidData.patientName}</p>
+                      <div className="bg-[var(--bg-surface)] rounded-lg p-3 border border-green-100">
+                        <span className="text-xs text-[var(--text-secondary)] font-medium">Patient Name</span>
+                        <p className="font-bold text-[var(--text-primary)] mt-1">{hRtidData.patientName}</p>
                       </div>
 
-                      <div className="bg-[var(--clr-bg-card)] rounded-lg p-3 border border-green-100">
-                        <span className="text-xs text-[var(--txt-body)] font-medium">Blood Group</span>
-                        <p className="font-bold text-[var(--clr-emergency)] text-xl mt-1">{hRtidData.bloodGroup}</p>
+                      <div className="bg-[var(--bg-surface)] rounded-lg p-3 border border-green-100">
+                        <span className="text-xs text-[var(--text-secondary)] font-medium">Blood Group</span>
+                        <p className="font-bold text-[var(--clr-danger)] text-xl mt-1">{hRtidData.bloodGroup}</p>
                       </div>
 
-                      <div className="bg-[var(--clr-bg-card)] rounded-lg p-3 border border-green-100">
-                        <span className="text-xs text-[var(--txt-body)] font-medium">Component</span>
-                        <p className="font-bold text-[var(--txt-heading)] mt-1">{hRtidData.component}</p>
+                      <div className="bg-[var(--bg-surface)] rounded-lg p-3 border border-green-100">
+                        <span className="text-xs text-[var(--text-secondary)] font-medium">Component</span>
+                        <p className="font-bold text-[var(--text-primary)] mt-1">{hRtidData.component}</p>
                       </div>
 
-                      <div className="bg-[var(--clr-bg-card)] rounded-lg p-3 border border-green-100">
-                        <span className="text-xs text-[var(--txt-body)] font-medium">Units Required</span>
-                        <p className="font-bold text-[var(--txt-heading)] mt-1">{hRtidData.unitsRequired}</p>
+                      <div className="bg-[var(--bg-surface)] rounded-lg p-3 border border-green-100">
+                        <span className="text-xs text-[var(--text-secondary)] font-medium">Units Required</span>
+                        <p className="font-bold text-[var(--text-primary)] mt-1">{hRtidData.unitsRequired}</p>
                       </div>
 
-                      <div className="bg-[var(--clr-bg-card)] rounded-lg p-3 border border-green-100 col-span-2">
-                        <span className="text-xs text-[var(--txt-body)] font-medium">Hospital</span>
-                        <p className="font-bold text-[var(--txt-heading)] mt-1">{hRtidData.hospitalName}</p>
+                      <div className="bg-[var(--bg-surface)] rounded-lg p-3 border border-green-100 col-span-2">
+                        <span className="text-xs text-[var(--text-secondary)] font-medium">Hospital</span>
+                        <p className="font-bold text-[var(--text-primary)] mt-1">{hRtidData.hospitalName}</p>
                       </div>
 
-                      <div className="bg-[var(--clr-bg-card)] rounded-lg p-3 border border-green-100">
-                        <span className="text-xs text-[var(--txt-body)] font-medium flex items-center gap-1">
+                      <div className="bg-[var(--bg-surface)] rounded-lg p-3 border border-green-100">
+                        <span className="text-xs text-[var(--text-secondary)] font-medium flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
                           Required By
                         </span>
-                        <p className="font-bold text-[var(--clr-emergency)] mt-1 text-sm">{hRtidData.requiredBy}</p>
+                        <p className="font-bold text-[var(--clr-danger)] mt-1 text-sm">{hRtidData.requiredBy}</p>
                       </div>
 
                       {(hRtidData.district || hRtidData.state) && (
-                        <div className="bg-[var(--clr-bg-card)] rounded-lg p-3 border border-green-100">
-                          <span className="text-xs text-[var(--txt-body)] font-medium">Location</span>
-                          <p className="font-bold text-[var(--txt-heading)] mt-1 text-sm">
+                        <div className="bg-[var(--bg-surface)] rounded-lg p-3 border border-green-100">
+                          <span className="text-xs text-[var(--text-secondary)] font-medium">Location</span>
+                          <p className="font-bold text-[var(--text-primary)] mt-1 text-sm">
                             {hRtidData.district}, {hRtidData.state}
                           </p>
                         </div>
                       )}
                     </div>
 
-                    <div className="mt-4 p-3 bg-[var(--clr-bg-card)] rounded-lg border border-green-200">
+                    <div className="mt-4 p-3 bg-[var(--bg-surface)] rounded-lg border border-green-200">
                       <p className="text-sm text-green-800 font-medium flex items-center gap-2">
                         <span>🎯</span>
                         <span>This donation will directly help <strong>{hRtidData.patientName}</strong></span>
@@ -504,7 +504,7 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
         </div>
 
         {/* FOOTER */}
-        <DialogFooter className="border-t border-[var(--clr-border)] pt-4">
+        <DialogFooter className="border-t border-[var(--border-color)] pt-4">
           <Button variant="outline" onClick={handleClose} className="px-6">
             Cancel
           </Button>

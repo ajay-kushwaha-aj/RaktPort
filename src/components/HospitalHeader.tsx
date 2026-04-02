@@ -38,7 +38,7 @@ export const HospitalHeader = ({
                     >
                         <Bell className="w-5 h-5" />
                         {notificationCount > 0 && (
-                            <span className="absolute top-1 right-1 w-3 h-3 bg-[var(--clr-emergency)] rounded-full border-2 border-white"></span>
+                            <span className="absolute top-1 right-1 w-3 h-3 bg-[var(--clr-danger)] rounded-full border-2 border-white"></span>
                         )}
                     </Button>
 

@@ -116,7 +116,7 @@ export function PWAInstallPrompt() {
           {/* Close */}
           <button
             onClick={handleDismiss}
-            className="absolute top-3 right-3 p-1 rounded-full bg-[var(--clr-bg-card)]/10 hover:bg-[var(--clr-bg-card)]/20 transition"
+            className="absolute top-3 right-3 p-1 rounded-full bg-[var(--bg-surface)]/10 hover:bg-[var(--bg-surface)]/20 transition"
             aria-label="Dismiss install prompt"
           >
             <X className="w-4 h-4" />
@@ -124,7 +124,7 @@ export function PWAInstallPrompt() {
 
           <div className="p-4 pr-10 flex items-center gap-3.5">
             {/* App icon */}
-            <div className="flex-shrink-0 w-14 h-14 rounded-xl overflow-hidden border-2 border-white/20 shadow-lg bg-[var(--clr-bg-card)]/10">
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl overflow-hidden border-2 border-white/20 shadow-lg bg-[var(--bg-surface)]/10">
               <img src="/icon-192.png" alt="RaktPort" className="w-full h-full object-cover" />
             </div>
 
@@ -145,7 +145,7 @@ export function PWAInstallPrompt() {
             <button
               onClick={handleInstall}
               disabled={installing}
-              className="flex-shrink-0 bg-[var(--clr-bg-card)] text-[var(--clr-brand)] font-bold text-xs px-4 py-2 rounded-xl hover:bg-red-50 active:scale-95 transition-all shadow-md disabled:opacity-60"
+              className="flex-shrink-0 bg-[var(--bg-surface)] text-[var(--clr-brand)] font-bold text-xs px-4 py-2 rounded-xl hover:bg-red-50 active:scale-95 transition-all shadow-md disabled:opacity-60"
             >
               {installing ? (
                 <span className="flex items-center gap-1.5">
@@ -164,7 +164,7 @@ export function PWAInstallPrompt() {
           {/* Feature chips */}
           <div className="px-4 pb-3 flex gap-2 flex-wrap">
             {['⚡ Fast', '📴 Offline', '🔔 Notifications'].map((f) => (
-              <span key={f} className="text-[10px] bg-[var(--clr-bg-card)]/10 px-2 py-0.5 rounded-full border border-white/5">
+              <span key={f} className="text-[10px] bg-[var(--bg-surface)]/10 px-2 py-0.5 rounded-full border border-white/5">
                 {f}
               </span>
             ))}
@@ -176,19 +176,19 @@ export function PWAInstallPrompt() {
       {showIOSGuide && (
         <div className="fixed inset-0 z-[10000] bg-black/60 backdrop-blur-sm flex items-end justify-center p-4 animate-in fade-in duration-300" onClick={() => setShowIOSGuide(false)}>
           <div
-            className="bg-[var(--clr-bg-card)] dark:bg-gray-900 rounded-t-2xl rounded-b-xl w-full max-w-md shadow-2xl overflow-hidden animate-in slide-in-from-bottom-8 duration-400"
+            className="bg-[var(--bg-surface)] dark:bg-gray-900 rounded-t-2xl rounded-b-xl w-full max-w-md shadow-2xl overflow-hidden animate-in slide-in-from-bottom-8 duration-400"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-[var(--clr-brand)] to-[#a01010] text-[var(--txt-inverse)] px-5 py-4 flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl overflow-hidden border-2 border-white/20 bg-[var(--clr-bg-card)]/10">
+              <div className="w-12 h-12 rounded-xl overflow-hidden border-2 border-white/20 bg-[var(--bg-surface)]/10">
                 <img src="/icon-192.png" alt="RaktPort" className="w-full h-full object-cover" />
               </div>
               <div>
                 <h3 className="font-bold text-base">Install RaktPort</h3>
                 <p className="text-xs text-red-100/80">Follow these steps on Safari</p>
               </div>
-              <button onClick={() => setShowIOSGuide(false)} className="ml-auto p-1.5 rounded-full bg-[var(--clr-bg-card)]/10 hover:bg-[var(--clr-bg-card)]/20">
+              <button onClick={() => setShowIOSGuide(false)} className="ml-auto p-1.5 rounded-full bg-[var(--bg-surface)]/10 hover:bg-[var(--bg-surface)]/20">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -215,8 +215,8 @@ export function PWAInstallPrompt() {
 
             {/* iOS Safari bar indicator */}
             <div className="px-5 pb-5">
-              <div className="bg-[var(--clr-bg-page)] dark:bg-gray-800 rounded-xl p-3 text-center">
-                <p className="text-[11px] text-[var(--txt-body)]">
+              <div className="bg-[var(--bg-page)] dark:bg-gray-800 rounded-xl p-3 text-center">
+                <p className="text-[11px] text-[var(--text-secondary)]">
                   💡 This works best in <strong>Safari</strong>. Chrome on iOS doesn't support Add to Home Screen.
                 </p>
               </div>

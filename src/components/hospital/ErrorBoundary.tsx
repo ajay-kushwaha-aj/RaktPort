@@ -30,16 +30,16 @@ export class ErrorBoundary extends React.Component<Props, State> {
       return (
         <div className="flex flex-col items-center justify-center p-8 text-center min-h-[200px]">
           <div className="w-14 h-14 rounded-2xl bg-red-100 dark:bg-red-950/40 flex items-center justify-center mb-4">
-            <AlertTriangle className="w-7 h-7 text-[var(--clr-emergency)] dark:text-[var(--clr-emergency)]" />
+            <AlertTriangle className="w-7 h-7 text-[var(--clr-danger)] dark:text-[var(--clr-danger)]" />
           </div>
-          <h3 className="text-lg font-bold text-[var(--txt-heading)] dark:text-gray-100" style={{ fontFamily: "Outfit,sans-serif" }}>
+          <h3 className="text-lg font-bold text-[var(--text-primary)] dark:text-gray-100" style={{ fontFamily: "Outfit,sans-serif" }}>
             {this.props.fallbackTitle || "Something went wrong"}
           </h3>
-          <p className="text-sm text-[var(--txt-body)] dark:text-gray-400 mt-1 max-w-md">
+          <p className="text-sm text-[var(--text-secondary)] dark:text-gray-400 mt-1 max-w-md">
             An unexpected error occurred in the dashboard. This has been logged automatically.
           </p>
           {this.state.error && (
-            <code className="text-xs text-[var(--clr-emergency)] dark:text-[var(--clr-emergency)] bg-red-50 dark:bg-red-950/30 px-3 py-1.5 rounded-lg mt-3 max-w-md truncate block">
+            <code className="text-xs text-[var(--clr-danger)] dark:text-[var(--clr-danger)] bg-red-50 dark:bg-red-950/30 px-3 py-1.5 rounded-lg mt-3 max-w-md truncate block">
               {this.state.error.message}
             </code>
           )}

@@ -346,7 +346,7 @@ export const AppointmentModal = ({
                       placeholder="Donor Name"
                       required
                       readOnly={!isNewDonor}
-                      className={!isNewDonor ? "bg-[var(--clr-bg-page)]" : ""}
+                      className={!isNewDonor ? "bg-[var(--bg-page)]" : ""}
                     />
                   </div>
                   <div>

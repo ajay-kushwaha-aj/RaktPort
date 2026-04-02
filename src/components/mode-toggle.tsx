@@ -28,7 +28,7 @@ export function ModeToggle() {
             >
                 {isDark
                     ? <Moon className="h-3.5 w-3.5 text-yellow-300" />
-                    : <Sun className="h-3.5 w-3.5 text-[var(--clr-emergency)]" />
+                    : <Sun className="h-3.5 w-3.5 text-[var(--clr-danger)]" />
                 }
             </span>
         </button>

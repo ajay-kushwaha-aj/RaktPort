@@ -16,8 +16,8 @@ export const ProfileModal = ({ isOpen, onClose, hospital }: { isOpen: boolean; o
             {(hospital?.fullName || "H")[0]}
           </div>
           <div>
-            <p className="font-bold text-[var(--txt-heading)] dark:text-gray-100 text-sm">{hospital?.fullName || "—"}</p>
-            <p className="text-xs text-[var(--txt-body)] dark:text-gray-400 mt-0.5">Hospital · RaktPort Registered</p>
+            <p className="font-bold text-[var(--text-primary)] dark:text-gray-100 text-sm">{hospital?.fullName || "—"}</p>
+            <p className="text-xs text-[var(--text-secondary)] dark:text-gray-400 mt-0.5">Hospital · RaktPort Registered</p>
           </div>
         </div>
         {[
@@ -27,7 +27,7 @@ export const ProfileModal = ({ isOpen, onClose, hospital }: { isOpen: boolean; o
           { icon: <Mail className="w-4 h-4" />, label: "Email", val: hospital?.email || "—" },
         ].map(r => (
           <div key={r.label} className="flex items-start gap-3 px-1">
-            <span className="text-gray-400 dark:text-[var(--txt-body)] mt-0.5 flex-shrink-0">{r.icon}</span>
+            <span className="text-gray-400 dark:text-[var(--text-secondary)] mt-0.5 flex-shrink-0">{r.icon}</span>
             <div>
               <p className="text-[10px] text-gray-400 font-semibold uppercase">{r.label}</p>
               <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{r.val}</p>

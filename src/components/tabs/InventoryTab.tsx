@@ -59,7 +59,7 @@ export const InventoryTab = ({ inventory }: InventoryTabProps) => {
                   <div className="text-3xl font-bold text-primary mb-1">{bg}</div>
                   <div className="text-sm text-muted-foreground">Blood Group</div>
                 </div>
-                <div className={`px-2 py-1 rounded-md text-xs font-bold border flex items-center gap-1 bg-[var(--clr-bg-card)]/60 backdrop-blur-sm ${textColor} border-current`}>
+                <div className={`px-2 py-1 rounded-md text-xs font-bold border flex items-center gap-1 bg-[var(--bg-surface)]/60 backdrop-blur-sm ${textColor} border-current`}>
                   <span>{getStatusEmoji(status)}</span>
                   <span>{getStatusLabel(status)}</span>
                 </div>
@@ -88,8 +88,8 @@ export const InventoryTab = ({ inventory }: InventoryTabProps) => {
                   className={`h-2 rounded-full transition-all duration-500 ${status === 'good'
                     ? 'bg-[var(--clr-success)]'
                     : status === 'low'
-                      ? 'bg-[var(--clr-emergency)]'
-                      : 'bg-[var(--clr-emergency)]'
+                      ? 'bg-[var(--clr-danger)]'
+                      : 'bg-[var(--clr-danger)]'
                     }`}
                   style={{
                     width: `${item.total > 0 ? (item.available / item.total) * 100 : 0}%`,
@@ -106,11 +106,11 @@ export const InventoryTab = ({ inventory }: InventoryTabProps) => {
         <h3 className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wide">Inventory Status Thresholds</h3>
         <div className="flex flex-wrap gap-6">
           <div className="flex items-center gap-3">
-            <div className="w-4 h-4 rounded-full bg-[var(--clr-emergency)] shadow-sm border border-[var(--clr-emergency)]"></div>
+            <div className="w-4 h-4 rounded-full bg-[var(--clr-danger)] shadow-sm border border-[var(--clr-emergency)]"></div>
             <span className="text-sm text-foreground font-medium">Critical: &lt; 30 Units</span>
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-4 h-4 rounded-full bg-[var(--clr-emergency)] shadow-sm border border-[var(--clr-emergency)]"></div>
+            <div className="w-4 h-4 rounded-full bg-[var(--clr-danger)] shadow-sm border border-[var(--clr-emergency)]"></div>
             <span className="text-sm text-foreground font-medium">Low: 30 - 50 Units</span>
           </div>
           <div className="flex items-center gap-3">

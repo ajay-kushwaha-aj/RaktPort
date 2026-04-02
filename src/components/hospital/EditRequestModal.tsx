@@ -102,15 +102,15 @@ export const EditRequestModal = ({ isOpen, onClose, onSave, request }: Props) =>
     <Dialog open={isOpen} onOpenChange={o => { if (!o && !saving) onClose(); }}>
       <DialogContent className="sm:max-w-2xl max-h-[92vh] overflow-y-auto rounded-2xl p-0">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-[var(--clr-bg-card)] dark:bg-gray-900 rounded-t-2xl border-b border-gray-100 dark:border-gray-800 p-5">
+        <div className="sticky top-0 z-10 bg-[var(--bg-surface)] dark:bg-gray-900 rounded-t-2xl border-b border-gray-100 dark:border-gray-800 p-5">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/30 flex items-center justify-center text-xl flex-shrink-0">✏️</div>
             <div className="flex-1">
-              <h2 className="text-lg font-bold text-[var(--txt-heading)] dark:text-gray-100" style={{ fontFamily: "Outfit,sans-serif" }}>Edit Blood Request</h2>
-              <p className="text-xs text-[var(--txt-body)] dark:text-gray-400">RTID: {request.rtid} · {request.status}</p>
+              <h2 className="text-lg font-bold text-[var(--text-primary)] dark:text-gray-100" style={{ fontFamily: "Outfit,sans-serif" }}>Edit Blood Request</h2>
+              <p className="text-xs text-[var(--text-secondary)] dark:text-gray-400">RTID: {request.rtid} · {request.status}</p>
             </div>
-            <button type="button" onClick={() => { if (!saving) onClose(); }} className="w-8 h-8 rounded-lg bg-[var(--clr-bg-page)] dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center">
-              <X className="w-4 h-4 text-[var(--txt-body)] dark:text-gray-400" />
+            <button type="button" onClick={() => { if (!saving) onClose(); }} className="w-8 h-8 rounded-lg bg-[var(--bg-page)] dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center">
+              <X className="w-4 h-4 text-[var(--text-secondary)] dark:text-gray-400" />
             </button>
           </div>
         </div>
@@ -118,8 +118,8 @@ export const EditRequestModal = ({ isOpen, onClose, onSave, request }: Props) =>
         {!canEdit ? (
           <div className="p-8 text-center">
             <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-3" />
-            <h3 className="text-lg font-bold text-[var(--txt-heading)] dark:text-gray-100 mb-2">Cannot Edit Request</h3>
-            <p className="text-sm text-[var(--txt-body)] dark:text-gray-400">
+            <h3 className="text-lg font-bold text-[var(--text-primary)] dark:text-gray-100 mb-2">Cannot Edit Request</h3>
+            <p className="text-sm text-[var(--text-secondary)] dark:text-gray-400">
               Requests with status <strong>{request.status}</strong> cannot be edited.
               Only requests in CREATED or PENDING status can be modified.
             </p>
@@ -127,9 +127,9 @@ export const EditRequestModal = ({ isOpen, onClose, onSave, request }: Props) =>
         ) : (
           <div className="p-5 space-y-4">
             {/* Urgency */}
-            <div className="bg-gradient-to-r from-gray-50 dark:from-gray-800/50 to-white dark:to-gray-900 rounded-xl p-4 border border-[var(--clr-border)] dark:border-gray-700">
+            <div className="bg-gradient-to-r from-gray-50 dark:from-gray-800/50 to-white dark:to-gray-900 rounded-xl p-4 border border-[var(--border-color)] dark:border-gray-700">
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-sm font-bold text-[var(--txt-heading)] dark:text-gray-200">Urgency Level</span>
+                <span className="text-sm font-bold text-[var(--text-primary)] dark:text-gray-200">Urgency Level</span>
               </div>
               <div className="hd-urg-selector">
                 {(["Emergency", "Urgent", "Routine"] as UrgencyLevel[]).map(lvl => {
@@ -147,7 +147,7 @@ export const EditRequestModal = ({ isOpen, onClose, onSave, request }: Props) =>
 
             {/* Patient Info */}
             <div className="space-y-3">
-              <div className="flex items-center gap-2"><User className="w-4 h-4 text-[var(--clr-info)]" /><span className="text-sm font-bold text-[var(--txt-heading)] dark:text-gray-200">Patient Information</span></div>
+              <div className="flex items-center gap-2"><User className="w-4 h-4 text-[var(--clr-info)]" /><span className="text-sm font-bold text-[var(--text-primary)] dark:text-gray-200">Patient Information</span></div>
               <div><label className="hd-label">Patient Name <span className="hd-required">*</span></label><input className="hd-input" value={patientName} onChange={e => setPatientName(e.target.value)} /></div>
               <div className="grid grid-cols-2 gap-3">
                 <div><label className="hd-label">Age</label><input className="hd-input" type="number" min="1" max="120" value={age} onChange={e => setAge(e.target.value)} /></div>
@@ -161,13 +161,13 @@ export const EditRequestModal = ({ isOpen, onClose, onSave, request }: Props) =>
 
             {/* Blood Details */}
             <div className="space-y-3">
-              <div className="flex items-center gap-2"><Droplet className="w-4 h-4 text-[var(--clr-emergency)]" /><span className="text-sm font-bold text-[var(--txt-heading)] dark:text-gray-200">Blood Details</span></div>
+              <div className="flex items-center gap-2"><Droplet className="w-4 h-4 text-[var(--clr-danger)]" /><span className="text-sm font-bold text-[var(--text-primary)] dark:text-gray-200">Blood Details</span></div>
               <div>
                 <label className="hd-label">Blood Group <span className="hd-required">*</span></label>
                 <div className="grid grid-cols-4 gap-2 mt-1">
                   {BLOOD_GROUPS.map((bg: string) => (
                     <button key={bg} type="button" onClick={() => setBloodGroup(bg as BloodGroup)}
-                      className={`py-2 rounded-xl text-sm font-black border-2 transition-all ${bloodGroup === bg ? "bg-[var(--clr-brand)] text-[var(--txt-inverse)] border-[var(--clr-brand)] scale-105 shadow-md" : "bg-[var(--clr-bg-page)] dark:bg-gray-800 text-[var(--txt-body)] dark:text-gray-400 border-[var(--clr-border)] dark:border-gray-700"}`}>
+                      className={`py-2 rounded-xl text-sm font-black border-2 transition-all ${bloodGroup === bg ? "bg-[var(--clr-brand)] text-[var(--txt-inverse)] border-[var(--clr-brand)] scale-105 shadow-md" : "bg-[var(--bg-page)] dark:bg-gray-800 text-[var(--text-secondary)] dark:text-gray-400 border-[var(--border-color)] dark:border-gray-700"}`}>
                       {bg}
                     </button>
                   ))}
@@ -178,9 +178,9 @@ export const EditRequestModal = ({ isOpen, onClose, onSave, request }: Props) =>
                 <div>
                   <label className="hd-label">Units <span className="hd-required">*</span></label>
                   <div className="flex items-center gap-2">
-                    <button type="button" onClick={() => setUnitsRequired(u => Math.max(1, u - 1))} className="w-9 h-9 rounded-lg border-2 border-[var(--clr-border)] dark:border-gray-700 font-bold text-[var(--txt-body)] dark:text-gray-400 flex items-center justify-center">−</button>
+                    <button type="button" onClick={() => setUnitsRequired(u => Math.max(1, u - 1))} className="w-9 h-9 rounded-lg border-2 border-[var(--border-color)] dark:border-gray-700 font-bold text-[var(--text-secondary)] dark:text-gray-400 flex items-center justify-center">−</button>
                     <input className="hd-input text-center font-bold" type="number" min="1" max="20" value={unitsRequired} onChange={e => setUnitsRequired(+e.target.value || 1)} />
-                    <button type="button" onClick={() => setUnitsRequired(u => Math.min(20, u + 1))} className="w-9 h-9 rounded-lg border-2 border-[var(--clr-border)] dark:border-gray-700 font-bold text-[var(--txt-body)] dark:text-gray-400 flex items-center justify-center">+</button>
+                    <button type="button" onClick={() => setUnitsRequired(u => Math.min(20, u + 1))} className="w-9 h-9 rounded-lg border-2 border-[var(--border-color)] dark:border-gray-700 font-bold text-[var(--text-secondary)] dark:text-gray-400 flex items-center justify-center">+</button>
                   </div>
                 </div>
               </div>
@@ -189,7 +189,7 @@ export const EditRequestModal = ({ isOpen, onClose, onSave, request }: Props) =>
                 <div className="grid grid-cols-4 gap-1.5">
                   {TRANSFUSION_INDICATIONS.map(ind => (
                     <button key={ind} type="button" onClick={() => setTransfusionIndication(ind)}
-                      className={`py-2 rounded-xl text-[11px] font-semibold border-2 transition-all ${transfusionIndication === ind ? "bg-[var(--clr-info)] text-[var(--txt-inverse)] border-[var(--clr-info)]" : "bg-[var(--clr-bg-page)] dark:bg-gray-800 text-[var(--txt-body)] dark:text-gray-400 border-[var(--clr-border)] dark:border-gray-700"}`}>
+                      className={`py-2 rounded-xl text-[11px] font-semibold border-2 transition-all ${transfusionIndication === ind ? "bg-[var(--clr-info)] text-[var(--txt-inverse)] border-[var(--clr-info)]" : "bg-[var(--bg-page)] dark:bg-gray-800 text-[var(--text-secondary)] dark:text-gray-400 border-[var(--border-color)] dark:border-gray-700"}`}>
                       {ind}
                     </button>
                   ))}
@@ -199,7 +199,7 @@ export const EditRequestModal = ({ isOpen, onClose, onSave, request }: Props) =>
 
             {/* Doctor & Location */}
             <div className="space-y-3">
-              <div className="flex items-center gap-2"><Stethoscope className="w-4 h-4 text-[var(--clr-success)]" /><span className="text-sm font-bold text-[var(--txt-heading)] dark:text-gray-200">Doctor & Location</span></div>
+              <div className="flex items-center gap-2"><Stethoscope className="w-4 h-4 text-[var(--clr-success)]" /><span className="text-sm font-bold text-[var(--text-primary)] dark:text-gray-200">Doctor & Location</span></div>
               <div className="grid grid-cols-2 gap-3">
                 <div><label className="hd-label">Doctor Name</label><input className="hd-input" value={doctorName} onChange={e => setDoctorName(e.target.value)} /></div>
                 <div><label className="hd-label">MCI Reg.</label><input className="hd-input" value={doctorRegNo} onChange={e => setDoctorRegNo(e.target.value)} /></div>
@@ -218,7 +218,7 @@ export const EditRequestModal = ({ isOpen, onClose, onSave, request }: Props) =>
 
             {/* Actions */}
             <div className="flex gap-3 pt-2 border-t border-gray-100 dark:border-gray-800">
-              <button type="button" onClick={onClose} disabled={saving} className="flex-1 py-2.5 border-2 border-[var(--clr-border)] dark:border-gray-700 rounded-xl text-sm font-semibold text-[var(--txt-body)] dark:text-gray-400 hover:bg-[var(--clr-bg-page)] dark:hover:bg-gray-800 transition-all">Cancel</button>
+              <button type="button" onClick={onClose} disabled={saving} className="flex-1 py-2.5 border-2 border-[var(--border-color)] dark:border-gray-700 rounded-xl text-sm font-semibold text-[var(--text-secondary)] dark:text-gray-400 hover:bg-[var(--bg-page)] dark:hover:bg-gray-800 transition-all">Cancel</button>
               <button type="button" onClick={handleSave} disabled={saving} className="flex-1 py-2.5 rounded-xl text-sm font-bold text-[var(--txt-inverse)] transition-all flex items-center justify-center gap-2" style={{ background: saving ? "#d1d5db" : "linear-gradient(135deg,var(--clr-brand),#b30000)" }}>
                 {saving ? <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving…</> : <><Save className="w-4 h-4" /> Save Changes</>}
               </button>

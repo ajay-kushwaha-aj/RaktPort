@@ -227,8 +227,8 @@ const CountdownTimer = ({targetDate,compact=false,label=''}:{targetDate:Date;com
     };
     update(); const id=setInterval(update,1000); return ()=>clearInterval(id);
   },[targetDate]);
-  if(compact) return <span className={`text-xs font-mono font-semibold ${isPast?'text-[var(--clr-emergency)]':'text-[var(--rtid-badge)]'}`}>{label&&<span className="opacity-70">{label} </span>}{display}</span>;
-  return <div className={`flex items-center gap-1.5 ${isPast?'text-[var(--clr-emergency)]':'text-blue-700'}`}><Clock className="w-3.5 h-3.5 flex-shrink-0"/><span className="text-xs font-semibold font-mono">{label&&`${label}: `}{display}</span></div>;
+  if(compact) return <span className={`text-xs font-mono font-semibold ${isPast?'text-[var(--clr-danger)]':'text-[var(--brand-primary)]'}`}>{label&&<span className="opacity-70">{label} </span>}{display}</span>;
+  return <div className={`flex items-center gap-1.5 ${isPast?'text-[var(--clr-danger)]':'text-blue-700'}`}><Clock className="w-3.5 h-3.5 flex-shrink-0"/><span className="text-xs font-semibold font-mono">{label&&`${label}: `}{display}</span></div>;
 };
 
 const ComponentBadge = ({component}:{component:DonationComponent}) => {
@@ -246,9 +246,9 @@ const ImpactTimelineView = ({timeline}:{timeline:ImpactTimeline}) => {
   const stages=[{key:'donated',label:'Donated',date:timeline.donated,icon:Droplet},{key:'linkedToRequest',label:'Linked to Request',date:timeline.linkedToRequest,icon:Heart},{key:'usedByPatient',label:'Used by Patient',date:timeline.usedByPatient,icon:Activity},{key:'creditIssued',label:'Credit Issued',date:timeline.creditIssued,icon:Gift}];
   return (
     <div className="space-y-3">
-      <h4 className="font-semibold text-[var(--txt-heading)] flex items-center gap-2"><TrendingUp className="w-4 h-4 text-[var(--clr-success)]"/> Impact Journey</h4>
+      <h4 className="font-semibold text-[var(--text-primary)] flex items-center gap-2"><TrendingUp className="w-4 h-4 text-[var(--clr-success)]"/> Impact Journey</h4>
       <div className="relative pl-5">
-        {stages.map((s,i)=>{const Icon=s.icon,done=!!s.date,last=i===stages.length-1;return(<div key={s.key} className="relative pb-5">{!last&&<div className={`absolute left-0 top-5 w-0.5 h-full ${done?'bg-[var(--clr-success)]':'bg-gray-200'}`}/>}<div className="flex items-start gap-2.5"><div className={`relative z-10 w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${done?'bg-[var(--clr-success)] text-[var(--txt-inverse)]':'bg-gray-200 text-gray-400'}`}><Icon className="w-3.5 h-3.5"/></div><div className="pt-0.5"><p className={`font-medium text-sm ${done?'text-[var(--txt-heading)]':'text-gray-400'}`}>{s.label}</p>{s.date&&<p className="text-xs text-gray-400 mt-0.5">{formatDateTimeDMY(s.date)}</p>}</div></div></div>);})}
+        {stages.map((s,i)=>{const Icon=s.icon,done=!!s.date,last=i===stages.length-1;return(<div key={s.key} className="relative pb-5">{!last&&<div className={`absolute left-0 top-5 w-0.5 h-full ${done?'bg-[var(--clr-success)]':'bg-gray-200'}`}/>}<div className="flex items-start gap-2.5"><div className={`relative z-10 w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${done?'bg-[var(--clr-success)] text-[var(--txt-inverse)]':'bg-gray-200 text-gray-400'}`}><Icon className="w-3.5 h-3.5"/></div><div className="pt-0.5"><p className={`font-medium text-sm ${done?'text-[var(--text-primary)]':'text-gray-400'}`}>{s.label}</p>{s.date&&<p className="text-xs text-gray-400 mt-0.5">{formatDateTimeDMY(s.date)}</p>}</div></div></div>);})}
       </div>
       <div className="p-3 bg-green-50 rounded-lg border border-green-200 text-sm text-green-800 font-medium flex items-center gap-2"><Heart className="w-4 h-4 fill-green-600 flex-shrink-0"/>{timeline.usedByPatient?'Your donation directly saved a life! 🎉':timeline.linkedToRequest?"Your donation is fulfilling a patient's need...":'Your donation is being processed...'}</div>
     </div>
@@ -261,7 +261,7 @@ const HistoryQRModal = ({isOpen,onClose,data}:{isOpen:boolean;onClose:()=>void;d
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md rounded-2xl">
         <DialogHeader><DialogTitle className="text-primary text-center flex items-center justify-center gap-2"><QrCode className="w-5 h-5"/> Donation QR</DialogTitle><DialogDescription className="text-center">RTID: <span className="font-mono font-bold text-black">{data.rtid}</span></DialogDescription></DialogHeader>
-        <div className="flex flex-col items-center gap-4 py-4 bg-[var(--clr-bg-page)] rounded-xl border border-dashed border-[var(--clr-border)]">
+        <div className="flex flex-col items-center gap-4 py-4 bg-[var(--bg-page)] rounded-xl border border-dashed border-[var(--border-color)]">
           <QRCodeCanvas data={data.payload} className="border-4 border-white shadow rounded-lg"/>
           <div className="text-center space-y-1"><p className="text-sm text-muted-foreground">{formatDateDMY(data.date)} · {data.location}</p>{data.component&&<div className="flex justify-center"><ComponentBadge component={data.component}/></div>}{data.qrStatus&&<div className="flex justify-center"><QRStatusBadge status={data.qrStatus} expiryTime={data.otpExpiryTime}/></div>}</div>
         </div>
@@ -520,16 +520,16 @@ else{imgs.forEach(function(img){if(img.complete)tryPrint();else{img.onload=tryPr
           <div className="px-8 py-6 text-center space-y-3">
             <div className="flex items-center justify-center gap-3">
               <img src={logo} alt="" className="w-10 h-10 object-contain rounded-lg"/>
-              <div><p className="text-2xl font-bold text-[var(--clr-brand)] tracking-wide">RaktPort</p><p className="text-[10px] text-[var(--txt-body)] tracking-[0.15em] uppercase">National Blood Management System</p></div>
+              <div><p className="text-2xl font-bold text-[var(--clr-brand)] tracking-wide">RaktPort</p><p className="text-[10px] text-[var(--text-secondary)] tracking-[0.15em] uppercase">National Blood Management System</p></div>
             </div>
             <div className="h-px mx-8" style={{background:'linear-gradient(to right,transparent,var(--clr-brand) 30%,var(--clr-brand) 70%,transparent)'}}/>
             <div>
-              <p className="text-[11px] tracking-[0.2em] text-[var(--txt-body)] uppercase mb-1">Certificate of Appreciation</p>
+              <p className="text-[11px] tracking-[0.2em] text-[var(--text-secondary)] uppercase mb-1">Certificate of Appreciation</p>
               <p className="text-[11px] text-gray-400 mb-2">This is to certify that</p>
-              <h2 className="text-3xl sm:text-4xl font-bold text-[var(--txt-heading)] tracking-wide">{(donorData.fullName||'Donor Name').toUpperCase()}</h2>
+              <h2 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)] tracking-wide">{(donorData.fullName||'Donor Name').toUpperCase()}</h2>
               <p className="text-sm text-[var(--clr-brand)] font-medium mt-1.5 italic">ID: {donorData.internalId || donorData.donorId || 'N/A'} &nbsp;·&nbsp; Blood Group: {donorData.bloodGroup||'N/A'}</p>
             </div>
-            <p className="text-sm text-[var(--txt-body)] leading-relaxed max-w-md mx-auto">has donated blood <strong className="text-[var(--clr-brand)]">{donorData.donationsCount||0} time{(donorData.donationsCount||0)!==1?'s':''}</strong> through RaktPort, potentially saving up to <strong className="text-[var(--clr-brand)]">~{lives} lives</strong>.</p>
+            <p className="text-sm text-[var(--text-secondary)] leading-relaxed max-w-md mx-auto">has donated blood <strong className="text-[var(--clr-brand)]">{donorData.donationsCount||0} time{(donorData.donationsCount||0)!==1?'s':''}</strong> through RaktPort, potentially saving up to <strong className="text-[var(--clr-brand)]">~{lives} lives</strong>.</p>
             <div className="flex flex-wrap justify-center gap-2">
               {[['Donations',String(donorData.donationsCount||0)],['Lives Saved',`~${lives}`],['Blood Group',donorData.bloodGroup||'N/A'],['First Gift',firstDate?formatDateDMY(firstDate):'N/A'],['Latest',lastDate?formatDateDMY(lastDate):'N/A']].map(([lbl,val])=>(
                 <div key={lbl} className="bg-[var(--stats-bg)] text-[var(--txt-inverse)] px-3 py-2 rounded-xl text-center min-w-[72px]"><p className="text-[9px] opacity-70 uppercase tracking-wide mb-0.5">{lbl}</p><p className="text-sm font-bold">{val}</p></div>
@@ -537,9 +537,9 @@ else{imgs.forEach(function(img){if(img.complete)tryPrint();else{img.onload=tryPr
             </div>
             <div className="h-px mx-4 bg-[var(--stats-divider)]"/>
             <div className="flex items-center justify-between px-4">
-              <div className="flex flex-col items-center"><canvas ref={previewQrRef} className="w-14 h-14 border border-[var(--clr-border)] rounded p-0.5"/><p className="text-[8px] text-gray-400 mt-0.5 font-mono">{certNo}</p></div>
+              <div className="flex flex-col items-center"><canvas ref={previewQrRef} className="w-14 h-14 border border-[var(--border-color)] rounded p-0.5"/><p className="text-[8px] text-gray-400 mt-0.5 font-mono">{certNo}</p></div>
               <div className="text-center"><p className="text-[10px] text-gray-400">Issue Date</p><p className="text-sm font-bold text-gray-700">{formatDateDMY(new Date())}</p></div>
-              <div className="text-center"><div className="w-28 border-b border-gray-400 mb-1"/><p className="text-[10px] text-[var(--txt-body)]">Authorised by RaktPort</p><p className="text-[9px] text-gray-400">National Blood Authority</p></div>
+              <div className="text-center"><div className="w-28 border-b border-gray-400 mb-1"/><p className="text-[10px] text-[var(--text-secondary)]">Authorised by RaktPort</p><p className="text-[9px] text-gray-400">National Blood Authority</p></div>
             </div>
             <p className="text-xs text-[var(--clr-brand)] italic pb-2">"Every drop of blood donated is a promise of hope — Thank you for saving lives"</p>
           </div>
@@ -562,12 +562,12 @@ const BloodCompatibilityModal = ({isOpen,onClose,bloodGroup}:{isOpen:boolean;onC
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-lg rounded-2xl">
-        <DialogHeader><DialogTitle className="flex items-center gap-2"><HeartHandshake className="w-5 h-5 text-[var(--clr-emergency)]"/> Blood Type Compatibility</DialogTitle><DialogDescription>Your blood type <strong>{bloodGroup}</strong> compatibility guide</DialogDescription></DialogHeader>
+        <DialogHeader><DialogTitle className="flex items-center gap-2"><HeartHandshake className="w-5 h-5 text-[var(--clr-danger)]"/> Blood Type Compatibility</DialogTitle><DialogDescription>Your blood type <strong>{bloodGroup}</strong> compatibility guide</DialogDescription></DialogHeader>
         <div className="space-y-4">
           <div className="flex items-center justify-center"><div className="w-20 h-20 rounded-full bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center shadow-xl"><span className="text-2xl font-black text-[var(--txt-inverse)]">{bloodGroup}</span></div></div>
-          <p className="text-sm text-[var(--txt-body)] text-center bg-red-50 rounded-xl p-3 border border-[var(--clr-border)]">{info.facts}</p>
-          <div><h4 className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-1.5"><Droplet className="w-4 h-4 text-[var(--clr-emergency)]"/> You can donate to</h4><div className="flex flex-wrap gap-2">{ALL.map(g=><div key={g} className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-black border-2 ${info.donateTo.includes(g)?'bg-[var(--stats-bg)] text-[var(--txt-inverse)] border-[var(--clr-emergency)] shadow-md scale-110':'bg-[var(--clr-bg-page)] text-gray-300 border-[var(--clr-border)]'}`}>{g}</div>)}</div></div>
-          <div><h4 className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-1.5"><Heart className="w-4 h-4 text-[var(--clr-success)] fill-green-500"/> You can receive from</h4><div className="flex flex-wrap gap-2">{ALL.map(g=><div key={g} className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-black border-2 ${info.receiveFrom.includes(g)?'bg-[var(--clr-success)] text-[var(--txt-inverse)] border-[var(--clr-success)] shadow-md scale-110':'bg-[var(--clr-bg-page)] text-gray-300 border-[var(--clr-border)]'}`}>{g}</div>)}</div></div>
+          <p className="text-sm text-[var(--text-secondary)] text-center bg-red-50 rounded-xl p-3 border border-[var(--border-color)]">{info.facts}</p>
+          <div><h4 className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-1.5"><Droplet className="w-4 h-4 text-[var(--clr-danger)]"/> You can donate to</h4><div className="flex flex-wrap gap-2">{ALL.map(g=><div key={g} className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-black border-2 ${info.donateTo.includes(g)?'bg-[var(--stats-bg)] text-[var(--txt-inverse)] border-[var(--clr-emergency)] shadow-md scale-110':'bg-[var(--bg-page)] text-gray-300 border-[var(--border-color)]'}`}>{g}</div>)}</div></div>
+          <div><h4 className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-1.5"><Heart className="w-4 h-4 text-[var(--clr-success)] fill-green-500"/> You can receive from</h4><div className="flex flex-wrap gap-2">{ALL.map(g=><div key={g} className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-black border-2 ${info.receiveFrom.includes(g)?'bg-[var(--clr-success)] text-[var(--txt-inverse)] border-[var(--clr-success)] shadow-md scale-110':'bg-[var(--bg-page)] text-gray-300 border-[var(--border-color)]'}`}>{g}</div>)}</div></div>
           {bloodGroup==='O-'&&<div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm text-amber-800 flex gap-2"><Star className="w-4 h-4 fill-amber-500 flex-shrink-0 mt-0.5"/><span><strong>Universal Donor:</strong> Your blood can be given to anyone in an emergency!</span></div>}
           {bloodGroup==='AB+'&&<div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-sm text-blue-800 flex gap-2"><Star className="w-4 h-4 fill-blue-500 flex-shrink-0 mt-0.5"/><span><strong>Universal Recipient:</strong> You can receive blood from any blood type!</span></div>}
         </div>
@@ -582,11 +582,11 @@ const HealthTipsSection = ({isOpen,onClose}:{isOpen:boolean;onClose:()=>void}) =
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md rounded-2xl">
-        <DialogHeader><DialogTitle className="flex items-center gap-2"><BookOpen className="w-5 h-5 text-[var(--rtid-badge)]"/> Health Tips for Donors</DialogTitle></DialogHeader>
+        <DialogHeader><DialogTitle className="flex items-center gap-2"><BookOpen className="w-5 h-5 text-[var(--brand-primary)]"/> Health Tips for Donors</DialogTitle></DialogHeader>
         <div className="space-y-4">
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-5 border border-[var(--clr-border)] text-center min-h-[120px] flex flex-col items-center justify-center"><div className="text-4xl mb-3">{HEALTH_TIPS[current].icon}</div><h3 className="font-bold text-[var(--txt-heading)] mb-1">{HEALTH_TIPS[current].title}</h3><p className="text-sm text-[var(--txt-body)] leading-relaxed">{HEALTH_TIPS[current].tip}</p></div>
-          <div className="flex justify-center gap-1.5">{HEALTH_TIPS.map((_,i)=><button key={i} onClick={()=>setCurrent(i)} className={`h-2 rounded-full transition-all ${i===current?'bg-[var(--rtid-badge)] w-6':'bg-gray-300 w-2'}`}/>)}</div>
-          <div className="space-y-2 max-h-52 overflow-y-auto">{HEALTH_TIPS.map((t,i)=><button key={i} onClick={()=>setCurrent(i)} className={`w-full flex items-start gap-3 p-3 rounded-xl text-left ${i===current?'bg-blue-50 border border-blue-200':'hover:bg-[var(--clr-bg-page)]'}`}><span className="text-xl flex-shrink-0">{t.icon}</span><div><p className="text-sm font-semibold text-[var(--txt-heading)]">{t.title}</p><p className="text-xs text-[var(--txt-body)] mt-0.5 line-clamp-1">{t.tip}</p></div></button>)}</div>
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-5 border border-[var(--border-color)] text-center min-h-[120px] flex flex-col items-center justify-center"><div className="text-4xl mb-3">{HEALTH_TIPS[current].icon}</div><h3 className="font-bold text-[var(--text-primary)] mb-1">{HEALTH_TIPS[current].title}</h3><p className="text-sm text-[var(--text-secondary)] leading-relaxed">{HEALTH_TIPS[current].tip}</p></div>
+          <div className="flex justify-center gap-1.5">{HEALTH_TIPS.map((_,i)=><button key={i} onClick={()=>setCurrent(i)} className={`h-2 rounded-full transition-all ${i===current?'bg-[var(--brand-primary)] w-6':'bg-gray-300 w-2'}`}/>)}</div>
+          <div className="space-y-2 max-h-52 overflow-y-auto">{HEALTH_TIPS.map((t,i)=><button key={i} onClick={()=>setCurrent(i)} className={`w-full flex items-start gap-3 p-3 rounded-xl text-left ${i===current?'bg-blue-50 border border-blue-200':'hover:bg-[var(--bg-page)]'}`}><span className="text-xl flex-shrink-0">{t.icon}</span><div><p className="text-sm font-semibold text-[var(--text-primary)]">{t.title}</p><p className="text-xs text-[var(--text-secondary)] mt-0.5 line-clamp-1">{t.tip}</p></div></button>)}</div>
         </div>
       </DialogContent>
     </Dialog>
@@ -603,10 +603,10 @@ const ShareCardModal = ({isOpen,onClose,donorData}:{isOpen:boolean;onClose:()=>v
       <DialogContent className="max-w-sm rounded-2xl">
         <DialogHeader><DialogTitle className="flex items-center gap-2"><Share2 className="w-5 h-5 text-primary"/> Share Your Story</DialogTitle></DialogHeader>
         <div className="rounded-2xl overflow-hidden bg-[var(--stats-bg)] p-5 text-[var(--txt-inverse)] text-center space-y-3 shadow-xl">
-          <div className="w-16 h-16 rounded-full bg-[var(--clr-bg-card)]/20 flex items-center justify-center text-2xl font-black mx-auto">{(donorData.fullName||'D').split(' ').map(s=>s[0]).join('').toUpperCase().slice(0,2)}</div>
+          <div className="w-16 h-16 rounded-full bg-[var(--bg-surface)]/20 flex items-center justify-center text-2xl font-black mx-auto">{(donorData.fullName||'D').split(' ').map(s=>s[0]).join('').toUpperCase().slice(0,2)}</div>
           <div className="text-xl font-bold">{donorData.fullName}</div>
           <div className="text-3xl font-black text-red-200">{donorData.bloodGroup}</div>
-          <div className="flex justify-center gap-6 py-2 bg-[var(--clr-bg-card)]/10 rounded-xl">{[['Donations',donorData.donationsCount||0],['Lives',`~${(donorData.donationsCount||0)*3}`]].map(([l,v])=><div key={l as string} className="text-center"><div className="text-xl font-black">{v}</div><div className="text-xs opacity-70">{l}</div></div>)}</div>
+          <div className="flex justify-center gap-6 py-2 bg-[var(--bg-surface)]/10 rounded-xl">{[['Donations',donorData.donationsCount||0],['Lives',`~${(donorData.donationsCount||0)*3}`]].map(([l,v])=><div key={l as string} className="text-center"><div className="text-xl font-black">{v}</div><div className="text-xs opacity-70">{l}</div></div>)}</div>
           <div className="text-xs opacity-60">{donorData.internalId || donorData.donorId || 'RaktPort Donor'}</div>
           {donorData.username && <div className="text-[10px] opacity-50 mt-0.5">{formatUsername(donorData.username)}</div>}
         </div>
@@ -853,7 +853,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
   const upcomingAppointments = useMemo(()=>donationHistory.filter(d=>['Scheduled','Pending'].includes(d.status)),[donationHistory]);
 
   const computeBadge = (n:number) => n>=20?'💎 Diamond':n>=10?'🥇 Gold':n>=5?'🥈 Silver':'🥉 Bronze';
-  const badgeBg      = (n:number) => n>=20?'bg-[var(--rtid-badge)]':n>=10?'bg-yellow-500':n>=5?'bg-gray-400':'bg-orange-700';
+  const badgeBg      = (n:number) => n>=20?'bg-[var(--brand-primary)]':n>=10?'bg-yellow-500':n>=5?'bg-gray-400':'bg-orange-700';
 
   // ── Handlers ───────────────────────────────────────────────
 
@@ -1053,7 +1053,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
             <div className="min-w-0">
               <h1 className="text-base sm:text-lg font-bold leading-tight flex flex-wrap items-center gap-1.5">
                 <span className="truncate max-w-[150px] sm:max-w-[300px]">Hello, {(donorData.fullName||'Donor').split(' ')[0]}! 👋</span>
-                {donorData.bloodGroup && <span className="bg-[var(--clr-bg-card)]/20 text-xs px-2 py-0.5 rounded-full flex-shrink-0">{donorData.bloodGroup}</span>}
+                {donorData.bloodGroup && <span className="bg-[var(--bg-surface)]/20 text-xs px-2 py-0.5 rounded-full flex-shrink-0">{donorData.bloodGroup}</span>}
               </h1>
               <p className="text-xs text-red-200 opacity-80 truncate">
                 {donorData.internalId || donorData.donorId || 'RaktPort Donor'}
@@ -1063,7 +1063,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             <ModeToggle />
-            <Button variant="secondary" size="sm" className="bg-[var(--clr-bg-card)] text-[var(--clr-brand)] hover:bg-[var(--clr-bg-page)] dark:bg-[var(--clr-bg-card)]/10 dark:text-[var(--txt-inverse)] dark:hover:bg-[var(--clr-bg-card)]/20 text-xs px-3" onClick={()=>setProfileOpen(true)}>
+            <Button variant="secondary" size="sm" className="bg-[var(--bg-surface)] text-[var(--clr-brand)] hover:bg-[var(--bg-page)] dark:bg-[var(--bg-surface)]/10 dark:text-[var(--txt-inverse)] dark:hover:bg-[var(--bg-surface)]/20 text-xs px-3" onClick={()=>setProfileOpen(true)}>
               <User className="w-3.5 h-3.5 mr-1"/> Profile
             </Button>
             <button onClick={handleLogoutConfirm} className="text-xs font-medium opacity-80 hover:opacity-100 px-1">Logout</button>
@@ -1074,7 +1074,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
       {/* ═══ MOTIVATION BANNER ═════════════════════════════════ */}
       <div className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30 border-b border-orange-100 dark:border-orange-900/40 py-2 no-print">
         <p className="text-xs sm:text-sm text-center text-orange-800 dark:text-orange-300 font-medium px-4 flex items-center justify-center gap-2">
-          <Star className="w-3.5 h-3.5 fill-orange-500 text-[var(--clr-emergency)] flex-shrink-0"/>
+          <Star className="w-3.5 h-3.5 fill-orange-500 text-[var(--clr-danger)] flex-shrink-0"/>
           <em>"{motivationQuote}"</em>
         </p>
       </div>
@@ -1086,7 +1086,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
             <div key={alert.id} className={`px-4 py-3 flex items-center gap-3 flex-wrap ${alert.urgency==='critical'?'bg-[var(--stats-bg)]':'bg-[var(--stats-bg)]'} text-[var(--txt-inverse)]`}>
               <Zap className="w-4 h-4 flex-shrink-0"/>
               <span className="text-sm font-semibold flex-1">🚨 Urgent: <strong>{alert.bloodGroup}</strong> needed at {alert.hospitalName}</span>
-              <Button size="sm" className="bg-[var(--clr-bg-card)] text-red-700 hover:bg-[var(--clr-bg-page)] text-xs py-1 h-7" onClick={()=>{setScheduleOpen(true);setEmergencyOpen(false);}}>Respond Now</Button>
+              <Button size="sm" className="bg-[var(--bg-surface)] text-red-700 hover:bg-[var(--bg-page)] text-xs py-1 h-7" onClick={()=>{setScheduleOpen(true);setEmergencyOpen(false);}}>Respond Now</Button>
               <button onClick={()=>setEmergencyAlerts(prev=>prev.filter(a=>a.id!==alert.id))} className="opacity-70 hover:opacity-100"><X className="w-4 h-4"/></button>
             </div>
           ))}
@@ -1098,7 +1098,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
 
         {error && (
           <div className="bg-red-50 dark:bg-red-950/30 border-l-4 border-[var(--clr-emergency)] p-3 rounded-md flex gap-2 no-print">
-            <AlertCircle className="text-[var(--clr-emergency)] w-4 h-4 mt-0.5 flex-shrink-0"/>
+            <AlertCircle className="text-[var(--clr-danger)] w-4 h-4 mt-0.5 flex-shrink-0"/>
             <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
           </div>
         )}
@@ -1109,12 +1109,12 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
             <div className="flex items-center gap-4">
               <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl flex-shrink-0 ${isEligible?'bg-green-100 dark:bg-green-900/40':'bg-[var(--stats-divider)] dark:bg-red-900/40'}`}>{isEligible?'🩸':'🚫'}</div>
               <div className="flex-1 min-w-0">
-                <p className={`font-bold text-sm ${isEligible?'text-green-700 dark:text-[var(--clr-success)]':'text-[var(--clr-emergency)] dark:text-[var(--clr-emergency)]'}`}>{eligibilityMsg}</p>
+                <p className={`font-bold text-sm ${isEligible?'text-green-700 dark:text-[var(--clr-success)]':'text-[var(--clr-danger)] dark:text-[var(--clr-danger)]'}`}>{eligibilityMsg}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">Last donation: {lastDonationDisplay}</p>
                 {!isEligible&&nextEligibleDate&&nextEligibleDate>new Date()&&(
                   <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
                     <div className="flex items-center gap-2">
-                      <AlarmClock className="w-3.5 h-3.5 text-[var(--rtid-badge)] dark:text-[var(--rtid-badge)] flex-shrink-0"/>
+                      <AlarmClock className="w-3.5 h-3.5 text-[var(--brand-primary)] dark:text-[var(--brand-primary)] flex-shrink-0"/>
                       <div>
                         <p className="text-xs font-semibold text-blue-700 dark:text-blue-300">Next eligible: {nextEligibleDisplay}</p>
                         <CountdownTimer targetDate={nextEligibleDate} compact label="Time remaining"/>
@@ -1126,7 +1126,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                       const comp=lastDon.component||'Whole Blood',isFemale=(donorData.gender||'').toLowerCase()==='female';
                       const total=COOLDOWN_DAYS[comp][isFemale?'female':'male']*86400000,elapsed=Date.now()-lastDon.date.getTime();
                       const pct=Math.min(Math.round((elapsed/total)*100),100);
-                      return <div className="mt-1.5"><div className="flex justify-between text-[10px] text-[var(--rtid-badge)] mb-0.5"><span>Recovery progress</span><span>{pct}%</span></div><Progress value={pct} className="h-1.5"/></div>;
+                      return <div className="mt-1.5"><div className="flex justify-between text-[10px] text-[var(--brand-primary)] mb-0.5"><span>Recovery progress</span><span>{pct}%</span></div><Progress value={pct} className="h-1.5"/></div>;
                     })()}
                   </div>
                 )}
@@ -1142,12 +1142,12 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
         {/* ── STATS ROW ─────────────────────────────────────── */}
         <div className="grid grid-cols-3 gap-3 no-print">
           {[
-            {icon:<Droplet className="w-5 h-5 text-[var(--clr-emergency)] fill-red-500 mx-auto mb-1"/>, val:donorData.credits||0,   label:'Credits'},
-            {icon:<Flame   className="w-5 h-5 text-[var(--clr-emergency)] mx-auto mb-1"/>,           val:donationStreak,         label:'Streak (12mo)'},
+            {icon:<Droplet className="w-5 h-5 text-[var(--clr-danger)] fill-red-500 mx-auto mb-1"/>, val:donorData.credits||0,   label:'Credits'},
+            {icon:<Flame   className="w-5 h-5 text-[var(--clr-danger)] mx-auto mb-1"/>,           val:donationStreak,         label:'Streak (12mo)'},
             {icon:<Heart   className="w-5 h-5 text-pink-500 fill-pink-400 mx-auto mb-1"/>,val:(donorData.donationsCount||0)*3,label:'Lives'},
           ].map(({icon,val,label})=>(
             <Card key={label} className="shadow-sm hover:shadow-md transition-shadow">
-              <CardContent className="p-3 sm:p-4 text-center">{icon}<p className="text-2xl font-black text-[var(--txt-heading)] dark:text-gray-100">{val}</p><p className="text-xs text-[var(--txt-body)] dark:text-gray-400">{label}</p></CardContent>
+              <CardContent className="p-3 sm:p-4 text-center">{icon}<p className="text-2xl font-black text-[var(--text-primary)] dark:text-gray-100">{val}</p><p className="text-xs text-[var(--text-secondary)] dark:text-gray-400">{label}</p></CardContent>
             </Card>
           ))}
         </div>
@@ -1167,33 +1167,33 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
         </div>
 
         {/* ── HEALTH TIP BANNER ─────────────────────────────── */}
-        <div className="no-print bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-2xl p-4 border border-[var(--clr-border)] dark:border-blue-800 flex items-start gap-3 cursor-pointer" onClick={()=>setHealthTipsOpen(true)}>
+        <div className="no-print bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-2xl p-4 border border-[var(--border-color)] dark:border-blue-800 flex items-start gap-3 cursor-pointer" onClick={()=>setHealthTipsOpen(true)}>
           <span className="text-2xl flex-shrink-0">{HEALTH_TIPS[currentHealthTip].icon}</span>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1 mb-0.5">
               <p className="text-xs font-bold text-blue-800 dark:text-blue-300">{HEALTH_TIPS[currentHealthTip].title}</p>
-              <Badge variant="outline" className="text-[9px] px-1 py-0 border-blue-200 dark:border-blue-700 text-[var(--rtid-badge)] dark:text-[var(--rtid-badge)] ml-auto">Health Tip</Badge>
+              <Badge variant="outline" className="text-[9px] px-1 py-0 border-blue-200 dark:border-blue-700 text-[var(--brand-primary)] dark:text-[var(--brand-primary)] ml-auto">Health Tip</Badge>
             </div>
-            <p className="text-xs text-[var(--rtid-badge)] dark:text-[var(--rtid-badge)] line-clamp-2">{HEALTH_TIPS[currentHealthTip].tip}</p>
+            <p className="text-xs text-[var(--brand-primary)] dark:text-[var(--brand-primary)] line-clamp-2">{HEALTH_TIPS[currentHealthTip].tip}</p>
           </div>
-          <ChevronRight className="w-4 h-4 text-[var(--rtid-badge)] flex-shrink-0 mt-0.5"/>
+          <ChevronRight className="w-4 h-4 text-[var(--brand-primary)] flex-shrink-0 mt-0.5"/>
         </div>
 
         {/* ── IMPACT SECTION ────────────────────────────────── */}
         <div className="no-print">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-base font-bold text-[var(--txt-heading)] dark:text-gray-100 flex items-center gap-2"><Award className="w-4 h-4 text-yellow-500"/> Your Impact</h3>
+            <h3 className="text-base font-bold text-[var(--text-primary)] dark:text-gray-100 flex items-center gap-2"><Award className="w-4 h-4 text-yellow-500"/> Your Impact</h3>
             <button onClick={()=>setCompatOpen(true)} className="text-xs text-primary flex items-center gap-1 font-semibold hover:underline">{donorData.bloodGroup} Compatibility <ChevronRight className="w-3 h-3"/></button>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
-              {icon:<Droplet className="w-5 h-5 text-[var(--rtid-badge)] mx-auto mb-1"/>,   val:donorData.donationsCount||0,           label:'Total Donations', border:'border-t-blue-500'},
+              {icon:<Droplet className="w-5 h-5 text-[var(--brand-primary)] mx-auto mb-1"/>,   val:donorData.donationsCount||0,           label:'Total Donations', border:'border-t-blue-500'},
               {icon:<Award   className="w-5 h-5 text-amber-500 mx-auto mb-1"/>, val:<span className={`text-xs font-bold px-2 py-0.5 rounded-full text-[var(--txt-inverse)] ${badgeBg(donorData.donationsCount||0)}`}>{computeBadge(donorData.donationsCount||0)}</span>, label:'Current Rank', border:'border-t-amber-500'},
               {icon:<Heart   className="w-5 h-5 text-pink-500 fill-pink-400 mx-auto mb-1"/>, val:(donorData.donationsCount||0)*3, label:'Lives Impacted', border:'border-t-pink-500'},
-              {icon:<CalendarCheck className="w-5 h-5 text-[var(--clr-success)] mx-auto mb-1"/>, val:<span className="text-sm font-bold text-[var(--txt-heading)] dark:text-gray-100 leading-tight">{nextEligibleDisplay}</span>, label:'Next Eligible', border:'border-t-green-500'},
+              {icon:<CalendarCheck className="w-5 h-5 text-[var(--clr-success)] mx-auto mb-1"/>, val:<span className="text-sm font-bold text-[var(--text-primary)] dark:text-gray-100 leading-tight">{nextEligibleDisplay}</span>, label:'Next Eligible', border:'border-t-green-500'},
             ].map(({icon,val,label,border})=>(
-              <Card key={label} className={`bg-[var(--clr-bg-card)] dark:bg-gray-900 hover:shadow-md transition-shadow border-t-4 ${border}`}>
-                <CardContent className="p-4 text-center">{icon}<p className="text-2xl font-black dark:text-gray-100">{val}</p><p className="text-xs text-[var(--txt-body)] dark:text-gray-400 mt-0.5">{label}</p></CardContent>
+              <Card key={label} className={`bg-[var(--bg-surface)] dark:bg-gray-900 hover:shadow-md transition-shadow border-t-4 ${border}`}>
+                <CardContent className="p-4 text-center">{icon}<p className="text-2xl font-black dark:text-gray-100">{val}</p><p className="text-xs text-[var(--text-secondary)] dark:text-gray-400 mt-0.5">{label}</p></CardContent>
               </Card>
             ))}
           </div>
@@ -1205,9 +1205,9 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
         {upcomingAppointments.length>0&&(
           <div className="no-print">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-base font-bold text-[var(--txt-heading)] dark:text-gray-100 flex items-center gap-2">
-                <CalendarCheck className="w-4 h-4 text-[var(--rtid-badge)] dark:text-[var(--rtid-badge)]"/> Upcoming Appointments
-                <Badge className="bg-[var(--rtid-badge)] text-[var(--txt-inverse)] text-[10px] px-1.5 py-0.5">{upcomingAppointments.length}</Badge>
+              <h3 className="text-base font-bold text-[var(--text-primary)] dark:text-gray-100 flex items-center gap-2">
+                <CalendarCheck className="w-4 h-4 text-[var(--brand-primary)] dark:text-[var(--brand-primary)]"/> Upcoming Appointments
+                <Badge className="bg-[var(--brand-primary)] text-[var(--txt-inverse)] text-[10px] px-1.5 py-0.5">{upcomingAppointments.length}</Badge>
               </h3>
               <Button size="sm" variant="outline" className="text-xs border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/40" onClick={()=>setScheduleOpen(true)}>+ Book New</Button>
             </div>
@@ -1219,7 +1219,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                     <CardContent className="p-4">
                       <div className="flex items-start gap-4">
                         {/* Date badge */}
-                        <div className="w-14 h-14 rounded-xl bg-[var(--rtid-badge)] flex flex-col items-center justify-center text-[var(--txt-inverse)] flex-shrink-0 shadow-md">
+                        <div className="w-14 h-14 rounded-xl bg-[var(--brand-primary)] flex flex-col items-center justify-center text-[var(--txt-inverse)] flex-shrink-0 shadow-md">
                           <span className="text-xl font-black leading-none">{String(appt.date.getDate()).padStart(2,'0')}</span>
                           <span className="text-[10px] opacity-80 uppercase tracking-wide">{appt.date.toLocaleString('default',{month:'short'})}</span>
                           <span className="text-[9px] opacity-60">{appt.date.getFullYear()}</span>
@@ -1232,11 +1232,11 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                             <ComponentBadge component={appt.component||'Whole Blood'}/>
                             <Badge variant="outline" className="border-blue-300 text-blue-700 bg-blue-50 text-[10px]">{appt.status}</Badge>
                           </div>
-                          <p className="text-sm font-semibold text-[var(--txt-heading)] dark:text-gray-100 truncate">{appt.hospitalName}</p>
+                          <p className="text-sm font-semibold text-[var(--text-primary)] dark:text-gray-100 truncate">{appt.hospitalName}</p>
                           <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5">
-                            <span className="text-xs text-[var(--txt-body)] flex items-center gap-1"><Clock className="w-3 h-3"/>{appt.time||'N/A'}</span>
-                            <span className="text-xs text-[var(--txt-body)] flex items-center gap-1"><MapPin className="w-3 h-3"/>{appt.city||'N/A'}</span>
-                            <span className="text-xs text-[var(--txt-body)] flex items-center gap-1"><Droplet className="w-3 h-3 text-[var(--clr-emergency)]"/>{appt.component||'Whole Blood'}</span>
+                            <span className="text-xs text-[var(--text-secondary)] flex items-center gap-1"><Clock className="w-3 h-3"/>{appt.time||'N/A'}</span>
+                            <span className="text-xs text-[var(--text-secondary)] flex items-center gap-1"><MapPin className="w-3 h-3"/>{appt.city||'N/A'}</span>
+                            <span className="text-xs text-[var(--text-secondary)] flex items-center gap-1"><Droplet className="w-3 h-3 text-[var(--clr-danger)]"/>{appt.component||'Whole Blood'}</span>
                           </div>
                           {isFuture&&(
                             <div className="mt-1.5 inline-flex items-center gap-1 bg-blue-100 text-blue-700 rounded-full px-2 py-0.5">
@@ -1246,10 +1246,10 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                         </div>
                         {/* Actions */}
                         <div className="flex flex-col gap-1 flex-shrink-0">
-                          <button onClick={()=>handleRescheduleClick(appt)} title="Reschedule" className="p-2 hover:bg-blue-100 rounded-xl text-[var(--rtid-badge)] hover:text-blue-700 transition-colors"><CalendarCheck className="w-4 h-4"/></button>
-                          <button onClick={()=>handleCancelAppointment(appt)} title="Cancel"     className="p-2 hover:bg-red-50 rounded-xl text-[var(--clr-emergency)] hover:text-[var(--clr-emergency)] transition-colors"><XCircle className="w-4 h-4"/></button>
-                          <button onClick={()=>handleViewHistoryQR(appt)}    title="View QR"    className="p-2 hover:bg-[var(--clr-bg-page)] rounded-xl text-[var(--txt-body)] hover:text-primary transition-colors"><QrCode className="w-4 h-4"/></button>
-                          <button onClick={()=>setDonationToPrint(appt)}     title="Print"      className="p-2 hover:bg-[var(--clr-bg-page)] rounded-xl text-[var(--txt-body)] hover:text-primary transition-colors"><Printer className="w-4 h-4"/></button>
+                          <button onClick={()=>handleRescheduleClick(appt)} title="Reschedule" className="p-2 hover:bg-blue-100 rounded-xl text-[var(--brand-primary)] hover:text-blue-700 transition-colors"><CalendarCheck className="w-4 h-4"/></button>
+                          <button onClick={()=>handleCancelAppointment(appt)} title="Cancel"     className="p-2 hover:bg-red-50 rounded-xl text-[var(--clr-danger)] hover:text-[var(--clr-danger)] transition-colors"><XCircle className="w-4 h-4"/></button>
+                          <button onClick={()=>handleViewHistoryQR(appt)}    title="View QR"    className="p-2 hover:bg-[var(--bg-page)] rounded-xl text-[var(--text-secondary)] hover:text-primary transition-colors"><QrCode className="w-4 h-4"/></button>
+                          <button onClick={()=>setDonationToPrint(appt)}     title="Print"      className="p-2 hover:bg-[var(--bg-page)] rounded-xl text-[var(--text-secondary)] hover:text-primary transition-colors"><Printer className="w-4 h-4"/></button>
                         </div>
                       </div>
                     </CardContent>
@@ -1264,14 +1264,14 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
             DONATION HISTORY TABLE
             FIX: D-RTID column — full text, larger font, no truncation
         ════════════════════════════════════════════════════ */}
-        <Card className="bg-[var(--clr-bg-card)] dark:bg-gray-900 rounded-xl shadow-md border border-gray-100 dark:border-gray-800 overflow-hidden">
-          <CardHeader className="bg-[var(--clr-bg-page)]/50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-700 p-4">
-            <CardTitle className="text-sm text-[var(--txt-heading)] dark:text-gray-100 flex items-center gap-2">
+        <Card className="bg-[var(--bg-surface)] dark:bg-gray-900 rounded-xl shadow-md border border-gray-100 dark:border-gray-800 overflow-hidden">
+          <CardHeader className="bg-[var(--bg-page)]/50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-700 p-4">
+            <CardTitle className="text-sm text-[var(--text-primary)] dark:text-gray-100 flex items-center gap-2">
               <List className="w-4 h-4 text-primary"/> Donation History &amp; Credits
             </CardTitle>
             <CardDescription className="text-xs mt-0.5">
               Tap QR icon to view verification code. Tap H badge to see patient impact.
-              {upcomingAppointments.length>0&&<span className="ml-2 text-[var(--rtid-badge)] font-medium">· {upcomingAppointments.length} upcoming shown first</span>}
+              {upcomingAppointments.length>0&&<span className="ml-2 text-[var(--brand-primary)] font-medium">· {upcomingAppointments.length} upcoming shown first</span>}
             </CardDescription>
           </CardHeader>
           <CardContent className="p-0">
@@ -1285,7 +1285,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow className="bg-[var(--clr-bg-page)]/30">
+                    <TableRow className="bg-[var(--bg-page)]/30">
                       {/* Wider columns so RTID fits */}
                       <TableHead className="text-xs font-semibold px-3 py-2 min-w-[110px]">Date</TableHead>
                       <TableHead className="text-xs font-semibold px-3 py-2 min-w-[200px]">D-RTID</TableHead>
@@ -1301,13 +1301,13 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                       const isFuture=r.date.getTime()>Date.now();
                       const isUpcoming=canCancel;
                       return (
-                        <TableRow key={i} className={`hover:bg-[var(--clr-bg-page)] dark:hover:bg-gray-800/50 transition-colors ${isUpcoming?'bg-blue-50/40 dark:bg-blue-900/20 border-l-2 border-l-blue-400 dark:border-l-blue-500':''}`}>
+                        <TableRow key={i} className={`hover:bg-[var(--bg-page)] dark:hover:bg-gray-800/50 transition-colors ${isUpcoming?'bg-blue-50/40 dark:bg-blue-900/20 border-l-2 border-l-blue-400 dark:border-l-blue-500':''}`}>
 
                           {/* Date */}
                           <TableCell className="px-3 py-2.5">
                             <div>
-                              <p className="text-xs font-semibold text-[var(--txt-heading)] dark:text-gray-200">{formatDateDMY(r.date)}</p>
-                              {r.time&&<p className="text-[10px] text-gray-400 dark:text-[var(--txt-body)]">{r.time}</p>}
+                              <p className="text-xs font-semibold text-[var(--text-primary)] dark:text-gray-200">{formatDateDMY(r.date)}</p>
+                              {r.time&&<p className="text-[10px] text-gray-400 dark:text-[var(--text-secondary)]">{r.time}</p>}
                               {canCancel&&isFuture&&<CountdownTimer targetDate={r.date} compact label="In"/>}
                             </div>
                           </TableCell>
@@ -1318,13 +1318,13 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                               <span className={`font-mono text-xs px-2 py-1 rounded-md border font-semibold whitespace-nowrap select-all ${
                                 isUpcoming
                                   ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-900 dark:text-blue-200 border-blue-300 dark:border-blue-700'
-                                  : 'bg-[var(--clr-bg-page)] dark:bg-gray-800 text-[var(--txt-heading)] dark:text-gray-200 border-[var(--clr-border)] dark:border-gray-600'
+                                  : 'bg-[var(--bg-page)] dark:bg-gray-800 text-[var(--text-primary)] dark:text-gray-200 border-[var(--border-color)] dark:border-gray-600'
                               }`}>
                                 {r.rtidCode}
                               </span>
                               {r.linkedHrtid&&r.linkedHrtid!=='—'&&r.linkedHrtid!=='N/A'&&(
                                 <button onClick={()=>handleViewHrtid(r.linkedHrtid)}
-                                  className="w-5 h-5 rounded-full bg-blue-100 text-[var(--rtid-badge)] flex items-center justify-center text-[10px] font-bold border border-blue-200 hover:bg-blue-200 flex-shrink-0"
+                                  className="w-5 h-5 rounded-full bg-blue-100 text-[var(--brand-primary)] flex items-center justify-center text-[10px] font-bold border border-blue-200 hover:bg-blue-200 flex-shrink-0"
                                   title="View patient impact">H</button>
                               )}
                             </div>
@@ -1352,18 +1352,18 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                             {r.status==='Verified'        &&<Badge variant="outline" className="border-teal-300 text-teal-700 bg-teal-50 text-[10px]">Verified</Badge>}
                             {r.status==='Credited'        &&<Badge variant="outline" className="border-indigo-300 text-indigo-700 bg-indigo-50 text-[10px]">Credited</Badge>}
                             {r.status==='Redeemed-Credit' &&<Badge variant="outline" className="border-blue-300 text-blue-700 bg-blue-50 text-[10px]">Redeemed</Badge>}
-                            {r.status==='Completed'       &&<Badge variant="outline" className="border-[var(--clr-border)] text-[var(--txt-body)] bg-[var(--clr-bg-page)] text-[10px]">Completed</Badge>}
+                            {r.status==='Completed'       &&<Badge variant="outline" className="border-[var(--border-color)] text-[var(--text-secondary)] bg-[var(--bg-page)] text-[10px]">Completed</Badge>}
                             {r.status==='Expired'         &&<Badge variant="outline" className="border-red-300 text-red-700 bg-red-50 text-[10px]">Expired</Badge>}
-                            {r.status==='Cancelled'       &&<Badge variant="outline" className="border-gray-400 text-[var(--txt-body)] bg-[var(--clr-bg-page)] text-[10px]">Cancelled</Badge>}
+                            {r.status==='Cancelled'       &&<Badge variant="outline" className="border-gray-400 text-[var(--text-secondary)] bg-[var(--bg-page)] text-[10px]">Cancelled</Badge>}
                           </TableCell>
 
                           {/* Actions */}
                           <TableCell className="px-3 py-2.5 text-right">
                             <div className="flex items-center justify-end gap-0.5">
-                              {canCancel&&<button onClick={()=>handleRescheduleClick(r)} title="Reschedule" className="p-1.5 hover:bg-blue-50 rounded-lg text-[var(--rtid-badge)] hover:text-blue-700 transition-colors"><CalendarCheck className="w-4 h-4"/></button>}
-                              {canCancel&&<button onClick={()=>handleCancelAppointment(r)} title="Cancel" className="p-1.5 hover:bg-red-50 rounded-lg text-[var(--clr-emergency)] hover:text-[var(--clr-emergency)] transition-colors"><XCircle className="w-4 h-4"/></button>}
-                              <button onClick={()=>handleViewHistoryQR(r)} title="View QR" className="p-1.5 hover:bg-[var(--clr-bg-page)] rounded-lg text-[var(--txt-body)] hover:text-primary transition-colors"><QrCode className="w-4 h-4"/></button>
-                              <button onClick={()=>setDonationToPrint(r)} title="Print slip" className="p-1.5 hover:bg-[var(--clr-bg-page)] rounded-lg text-[var(--txt-body)] hover:text-primary transition-colors"><Printer className="w-4 h-4"/></button>
+                              {canCancel&&<button onClick={()=>handleRescheduleClick(r)} title="Reschedule" className="p-1.5 hover:bg-blue-50 rounded-lg text-[var(--brand-primary)] hover:text-blue-700 transition-colors"><CalendarCheck className="w-4 h-4"/></button>}
+                              {canCancel&&<button onClick={()=>handleCancelAppointment(r)} title="Cancel" className="p-1.5 hover:bg-red-50 rounded-lg text-[var(--clr-danger)] hover:text-[var(--clr-danger)] transition-colors"><XCircle className="w-4 h-4"/></button>}
+                              <button onClick={()=>handleViewHistoryQR(r)} title="View QR" className="p-1.5 hover:bg-[var(--bg-page)] rounded-lg text-[var(--text-secondary)] hover:text-primary transition-colors"><QrCode className="w-4 h-4"/></button>
+                              <button onClick={()=>setDonationToPrint(r)} title="Print slip" className="p-1.5 hover:bg-[var(--bg-page)] rounded-lg text-[var(--text-secondary)] hover:text-primary transition-colors"><Printer className="w-4 h-4"/></button>
                             </div>
                           </TableCell>
                         </TableRow>
@@ -1387,21 +1387,21 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
         <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-2xl no-print max-h-[95vh] overflow-y-auto">
           <div className="flex flex-col sm:flex-row h-full">
             <div className="w-full sm:w-[200px] sm:flex-shrink-0 bg-gradient-to-br from-[var(--clr-brand)] to-[#5a0000] text-[var(--txt-inverse)] p-5 flex flex-col items-center justify-center text-center">
-              <div className="w-20 h-20 rounded-full border-4 border-white/30 bg-[var(--clr-bg-card)]/10 flex items-center justify-center text-3xl font-black mb-3">{initials(donorData.fullName||'D')}</div>
+              <div className="w-20 h-20 rounded-full border-4 border-white/30 bg-[var(--bg-surface)]/10 flex items-center justify-center text-3xl font-black mb-3">{initials(donorData.fullName||'D')}</div>
               <h2 className="text-lg font-bold mb-0.5">{donorData.fullName}</h2>
               <p className="text-xs text-red-200 mb-1 font-mono">{donorData.internalId || 'N/A'}</p>
               {donorData.username && <p className="text-xs text-red-300 mb-3">{formatUsername(donorData.username)}</p>}
               {!donorData.username && <div className="mb-3" />}
-              <div className="bg-[var(--clr-bg-card)]/10 rounded-xl p-3 w-full border border-white/10 mb-3">
+              <div className="bg-[var(--bg-surface)]/10 rounded-xl p-3 w-full border border-white/10 mb-3">
                 <div className="flex justify-around">
                   <div className="text-center"><p className="text-[10px] text-red-200 uppercase">Blood</p><p className="text-2xl font-black">{donorData.bloodGroup}</p></div>
                   <div className="text-center"><p className="text-[10px] text-red-200 uppercase">Age</p><p className="text-lg font-bold">{calculateAge(donorData.dob)} yr</p></div>
                 </div>
               </div>
-              <QRCodeCanvas data={`Profile:${donorData.internalId || userId}`} size={80} className="rounded-lg bg-[var(--clr-bg-card)] p-1"/>
+              <QRCodeCanvas data={`Profile:${donorData.internalId || userId}`} size={80} className="rounded-lg bg-[var(--bg-surface)] p-1"/>
               <p className="text-[9px] text-red-300 mt-1.5">Scan to verify</p>
             </div>
-            <div className="flex-1 bg-[var(--clr-bg-card)] p-4 overflow-y-auto">
+            <div className="flex-1 bg-[var(--bg-surface)] p-4 overflow-y-auto">
               <Tabs defaultValue="overview">
                 <TabsList className="grid grid-cols-3 mb-4">
                   <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -1418,14 +1418,14 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                     {icon:CalendarCheck,label:'Last Donation',value:lastDonationDisplay},
                     {icon:Calendar,   label:'Next Eligible', value:nextEligibleDisplay},
                   ].map(({icon:Icon,label,value})=>(
-                    <div key={label} className="flex items-center gap-3 p-3 bg-[var(--clr-bg-page)] rounded-xl border border-gray-100">
+                    <div key={label} className="flex items-center gap-3 p-3 bg-[var(--bg-page)] rounded-xl border border-gray-100">
                       <Icon className="w-4 h-4 text-gray-400 flex-shrink-0"/>
-                      <div className="min-w-0"><p className="text-[10px] text-gray-400 font-medium">{label}</p><p className="text-sm font-semibold text-[var(--txt-heading)] truncate">{value}</p></div>
+                      <div className="min-w-0"><p className="text-[10px] text-gray-400 font-medium">{label}</p><p className="text-sm font-semibold text-[var(--text-primary)] truncate">{value}</p></div>
                     </div>
                   ))}
                   {nextEligibleDate&&nextEligibleDate>new Date()&&(
                     <div className="p-3 bg-blue-50 rounded-xl border border-blue-200">
-                      <div className="flex items-center gap-2"><AlarmClock className="w-4 h-4 text-[var(--rtid-badge)] flex-shrink-0"/><div><p className="text-xs font-bold text-blue-800">Countdown to next donation</p><CountdownTimer targetDate={nextEligibleDate} compact/></div></div>
+                      <div className="flex items-center gap-2"><AlarmClock className="w-4 h-4 text-[var(--brand-primary)] flex-shrink-0"/><div><p className="text-xs font-bold text-blue-800">Countdown to next donation</p><CountdownTimer targetDate={nextEligibleDate} compact/></div></div>
                     </div>
                   )}
                   <div className="flex gap-2 pt-2">
@@ -1437,7 +1437,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                   <div className="grid grid-cols-2 gap-3">
                     {[{icon:'🥉',label:'Bronze Donor',req:1,desc:'1+ donations'},{icon:'🥈',label:'Silver Donor',req:5,desc:'5+ donations'},{icon:'🥇',label:'Gold Donor',req:10,desc:'10+ donations'},{icon:'💎',label:'Diamond Donor',req:20,desc:'20+ donations'}].map(b=>{
                       const unlocked=(donorData.donationsCount||0)>=b.req;
-                      return <div key={b.label} className={`p-4 rounded-xl border-2 text-center ${unlocked?'border-yellow-300 bg-yellow-50':'border-gray-100 bg-[var(--clr-bg-page)] opacity-50 grayscale'}`}><span className="text-3xl">{b.icon}</span><p className="text-xs font-bold mt-1 text-[var(--txt-heading)]">{b.label}</p><p className="text-[10px] text-[var(--txt-body)]">{b.desc}</p>{unlocked&&<p className="text-[9px] text-[var(--clr-success)] font-bold mt-0.5">✓ Unlocked</p>}</div>;
+                      return <div key={b.label} className={`p-4 rounded-xl border-2 text-center ${unlocked?'border-yellow-300 bg-yellow-50':'border-gray-100 bg-[var(--bg-page)] opacity-50 grayscale'}`}><span className="text-3xl">{b.icon}</span><p className="text-xs font-bold mt-1 text-[var(--text-primary)]">{b.label}</p><p className="text-[10px] text-[var(--text-secondary)]">{b.desc}</p>{unlocked&&<p className="text-[9px] text-[var(--clr-success)] font-bold mt-0.5">✓ Unlocked</p>}</div>;
                     })}
                   </div>
                 </TabsContent>
@@ -1471,21 +1471,21 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
               <Input placeholder="Enter city (e.g. Delhi, Mumbai)" value={scheduleCity} onChange={e=>setScheduleCity(e.target.value)} onKeyPress={e=>e.key==='Enter'&&handleFindCenters()} className="flex-1"/>
               <Button onClick={handleFindCenters} disabled={apiLoading||!scheduleCity.trim()}>{apiLoading?<Loader2 className="w-4 h-4 animate-spin"/>:'Search'}</Button>
             </div>
-            {apiLoading&&<div className="text-center py-8"><Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-2"/><p className="text-sm text-[var(--txt-body)]">Finding blood banks…</p></div>}
+            {apiLoading&&<div className="text-center py-8"><Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-2"/><p className="text-sm text-[var(--text-secondary)]">Finding blood banks…</p></div>}
             {!apiLoading&&centers.length>0&&(
               <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
                 {centers.map(c=>(
                   <div key={c.id} className="border-2 rounded-xl p-3 hover:border-primary cursor-pointer transition-all group" onClick={()=>handleSelectCenter(c)}>
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
-                        <p className="font-bold text-sm text-[var(--txt-heading)] flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5 text-primary flex-shrink-0"/>{c.name}</p>
-                        <p className="text-xs text-[var(--txt-body)] mt-0.5 flex items-start gap-1"><MapPin className="w-3 h-3 flex-shrink-0 mt-0.5"/>{c.fullAddress||c.address}</p>
-                        {c.phone&&<p className="text-xs text-[var(--txt-body)] flex items-center gap-1 mt-0.5"><Phone className="w-3 h-3"/>{c.phone}</p>}
+                        <p className="font-bold text-sm text-[var(--text-primary)] flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5 text-primary flex-shrink-0"/>{c.name}</p>
+                        <p className="text-xs text-[var(--text-secondary)] mt-0.5 flex items-start gap-1"><MapPin className="w-3 h-3 flex-shrink-0 mt-0.5"/>{c.fullAddress||c.address}</p>
+                        {c.phone&&<p className="text-xs text-[var(--text-secondary)] flex items-center gap-1 mt-0.5"><Phone className="w-3 h-3"/>{c.phone}</p>}
                       </div>
                       <Badge className="bg-primary text-[var(--txt-inverse)] text-xs flex-shrink-0 group-hover:bg-primary/90">Book</Badge>
                     </div>
                     {c.latitude&&c.longitude&&(
-                      <button className="mt-2 text-[10px] text-[var(--rtid-badge)] flex items-center gap-1 hover:underline" onClick={e=>{e.stopPropagation();window.open(`https://www.google.com/maps/dir/?api=1&destination=${c.latitude},${c.longitude}`,'_blank');}}>
+                      <button className="mt-2 text-[10px] text-[var(--brand-primary)] flex items-center gap-1 hover:underline" onClick={e=>{e.stopPropagation();window.open(`https://www.google.com/maps/dir/?api=1&destination=${c.latitude},${c.longitude}`,'_blank');}}>
                         <Navigation className="w-3 h-3"/> Get Directions
                       </button>
                     )}
@@ -1543,9 +1543,9 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
               </Select>
             </div>
             
-            <div className="mt-3 p-3 bg-red-50/50 border border-[var(--clr-border)] rounded-xl space-y-2">
+            <div className="mt-3 p-3 bg-red-50/50 border border-[var(--border-color)] rounded-xl space-y-2">
               <Label className="text-[11px] font-bold text-red-800">Pre-donation Questionnaire (NACO)</Label>
-              <p className="text-[10px] text-[var(--clr-emergency)]/80 leading-tight mb-2">Please confirm you meet the following baseline requirements:</p>
+              <p className="text-[10px] text-[var(--clr-danger)]/80 leading-tight mb-2">Please confirm you meet the following baseline requirements:</p>
               {[
                 {key:'highRisk', label:'No high-risk behavior'},
                 {key:'illness', label:'No recent illness, infection, or major surgery'},
@@ -1558,7 +1558,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                     id={`consent-${q.key}`} 
                     checked={bookingConsent[q.key as keyof typeof bookingConsent]} 
                     onChange={(e)=>setBookingConsent(s=>({...s, [q.key]: e.target.checked}))}
-                    className="mt-0.5 w-3 h-3 text-[var(--clr-emergency)] border-red-300 rounded focus:ring-red-500 cursor-pointer"
+                    className="mt-0.5 w-3 h-3 text-[var(--clr-danger)] border-red-300 rounded focus:ring-red-500 cursor-pointer"
                   />
                   <Label htmlFor={`consent-${q.key}`} className="text-[10px] sm:text-xs font-medium leading-tight cursor-pointer text-gray-700">{q.label}</Label>
                 </div>
@@ -1581,10 +1581,10 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
             <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3"><Check className="w-7 h-7 text-[var(--clr-success)]"/></div>
             <DialogTitle className="text-green-700">Booking Confirmed!</DialogTitle>
           </DialogHeader>
-          <div className="py-4 flex flex-col items-center gap-3 bg-[var(--clr-bg-page)] rounded-xl border border-dashed border-[var(--clr-border)]">
-            <p className="text-xs text-[var(--txt-body)] font-medium">Show this QR at the centre</p>
+          <div className="py-4 flex flex-col items-center gap-3 bg-[var(--bg-page)] rounded-xl border border-dashed border-[var(--border-color)]">
+            <p className="text-xs text-[var(--text-secondary)] font-medium">Show this QR at the centre</p>
             <canvas ref={confirmQrRef} className="border-4 border-white shadow rounded-lg"/>
-            <p className="font-mono font-bold text-sm tracking-wider bg-[var(--clr-bg-card)] px-3 py-1 rounded border">{bookingDetails.rtid}</p>
+            <p className="font-mono font-bold text-sm tracking-wider bg-[var(--bg-surface)] px-3 py-1 rounded border">{bookingDetails.rtid}</p>
           </div>
           <Button className="w-full mt-2" onClick={()=>{setBookingConfirmOpen(false);window.location.reload();}}>Done</Button>
         </DialogContent>
@@ -1616,9 +1616,9 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
           <DialogHeader><DialogTitle>Linked Patient Request</DialogTitle><DialogDescription>This donation was linked to a specific patient need</DialogDescription></DialogHeader>
           {hrtidLoading?<div className="flex justify-center p-6"><Loader2 className="w-7 h-7 animate-spin text-primary"/></div>:hrtidDetails?(
             <div className="space-y-3">
-              <div className="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-xl border border-[var(--clr-border)] dark:border-blue-800 space-y-2 text-sm">
+              <div className="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-xl border border-[var(--border-color)] dark:border-blue-800 space-y-2 text-sm">
                 {[['H-RTID',hrtidDetails.rtidCode],['Patient',hrtidDetails.patientName],['Hospital',hrtidDetails.hospital],['Blood Group',hrtidDetails.bloodGroup],['Units',String(hrtidDetails.units)],['Required By',hrtidDetails.requiredBy||'N/A']].map(([k,v])=>(
-                  <div key={k} className="flex justify-between gap-2"><span className="text-xs text-[var(--txt-body)] dark:text-gray-400 font-medium">{k}</span><span className="text-xs font-bold text-[var(--txt-heading)] dark:text-gray-100 text-right leading-tight max-w-[65%] break-words">{v}</span></div>
+                  <div key={k} className="flex justify-between gap-2"><span className="text-xs text-[var(--text-secondary)] dark:text-gray-400 font-medium">{k}</span><span className="text-xs font-bold text-[var(--text-primary)] dark:text-gray-100 text-right leading-tight max-w-[65%] break-words">{v}</span></div>
                 ))}
               </div>
               {hrtidDetails.impactTimeline&&<ImpactTimelineView timeline={hrtidDetails.impactTimeline}/>}

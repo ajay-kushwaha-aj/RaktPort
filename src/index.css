@@ -9,52 +9,56 @@ All colors MUST be HSL.
 @layer base {
   :root {
     /* ============================
-    RaktPort Design Token System
-    v2.0 — Production Ready
+    RaktPort Comprehensive Token System
+    v3.0 — Themed
     ============================ */
 
-    /* — Brand */
-    --clr-brand: #B81C2E;
-    --clr-brand-dark: #8C1221;
-    --clr-brand-tint: #FEE2E6;
+    /* Baseline Light Mode */
+    --bg-page: #FAF8F8;
+    --bg-surface: #FFFFFF;
+    --border-color: #E0D6D8;
+    --text-primary: #130A0C;
+    --text-secondary: #6E6268;
+    --brand-primary: #C41E3A;
+    --brand-tint: #FFF1F3;
+    --brand-hover: #9B1528;
 
-    /* — Neutrals */
-    --clr-navy: #1A2332;
-    --clr-slate: #4A5568;
-    --clr-muted: #8B9CB5;
-    --clr-bg-page: #F5F7FA;
-    --clr-bg-card: #FFFFFF;
-    --clr-border: #E8ECF2;
+    /* Semantic Roles */
+    --clr-info: #1D4ED8;
+    --clr-success: #0F766E;
+    --clr-warning: #B45309;
+    --clr-danger: #DC2626;
+    --clr-purple: #7E22CE;
+    --clr-soft-red: #FFD7DC;
+    --clr-dark-bg: #130A0C;
+    --clr-silver: #6E6268;
+    --clr-gold: #B45309;
 
-    /* — Semantic */
-    --clr-emergency: #DC4E0A;
-    --clr-success: #1A6B3C;
-    --clr-info: #1E4DA1;
-    --clr-warning: #92400E;
+    /* Aliases for backwards compatibility with v2 */
+    --clr-navy: var(--bg-page);
+    --clr-slate: var(--text-secondary);
+    --clr-muted: var(--text-secondary);
+    --clr-bg-page: var(--bg-page);
+    --clr-bg-card: var(--bg-surface);
+    --clr-border: var(--border-color);
+    --txt-heading: var(--text-primary);
+    --txt-body: var(--text-secondary);
+    --txt-inverse: var(--bg-surface);
+    --clr-brand: var(--brand-primary);
+    --clr-brand-tint: var(--brand-tint);
+    --clr-emergency: var(--clr-danger);
+    --header-bg: var(--brand-primary);
+    --header-accent: var(--brand-hover);
+    --header-cta: var(--bg-surface);
+    --stats-bg: var(--clr-dark-bg);
+    --stats-divider: var(--border-color);
+    --rtid-bg: var(--bg-surface);
+    --rtid-badge: var(--clr-info);
+    --rtid-btn: var(--brand-primary);
+    --footer-bg: var(--clr-dark-bg);
+    --footer-accent: var(--brand-primary);
+    --footer-txt: var(--text-secondary);
 
-    /* — Typography */
-    --txt-heading: #1A2332;
-    --txt-body: #4A5568;
-    --txt-inverse: #FFFFFF;
-
-    /* — Header */
-    --header-bg: #1A2332;
-    --header-accent: #B81C2E;
-    --header-cta: #B81C2E;
-
-    /* — Stats Bar */
-    --stats-bg: #B81C2E;
-    --stats-divider: #8C1221;
-
-    /* — RTID Tracker Section */
-    --rtid-bg: #1A2332;
-    --rtid-badge: #1E4DA1;
-    --rtid-btn: #B81C2E;
-
-    /* — Footer */
-    --footer-bg: #1A2332;
-    --footer-accent: #B81C2E;
-    --footer-txt: #8B9CB5;
 
     /* RaktPort Theme Colors */
     --maroon: 0 100% 27%;         /* Primary Brand - var(--clr-brand) */
@@ -114,6 +118,16 @@ All colors MUST be HSL.
   }
 
   .dark {
+    /* Baseline Dark Mode */
+    --bg-page: #130A0C;
+    --bg-surface: #1E1014;
+    --border-color: #2D1218;
+    --text-primary: #F5F0F1;
+    --text-secondary: #A09090;
+    --brand-primary: #E8294A;
+    --brand-tint: #2D0F16;
+    --brand-hover: #C41E3A;
+
     --background: 0 0% 7%;
     --foreground: 0 0% 98%;
 

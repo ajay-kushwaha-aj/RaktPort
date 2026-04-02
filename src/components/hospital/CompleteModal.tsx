@@ -71,10 +71,10 @@ export const CompleteModal = ({
               }`}>
                 {willComplete ? "✅" : "⚡"}
               </div>
-              <h3 className="text-lg font-bold text-[var(--txt-heading)] dark:text-gray-100" style={{ fontFamily: "Outfit,sans-serif" }}>
+              <h3 className="text-lg font-bold text-[var(--text-primary)] dark:text-gray-100" style={{ fontFamily: "Outfit,sans-serif" }}>
                 {willComplete ? "Confirm Full Administration" : `Confirm Partial Administration`}
               </h3>
-              <p className="text-xs text-[var(--txt-body)] dark:text-gray-400 mt-1">
+              <p className="text-xs text-[var(--text-secondary)] dark:text-gray-400 mt-1">
                 {willComplete
                   ? "All units will be administered — request will CLOSE"
                   : `${unitsNow} of ${required} units — ${required - (already + unitsNow)} remaining`}
@@ -82,20 +82,20 @@ export const CompleteModal = ({
             </div>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between py-1.5 border-b border-gray-100 dark:border-gray-800">
-                <span className="text-[var(--txt-body)] dark:text-gray-400">Patient</span>
-                <span className="font-semibold text-[var(--txt-heading)] dark:text-gray-100">{request.patientName}</span>
+                <span className="text-[var(--text-secondary)] dark:text-gray-400">Patient</span>
+                <span className="font-semibold text-[var(--text-primary)] dark:text-gray-100">{request.patientName}</span>
               </div>
               <div className="flex justify-between py-1.5 border-b border-gray-100 dark:border-gray-800">
-                <span className="text-[var(--txt-body)] dark:text-gray-400">Blood Group</span>
-                <span className="font-semibold text-[var(--txt-heading)] dark:text-gray-100">{request.bloodGroup} · {request.componentType || "Whole Blood"}</span>
+                <span className="text-[var(--text-secondary)] dark:text-gray-400">Blood Group</span>
+                <span className="font-semibold text-[var(--text-primary)] dark:text-gray-100">{request.bloodGroup} · {request.componentType || "Whole Blood"}</span>
               </div>
               <div className="flex justify-between py-1.5 border-b border-gray-100 dark:border-gray-800">
-                <span className="text-[var(--txt-body)] dark:text-gray-400">Units now</span>
+                <span className="text-[var(--text-secondary)] dark:text-gray-400">Units now</span>
                 <span className="font-bold text-blue-700 dark:text-blue-300 text-base">{unitsNow}</span>
               </div>
               <div className="flex justify-between py-1.5">
-                <span className="text-[var(--txt-body)] dark:text-gray-400">Total after this</span>
-                <span className="font-semibold text-[var(--txt-heading)] dark:text-gray-100">{already + unitsNow} / {required}</span>
+                <span className="text-[var(--text-secondary)] dark:text-gray-400">Total after this</span>
+                <span className="font-semibold text-[var(--text-primary)] dark:text-gray-100">{already + unitsNow} / {required}</span>
               </div>
             </div>
             <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl text-xs text-amber-800 dark:text-amber-300">
@@ -104,7 +104,7 @@ export const CompleteModal = ({
             </div>
             <div className="flex gap-3">
               <button type="button" onClick={() => setShowConfirmation(false)} disabled={isLoading}
-                className="flex-1 py-3 border-2 border-[var(--clr-border)] dark:border-gray-700 rounded-xl text-sm font-semibold text-[var(--txt-body)] dark:text-gray-400 hover:bg-[var(--clr-bg-page)] dark:hover:bg-gray-800 transition-all flex items-center justify-center gap-2">
+                className="flex-1 py-3 border-2 border-[var(--border-color)] dark:border-gray-700 rounded-xl text-sm font-semibold text-[var(--text-secondary)] dark:text-gray-400 hover:bg-[var(--bg-page)] dark:hover:bg-gray-800 transition-all flex items-center justify-center gap-2">
                 <ArrowLeft className="w-3.5 h-3.5" /> Back
               </button>
               <button type="button" onClick={handleConfirm} disabled={isLoading}
@@ -127,21 +127,21 @@ export const CompleteModal = ({
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-xl flex-shrink-0">🩸</div>
                 <div className="flex-1">
-                  <p className="font-bold text-[var(--txt-heading)] dark:text-gray-100 text-sm">{request.patientName}</p>
-                  <p className="text-xs text-[var(--txt-body)] dark:text-gray-400">{request.bloodGroup} · {request.componentType || "Whole Blood"} · RTID: {request.rtid}</p>
+                  <p className="font-bold text-[var(--text-primary)] dark:text-gray-100 text-sm">{request.patientName}</p>
+                  <p className="text-xs text-[var(--text-secondary)] dark:text-gray-400">{request.bloodGroup} · {request.componentType || "Whole Blood"} · RTID: {request.rtid}</p>
                 </div>
               </div>
               {/* Unit progress bar */}
               <div className="mt-3 space-y-1.5">
                 <div className="flex justify-between text-xs font-semibold">
-                  <span className="text-[var(--txt-body)] dark:text-gray-400">Progress</span>
+                  <span className="text-[var(--text-secondary)] dark:text-gray-400">Progress</span>
                   <span className="text-blue-700 dark:text-blue-300">{already} / {required} administered</span>
                 </div>
                 <div className="h-2.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden flex">
                   <div className="h-full bg-[var(--clr-info)] rounded-full transition-all" style={{ width: `${(already / required) * 100}%` }} title="Administered" />
                   <div className="h-full bg-amber-400 transition-all" style={{ width: `${(Math.max(0, redeemed - already) / required) * 100}%` }} title="Redeemed, pending" />
                 </div>
-                <div className="flex items-center gap-3 text-[10px] text-[var(--txt-body)] dark:text-gray-400">
+                <div className="flex items-center gap-3 text-[10px] text-[var(--text-secondary)] dark:text-gray-400">
                   <span className="flex items-center gap-1"><span className="w-2 h-2 bg-[var(--clr-info)] rounded-full inline-block" />Administered</span>
                   <span className="flex items-center gap-1"><span className="w-2 h-2 bg-amber-400 rounded-full inline-block" />Redeemed</span>
                   <span className="flex items-center gap-1"><span className="w-2 h-2 bg-gray-200 dark:bg-gray-600 rounded-full inline-block" />Pending</span>
@@ -171,7 +171,7 @@ export const CompleteModal = ({
 
             {/* MoHFW checklist */}
             <div className="space-y-2">
-              <p className="text-xs font-bold text-[var(--txt-body)] dark:text-gray-400 uppercase tracking-wide flex items-center gap-1.5">
+              <p className="text-xs font-bold text-[var(--text-secondary)] dark:text-gray-400 uppercase tracking-wide flex items-center gap-1.5">
                 <CheckSquare className="w-3.5 h-3.5 text-[var(--clr-info)] dark:text-[var(--clr-info)]" /> Post-Transfusion Checklist
               </p>
               {[
@@ -179,9 +179,9 @@ export const CompleteModal = ({
                 { id: "react", label: "No adverse reaction observed", checked: noReaction, set: setNoReaction, required: true },
                 { id: "consent", label: "Patient / guardian informed", checked: consentDone, set: setConsentDone, required: false },
               ].map(item => (
-                <label key={item.id} className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${item.checked ? "border-[var(--clr-success)] dark:border-[var(--clr-success)] bg-green-50 dark:bg-green-950/30" : "border-[var(--clr-border)] dark:border-gray-700 bg-[var(--clr-bg-page)] dark:bg-gray-800/50 hover:border-[var(--clr-border)] dark:hover:border-gray-600"}`}>
+                <label key={item.id} className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${item.checked ? "border-[var(--clr-success)] dark:border-[var(--clr-success)] bg-green-50 dark:bg-green-950/30" : "border-[var(--border-color)] dark:border-gray-700 bg-[var(--bg-page)] dark:bg-gray-800/50 hover:border-[var(--border-color)] dark:hover:border-gray-600"}`}>
                   <input type="checkbox" className="w-4 h-4 accent-green-600 flex-shrink-0 rounded" checked={item.checked} onChange={e => item.set(e.target.checked)} />
-                  <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">{item.label}{item.required && <span className="text-[var(--clr-emergency)] ml-0.5">*</span>}</span>
+                  <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">{item.label}{item.required && <span className="text-[var(--clr-danger)] ml-0.5">*</span>}</span>
                 </label>
               ))}
             </div>
@@ -194,7 +194,7 @@ export const CompleteModal = ({
 
             <div className="flex gap-3">
               <button type="button" onClick={onClose} disabled={isLoading}
-                className="flex-1 py-2.5 border-2 border-[var(--clr-border)] dark:border-gray-700 rounded-xl text-sm font-semibold text-[var(--txt-body)] dark:text-gray-400 hover:bg-[var(--clr-bg-page)] dark:hover:bg-gray-800 transition-all">
+                className="flex-1 py-2.5 border-2 border-[var(--border-color)] dark:border-gray-700 rounded-xl text-sm font-semibold text-[var(--text-secondary)] dark:text-gray-400 hover:bg-[var(--bg-page)] dark:hover:bg-gray-800 transition-all">
                 Cancel
               </button>
               <button type="button" onClick={() => setShowConfirmation(true)} disabled={!canSubmit || isLoading}

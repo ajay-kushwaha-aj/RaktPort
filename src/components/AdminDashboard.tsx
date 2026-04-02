@@ -71,7 +71,7 @@ const getStatusClasses = (status: string): string => {
     case 'verified': case 'completed': case 'available': return 'bg-green-100 text-green-700 border border-green-300';
     case 'rejected': case 'cancelled': return 'bg-[var(--stats-divider)] text-red-700 border border-red-300';
     case 'redeemed': return 'bg-blue-100 text-blue-700 border border-blue-300';
-    default: return 'bg-[var(--clr-bg-page)] text-gray-700 border border-[var(--clr-border)]';
+    default: return 'bg-[var(--bg-page)] text-gray-700 border border-[var(--border-color)]';
   }
 };
 
@@ -140,15 +140,15 @@ const OrgListModal = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-[var(--clr-bg-card)] rounded-2xl shadow-2xl max-w-4xl w-full max-h-[85vh] flex flex-col">
+      <div className="bg-[var(--bg-surface)] rounded-2xl shadow-2xl max-w-4xl w-full max-h-[85vh] flex flex-col">
         {/* Header */}
-        <div className="p-6 border-b border-[var(--clr-border)] flex items-center justify-between">
+        <div className="p-6 border-b border-[var(--border-color)] flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-[var(--txt-heading)]">{title}</h2>
-            <p className="text-sm text-[var(--txt-body)] mt-1">{filtered.length} organization(s)</p>
+            <h2 className="text-xl font-bold text-[var(--text-primary)]">{title}</h2>
+            <p className="text-sm text-[var(--text-secondary)] mt-1">{filtered.length} organization(s)</p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-[var(--clr-bg-page)] rounded-xl">
-            <X className="w-5 h-5 text-[var(--txt-body)]" />
+          <button onClick={onClose} className="p-2 hover:bg-[var(--bg-page)] rounded-xl">
+            <X className="w-5 h-5 text-[var(--text-secondary)]" />
           </button>
         </div>
 
@@ -159,7 +159,7 @@ const OrgListModal = ({
             <input
               type="text" placeholder="Search organizations..."
               value={search} onChange={e => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 border-2 border-[var(--clr-border)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm"
+              className="w-full pl-9 pr-4 py-2.5 border-2 border-[var(--border-color)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm"
             />
           </div>
         </div>
@@ -173,7 +173,7 @@ const OrgListModal = ({
             </div>
           ) : (
             filtered.map(org => (
-              <div key={org.id} className="bg-[var(--clr-bg-page)] rounded-xl p-4 border border-gray-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all">
+              <div key={org.id} className="bg-[var(--bg-page)] rounded-xl p-4 border border-gray-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-3 flex-1 min-w-0">
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
@@ -186,7 +186,7 @@ const OrgListModal = ({
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="font-bold text-[var(--txt-heading)] text-sm">{org.name}</h3>
+                        <h3 className="font-bold text-[var(--text-primary)] text-sm">{org.name}</h3>
                         <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                           org.type === 'Hospital' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'
                         }`}>{org.type}</span>
@@ -195,18 +195,18 @@ const OrgListModal = ({
                         </span>
                       </div>
                       <div className="mt-2 space-y-1">
-                        <p className="text-xs text-[var(--txt-body)] flex items-center gap-1.5">
+                        <p className="text-xs text-[var(--text-secondary)] flex items-center gap-1.5">
                           <Mail className="w-3 h-3" /> {org.email}
                         </p>
-                        <p className="text-xs text-[var(--txt-body)] flex items-center gap-1.5">
+                        <p className="text-xs text-[var(--text-secondary)] flex items-center gap-1.5">
                           <MapPin className="w-3 h-3" /> {org.address}
                         </p>
                         {org.contact !== 'N/A' && (
-                          <p className="text-xs text-[var(--txt-body)] flex items-center gap-1.5">
+                          <p className="text-xs text-[var(--text-secondary)] flex items-center gap-1.5">
                             <Phone className="w-3 h-3" /> {org.contact}
                           </p>
                         )}
-                        <p className="text-xs text-[var(--txt-body)] flex items-center gap-1.5">
+                        <p className="text-xs text-[var(--text-secondary)] flex items-center gap-1.5">
                           <FileText className="w-3 h-3" /> License: {org.license}
                         </p>
                         {org.verifiedAt && (
@@ -219,11 +219,11 @@ const OrgListModal = ({
                   </div>
                   {org.type === 'Hospital' && org.totalBeds && org.totalBeds !== 'N/A' && (
                     <div className="text-right flex-shrink-0">
-                      <div className="text-xs text-[var(--txt-body)]">Total Beds</div>
+                      <div className="text-xs text-[var(--text-secondary)]">Total Beds</div>
                       <div className="text-sm font-bold text-gray-700">{org.totalBeds}</div>
                       {org.icuBeds && org.icuBeds !== 'N/A' && (
                         <>
-                          <div className="text-xs text-[var(--txt-body)] mt-1">ICU</div>
+                          <div className="text-xs text-[var(--text-secondary)] mt-1">ICU</div>
                           <div className="text-sm font-bold text-gray-700">{org.icuBeds}</div>
                         </>
                       )}
@@ -242,7 +242,7 @@ const OrgListModal = ({
               Name: o.name, Type: o.type, License: o.license,
               Status: o.status, Address: o.address, Email: o.email, Contact: o.contact
             })), 'organizations')}
-            className="px-4 py-2 text-sm text-gray-700 bg-[var(--clr-bg-page)] hover:bg-gray-200 rounded-xl flex items-center gap-2"
+            className="px-4 py-2 text-sm text-gray-700 bg-[var(--bg-page)] hover:bg-gray-200 rounded-xl flex items-center gap-2"
           >
             <Download className="w-4 h-4" /> Export CSV
           </button>
@@ -264,18 +264,18 @@ const BloodGroupCard = ({ group, units, maxUnits }: { group: string; units: numb
     <div className={`rounded-2xl border-2 p-5 ${level.bg} hover:shadow-lg transition-all`}>
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <Droplet className="w-5 h-5 text-[var(--clr-emergency)]" fill="currentColor" />
-          <span className="text-2xl font-black text-[var(--txt-heading)]">{group}</span>
+          <Droplet className="w-5 h-5 text-[var(--clr-danger)]" fill="currentColor" />
+          <span className="text-2xl font-black text-[var(--text-primary)]">{group}</span>
         </div>
-        <span className={`text-xs font-bold px-2 py-1 rounded-full ${level.color} bg-[var(--clr-bg-card)]/70`}>
+        <span className={`text-xs font-bold px-2 py-1 rounded-full ${level.color} bg-[var(--bg-surface)]/70`}>
           {level.label}
         </span>
       </div>
       <div className="text-center mb-3">
-        <p className="text-4xl font-extrabold text-[var(--txt-heading)]">{units}</p>
-        <p className="text-xs text-[var(--txt-body)] font-medium">units available</p>
+        <p className="text-4xl font-extrabold text-[var(--text-primary)]">{units}</p>
+        <p className="text-xs text-[var(--text-secondary)] font-medium">units available</p>
       </div>
-      <div className="w-full bg-[var(--clr-bg-card)]/60 rounded-full h-2">
+      <div className="w-full bg-[var(--bg-surface)]/60 rounded-full h-2">
         <div className={`${level.bar} h-2 rounded-full transition-all duration-500`} style={{ width: `${pct}%` }} />
       </div>
     </div>
@@ -807,7 +807,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
 
       {/* ── HEADER ── */}
-      <header className="sticky top-0 z-50 bg-[var(--clr-bg-card)]/80 backdrop-blur-xl border-b border-[var(--clr-border)] shadow-sm">
+      <header className="sticky top-0 z-50 bg-[var(--bg-surface)]/80 backdrop-blur-xl border-b border-[var(--border-color)] shadow-sm">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-20">
             <div className="flex items-center gap-4">
@@ -818,20 +818,20 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                   RaktPort Admin
                 </h1>
-                <p className="text-xs text-[var(--txt-body)] font-medium">National Blood Management System</p>
+                <p className="text-xs text-[var(--text-secondary)] font-medium">National Blood Management System</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <button onClick={() => fetchData(true)} disabled={loading}
-                className="p-2.5 hover:bg-[var(--clr-bg-page)] rounded-xl transition-all group" title="Refresh">
-                <RefreshCw className={`w-5 h-5 text-[var(--txt-body)] group-hover:text-[var(--rtid-badge)] ${loading ? 'animate-spin' : ''}`} />
+                className="p-2.5 hover:bg-[var(--bg-page)] rounded-xl transition-all group" title="Refresh">
+                <RefreshCw className={`w-5 h-5 text-[var(--text-secondary)] group-hover:text-[var(--rtid-badge)] ${loading ? 'animate-spin' : ''}`} />
               </button>
 
               {/* Notifications */}
               <div className="relative">
                 <button onClick={() => setShowNotifications(!showNotifications)}
-                  className="relative p-2.5 hover:bg-[var(--clr-bg-page)] rounded-xl transition-all">
-                  <Bell className="w-5 h-5 text-[var(--txt-body)]" />
+                  className="relative p-2.5 hover:bg-[var(--bg-page)] rounded-xl transition-all">
+                  <Bell className="w-5 h-5 text-[var(--text-secondary)]" />
                   {notifications.length > 0 && (
                     <span className="absolute top-1 right-1 w-5 h-5 bg-[var(--stats-bg)] text-[var(--txt-inverse)] text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
                       {notifications.length}
@@ -839,9 +839,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   )}
                 </button>
                 {showNotifications && (
-                  <div className="absolute right-0 mt-2 w-80 bg-[var(--clr-bg-card)] rounded-2xl shadow-2xl border border-[var(--clr-border)] overflow-hidden z-50">
+                  <div className="absolute right-0 mt-2 w-80 bg-[var(--bg-surface)] rounded-2xl shadow-2xl border border-[var(--border-color)] overflow-hidden z-50">
                     <div className="p-4 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
-                      <h3 className="font-bold text-[var(--txt-heading)] flex items-center gap-2">
+                      <h3 className="font-bold text-[var(--text-primary)] flex items-center gap-2">
                         <Bell className="w-4 h-4" /> Notifications
                         <span className="ml-auto text-xs bg-[var(--rtid-badge)] text-[var(--txt-inverse)] px-2 py-0.5 rounded-full">{notifications.length}</span>
                       </h3>
@@ -849,12 +849,12 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     <div className="max-h-64 overflow-y-auto">
                       {notifications.map(n => (
                         <div key={n.id} onClick={() => setShowNotifications(false)}
-                          className="p-4 border-b hover:bg-[var(--clr-bg-page)] cursor-pointer">
+                          className="p-4 border-b hover:bg-[var(--bg-page)] cursor-pointer">
                           <div className="flex items-start gap-3">
                             <div className={`w-2 h-2 rounded-full mt-2 ${n.type === 'warning' ? 'bg-yellow-400' : n.type === 'success' ? 'bg-[var(--clr-success)]' : 'bg-[var(--rtid-badge)]'}`} />
                             <div>
-                              <p className="text-sm font-semibold text-[var(--txt-heading)]">{n.title}</p>
-                              <p className="text-xs text-[var(--txt-body)] mt-0.5">{n.message}</p>
+                              <p className="text-sm font-semibold text-[var(--text-primary)]">{n.title}</p>
+                              <p className="text-xs text-[var(--text-secondary)] mt-0.5">{n.message}</p>
                             </div>
                           </div>
                         </div>
@@ -868,10 +868,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
               </div>
 
               {/* Admin badge */}
-              <div className="flex items-center gap-3 pl-3 border-l border-[var(--clr-border)]">
+              <div className="flex items-center gap-3 pl-3 border-l border-[var(--border-color)]">
                 <div className="text-right hidden sm:block">
-                  <p className="text-sm font-bold text-[var(--txt-heading)]">{adminName}</p>
-                  <p className="text-xs text-[var(--txt-body)]">System Administrator</p>
+                  <p className="text-sm font-bold text-[var(--text-primary)]">{adminName}</p>
+                  <p className="text-xs text-[var(--text-secondary)]">System Administrator</p>
                 </div>
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-[var(--txt-inverse)] font-bold text-sm shadow-lg">
                   {adminName.charAt(0).toUpperCase()}
@@ -888,7 +888,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       </header>
 
       {/* ── NAV ── */}
-      <div className="sticky top-20 z-40 bg-[var(--clr-bg-card)]/90 backdrop-blur-lg border-b border-[var(--clr-border)] shadow-sm">
+      <div className="sticky top-20 z-40 bg-[var(--bg-surface)]/90 backdrop-blur-lg border-b border-[var(--border-color)] shadow-sm">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
           <nav className="flex gap-1 overflow-x-auto py-3 scrollbar-hide">
             {tabs.map(tab => {
@@ -899,12 +899,12 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold transition-all duration-200 whitespace-nowrap relative ${
                     isActive
                       ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-[var(--txt-inverse)] shadow-lg scale-105'
-                      : 'text-[var(--txt-body)] hover:bg-[var(--clr-bg-page)] hover:text-[var(--txt-heading)]'
+                      : 'text-[var(--text-secondary)] hover:bg-[var(--bg-page)] hover:text-[var(--text-primary)]'
                   }`}>
                   <Icon className="w-4 h-4" />
                   <span className="text-sm">{tab.label}</span>
                   {(tab as any).badge > 0 && (
-                    <span className={`px-1.5 py-0.5 text-xs font-bold rounded-full ${isActive ? 'bg-[var(--clr-bg-card)] text-[var(--rtid-badge)]' : 'bg-[var(--rtid-badge)] text-[var(--txt-inverse)]'}`}>
+                    <span className={`px-1.5 py-0.5 text-xs font-bold rounded-full ${isActive ? 'bg-[var(--bg-surface)] text-[var(--rtid-badge)]' : 'bg-[var(--rtid-badge)] text-[var(--txt-inverse)]'}`}>
                       {(tab as any).badge}
                     </span>
                   )}
@@ -918,9 +918,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       {/* Loading Overlay */}
       {loading && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-[var(--clr-bg-card)] rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-4">
+          <div className="bg-[var(--bg-surface)] rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-4">
             <Loader2 className="w-12 h-12 text-[var(--rtid-badge)] animate-spin" />
-            <p className="text-[var(--txt-heading)] font-semibold">Loading Dashboard...</p>
+            <p className="text-[var(--text-primary)] font-semibold">Loading Dashboard...</p>
           </div>
         </div>
       )}
@@ -935,7 +935,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             {/* Critical alert */}
             {criticalGroups.length > 0 && (
               <div className="bg-gradient-to-r from-red-50 to-rose-50 rounded-2xl p-5 border-l-4 border-[var(--clr-emergency)] shadow-lg flex items-center gap-4">
-                <AlertOctagon className="w-6 h-6 text-[var(--clr-emergency)] flex-shrink-0" />
+                <AlertOctagon className="w-6 h-6 text-[var(--clr-danger)] flex-shrink-0" />
                 <div>
                   <p className="font-bold text-red-900">🚨 Critical Blood Shortage Alert</p>
                   <p className="text-sm text-red-700 mt-0.5">
@@ -958,12 +958,12 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
               ].map((m, i) => {
                 const Icon = m.icon;
                 return (
-                  <div key={i} className="bg-[var(--clr-bg-card)] rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border border-gray-100">
+                  <div key={i} className="bg-[var(--bg-surface)] rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border border-gray-100">
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className="text-xs font-bold text-[var(--txt-body)] uppercase tracking-widest">{m.title}</p>
-                        <p className="text-4xl font-black text-[var(--txt-heading)] mt-2">{m.value.toLocaleString()}</p>
-                        <p className="text-xs text-[var(--txt-body)] mt-2 flex items-center gap-1">
+                        <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-widest">{m.title}</p>
+                        <p className="text-4xl font-black text-[var(--text-primary)] mt-2">{m.value.toLocaleString()}</p>
+                        <p className="text-xs text-[var(--text-secondary)] mt-2 flex items-center gap-1">
                           <TrendingUp className="w-3 h-3" /> {m.change}
                         </p>
                       </div>
@@ -1002,23 +1002,23 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 const pct = stat.total > 0 ? Math.round((stat.value / stat.total) * 100) : 0;
                 return (
                   <button key={i} onClick={stat.onClick}
-                    className="bg-[var(--clr-bg-card)] rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl hover:border-blue-200 hover:scale-[1.02] transition-all cursor-pointer text-left group">
+                    className="bg-[var(--bg-surface)] rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl hover:border-blue-200 hover:scale-[1.02] transition-all cursor-pointer text-left group">
                     <div className="flex items-center gap-4 mb-4">
                       <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center shadow-md`}>
                         <Icon className="w-6 h-6 text-[var(--txt-inverse)]" />
                       </div>
                       <div className="flex-1">
-                        <p className="text-2xl font-black text-[var(--txt-heading)]">{stat.value}</p>
-                        <p className="text-sm text-[var(--txt-body)]">{stat.label}</p>
+                        <p className="text-2xl font-black text-[var(--text-primary)]">{stat.value}</p>
+                        <p className="text-sm text-[var(--text-secondary)]">{stat.label}</p>
                       </div>
                       <ArrowRight className="w-5 h-5 text-gray-300 group-hover:text-[var(--rtid-badge)] group-hover:translate-x-1 transition-all" />
                     </div>
                     <div className="space-y-1">
-                      <div className="flex justify-between text-xs text-[var(--txt-body)]">
+                      <div className="flex justify-between text-xs text-[var(--text-secondary)]">
                         <span>{stat.value} of {stat.total}</span>
                         <span className="font-semibold text-[var(--rtid-badge)]">{pct}% verified</span>
                       </div>
-                      <div className="w-full bg-[var(--clr-bg-page)] rounded-full h-2">
+                      <div className="w-full bg-[var(--bg-page)] rounded-full h-2">
                         <div className={`bg-gradient-to-r ${stat.gradient} h-2 rounded-full transition-all`} style={{ width: `${pct}%` }} />
                       </div>
                     </div>
@@ -1031,13 +1031,13 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             </div>
 
             {/* National Inventory Quick Summary */}
-            <div className="bg-[var(--clr-bg-card)] rounded-2xl p-6 shadow-lg border border-gray-100">
+            <div className="bg-[var(--bg-surface)] rounded-2xl p-6 shadow-lg border border-gray-100">
               <div className="flex items-center justify-between mb-5">
                 <div>
-                  <h3 className="text-lg font-bold text-[var(--txt-heading)] flex items-center gap-2">
-                    <Droplet className="w-5 h-5 text-[var(--clr-emergency)]" fill="currentColor" /> National Blood Inventory
+                  <h3 className="text-lg font-bold text-[var(--text-primary)] flex items-center gap-2">
+                    <Droplet className="w-5 h-5 text-[var(--clr-danger)]" fill="currentColor" /> National Blood Inventory
                   </h3>
-                  <p className="text-sm text-[var(--txt-body)] mt-0.5">{totalNatUnits.toLocaleString()} total units available across India</p>
+                  <p className="text-sm text-[var(--text-secondary)] mt-0.5">{totalNatUnits.toLocaleString()} total units available across India</p>
                 </div>
                 <button onClick={() => setActiveTab('inventory')}
                   className="px-4 py-2 bg-[var(--rtid-badge)] text-[var(--txt-inverse)] rounded-xl text-sm font-semibold hover:bg-blue-700 transition-all flex items-center gap-2">
@@ -1050,9 +1050,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   const level = getInventoryLevel(units);
                   return (
                     <div key={bg} className={`rounded-xl p-3 border-2 text-center ${level.bg}`}>
-                      <p className="text-lg font-black text-[var(--txt-heading)]">{bg}</p>
+                      <p className="text-lg font-black text-[var(--text-primary)]">{bg}</p>
                       <p className={`text-2xl font-extrabold ${level.color}`}>{units}</p>
-                      <p className="text-[10px] text-[var(--txt-body)] mt-0.5">units</p>
+                      <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">units</p>
                     </div>
                   );
                 })}
@@ -1061,9 +1061,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
             {/* Charts Row */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <div className="bg-[var(--clr-bg-card)] rounded-2xl p-6 shadow-lg border border-gray-100">
-                <h3 className="text-lg font-bold text-[var(--txt-heading)] mb-6 flex items-center gap-2">
-                  <PieChart className="w-5 h-5 text-[var(--txt-body)]" /> Blood Group Distribution
+              <div className="bg-[var(--bg-surface)] rounded-2xl p-6 shadow-lg border border-gray-100">
+                <h3 className="text-lg font-bold text-[var(--text-primary)] mb-6 flex items-center gap-2">
+                  <PieChart className="w-5 h-5 text-[var(--text-secondary)]" /> Blood Group Distribution
                 </h3>
                 <ResponsiveContainer width="100%" height={280}>
                   <RechartsPie>
@@ -1076,9 +1076,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   </RechartsPie>
                 </ResponsiveContainer>
               </div>
-              <div className="bg-[var(--clr-bg-card)] rounded-2xl p-6 shadow-lg border border-gray-100">
-                <h3 className="text-lg font-bold text-[var(--txt-heading)] mb-6 flex items-center gap-2">
-                  <BarChart3 className="w-5 h-5 text-[var(--txt-body)]" /> 6-Month Trends
+              <div className="bg-[var(--bg-surface)] rounded-2xl p-6 shadow-lg border border-gray-100">
+                <h3 className="text-lg font-bold text-[var(--text-primary)] mb-6 flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-[var(--text-secondary)]" /> 6-Month Trends
                 </h3>
                 <ResponsiveContainer width="100%" height={280}>
                   <AreaChart data={monthlyTrends}>
@@ -1096,8 +1096,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
             {/* Today + Pending Actions */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-[var(--clr-bg-card)] rounded-2xl p-6 shadow-lg border border-gray-100">
-                <h3 className="text-lg font-bold text-[var(--txt-heading)] mb-4 flex items-center gap-2">
+              <div className="bg-[var(--bg-surface)] rounded-2xl p-6 shadow-lg border border-gray-100">
+                <h3 className="text-lg font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                   <Clock className="w-5 h-5" /> Today's Activity
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
@@ -1138,10 +1138,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             {/* Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <h2 className="text-2xl font-bold text-[var(--txt-heading)] flex items-center gap-2">
-                  <Droplet className="w-7 h-7 text-[var(--clr-emergency)]" fill="currentColor" /> National Blood Inventory
+                <h2 className="text-2xl font-bold text-[var(--text-primary)] flex items-center gap-2">
+                  <Droplet className="w-7 h-7 text-[var(--clr-danger)]" fill="currentColor" /> National Blood Inventory
                 </h2>
-                <p className="text-sm text-[var(--txt-body)] mt-1">
+                <p className="text-sm text-[var(--text-secondary)] mt-1">
                   Real-time inventory across all registered blood banks
                 </p>
               </div>
@@ -1156,7 +1156,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             {/* Alerts */}
             {criticalGroups.length > 0 && (
               <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-5 flex items-center gap-4">
-                <AlertOctagon className="w-6 h-6 text-[var(--clr-emergency)] flex-shrink-0" />
+                <AlertOctagon className="w-6 h-6 text-[var(--clr-danger)] flex-shrink-0" />
                 <div>
                   <p className="font-bold text-red-900">Critical Shortage</p>
                   <p className="text-sm text-red-700">{criticalGroups.join(', ')} — Immediate procurement required</p>
@@ -1202,12 +1202,12 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             </div>
 
             {/* ── NATIONAL INVENTORY ── */}
-            <div className="bg-[var(--clr-bg-card)] rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-              <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-[var(--clr-border)]">
-                <h3 className="text-lg font-bold text-[var(--txt-heading)] flex items-center gap-2">
+            <div className="bg-[var(--bg-surface)] rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+              <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-[var(--border-color)]">
+                <h3 className="text-lg font-bold text-[var(--text-primary)] flex items-center gap-2">
                   🇮🇳 National Blood Inventory
                 </h3>
-                <p className="text-sm text-[var(--txt-body)] mt-0.5">Aggregated from all registered blood banks</p>
+                <p className="text-sm text-[var(--text-secondary)] mt-0.5">Aggregated from all registered blood banks</p>
               </div>
               <div className="p-6">
                 <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
@@ -1235,14 +1235,14 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             </div>
 
             {/* ── CITY-WISE INVENTORY ── */}
-            <div className="bg-[var(--clr-bg-card)] rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-              <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-[var(--clr-border)]">
+            <div className="bg-[var(--bg-surface)] rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+              <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-[var(--border-color)]">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
-                    <h3 className="text-lg font-bold text-[var(--txt-heading)] flex items-center gap-2">
+                    <h3 className="text-lg font-bold text-[var(--text-primary)] flex items-center gap-2">
                       <MapPin className="w-5 h-5 text-indigo-600" /> City-wise Blood Inventory
                     </h3>
-                    <p className="text-sm text-[var(--txt-body)] mt-0.5">Select a city to view detailed inventory</p>
+                    <p className="text-sm text-[var(--text-secondary)] mt-0.5">Select a city to view detailed inventory</p>
                   </div>
                   <div className="flex items-center gap-3">
                     {/* City search */}
@@ -1250,11 +1250,11 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                       <input type="text" placeholder="Search city..."
                         value={inventorySearchTerm} onChange={e => setInventorySearchTerm(e.target.value)}
-                        className="pl-9 pr-4 py-2 border-2 border-[var(--clr-border)] rounded-xl text-sm focus:border-[var(--clr-info)] outline-none w-44" />
+                        className="pl-9 pr-4 py-2 border-2 border-[var(--border-color)] rounded-xl text-sm focus:border-[var(--clr-info)] outline-none w-44" />
                     </div>
                     {/* City dropdown */}
                     <select value={selectedCity} onChange={e => setSelectedCity(e.target.value)}
-                      className="px-4 py-2 border-2 border-[var(--clr-border)] rounded-xl text-sm font-medium focus:border-[var(--clr-info)] outline-none bg-[var(--clr-bg-card)] min-w-[160px]">
+                      className="px-4 py-2 border-2 border-[var(--border-color)] rounded-xl text-sm font-medium focus:border-[var(--clr-info)] outline-none bg-[var(--bg-surface)] min-w-[160px]">
                       <option value="">— Select City —</option>
                       {cityInvFiltered.map(city => (
                         <option key={city} value={city}>{city}</option>
@@ -1273,7 +1273,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         className={`px-3 py-1.5 rounded-full text-xs font-semibold border-2 transition-all ${
                           selectedCity === city
                             ? 'bg-indigo-600 text-[var(--txt-inverse)] border-indigo-600 shadow-md scale-105'
-                            : 'border-[var(--clr-border)] text-[var(--txt-body)] hover:border-indigo-300 hover:text-indigo-600'
+                            : 'border-[var(--border-color)] text-[var(--text-secondary)] hover:border-indigo-300 hover:text-indigo-600'
                         }`}>
                         <MapPin className="w-3 h-3 inline mr-1" />{city}
                         <span className="ml-1 opacity-70">
@@ -1296,8 +1296,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           <MapPin className="w-5 h-5 text-indigo-600" />
                         </div>
                         <div>
-                          <h4 className="text-xl font-bold text-[var(--txt-heading)]">{selectedCity}</h4>
-                          <p className="text-sm text-[var(--txt-body)]">
+                          <h4 className="text-xl font-bold text-[var(--text-primary)]">{selectedCity}</h4>
+                          <p className="text-sm text-[var(--text-secondary)]">
                             {BLOOD_GROUPS.reduce((s, bg) => s + (cityInventory[selectedCity]?.[bg] || 0), 0)} total units
                           </p>
                         </div>
@@ -1309,9 +1309,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         const level = getInventoryLevel(units);
                         return (
                           <div key={bg} className={`rounded-xl border-2 p-4 text-center ${level.bg}`}>
-                            <p className="text-xl font-black text-[var(--txt-heading)]">{bg}</p>
+                            <p className="text-xl font-black text-[var(--text-primary)]">{bg}</p>
                             <p className={`text-3xl font-extrabold ${level.color} mt-1`}>{units}</p>
-                            <p className="text-[10px] text-[var(--txt-body)] mt-1">units</p>
+                            <p className="text-[10px] text-[var(--text-secondary)] mt-1">units</p>
                             <div className={`w-full h-1 rounded-full mt-2 ${level.bar} opacity-50`} />
                           </div>
                         );
@@ -1347,12 +1347,12 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     <h4 className="text-sm font-bold text-gray-700 mb-3">All Cities Overview</h4>
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="bg-[var(--clr-bg-page)] rounded-xl">
-                          <th className="text-left px-3 py-2 text-xs font-bold text-[var(--txt-body)] uppercase">City</th>
+                        <tr className="bg-[var(--bg-page)] rounded-xl">
+                          <th className="text-left px-3 py-2 text-xs font-bold text-[var(--text-secondary)] uppercase">City</th>
                           {BLOOD_GROUPS.map(bg => (
-                            <th key={bg} className="text-center px-2 py-2 text-xs font-bold text-[var(--txt-body)]">{bg}</th>
+                            <th key={bg} className="text-center px-2 py-2 text-xs font-bold text-[var(--text-secondary)]">{bg}</th>
                           ))}
-                          <th className="text-center px-3 py-2 text-xs font-bold text-[var(--txt-body)] uppercase">Total</th>
+                          <th className="text-center px-3 py-2 text-xs font-bold text-[var(--text-secondary)] uppercase">Total</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
@@ -1361,18 +1361,18 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           return (
                             <tr key={city} onClick={() => setSelectedCity(city)}
                               className={`cursor-pointer hover:bg-indigo-50 transition-colors ${selectedCity === city ? 'bg-indigo-50' : ''}`}>
-                              <td className="px-3 py-2.5 font-semibold text-[var(--txt-heading)] flex items-center gap-1.5">
+                              <td className="px-3 py-2.5 font-semibold text-[var(--text-primary)] flex items-center gap-1.5">
                                 <MapPin className="w-3 h-3 text-indigo-400" />{city}
                               </td>
                               {BLOOD_GROUPS.map(bg => {
                                 const u = cityInventory[city]?.[bg] || 0;
                                 return (
                                   <td key={bg} className={`text-center px-2 py-2.5 font-bold text-xs ${
-                                    u === 0 ? 'text-gray-300' : u < 10 ? 'text-[var(--clr-emergency)]' : u < 20 ? 'text-amber-600' : 'text-[var(--clr-success)]'
+                                    u === 0 ? 'text-gray-300' : u < 10 ? 'text-[var(--clr-danger)]' : u < 20 ? 'text-amber-600' : 'text-[var(--clr-success)]'
                                   }`}>{u || '—'}</td>
                                 );
                               })}
-                              <td className="text-center px-3 py-2.5 font-black text-[var(--txt-heading)]">{total}</td>
+                              <td className="text-center px-3 py-2.5 font-black text-[var(--text-primary)]">{total}</td>
                             </tr>
                           );
                         })}
@@ -1390,31 +1390,31 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
           <div className="space-y-6 animate-in fade-in duration-500">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <h2 className="text-2xl font-bold text-[var(--txt-heading)]">Organization Verification</h2>
-                <p className="text-sm text-[var(--txt-body)] mt-1">{filteredOrganizations.length} pending verification</p>
+                <h2 className="text-2xl font-bold text-[var(--text-primary)]">Organization Verification</h2>
+                <p className="text-sm text-[var(--text-secondary)] mt-1">{filteredOrganizations.length} pending verification</p>
               </div>
               <button onClick={() => setActiveTab('verify')}
-                className="px-4 py-2 bg-[var(--clr-bg-card)] border border-[var(--clr-border)] rounded-xl hover:bg-[var(--clr-bg-page)] flex items-center gap-2 text-sm font-semibold text-gray-700">
+                className="px-4 py-2 bg-[var(--bg-surface)] border border-[var(--border-color)] rounded-xl hover:bg-[var(--bg-page)] flex items-center gap-2 text-sm font-semibold text-gray-700">
                 <Download className="w-4 h-4" /> Export
               </button>
             </div>
 
-            <div className="bg-[var(--clr-bg-card)] rounded-2xl p-4 shadow-lg border border-gray-100">
+            <div className="bg-[var(--bg-surface)] rounded-2xl p-4 shadow-lg border border-gray-100">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input type="text" placeholder="Search..." value={orgSearchTerm} onChange={e => setOrgSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 border-2 border-[var(--clr-border)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm" />
+                    className="w-full pl-10 pr-4 py-2.5 border-2 border-[var(--border-color)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm" />
                 </div>
                 <select value={verifyFilter} onChange={e => setVerifyFilter(e.target.value)}
-                  className="px-4 py-2.5 border-2 border-[var(--clr-border)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
+                  className="px-4 py-2.5 border-2 border-[var(--border-color)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
                   <option value="all">All Status</option>
                   <option value="pending">Pending</option>
                   <option value="verified">Verified</option>
                   <option value="rejected">Rejected</option>
                 </select>
                 <select value={verifySort} onChange={e => setVerifySort(e.target.value)}
-                  className="px-4 py-2.5 border-2 border-[var(--clr-border)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
+                  className="px-4 py-2.5 border-2 border-[var(--border-color)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
                   <option value="name_asc">Name (A-Z)</option>
                   <option value="name_desc">Name (Z-A)</option>
                   <option value="type">By Type</option>
@@ -1425,21 +1425,21 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             {filteredOrganizations.length > 0 ? (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {filteredOrganizations.map(org => (
-                  <div key={org.id} className="bg-[var(--clr-bg-card)] rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all">
+                  <div key={org.id} className="bg-[var(--bg-surface)] rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
-                        <h3 className="text-lg font-bold text-[var(--txt-heading)]">{org.name}</h3>
+                        <h3 className="text-lg font-bold text-[var(--text-primary)]">{org.name}</h3>
                         <div className="flex items-center gap-2 mt-2">
                           <span className={`px-3 py-1 rounded-full text-xs font-semibold ${org.type === 'Hospital' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>{org.type}</span>
                           <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusClasses(org.status)}`}>{org.status}</span>
                         </div>
                       </div>
                       <button onClick={() => { setSelectedOrg(org); setShowOrgDetails(true); }}
-                        className="p-2 hover:bg-[var(--clr-bg-page)] rounded-lg transition-colors">
-                        <Eye className="w-5 h-5 text-[var(--txt-body)]" />
+                        className="p-2 hover:bg-[var(--bg-page)] rounded-lg transition-colors">
+                        <Eye className="w-5 h-5 text-[var(--text-secondary)]" />
                       </button>
                     </div>
-                    <div className="space-y-2 text-sm text-[var(--txt-body)]">
+                    <div className="space-y-2 text-sm text-[var(--text-secondary)]">
                       <div className="flex items-center gap-2"><Mail className="w-4 h-4 text-gray-400" />{org.email}</div>
                       <div className="flex items-center gap-2"><Phone className="w-4 h-4 text-gray-400" />{org.contact}</div>
                       <div className="flex items-center gap-2"><MapPin className="w-4 h-4 text-gray-400" />{org.address}</div>
@@ -1461,10 +1461,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 ))}
               </div>
             ) : (
-              <div className="bg-[var(--clr-bg-card)] rounded-2xl p-12 text-center shadow-lg border border-gray-100">
+              <div className="bg-[var(--bg-surface)] rounded-2xl p-12 text-center shadow-lg border border-gray-100">
                 <CheckCircle className="w-16 h-16 text-[var(--clr-success)] mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-[var(--txt-heading)] mb-2">All Caught Up!</h3>
-                <p className="text-[var(--txt-body)]">No organizations pending verification</p>
+                <h3 className="text-xl font-bold text-[var(--text-primary)] mb-2">All Caught Up!</h3>
+                <p className="text-[var(--text-secondary)]">No organizations pending verification</p>
               </div>
             )}
           </div>
@@ -1475,8 +1475,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
           <div className="space-y-6 animate-in fade-in duration-500">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-[var(--txt-heading)]">National Ledger</h2>
-                <p className="text-sm text-[var(--txt-body)] mt-1">{filteredLedger.length} total entries</p>
+                <h2 className="text-2xl font-bold text-[var(--text-primary)]">National Ledger</h2>
+                <p className="text-sm text-[var(--text-secondary)] mt-1">{filteredLedger.length} total entries</p>
               </div>
               <button onClick={() => downloadCSV(filteredLedger.slice(0, 500).map(e => ({
                 RTID: e.rtid, Type: e.type, 'Blood Group': e.bloodGroup, Units: e.units,
@@ -1487,16 +1487,16 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
               </button>
             </div>
 
-            <div className="bg-[var(--clr-bg-card)] rounded-2xl p-4 shadow-lg border border-gray-100">
+            <div className="bg-[var(--bg-surface)] rounded-2xl p-4 shadow-lg border border-gray-100">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input type="text" placeholder="Search RTID, blood group, city..."
                     value={ledgerSearchTerm} onChange={e => setLedgerSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 border-2 border-[var(--clr-border)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm" />
+                    className="w-full pl-10 pr-4 py-2.5 border-2 border-[var(--border-color)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm" />
                 </div>
                 <select value={ledgerFilterStatus} onChange={e => setLedgerFilterStatus(e.target.value)}
-                  className="px-4 py-2.5 border-2 border-[var(--clr-border)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
+                  className="px-4 py-2.5 border-2 border-[var(--border-color)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
                   <option value="all">All Status</option>
                   <option value="pending">Pending</option>
                   <option value="available">Available</option>
@@ -1504,7 +1504,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   <option value="completed">Completed</option>
                 </select>
                 <select value={ledgerSort} onChange={e => setLedgerSort(e.target.value)}
-                  className="px-4 py-2.5 border-2 border-[var(--clr-border)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
+                  className="px-4 py-2.5 border-2 border-[var(--border-color)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
                   <option value="newest">Newest First</option>
                   <option value="oldest">Oldest First</option>
                   <option value="bloodgroup">By Blood Group</option>
@@ -1512,39 +1512,39 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
               </div>
             </div>
 
-            <div className="bg-[var(--clr-bg-card)] rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+            <div className="bg-[var(--bg-surface)] rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-[var(--clr-border)]">
+                  <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-[var(--border-color)]">
                     <tr>
                       {['RTID','Type','Blood','Units','Status','Location','Date'].map(h => (
-                        <th key={h} className="px-4 py-3 text-left text-xs font-bold text-[var(--txt-body)] uppercase">{h}</th>
+                        <th key={h} className="px-4 py-3 text-left text-xs font-bold text-[var(--text-secondary)] uppercase">{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {filteredLedger.slice(0, 60).map((entry, i) => (
-                      <tr key={i} className="hover:bg-[var(--clr-bg-page)]">
-                        <td className="px-4 py-3 text-xs font-mono font-semibold text-[var(--txt-heading)]">{entry.rtid}</td>
+                      <tr key={i} className="hover:bg-[var(--bg-page)]">
+                        <td className="px-4 py-3 text-xs font-mono font-semibold text-[var(--text-primary)]">{entry.rtid}</td>
                         <td className="px-4 py-3">
                           <span className={`px-2 py-1 rounded-full text-xs font-semibold ${entry.type === 'Donation' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
                             {entry.type}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-sm font-bold text-[var(--txt-heading)]">{entry.bloodGroup}</td>
+                        <td className="px-4 py-3 text-sm font-bold text-[var(--text-primary)]">{entry.bloodGroup}</td>
                         <td className="px-4 py-3 text-sm font-semibold text-gray-700">{entry.units}</td>
                         <td className="px-4 py-3">
                           <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusClasses(entry.status)}`}>{entry.status}</span>
                         </td>
-                        <td className="px-4 py-3 text-sm text-[var(--txt-body)]">{entry.city}</td>
-                        <td className="px-4 py-3 text-sm text-[var(--txt-body)]">{formatDate(entry.createdAt)}</td>
+                        <td className="px-4 py-3 text-sm text-[var(--text-secondary)]">{entry.city}</td>
+                        <td className="px-4 py-3 text-sm text-[var(--text-secondary)]">{formatDate(entry.createdAt)}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
               {filteredLedger.length > 60 && (
-                <div className="p-4 bg-[var(--clr-bg-page)] border-t text-center text-sm text-[var(--txt-body)]">
+                <div className="p-4 bg-[var(--bg-page)] border-t text-center text-sm text-[var(--text-secondary)]">
                   Showing 60 of {filteredLedger.length} entries. Export for complete data.
                 </div>
               )}
@@ -1556,7 +1556,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
         {activeTab === 'analytics' && (
           <div className="space-y-8 animate-in fade-in duration-500">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-[var(--txt-heading)]">Analytics & Reports</h2>
+              <h2 className="text-2xl font-bold text-[var(--text-primary)]">Analytics & Reports</h2>
               <button onClick={() => downloadCSV(bloodGroupDistribution.map(d => ({ 'Blood Group': d.name, Count: d.value })), 'analytics')}
                 className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-[var(--txt-inverse)] rounded-xl text-sm font-semibold flex items-center gap-2 hover:shadow-lg">
                 <Download className="w-4 h-4" /> Export
@@ -1564,8 +1564,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             </div>
 
             {/* Monthly trends */}
-            <div className="bg-[var(--clr-bg-card)] rounded-2xl p-6 shadow-lg border border-gray-100">
-              <h3 className="text-lg font-bold text-[var(--txt-heading)] mb-6">6-Month Activity Trends</h3>
+            <div className="bg-[var(--bg-surface)] rounded-2xl p-6 shadow-lg border border-gray-100">
+              <h3 className="text-lg font-bold text-[var(--text-primary)] mb-6">6-Month Activity Trends</h3>
               <ResponsiveContainer width="100%" height={320}>
                 <AreaChart data={monthlyTrends}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -1582,8 +1582,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* City-wise */}
-              <div className="bg-[var(--clr-bg-card)] rounded-2xl p-6 shadow-lg border border-gray-100">
-                <h3 className="text-lg font-bold text-[var(--txt-heading)] mb-6">Top Cities by Activity</h3>
+              <div className="bg-[var(--bg-surface)] rounded-2xl p-6 shadow-lg border border-gray-100">
+                <h3 className="text-lg font-bold text-[var(--text-primary)] mb-6">Top Cities by Activity</h3>
                 <ResponsiveContainer width="100%" height={320}>
                   <BarChart data={cityWiseData} layout="vertical">
                     <CartesianGrid strokeDasharray="3 3" stroke="#f5f5f5" />
@@ -1598,8 +1598,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
               </div>
 
               {/* Status pie */}
-              <div className="bg-[var(--clr-bg-card)] rounded-2xl p-6 shadow-lg border border-gray-100">
-                <h3 className="text-lg font-bold text-[var(--txt-heading)] mb-6">Status Distribution</h3>
+              <div className="bg-[var(--bg-surface)] rounded-2xl p-6 shadow-lg border border-gray-100">
+                <h3 className="text-lg font-bold text-[var(--text-primary)] mb-6">Status Distribution</h3>
                 <ResponsiveContainer width="100%" height={320}>
                   <RechartsPie>
                     <Pie data={statusDistribution} cx="50%" cy="50%" outerRadius={110}
@@ -1619,14 +1619,14 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 { label: 'Fulfillment Rate', value: `${metrics.totalRequests > 0 ? Math.round((metrics.totalRedemptions / metrics.totalRequests) * 100) : 0}%`, icon: Target, color: 'text-[var(--clr-success)]', bg: 'bg-green-50' },
                 { label: 'Avg Daily Donations', value: Math.round(metrics.totalDonations / 30), icon: TrendingUp, color: 'text-[var(--rtid-badge)]', bg: 'bg-blue-50' },
                 { label: 'Pending Requests', value: metrics.activeRTIDs, icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50' },
-                { label: 'Fraud Attempts', value: metrics.fraudAttempts, icon: Flag, color: 'text-[var(--clr-emergency)]', bg: 'bg-red-50' }
+                { label: 'Fraud Attempts', value: metrics.fraudAttempts, icon: Flag, color: 'text-[var(--clr-danger)]', bg: 'bg-red-50' }
               ].map((m, i) => {
                 const Icon = m.icon;
                 return (
                   <div key={i} className={`rounded-2xl p-5 ${m.bg} border border-white shadow-sm`}>
                     <Icon className={`w-6 h-6 ${m.color} mb-3`} />
                     <p className={`text-3xl font-black ${m.color}`}>{m.value}</p>
-                    <p className="text-sm text-[var(--txt-body)] mt-1">{m.label}</p>
+                    <p className="text-sm text-[var(--text-secondary)] mt-1">{m.label}</p>
                   </div>
                 );
               })}
@@ -1639,8 +1639,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
           <div className="space-y-6 animate-in fade-in duration-500">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-[var(--txt-heading)]">Donor Management</h2>
-                <p className="text-sm text-[var(--txt-body)] mt-1">{filteredDonors.length} donors found</p>
+                <h2 className="text-2xl font-bold text-[var(--text-primary)]">Donor Management</h2>
+                <p className="text-sm text-[var(--text-secondary)] mt-1">{filteredDonors.length} donors found</p>
               </div>
               <button onClick={() => downloadCSV(filteredDonors.map(d => ({
                 Name: d.fullName, 'Blood Group': d.bloodGroup, City: d.district || d.city,
@@ -1659,24 +1659,24 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 { label: 'Avg Donations', value: donors.length > 0 ? (donors.reduce((s, d) => s + (d.donationsCount || 0), 0) / donors.length).toFixed(1) : 0, color: 'from-green-500 to-green-600' },
                 { label: 'Active (30d)', value: donors.filter(d => d.lastDonationDate && new Date(d.lastDonationDate) > new Date(Date.now() - 30 * 86400000)).length, color: 'from-purple-500 to-purple-600' }
               ].map((s, i) => (
-                <div key={i} className="bg-[var(--clr-bg-card)] rounded-2xl p-5 shadow-lg border border-gray-100 text-center">
+                <div key={i} className="bg-[var(--bg-surface)] rounded-2xl p-5 shadow-lg border border-gray-100 text-center">
                   <p className={`text-3xl font-black bg-gradient-to-r ${s.color} bg-clip-text text-transparent`}>{s.value}</p>
-                  <p className="text-sm text-[var(--txt-body)] mt-1">{s.label}</p>
+                  <p className="text-sm text-[var(--text-secondary)] mt-1">{s.label}</p>
                 </div>
               ))}
             </div>
 
             {/* Filters */}
-            <div className="bg-[var(--clr-bg-card)] rounded-2xl p-4 shadow-lg border border-gray-100">
+            <div className="bg-[var(--bg-surface)] rounded-2xl p-4 shadow-lg border border-gray-100">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input type="text" placeholder="Search donors by name, blood group, city..."
                     value={donorSearch} onChange={e => setDonorSearch(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 border-2 border-[var(--clr-border)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm" />
+                    className="w-full pl-10 pr-4 py-2.5 border-2 border-[var(--border-color)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm" />
                 </div>
                 <select value={donorFilter} onChange={e => setDonorFilter(e.target.value)}
-                  className="px-4 py-2.5 border-2 border-[var(--clr-border)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
+                  className="px-4 py-2.5 border-2 border-[var(--border-color)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
                   <option value="all">All Blood Groups</option>
                   {BLOOD_GROUPS.map(bg => <option key={bg} value={bg}>{bg}</option>)}
                 </select>
@@ -1684,44 +1684,44 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             </div>
 
             {/* Donor Table */}
-            <div className="bg-[var(--clr-bg-card)] rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+            <div className="bg-[var(--bg-surface)] rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-[var(--clr-bg-page)] border-b border-[var(--clr-border)]">
+                  <thead className="bg-[var(--bg-page)] border-b border-[var(--border-color)]">
                     <tr>
                       {['Donor','Blood Group','City','Mobile','Donations','Credits','Last Donation'].map(h => (
-                        <th key={h} className="px-4 py-3 text-left text-xs font-bold text-[var(--txt-body)] uppercase">{h}</th>
+                        <th key={h} className="px-4 py-3 text-left text-xs font-bold text-[var(--text-secondary)] uppercase">{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {filteredDonors.slice(0, 50).map((d, i) => (
-                      <tr key={i} className="hover:bg-[var(--clr-bg-page)]">
+                      <tr key={i} className="hover:bg-[var(--bg-page)]">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-[var(--txt-inverse)] text-xs font-bold">
                               {(d.fullName || 'D').charAt(0).toUpperCase()}
                             </div>
                             <div>
-                              <p className="text-sm font-semibold text-[var(--txt-heading)]">{d.fullName || 'Unknown'}</p>
+                              <p className="text-sm font-semibold text-[var(--text-primary)]">{d.fullName || 'Unknown'}</p>
                               <p className="text-xs text-gray-400">{d.userId || d.email || d.id}</p>
                             </div>
                           </div>
                         </td>
                         <td className="px-4 py-3">
-                          <span className="px-3 py-1 rounded-full text-sm font-black text-red-700 bg-red-50 border border-[var(--clr-border)]">
+                          <span className="px-3 py-1 rounded-full text-sm font-black text-red-700 bg-red-50 border border-[var(--border-color)]">
                             {d.bloodGroup || '—'}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-sm text-[var(--txt-body)]">{d.district || d.city || '—'}</td>
-                        <td className="px-4 py-3 text-sm text-[var(--txt-body)]">{d.mobile || '—'}</td>
+                        <td className="px-4 py-3 text-sm text-[var(--text-secondary)]">{d.district || d.city || '—'}</td>
+                        <td className="px-4 py-3 text-sm text-[var(--text-secondary)]">{d.mobile || '—'}</td>
                         <td className="px-4 py-3">
-                          <span className="text-sm font-bold text-[var(--txt-heading)]">{d.donationsCount || 0}</span>
+                          <span className="text-sm font-bold text-[var(--text-primary)]">{d.donationsCount || 0}</span>
                         </td>
                         <td className="px-4 py-3">
                           <span className="text-sm font-bold text-[var(--clr-success)]">{d.credits || 0}</span>
                         </td>
-                        <td className="px-4 py-3 text-sm text-[var(--txt-body)]">
+                        <td className="px-4 py-3 text-sm text-[var(--text-secondary)]">
                           {d.lastDonationDate ? formatDate(d.lastDonationDate) : '—'}
                         </td>
                       </tr>
@@ -1730,7 +1730,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 </table>
               </div>
               {filteredDonors.length > 50 && (
-                <div className="p-4 bg-[var(--clr-bg-page)] border-t text-center text-sm text-[var(--txt-body)]">
+                <div className="p-4 bg-[var(--bg-page)] border-t text-center text-sm text-[var(--text-secondary)]">
                   Showing 50 of {filteredDonors.length} donors.
                 </div>
               )}
@@ -1741,25 +1741,25 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
         {/* ══════════ RTID CHECK TAB ══════════ */}
         {activeTab === 'rtid' && (
           <div className="space-y-6 animate-in fade-in duration-500">
-            <div className="bg-[var(--clr-bg-card)] rounded-2xl p-8 shadow-lg border border-gray-100 max-w-2xl mx-auto">
+            <div className="bg-[var(--bg-surface)] rounded-2xl p-8 shadow-lg border border-gray-100 max-w-2xl mx-auto">
               <div className="text-center mb-8">
                 <div className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mb-4 shadow-lg">
                   <Shield className="w-10 h-10 text-[var(--txt-inverse)]" />
                 </div>
-                <h2 className="text-3xl font-bold text-[var(--txt-heading)] mb-2">RTID Verification</h2>
-                <p className="text-[var(--txt-body)]">Verify RTIDs against the National Ledger</p>
+                <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-2">RTID Verification</h2>
+                <p className="text-[var(--text-secondary)]">Verify RTIDs against the National Ledger</p>
               </div>
 
               <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
                   {(['D', 'H'] as const).map(p => (
                     <button key={p} onClick={() => setRtidPrefix(p)}
-                      className={`p-4 rounded-xl border-2 transition-all ${rtidPrefix === p ? (p === 'D' ? 'border-[var(--clr-success)] bg-green-50' : 'border-[var(--clr-info)] bg-blue-50') : 'border-[var(--clr-border)] hover:border-[var(--clr-border)]'}`}>
+                      className={`p-4 rounded-xl border-2 transition-all ${rtidPrefix === p ? (p === 'D' ? 'border-[var(--clr-success)] bg-green-50' : 'border-[var(--clr-info)] bg-blue-50') : 'border-[var(--border-color)] hover:border-[var(--border-color)]'}`}>
                       <div className="flex items-center gap-3">
                         {p === 'D' ? <Droplet className={`w-6 h-6 ${rtidPrefix === 'D' ? 'text-[var(--clr-success)]' : 'text-gray-400'}`} /> : <Building2 className={`w-6 h-6 ${rtidPrefix === 'H' ? 'text-[var(--rtid-badge)]' : 'text-gray-400'}`} />}
                         <div className="text-left">
                           <p className="font-bold text-sm">{p}-RTID</p>
-                          <p className="text-xs text-[var(--txt-body)]">{p === 'D' ? 'Donation' : 'Hospital Request'}</p>
+                          <p className="text-xs text-[var(--text-secondary)]">{p === 'D' ? 'Donation' : 'Hospital Request'}</p>
                         </div>
                         {rtidPrefix === p && <CheckCircle className={`w-4 h-4 ml-auto ${p === 'D' ? 'text-[var(--clr-success)]' : 'text-[var(--rtid-badge)]'}`} />}
                       </div>
@@ -1776,7 +1776,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   <input type="text" value={rtidCheckInput} onChange={e => setRtidCheckInput(e.target.value.toUpperCase())}
                     placeholder="Enter RTID code"
                     onKeyPress={e => e.key === 'Enter' && handleRTIDCheck()}
-                    className="w-full pl-36 pr-4 py-4 border-2 border-[var(--clr-border)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-mono" />
+                    className="w-full pl-36 pr-4 py-4 border-2 border-[var(--border-color)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-mono" />
                 </div>
 
                 <button onClick={handleRTIDCheck} disabled={rtidLoading || !rtidCheckInput.trim()}
@@ -1794,7 +1794,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         <CheckCircle className="w-8 h-8 text-[var(--clr-success)]" />
                         <h3 className="text-lg font-bold text-green-900">RTID Verified ✓</h3>
                       </div>
-                      <div className="grid grid-cols-2 gap-3 bg-[var(--clr-bg-card)]/80 rounded-xl p-4 text-sm">
+                      <div className="grid grid-cols-2 gap-3 bg-[var(--bg-surface)]/80 rounded-xl p-4 text-sm">
                         {[
                           ['RTID', rtidCheckResult.fullRTID],
                           ['Type', rtidCheckResult.type],
@@ -1806,15 +1806,15 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           ['Created', rtidCheckResult.createdAt]
                         ].map(([k, v]) => (
                           <div key={k as string}>
-                            <p className="text-xs text-[var(--txt-body)] uppercase font-semibold">{k as string}</p>
-                            <p className="font-bold text-[var(--txt-heading)]">{v as string}</p>
+                            <p className="text-xs text-[var(--text-secondary)] uppercase font-semibold">{k as string}</p>
+                            <p className="font-bold text-[var(--text-primary)]">{v as string}</p>
                           </div>
                         ))}
                       </div>
                     </>
                   ) : (
                     <div className="flex items-center gap-3">
-                      <XCircle className="w-8 h-8 text-[var(--clr-emergency)]" />
+                      <XCircle className="w-8 h-8 text-[var(--clr-danger)]" />
                       <div>
                         <h3 className="text-lg font-bold text-red-900">RTID Not Found</h3>
                         <p className="text-sm text-red-700 mt-1">⚠️ Potential fraud alert — this RTID is not in the National Ledger</p>
@@ -1831,32 +1831,32 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
         {activeTab === 'fraud' && (
           <div className="space-y-6 animate-in fade-in duration-500">
             <div>
-              <h2 className="text-2xl font-bold text-[var(--txt-heading)] flex items-center gap-2">
-                <AlertOctagon className="w-7 h-7 text-[var(--clr-emergency)]" /> Fraud Alerts
+              <h2 className="text-2xl font-bold text-[var(--text-primary)] flex items-center gap-2">
+                <AlertOctagon className="w-7 h-7 text-[var(--clr-danger)]" /> Fraud Alerts
               </h2>
-              <p className="text-sm text-[var(--txt-body)] mt-1">{fraudAlerts.length} suspicious activities detected</p>
+              <p className="text-sm text-[var(--text-secondary)] mt-1">{fraudAlerts.length} suspicious activities detected</p>
             </div>
 
             {fraudAlerts.length === 0 ? (
-              <div className="bg-[var(--clr-bg-card)] rounded-2xl p-12 text-center shadow-lg border border-gray-100">
+              <div className="bg-[var(--bg-surface)] rounded-2xl p-12 text-center shadow-lg border border-gray-100">
                 <ShieldCheck className="w-16 h-16 text-[var(--clr-success)] mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-[var(--txt-heading)] mb-2">No Fraud Alerts</h3>
-                <p className="text-[var(--txt-body)]">System is operating normally. No suspicious activities detected.</p>
+                <h3 className="text-xl font-bold text-[var(--text-primary)] mb-2">No Fraud Alerts</h3>
+                <p className="text-[var(--text-secondary)]">System is operating normally. No suspicious activities detected.</p>
               </div>
             ) : (
               <div className="space-y-4">
                 {fraudAlerts.map(alert => (
-                  <div key={alert.id} className="bg-[var(--clr-bg-card)] rounded-2xl p-6 shadow-lg border-l-4 border-[var(--clr-emergency)]">
+                  <div key={alert.id} className="bg-[var(--bg-surface)] rounded-2xl p-6 shadow-lg border-l-4 border-[var(--clr-emergency)]">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-start gap-4">
                         <div className="w-10 h-10 bg-[var(--stats-divider)] rounded-xl flex items-center justify-center flex-shrink-0">
-                          <AlertOctagon className="w-5 h-5 text-[var(--clr-emergency)]" />
+                          <AlertOctagon className="w-5 h-5 text-[var(--clr-danger)]" />
                         </div>
                         <div>
-                          <p className="font-bold text-[var(--txt-heading)]">Suspicious Request: <span className="font-mono text-[var(--clr-emergency)]">{alert.rtid}</span></p>
-                          <p className="text-sm text-[var(--txt-body)] mt-1">Hospital: {alert.hospital}</p>
-                          <p className="text-sm text-[var(--txt-body)]">Blood Group: <strong>{alert.bloodGroup}</strong></p>
-                          <p className="text-sm text-[var(--clr-emergency)] mt-2 font-medium">{alert.reason}</p>
+                          <p className="font-bold text-[var(--text-primary)]">Suspicious Request: <span className="font-mono text-[var(--clr-danger)]">{alert.rtid}</span></p>
+                          <p className="text-sm text-[var(--text-secondary)] mt-1">Hospital: {alert.hospital}</p>
+                          <p className="text-sm text-[var(--text-secondary)]">Blood Group: <strong>{alert.bloodGroup}</strong></p>
+                          <p className="text-sm text-[var(--clr-danger)] mt-2 font-medium">{alert.reason}</p>
                           <p className="text-xs text-gray-400 mt-1">{formatDateTime(alert.createdAt)}</p>
                         </div>
                       </div>
@@ -1864,7 +1864,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         <button className="px-3 py-1.5 text-xs font-semibold bg-[var(--stats-divider)] text-red-700 rounded-lg hover:bg-red-200">
                           Block
                         </button>
-                        <button className="px-3 py-1.5 text-xs font-semibold bg-[var(--clr-bg-page)] text-gray-700 rounded-lg hover:bg-gray-200">
+                        <button className="px-3 py-1.5 text-xs font-semibold bg-[var(--bg-page)] text-gray-700 rounded-lg hover:bg-gray-200">
                           Dismiss
                         </button>
                       </div>
@@ -1880,41 +1880,41 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
         {activeTab === 'audit' && (
           <div className="space-y-6 animate-in fade-in duration-500">
             <div>
-              <h2 className="text-2xl font-bold text-[var(--txt-heading)]">Audit Log</h2>
-              <p className="text-sm text-[var(--txt-body)] mt-1">Complete system activity trail</p>
+              <h2 className="text-2xl font-bold text-[var(--text-primary)]">Audit Log</h2>
+              <p className="text-sm text-[var(--text-secondary)] mt-1">Complete system activity trail</p>
             </div>
 
-            <div className="bg-[var(--clr-bg-card)] rounded-2xl p-4 shadow-lg border border-gray-100">
+            <div className="bg-[var(--bg-surface)] rounded-2xl p-4 shadow-lg border border-gray-100">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <select value={auditFilter} onChange={e => setAuditFilter(e.target.value)}
-                  className="px-4 py-2.5 border-2 border-[var(--clr-border)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
+                  className="px-4 py-2.5 border-2 border-[var(--border-color)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
                   <option value="all">All Activities</option>
                   <option value="verification">Verifications</option>
                   <option value="donation">Donations</option>
                   <option value="request">Requests</option>
                 </select>
                 <select value={auditSort} onChange={e => setAuditSort(e.target.value)}
-                  className="px-4 py-2.5 border-2 border-[var(--clr-border)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
+                  className="px-4 py-2.5 border-2 border-[var(--border-color)] rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
                   <option value="newest">Newest First</option>
                   <option value="oldest">Oldest First</option>
                 </select>
               </div>
             </div>
 
-            <div className="bg-[var(--clr-bg-card)] rounded-2xl p-6 shadow-lg border border-gray-100 max-h-[600px] overflow-y-auto">
+            <div className="bg-[var(--bg-surface)] rounded-2xl p-6 shadow-lg border border-gray-100 max-h-[600px] overflow-y-auto">
               <div className="space-y-3">
                 {filteredAuditLog.slice(0, 100).map((log, i) => (
-                  <div key={i} className="flex items-start gap-4 p-4 rounded-xl hover:bg-[var(--clr-bg-page)] border border-gray-100">
+                  <div key={i} className="flex items-start gap-4 p-4 rounded-xl hover:bg-[var(--bg-page)] border border-gray-100">
                     <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
                       log.type === 'verification' ? 'bg-green-100' : log.type === 'donation' ? 'bg-[var(--stats-divider)]' : 'bg-blue-100'
                     }`}>
                       {log.type === 'verification' ? <CheckSquare className="w-4 h-4 text-[var(--clr-success)]" />
-                        : log.type === 'donation' ? <Droplet className="w-4 h-4 text-[var(--clr-emergency)]" />
+                        : log.type === 'donation' ? <Droplet className="w-4 h-4 text-[var(--clr-danger)]" />
                         : <Activity className="w-4 h-4 text-[var(--rtid-badge)]" />}
                     </div>
                     <div className="flex-1">
-                      <p className="font-semibold text-[var(--txt-heading)] text-sm">{log.action}</p>
-                      <p className="text-xs text-[var(--txt-body)] mt-0.5">{log.user} — {log.details}</p>
+                      <p className="font-semibold text-[var(--text-primary)] text-sm">{log.action}</p>
+                      <p className="text-xs text-[var(--text-secondary)] mt-0.5">{log.user} — {log.details}</p>
                       <p className="text-xs text-gray-400 mt-0.5">{formatDateTime(log.timestamp)}</p>
                     </div>
                   </div>
@@ -1930,11 +1930,11 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       <footer className="bg-gradient-to-r from-gray-900 to-gray-800 text-[var(--txt-inverse)] py-8 mt-16">
         <div className="max-w-[1400px] mx-auto px-6 text-center">
           <div className="flex justify-center items-center gap-2 mb-2">
-            <Droplet className="text-[var(--clr-emergency)]" size={20} fill="var(--clr-emergency)" />
+            <Droplet className="text-[var(--clr-danger)]" size={20} fill="var(--clr-emergency)" />
             <span className="font-bold">RaktPort Admin Dashboard</span>
           </div>
           <p className="text-sm text-gray-400">National Blood Management System | Government of India</p>
-          <div className="flex justify-center gap-4 mt-3 text-xs text-[var(--txt-body)]">
+          <div className="flex justify-center gap-4 mt-3 text-xs text-[var(--text-secondary)]">
             <span>Secure Access</span>•<span>Real-time Monitoring</span>•<span>Fraud Prevention</span>•<span>Analytics</span>
           </div>
         </div>
@@ -1952,17 +1952,17 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       {/* ── ORG DETAILS MODAL ── */}
       {showOrgDetails && selectedOrg && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[var(--clr-bg-card)] rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto">
-            <div className="sticky top-0 bg-[var(--clr-bg-card)] p-6 border-b border-[var(--clr-border)] flex justify-between items-center">
+          <div className="bg-[var(--bg-surface)] rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto">
+            <div className="sticky top-0 bg-[var(--bg-surface)] p-6 border-b border-[var(--border-color)] flex justify-between items-center">
               <div>
-                <h2 className="text-xl font-bold text-[var(--txt-heading)]">{selectedOrg.name}</h2>
+                <h2 className="text-xl font-bold text-[var(--text-primary)]">{selectedOrg.name}</h2>
                 <div className="flex gap-2 mt-2">
                   <span className={`px-3 py-1 rounded-full text-xs font-semibold ${selectedOrg.type === 'Hospital' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>{selectedOrg.type}</span>
                   <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusClasses(selectedOrg.status)}`}>{selectedOrg.status}</span>
                 </div>
               </div>
-              <button onClick={() => setShowOrgDetails(false)} className="p-2 hover:bg-[var(--clr-bg-page)] rounded-xl">
-                <X className="w-5 h-5 text-[var(--txt-body)]" />
+              <button onClick={() => setShowOrgDetails(false)} className="p-2 hover:bg-[var(--bg-page)] rounded-xl">
+                <X className="w-5 h-5 text-[var(--text-secondary)]" />
               </button>
             </div>
             <div className="p-6 space-y-4">
@@ -1972,11 +1972,11 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 { icon: MapPin, label: 'Address', value: selectedOrg.address },
                 { icon: FileText, label: 'License No.', value: selectedOrg.license }
               ].map(({ icon: Icon, label, value }) => (
-                <div key={label} className="flex items-start gap-3 p-3 bg-[var(--clr-bg-page)] rounded-xl">
+                <div key={label} className="flex items-start gap-3 p-3 bg-[var(--bg-page)] rounded-xl">
                   <Icon className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="text-xs text-gray-400 font-medium">{label}</p>
-                    <p className="text-sm font-semibold text-[var(--txt-heading)]">{value}</p>
+                    <p className="text-sm font-semibold text-[var(--text-primary)]">{value}</p>
                   </div>
                 </div>
               ))}
@@ -1993,7 +1993,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 </div>
               )}
             </div>
-            <div className="sticky bottom-0 bg-[var(--clr-bg-page)] p-6 border-t flex justify-end gap-3">
+            <div className="sticky bottom-0 bg-[var(--bg-page)] p-6 border-t flex justify-end gap-3">
               <button onClick={() => setShowOrgDetails(false)} className="px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-xl text-sm font-semibold">Close</button>
               {selectedOrg.status === 'pending' && (
                 <>

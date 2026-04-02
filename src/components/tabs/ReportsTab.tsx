@@ -13,16 +13,16 @@ interface ReportsTabProps {
 
 const Bar = ({ height, label, color = "bg-[var(--clr-info)]", value }: any) => (
     <div className="flex flex-col items-center gap-2 group cursor-pointer">
-        <div className="relative w-12 bg-[var(--clr-bg-page)] dark:bg-gray-800 rounded-t-lg h-48 flex items-end overflow-hidden">
+        <div className="relative w-12 bg-[var(--bg-page)] dark:bg-gray-800 rounded-t-lg h-48 flex items-end overflow-hidden">
             <div
                 className={`w-full ${color} transition-all duration-500 group-hover:opacity-80`}
                 style={{ height: `${Math.min(height, 100)}%` }}
             />
-            <div className="absolute top-2 w-full text-center text-xs font-bold text-[var(--txt-body)] dark:text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute top-2 w-full text-center text-xs font-bold text-[var(--text-secondary)] dark:text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
                 {value}
             </div>
         </div>
-        <span className="text-xs font-medium text-[var(--txt-body)] dark:text-gray-300">{label}</span>
+        <span className="text-xs font-medium text-[var(--text-secondary)] dark:text-gray-300">{label}</span>
     </div>
 );
 
@@ -164,10 +164,10 @@ export const ReportsTab = ({ inventory, donations, redemptions, criticalGroups }
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                         <CardTitle className="text-sm font-medium text-muted-foreground">Critical Alerts</CardTitle>
-                        <AlertTriangle className="h-4 w-4 text-[var(--clr-emergency)]" />
+                        <AlertTriangle className="h-4 w-4 text-[var(--clr-danger)]" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-[var(--clr-emergency)]">{criticalGroups.length} Groups</div>
+                        <div className="text-2xl font-bold text-[var(--clr-danger)]">{criticalGroups.length} Groups</div>
                         <p className="text-xs text-muted-foreground mt-1">
                             {criticalGroups.length > 0 ? criticalGroups.join(', ') : 'All stock levels healthy'}
                         </p>
@@ -177,7 +177,7 @@ export const ReportsTab = ({ inventory, donations, redemptions, criticalGroups }
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                         <CardTitle className="text-sm font-medium text-muted-foreground">Utilization Rate</CardTitle>
-                        <TrendingUp className="h-4 w-4 text-[var(--clr-emergency)]" />
+                        <TrendingUp className="h-4 w-4 text-[var(--clr-danger)]" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
@@ -203,58 +203,58 @@ export const ReportsTab = ({ inventory, donations, redemptions, criticalGroups }
                                 label="A+"
                                 height={getPercentage(inventory['A+']?.total || 0) * 3}
                                 value={inventory['A+']?.total || 0}
-                                color="bg-[var(--clr-emergency)]"
+                                color="bg-[var(--clr-danger)]"
                             />
                             <Bar
                                 label="A-"
                                 height={getPercentage(inventory['A-']?.total || 0) * 3}
                                 value={inventory['A-']?.total || 0}
-                                color="bg-[var(--clr-emergency)]"
+                                color="bg-[var(--clr-danger)]"
                             />
                             <Bar
                                 label="B+"
                                 height={getPercentage(inventory['B+']?.total || 0) * 3}
                                 value={inventory['B+']?.total || 0}
-                                color="bg-[var(--clr-emergency)]"
+                                color="bg-[var(--clr-danger)]"
                             />
                             <Bar
                                 label="B-"
                                 height={getPercentage(inventory['B-']?.total || 0) * 3}
                                 value={inventory['B-']?.total || 0}
-                                color="bg-[var(--clr-emergency)]"
+                                color="bg-[var(--clr-danger)]"
                             />
                             <Bar
                                 label="AB+"
                                 height={getPercentage(inventory['AB+']?.total || 0) * 3}
                                 value={inventory['AB+']?.total || 0}
-                                color="bg-[var(--clr-emergency)]"
+                                color="bg-[var(--clr-danger)]"
                             />
                             <Bar
                                 label="AB-"
                                 height={getPercentage(inventory['AB-']?.total || 0) * 3}
                                 value={inventory['AB-']?.total || 0}
-                                color="bg-[var(--clr-emergency)]"
+                                color="bg-[var(--clr-danger)]"
                             />
                             <Bar
                                 label="O+"
                                 height={getPercentage(inventory['O+']?.total || 0) * 3}
                                 value={inventory['O+']?.total || 0}
-                                color="bg-[var(--clr-emergency)]"
+                                color="bg-[var(--clr-danger)]"
                             />
                             <Bar
                                 label="O-"
                                 height={getPercentage(inventory['O-']?.total || 0) * 3}
                                 value={inventory['O-']?.total || 0}
-                                color="bg-[var(--clr-emergency)]"
+                                color="bg-[var(--clr-danger)]"
                             />
                         </div>
                         <div className="border-t pt-4 mt-4 grid grid-cols-2 gap-4 text-sm">
                             <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 bg-[var(--clr-emergency)] rounded-full"></div>
+                                <div className="w-3 h-3 bg-[var(--clr-danger)] rounded-full"></div>
                                 <span>Positive Groups</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 bg-[var(--clr-emergency)] rounded-full"></div>
+                                <div className="w-3 h-3 bg-[var(--clr-danger)] rounded-full"></div>
                                 <span>Negative Groups</span>
                             </div>
                         </div>
@@ -282,7 +282,7 @@ export const ReportsTab = ({ inventory, donations, redemptions, criticalGroups }
                                             </div>
                                             <div
                                                 style={{ width: `${(item.out / maxVal) * 100}%` }}
-                                                className="h-6 bg-[var(--clr-emergency)] rounded-r-full flex items-center justify-end pr-2"
+                                                className="h-6 bg-[var(--clr-danger)] rounded-r-full flex items-center justify-end pr-2"
                                             >
                                                 <span className="text-xs text-[var(--txt-inverse)] font-bold">{item.out}</span>
                                             </div>
@@ -296,7 +296,7 @@ export const ReportsTab = ({ inventory, donations, redemptions, criticalGroups }
                                 <div className="w-3 h-3 bg-[var(--clr-info)] rounded"></div> Collected
                             </div>
                             <div className="flex items-center gap-2 text-sm">
-                                <div className="w-3 h-3 bg-[var(--clr-emergency)] rounded"></div> Issued
+                                <div className="w-3 h-3 bg-[var(--clr-danger)] rounded"></div> Issued
                             </div>
                         </div>
                     </CardContent>

@@ -68,7 +68,7 @@ function GoogleIcon({ size = 18 }: { size?: number }) {
 }
 
 function Spinner({ white = false }: { white?: boolean }) {
-  return <span className={`inline-block w-4 h-4 border-2 rounded-full animate-spin flex-shrink-0 ${white ? 'border-white/30 border-t-white' : 'border-[var(--clr-border)] border-t-gray-600'}`} aria-hidden="true" />;
+  return <span className={`inline-block w-4 h-4 border-2 rounded-full animate-spin flex-shrink-0 ${white ? 'border-white/30 border-t-white' : 'border-[var(--border-color)] border-t-gray-600'}`} aria-hidden="true" />;
 }
 
 function maskPhone(phone: string): string {
@@ -315,29 +315,29 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
 
       {/* Back button */}
       <div className="sticky top-0 z-30 flex items-center px-3 pt-3 pb-2 sm:px-6 sm:pt-5 pointer-events-none">
-        <button onClick={onBack} className="pointer-events-auto inline-flex items-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 bg-[var(--clr-bg-card)]/85 backdrop-blur-md rounded-full shadow-md hover:shadow-lg hover:bg-[var(--clr-bg-card)] active:scale-95 transition-all group">
-          <ArrowLeft className="w-4 h-4 text-[var(--txt-body)] group-hover:text-[var(--txt-heading)]" />
-          <span className="text-xs sm:text-sm font-medium text-[var(--txt-body)] group-hover:text-[var(--txt-heading)]">Back to Home</span>
+        <button onClick={onBack} className="pointer-events-auto inline-flex items-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 bg-[var(--bg-surface)]/85 backdrop-blur-md rounded-full shadow-md hover:shadow-lg hover:bg-[var(--bg-surface)] active:scale-95 transition-all group">
+          <ArrowLeft className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]" />
+          <span className="text-xs sm:text-sm font-medium text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]">Back to Home</span>
         </button>
       </div>
 
       {/* Card */}
       <div className="relative flex justify-center px-3 pb-8 pt-2 sm:px-4 sm:pt-4 sm:min-h-[calc(100vh-56px)] sm:items-center">
         <div className="w-full max-w-md">
-          <div className="bg-[var(--clr-bg-card)]/80 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-2xl border border-white/30 overflow-hidden">
+          <div className="bg-[var(--bg-surface)]/80 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-2xl border border-white/30 overflow-hidden">
 
             {/* Header */}
             <div className="pt-5 pb-4 px-4 sm:pt-8 sm:pb-6 sm:px-8 bg-gradient-to-br from-white/50 to-white/20 flex flex-col items-center text-center">
               <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl overflow-hidden shadow-lg mb-3 ring-4 ring-white/60">
                 <img src={logo} alt="RaktPort" className="w-full h-full object-cover" />
               </div>
-              <h1 className="text-xl sm:text-2xl font-bold text-[var(--txt-heading)] mb-0.5">Welcome Back</h1>
-              <p className="text-xs sm:text-sm text-[var(--txt-body)]">Sign in to continue to RaktPort</p>
+              <h1 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] mb-0.5">Welcome Back</h1>
+              <p className="text-xs sm:text-sm text-[var(--text-secondary)]">Sign in to continue to RaktPort</p>
             </div>
 
             {/* Role selector */}
             <div className="px-3 sm:px-8 pt-4 sm:pt-6 pb-2">
-              <div className="relative bg-[var(--clr-bg-page)]/70 backdrop-blur-sm rounded-xl sm:rounded-2xl p-1.5 shadow-inner">
+              <div className="relative bg-[var(--bg-page)]/70 backdrop-blur-sm rounded-xl sm:rounded-2xl p-1.5 shadow-inner">
                 <div className={`absolute top-1.5 bottom-1.5 bg-gradient-to-r ${current.color} rounded-lg shadow-md transition-all duration-300 ease-out`}
                   style={{ left: `calc(${roleIdx * 25}% + 6px)`, width: 'calc(25% - 12px)' }} aria-hidden="true" />
                 <div className="relative grid grid-cols-4">
@@ -345,7 +345,7 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
                     const active = r.id === role;
                     return (
                       <button key={r.id} type="button" onClick={() => setRole(r.id)} disabled={anyBusy} aria-pressed={active}
-                        className={`flex flex-col items-center gap-0.5 py-2.5 sm:py-3 rounded-lg transition-all duration-200 min-h-[52px] touch-manipulation ${active ? 'text-[var(--txt-inverse)]' : 'text-[var(--txt-body)] hover:text-gray-700'} disabled:opacity-50`}>
+                        className={`flex flex-col items-center gap-0.5 py-2.5 sm:py-3 rounded-lg transition-all duration-200 min-h-[52px] touch-manipulation ${active ? 'text-[var(--txt-inverse)]' : 'text-[var(--text-secondary)] hover:text-gray-700'} disabled:opacity-50`}>
                         <r.Icon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${active ? 'scale-110' : ''}`} />
                         <span className="text-[9px] sm:text-[11px] font-semibold leading-tight">{r.label}</span>
                       </button>
@@ -357,14 +357,14 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
 
             {/* Login method tabs */}
             <div className="px-4 sm:px-8 pt-3">
-              <div className="flex bg-[var(--clr-bg-page)]/50 rounded-xl p-1 gap-1">
+              <div className="flex bg-[var(--bg-page)]/50 rounded-xl p-1 gap-1">
                 {([
                   { id: 'smart' as LoginTab, label: 'Quick Login', Icon: Fingerprint },
                   { id: 'email' as LoginTab, label: 'Email', Icon: Mail },
                 ] as const).map(t => (
                   <button key={t.id} type="button" onClick={() => setTab(t.id)} disabled={anyBusy}
                     className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all touch-manipulation ${
-                      tab === t.id ? 'bg-[var(--clr-bg-card)] shadow-sm text-[var(--txt-heading)]' : 'text-[var(--txt-body)] hover:text-gray-700 hover:bg-[var(--clr-bg-card)]/50'
+                      tab === t.id ? 'bg-[var(--bg-surface)] shadow-sm text-[var(--text-primary)]' : 'text-[var(--text-secondary)] hover:text-gray-700 hover:bg-[var(--bg-surface)]/50'
                     } disabled:opacity-50`}>
                     <t.Icon className="w-3.5 h-3.5" />
                     {t.label}
@@ -388,7 +388,7 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
                           User ID / Username / Phone
                         </label>
                         <div className="relative group">
-                          <Hash className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-focus-within:text-[var(--txt-body)] pointer-events-none" />
+                          <Hash className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-focus-within:text-[var(--text-secondary)] pointer-events-none" />
                           <input
                             type="text"
                             value={smartInput}
@@ -396,7 +396,7 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
                             placeholder="DON-DL-26-0001 / ajay@rakt / 98765..."
                             disabled={anyBusy}
                             onKeyDown={e => e.key === 'Enter' && handleSmartLookup()}
-                            className="w-full pl-9 sm:pl-12 pr-3 sm:pr-4 py-3 sm:py-3.5 bg-[var(--clr-bg-card)]/60 border-2 border-[var(--clr-border)] rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none transition-all text-[var(--txt-heading)] placeholder-gray-400 text-sm disabled:opacity-50"
+                            className="w-full pl-9 sm:pl-12 pr-3 sm:pr-4 py-3 sm:py-3.5 bg-[var(--bg-surface)]/60 border-2 border-[var(--border-color)] rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none transition-all text-[var(--text-primary)] placeholder-gray-400 text-sm disabled:opacity-50"
                           />
                           {/* Type badge */}
                           {smartInput.length >= 2 && badge && (
@@ -406,7 +406,7 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
                             </span>
                           )}
                         </div>
-                        <p className="text-[10px] sm:text-xs text-[var(--txt-body)]">
+                        <p className="text-[10px] sm:text-xs text-[var(--text-secondary)]">
                           Enter your User ID, @rakt username, or registered phone number
                         </p>
                       </div>
@@ -431,28 +431,28 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
                         </div>
                         <div className="space-y-1.5 text-sm text-gray-700">
                           <div className="flex items-center gap-2">
-                            <span className="text-[var(--txt-body)] w-14 text-xs">Name</span>
+                            <span className="text-[var(--text-secondary)] w-14 text-xs">Name</span>
                             <span className="font-semibold">{foundUser.fullName}</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className="text-[var(--txt-body)] w-14 text-xs">Phone</span>
+                            <span className="text-[var(--text-secondary)] w-14 text-xs">Phone</span>
                             <span className="font-mono font-semibold">{maskPhone(foundUser.phone || '')}</span>
                           </div>
                           {foundUser.internalId && (
                             <div className="flex items-center gap-2">
-                              <span className="text-[var(--txt-body)] w-14 text-xs">ID</span>
+                              <span className="text-[var(--text-secondary)] w-14 text-xs">ID</span>
                               <span className="font-mono font-semibold text-blue-700">{foundUser.internalId}</span>
                             </div>
                           )}
                           {!foundUser.internalId && foundUser.donorId && (
                             <div className="flex items-center gap-2">
-                              <span className="text-[var(--txt-body)] w-14 text-xs">ID</span>
+                              <span className="text-[var(--text-secondary)] w-14 text-xs">ID</span>
                               <span className="font-mono font-semibold text-red-700">{foundUser.donorId}</span>
                             </div>
                           )}
                           {foundUser.username && (
                             <div className="flex items-center gap-2">
-                              <span className="text-[var(--txt-body)] w-14 text-xs">User</span>
+                              <span className="text-[var(--text-secondary)] w-14 text-xs">User</span>
                               <span className="font-semibold text-purple-700">{formatUsername(foundUser.username)}</span>
                             </div>
                           )}
@@ -468,7 +468,7 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
 
                       <div className="flex gap-3">
                         <button type="button" onClick={resetFlow} disabled={anyBusy}
-                          className="px-4 py-3 border-2 border-[var(--clr-border)] rounded-xl text-sm font-semibold text-gray-700 hover:bg-[var(--clr-bg-page)] active:scale-95 transition-all disabled:opacity-50">← Back</button>
+                          className="px-4 py-3 border-2 border-[var(--border-color)] rounded-xl text-sm font-semibold text-gray-700 hover:bg-[var(--bg-page)] active:scale-95 transition-all disabled:opacity-50">← Back</button>
                         <button type="button" onClick={handleSendOTP} disabled={anyBusy}
                           className={`flex-1 min-h-[50px] py-3 rounded-xl font-bold text-[var(--txt-inverse)] text-sm shadow-lg transition-all touch-manipulation ${
                             anyBusy ? 'bg-gray-300 cursor-not-allowed' : `bg-gradient-to-r ${current.color} hover:shadow-xl active:scale-[0.99]`
@@ -488,8 +488,8 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
                         <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-r ${current.color} flex items-center justify-center shadow-lg`}>
                           <Smartphone className="w-7 h-7 sm:w-8 sm:h-8 text-[var(--txt-inverse)]" />
                         </div>
-                        <h3 className="text-sm sm:text-base font-bold text-[var(--txt-heading)]">Enter Verification Code</h3>
-                        <p className="text-xs text-[var(--txt-body)]">Sent to {maskPhone(foundUser?.phone || '')}</p>
+                        <h3 className="text-sm sm:text-base font-bold text-[var(--text-primary)]">Enter Verification Code</h3>
+                        <p className="text-xs text-[var(--text-secondary)]">Sent to {maskPhone(foundUser?.phone || '')}</p>
                       </div>
 
                       <div className="flex justify-center gap-2 sm:gap-3" role="group" aria-label="OTP input">
@@ -497,8 +497,8 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
                           <input key={idx} id={`lp-otp-${uid}-${idx}`} type="text" inputMode="numeric" maxLength={1}
                             value={digit} onChange={e => changeOtpDigit(idx, e.target.value)} onKeyDown={e => otpKeyDown(idx, e)}
                             disabled={verifyLoading} aria-label={`OTP digit ${idx + 1}`}
-                            className={`text-center text-xl sm:text-2xl font-bold border-2 rounded-xl outline-none transition-all touch-manipulation text-[var(--txt-heading)] ${
-                              digit ? 'bg-[var(--clr-bg-card)] border-gray-500' : 'bg-[var(--clr-bg-card)]/60 border-[var(--clr-border)] focus:border-gray-500 focus:ring-4 focus:ring-gray-200/50'
+                            className={`text-center text-xl sm:text-2xl font-bold border-2 rounded-xl outline-none transition-all touch-manipulation text-[var(--text-primary)] ${
+                              digit ? 'bg-[var(--bg-surface)] border-gray-500' : 'bg-[var(--bg-surface)]/60 border-[var(--border-color)] focus:border-gray-500 focus:ring-4 focus:ring-gray-200/50'
                             } disabled:opacity-50`} style={{ width: 44, height: 52 }} />
                         ))}
                       </div>
@@ -516,11 +516,11 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
 
                       <div className="flex items-center justify-between">
                         <button type="button" onClick={resetFlow} disabled={anyBusy}
-                          className="text-xs text-[var(--txt-body)] hover:text-gray-700 font-medium disabled:opacity-50">← Change account</button>
-                        <div className="text-xs text-[var(--txt-body)]">
+                          className="text-xs text-[var(--text-secondary)] hover:text-gray-700 font-medium disabled:opacity-50">← Change account</button>
+                        <div className="text-xs text-[var(--text-secondary)]">
                           {resendTimer > 0
                             ? <>Resend in <strong className="text-gray-700">{resendTimer}s</strong></>
-                            : <button type="button" onClick={handleResendOTP} disabled={anyBusy} className="font-semibold text-gray-700 hover:text-[var(--txt-heading)] underline disabled:opacity-50">Resend OTP</button>}
+                            : <button type="button" onClick={handleResendOTP} disabled={anyBusy} className="font-semibold text-gray-700 hover:text-[var(--text-primary)] underline disabled:opacity-50">Resend OTP</button>}
                         </div>
                       </div>
                     </div>
@@ -534,10 +534,10 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
                   <div className="space-y-1.5">
                     <label htmlFor="lp-email" className="block text-xs sm:text-sm font-semibold text-gray-700">Email Address</label>
                     <div className="relative group">
-                      <Mail className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-focus-within:text-[var(--txt-body)] pointer-events-none" />
+                      <Mail className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-focus-within:text-[var(--text-secondary)] pointer-events-none" />
                       <input id="lp-email" type="email" autoComplete="email" value={emailInput}
                         onChange={e => setEmailInput(e.target.value)} disabled={anyBusy}
-                        className="w-full pl-9 sm:pl-12 pr-3 sm:pr-4 py-3 sm:py-3.5 bg-[var(--clr-bg-card)]/60 border-2 border-[var(--clr-border)] rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none transition-all text-[var(--txt-heading)] placeholder-gray-400 text-sm disabled:opacity-50"
+                        className="w-full pl-9 sm:pl-12 pr-3 sm:pr-4 py-3 sm:py-3.5 bg-[var(--bg-surface)]/60 border-2 border-[var(--border-color)] rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none transition-all text-[var(--text-primary)] placeholder-gray-400 text-sm disabled:opacity-50"
                         placeholder="you@example.com" />
                     </div>
                   </div>
@@ -547,13 +547,13 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
                       <button type="button" onClick={() => setShowForgotPwd(true)} tabIndex={-1} className="text-[10px] sm:text-xs font-semibold text-[var(--clr-info)] hover:text-blue-800 hover:underline">Forgot password?</button>
                     </div>
                     <div className="relative group">
-                      <Lock className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-focus-within:text-[var(--txt-body)] pointer-events-none" />
+                      <Lock className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-focus-within:text-[var(--text-secondary)] pointer-events-none" />
                       <input id="lp-password" type={showPassword ? 'text' : 'password'} autoComplete="current-password" value={passwordInput}
                         onChange={e => setPasswordInput(e.target.value)} disabled={anyBusy}
-                        className="w-full pl-9 sm:pl-12 pr-10 sm:pr-12 py-3 sm:py-3.5 bg-[var(--clr-bg-card)]/60 border-2 border-[var(--clr-border)] rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none transition-all text-[var(--txt-heading)] placeholder-gray-400 text-sm disabled:opacity-50"
+                        className="w-full pl-9 sm:pl-12 pr-10 sm:pr-12 py-3 sm:py-3.5 bg-[var(--bg-surface)]/60 border-2 border-[var(--border-color)] rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none transition-all text-[var(--text-primary)] placeholder-gray-400 text-sm disabled:opacity-50"
                         placeholder="••••••••" />
                       <button type="button" onClick={() => setShowPassword(v => !v)} tabIndex={-1}
-                        className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[var(--txt-body)] transition-colors p-0.5 touch-manipulation">
+                        className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[var(--text-secondary)] transition-colors p-0.5 touch-manipulation">
                         {showPassword ? <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Eye className="w-4 h-4 sm:w-5 sm:h-5" />}
                       </button>
                     </div>
@@ -576,7 +576,7 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
 
               {/* Google */}
               <button type="button" onClick={handleGoogle} disabled={anyBusy}
-                className="w-full flex items-center justify-center gap-2.5 min-h-[50px] px-4 py-3 sm:py-3.5 bg-[var(--clr-bg-card)] border-2 border-[var(--clr-border)] rounded-xl hover:border-[var(--clr-border)] hover:shadow-md active:scale-[0.98] transition-all font-semibold text-sm text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation">
+                className="w-full flex items-center justify-center gap-2.5 min-h-[50px] px-4 py-3 sm:py-3.5 bg-[var(--bg-surface)] border-2 border-[var(--border-color)] rounded-xl hover:border-[var(--border-color)] hover:shadow-md active:scale-[0.98] transition-all font-semibold text-sm text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation">
                 {gLoading ? <Spinner /> : <GoogleIcon size={18} />}
                 <span>{gLoading ? 'Signing in…' : 'Continue with Google'}</span>
               </button>
@@ -584,7 +584,7 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
 
             {/* Footer */}
             <div className="px-4 sm:px-8 pb-6 text-center text-xs sm:text-sm">
-              <span className="text-[var(--txt-body)]">Don't have an account? </span>
+              <span className="text-[var(--text-secondary)]">Don't have an account? </span>
               <button type="button" onClick={() => onSignupClick(role)}
                 className={`font-semibold bg-gradient-to-r ${current.color} bg-clip-text text-transparent hover:underline`}>
                 Sign Up
@@ -602,17 +602,17 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
       {/* Forgot Password Modal */}
       {showForgotPwd && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[var(--clr-bg-card)] rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4 animate-fadein">
-            <h3 className="font-bold text-lg text-[var(--txt-heading)]">Reset Password</h3>
-            <p className="text-sm text-[var(--txt-body)]">Enter your email and we'll send a link to reset your password.</p>
+          <div className="bg-[var(--bg-surface)] rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4 animate-fadein">
+            <h3 className="font-bold text-lg text-[var(--text-primary)]">Reset Password</h3>
+            <p className="text-sm text-[var(--text-secondary)]">Enter your email and we'll send a link to reset your password.</p>
             <div className="space-y-1.5">
               <input type="email" value={forgotEmail} onChange={e => setForgotEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full px-4 py-3 bg-[var(--clr-bg-card)] border-2 border-[var(--clr-border)] rounded-xl outline-none focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 transition-all text-sm" />
+                className="w-full px-4 py-3 bg-[var(--bg-surface)] border-2 border-[var(--border-color)] rounded-xl outline-none focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 transition-all text-sm" />
             </div>
             <div className="flex gap-2 pt-2">
               <button type="button" onClick={() => setShowForgotPwd(false)}
-                className="px-4 py-2 border-2 border-[var(--clr-border)] rounded-xl text-sm font-semibold text-[var(--txt-body)] hover:bg-[var(--clr-bg-page)]">Cancel</button>
+                className="px-4 py-2 border-2 border-[var(--border-color)] rounded-xl text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--bg-page)]">Cancel</button>
               <button type="button" onClick={async () => {
                 if (!forgotEmail) { toast.error('Enter email'); return; }
                 setForgotLoading(true);

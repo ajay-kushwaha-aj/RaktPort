@@ -187,7 +187,7 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
         </div>
 
         {/* ─ Nav bar ─ */}
-        <nav style={{ background:'var(--header-bg)', borderLeft:'3px solid var(--header-accent)' }} aria-label="Main navigation">
+        <nav style={{ background:'var(--brand-primary)', borderLeft:'3px solid var(--header-accent)' }} aria-label="Main navigation">
           <div className="container mx-auto" style={{ padding:'0 16px' }}>
 
             {/* Desktop */}

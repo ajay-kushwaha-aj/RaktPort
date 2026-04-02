@@ -75,7 +75,7 @@ export const BloodBankHeader = ({
             {/* Pending requests */}
             {bloodRequestsCount > 0 && (
               <div className="bbh-req-pill hidden sm:flex">
-                <span className="w-5 h-5 bg-[var(--clr-emergency)] rounded-full flex items-center justify-center text-[9px] font-black text-[var(--txt-inverse)] flex-shrink-0">
+                <span className="w-5 h-5 bg-[var(--clr-danger)] rounded-full flex items-center justify-center text-[9px] font-black text-[var(--txt-inverse)] flex-shrink-0">
                   {bloodRequestsCount > 9 ? '9+' : bloodRequestsCount}
                 </span>
                 Blood Requests
@@ -103,7 +103,7 @@ export const BloodBankHeader = ({
             <MapPin className="w-3 h-3 text-red-200/40" />
             <span className="text-[11px] text-red-200/50">{location || '…'}</span>
             {bloodRequestsCount > 0 && (
-              <span className="ml-auto text-[10px] font-bold bg-[var(--clr-emergency)]/25 text-red-200 px-2 py-0.5 rounded-full">
+              <span className="ml-auto text-[10px] font-bold bg-[var(--clr-danger)]/25 text-red-200 px-2 py-0.5 rounded-full">
                 {bloodRequestsCount} Requests
               </span>
             )}
