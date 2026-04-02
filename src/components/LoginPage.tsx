@@ -11,7 +11,7 @@ import { useState, useEffect, useCallback, useId, useMemo } from 'react';
 import {
   loginUser, signInWithGoogle, initRecaptcha,
   lookupUserByInternalId, lookupUserByUsername, lookupUserByPhone,
-  sendLoginOTP, verifyLoginOTP,
+  sendLoginOTP, verifyLoginOTP, resetPassword,
   type UserLookupResult,
 } from '../lib/auth';
 import {
@@ -95,6 +95,11 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  
+  // Forgot Password
+  const [showForgotPwd, setShowForgotPwd] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
 
   // OTP
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -537,7 +542,10 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
                     </div>
                   </div>
                   <div className="space-y-1.5">
-                    <label htmlFor="lp-password" className="block text-xs sm:text-sm font-semibold text-gray-700">Password</label>
+                    <div className="flex justify-between items-center">
+                      <label htmlFor="lp-password" className="block text-xs sm:text-sm font-semibold text-gray-700">Password</label>
+                      <button type="button" onClick={() => setShowForgotPwd(true)} tabIndex={-1} className="text-[10px] sm:text-xs font-semibold text-blue-600 hover:text-blue-800 hover:underline">Forgot password?</button>
+                    </div>
                     <div className="relative group">
                       <Lock className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-focus-within:text-gray-600 pointer-events-none" />
                       <input id="lp-password" type={showPassword ? 'text' : 'password'} autoComplete="current-password" value={passwordInput}
@@ -590,6 +598,41 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
           </p>
         </div>
       </div>
+
+      {/* Forgot Password Modal */}
+      {showForgotPwd && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4 animate-fadein">
+            <h3 className="font-bold text-lg text-gray-800">Reset Password</h3>
+            <p className="text-sm text-gray-500">Enter your email and we'll send a link to reset your password.</p>
+            <div className="space-y-1.5">
+              <input type="email" value={forgotEmail} onChange={e => setForgotEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-xl outline-none focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 transition-all text-sm" />
+            </div>
+            <div className="flex gap-2 pt-2">
+              <button type="button" onClick={() => setShowForgotPwd(false)}
+                className="px-4 py-2 border-2 border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50">Cancel</button>
+              <button type="button" onClick={async () => {
+                if (!forgotEmail) { toast.error('Enter email'); return; }
+                setForgotLoading(true);
+                const res = await resetPassword(forgotEmail);
+                setForgotLoading(false);
+                if (res.success) {
+                  toast.success('Reset link sent!');
+                  setShowForgotPwd(false);
+                  setForgotEmail('');
+                } else {
+                  toast.error('Error', { description: res.error });
+                }
+              }} disabled={forgotLoading}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-bold shadow-md hover:bg-blue-700 disabled:opacity-50">
+                {forgotLoading ? 'Sending...' : 'Send Link'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style>{`
         @keyframes blob { 0%,100%{transform:translate(0,0) scale(1)} 25%{transform:translate(20px,-20px) scale(1.1)} 50%{transform:translate(-20px,20px) scale(0.9)} 75%{transform:translate(20px,20px) scale(1.05)} }

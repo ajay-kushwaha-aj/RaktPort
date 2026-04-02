@@ -22,6 +22,7 @@ import {
   RecaptchaVerifier,
   signInWithPhoneNumber,
   updateProfile,
+  sendPasswordResetEmail,
   type ConfirmationResult,
   type User,
 } from 'firebase/auth';
@@ -512,6 +513,30 @@ export async function verifyLoginOTP(
   } catch (error: any) {
     try { await auth.signOut(); } catch (_) {}
     console.error('[Auth] verifyLoginOTP:', error);
+    return { success: false, error: friendlyAuthError(error.code) };
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Forgot Password & Registration Check
+───────────────────────────────────────────────────────────── */
+
+export async function lookupUserByEmail(email: string): Promise<boolean> {
+  try {
+    const q = query(collection(db, 'users'), where('email', '==', email.toLowerCase().trim()));
+    const snap = await getDocs(q);
+    return !snap.empty;
+  } catch (error) {
+    console.error('[Auth] lookupUserByEmail:', error);
+    return false;
+  }
+}
+
+export async function resetPassword(email: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    await sendPasswordResetEmail(auth, email);
+    return { success: true };
+  } catch (error: any) {
     return { success: false, error: friendlyAuthError(error.code) };
   }
 }

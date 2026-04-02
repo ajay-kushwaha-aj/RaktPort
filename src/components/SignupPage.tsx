@@ -9,6 +9,7 @@ import {
   verifyRegistrationOTP,
   registerUserWithPhone,
   signInWithGoogle,
+  lookupUserByEmail,
 } from '../lib/auth';
 import { sendVerificationEmail } from '../lib/emailService';
 import {
@@ -16,6 +17,7 @@ import {
   checkUsernameAvailable,
   formatUsername,
 } from '../lib/identity';
+import confetti from 'canvas-confetti';
 import { toast } from 'sonner';
 import {
   ArrowLeft, Eye, EyeOff, Upload, X, CheckCircle2,
@@ -527,6 +529,13 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
     // if (!recaptchaV) { toast.error('reCAPTCHA not ready — please refresh'); return; } // Dormant reCAPTCHA logic
     setOtpLoading(true);
     try {
+      const isRegistered = await lookupUserByEmail(form.email);
+      if (isRegistered) {
+        toast.error('Already Registered', { description: 'This email is already registered. Please log in.' });
+        setOtpLoading(false);
+        return;
+      }
+      
       const gCode = Math.floor(100000 + Math.random() * 900000).toString();
       setGeneratedEmailOtp(gCode);
       const res = await sendVerificationEmail(form.email, gCode, form.fullName || 'User');
@@ -659,7 +668,12 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
             console.warn('Inventory init failed:', e);
           }
         }
-        toast.success('Registration successful!', { description: role === 'donor' ? 'You can now log in.' : 'Account pending admin verification.' });
+        toast.success('Your Account Is successfully Created.', { description: role === 'donor' ? 'You can now log in.' : 'Account pending admin verification.' });
+        confetti({
+          particleCount: 150,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
         setTimeout(onLoginClick, 2000);
       } else { toast.error('Registration failed', { description: res.error }); }
     } catch (e: any) { toast.error('Error', { description: e.message ?? 'Unexpected error' }); }
