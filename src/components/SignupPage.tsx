@@ -38,10 +38,10 @@ interface SignupPageProps {
 /* ─────────────────── Config ─────────────────── */
 
 const ROLE_CONFIG = {
-  donor:     { title: 'Donor Registration',      subtitle: 'Join our life-saving community',   Icon: Heart,    gradient: 'from-red-500    to-pink-500',    bgGrad: 'from-red-50    via-pink-50   to-orange-50',  accent: '#ef4444', lightBg: 'bg-red-50',     borderL: 'border-red-400'     },
-  hospital:  { title: 'Hospital Registration',   subtitle: 'Partner with us to save lives',    Icon: Building2,gradient: 'from-blue-500   to-cyan-500',    bgGrad: 'from-blue-50   via-cyan-50   to-sky-50',     accent: '#3b82f6', lightBg: 'bg-blue-50',    borderL: 'border-blue-400'    },
+  donor:     { title: 'Donor Registration',      subtitle: 'Join our life-saving community',   Icon: Heart,    gradient: 'from-red-500    to-pink-500',    bgGrad: 'from-red-50    via-pink-50   to-orange-50',  accent: 'var(--clr-emergency)', lightBg: 'bg-red-50',     borderL: 'border-[var(--clr-emergency)]'     },
+  hospital:  { title: 'Hospital Registration',   subtitle: 'Partner with us to save lives',    Icon: Building2,gradient: 'from-blue-500   to-cyan-500',    bgGrad: 'from-blue-50   via-cyan-50   to-sky-50',     accent: 'var(--clr-info)', lightBg: 'bg-blue-50',    borderL: 'border-[var(--clr-info)]'    },
   bloodbank: { title: 'Blood Bank Registration', subtitle: 'Manage inventory efficiently',     Icon: Droplet,  gradient: 'from-purple-500 to-violet-500',   bgGrad: 'from-purple-50 via-violet-50 to-fuchsia-50', accent: '#a855f7', lightBg: 'bg-purple-50',  borderL: 'border-purple-400'  },
-  admin:     { title: 'Admin Registration',      subtitle: 'Manage the platform',              Icon: Shield,   gradient: 'from-emerald-500 to-teal-500',   bgGrad: 'from-emerald-50 via-teal-50  to-green-50',  accent: '#10b981', lightBg: 'bg-emerald-50', borderL: 'border-emerald-400' },
+  admin:     { title: 'Admin Registration',      subtitle: 'Manage the platform',              Icon: Shield,   gradient: 'from-emerald-500 to-teal-500',   bgGrad: 'from-emerald-50 via-teal-50  to-green-50',  accent: 'var(--clr-success)', lightBg: 'bg-emerald-50', borderL: 'border-emerald-400' },
 } as const;
 
 const INDIAN_STATES = [
@@ -81,10 +81,10 @@ function getPasswordStrength(pwd: string): { score: number; label: string; color
   if (/[A-Z]/.test(pwd)) score++;
   if (/[0-9]/.test(pwd)) score++;
   if (/[^A-Za-z0-9]/.test(pwd)) score++;
-  if (score <= 1) return { score, label: 'Weak', color: 'bg-red-500' };
+  if (score <= 1) return { score, label: 'Weak', color: 'bg-[var(--clr-emergency)]' };
   if (score <= 2) return { score, label: 'Fair', color: 'bg-amber-500' };
-  if (score <= 3) return { score, label: 'Good', color: 'bg-blue-500' };
-  return { score, label: 'Strong', color: 'bg-green-500' };
+  if (score <= 3) return { score, label: 'Good', color: 'bg-[var(--clr-info)]' };
+  return { score, label: 'Strong', color: 'bg-[var(--clr-success)]' };
 }
 
 /* ─────────────────── Sub-components ─────────────────── */
@@ -110,7 +110,7 @@ function Field({ label, required, hint, children }: {
   return (
     <div>
       <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5">
-        {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+        {label}{required && <span className="text-[var(--clr-emergency)] ml-0.5">*</span>}
       </label>
       {children}
       {hint && <p className="mt-1 text-[10px] sm:text-xs text-gray-500">{hint}</p>}
@@ -170,7 +170,7 @@ function DocUpload({ inputId, docs, onUpload, onRemove }: {
             <li key={i} className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg">
               <FileText className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
               <span className="text-xs sm:text-sm text-gray-700 truncate flex-1">{f.name}</span>
-              <button type="button" onClick={() => onRemove(i)} className="flex-shrink-0 text-red-400 hover:text-red-600 transition-colors touch-manipulation">
+              <button type="button" onClick={() => onRemove(i)} className="flex-shrink-0 text-[var(--clr-emergency)] hover:text-[var(--clr-emergency)] transition-colors touch-manipulation">
                 <X className="w-4 h-4" />
               </button>
             </li>
@@ -887,8 +887,8 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                       {form.username.length >= 3 && (
                         <div className={`mt-1.5 flex items-center gap-1.5 text-[11px] font-medium ${
                           usernameStatus === 'checking'  ? 'text-gray-500' :
-                          usernameStatus === 'available' ? 'text-green-600' :
-                          usernameStatus === 'taken'     ? 'text-red-600' :
+                          usernameStatus === 'available' ? 'text-[var(--clr-success)]' :
+                          usernameStatus === 'taken'     ? 'text-[var(--clr-emergency)]' :
                           usernameStatus === 'invalid'   ? 'text-amber-600' : 'text-gray-500'
                         }`}>
                           {usernameStatus === 'checking'  && <><Loader2 className="w-3 h-3 animate-spin" /> Checking availability…</>}
@@ -942,7 +942,7 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                               aria-label={`OTP digit ${idx + 1}`}
                               className={`text-center text-xl sm:text-2xl font-bold border-2 rounded-xl outline-none transition-all touch-manipulation ${
                                 otpVerified
-                                  ? 'bg-green-50 border-green-500 text-green-700'
+                                  ? 'bg-green-50 border-[var(--clr-success)] text-green-700'
                                   : digit
                                     ? 'bg-white border-gray-500'
                                     : 'bg-white/60 border-gray-300 focus:border-gray-500 focus:ring-4 focus:ring-gray-200/50'
@@ -953,7 +953,7 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                         </div>
 
                         {otpVerified ? (
-                          <div className="flex items-center justify-center gap-2 text-green-600 font-semibold text-sm sm:text-base">
+                          <div className="flex items-center justify-center gap-2 text-[var(--clr-success)] font-semibold text-sm sm:text-base">
                             <CheckCircle2 className="w-5 h-5" /> Email verified successfully!
                           </div>
                         ) : (
@@ -994,7 +994,7 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                           {form.aadhar.length > 0 && (
                             <div className="flex gap-1 mt-1.5">
                               {Array.from({length: 12}).map((_, i) => (
-                                <div key={i} className={`h-1 flex-1 rounded-full transition-all ${i < form.aadhar.length ? 'bg-green-500' : 'bg-gray-200'}`} />
+                                <div key={i} className={`h-1 flex-1 rounded-full transition-all ${i < form.aadhar.length ? 'bg-[var(--clr-success)]' : 'bg-gray-200'}`} />
                               ))}
                             </div>
                           )}
@@ -1204,9 +1204,9 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                             ))}
                           </div>
                           <p className={`text-[10px] font-semibold ${
-                            pwdStrength.label === 'Strong' ? 'text-green-600' :
-                            pwdStrength.label === 'Good'   ? 'text-blue-600' :
-                            pwdStrength.label === 'Fair'   ? 'text-amber-600' : 'text-red-500'
+                            pwdStrength.label === 'Strong' ? 'text-[var(--clr-success)]' :
+                            pwdStrength.label === 'Good'   ? 'text-[var(--clr-info)]' :
+                            pwdStrength.label === 'Fair'   ? 'text-amber-600' : 'text-[var(--clr-emergency)]'
                           }`}>
                             Password strength: {pwdStrength.label}
                           </p>
@@ -1226,7 +1226,7 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                         </button>
                       </div>
                       {form.confirmPassword.length > 0 && (
-                        <p className={`mt-1 text-[11px] font-medium flex items-center gap-1 ${form.password === form.confirmPassword ? 'text-green-600' : 'text-red-500'}`}>
+                        <p className={`mt-1 text-[11px] font-medium flex items-center gap-1 ${form.password === form.confirmPassword ? 'text-[var(--clr-success)]' : 'text-[var(--clr-emergency)]'}`}>
                           {form.password === form.confirmPassword
                             ? <><CheckCircle2 className="w-3 h-3" /> Passwords match</>
                             : <><AlertCircle className="w-3 h-3" /> Passwords don't match</>}
@@ -1271,7 +1271,7 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
 
                     {role === 'donor' && (
                       <div className={`flex gap-2.5 p-3 sm:p-4 ${cfg.lightBg} rounded-xl border-l-4 ${cfg.borderL}`}>
-                        <Heart className="w-4 h-4 flex-shrink-0 mt-0.5 text-red-600" />
+                        <Heart className="w-4 h-4 flex-shrink-0 mt-0.5 text-[var(--clr-emergency)]" />
                         <p className="text-xs sm:text-sm text-gray-700">
                           <strong className="text-red-700">Note:</strong> By registering you pledge to donate voluntarily and maintain eligibility criteria.
                         </p>

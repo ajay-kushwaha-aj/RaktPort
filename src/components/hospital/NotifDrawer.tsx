@@ -17,8 +17,8 @@ export const NotifDrawer = ({
       <div className="fixed top-[70px] right-4 w-80 max-h-[75vh] overflow-hidden z-50 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex flex-col hd-enter-sm">
         <div className="p-4 border-b dark:border-gray-700 flex items-center justify-between flex-shrink-0">
           <h3 className="font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2 text-sm">
-            <Bell className="w-4 h-4 text-[#8B0000]" /> Notifications
-            {unread > 0 && <span className="bg-[#8B0000] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">{unread}</span>}
+            <Bell className="w-4 h-4 text-[var(--clr-brand)]" /> Notifications
+            {unread > 0 && <span className="bg-[var(--clr-brand)] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">{unread}</span>}
           </h3>
           <div className="flex items-center gap-1">
             {unread > 0 && (
@@ -28,7 +28,7 @@ export const NotifDrawer = ({
               </button>
             )}
             <button onClick={onClear} title="Clear all"
-              className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 text-gray-500 dark:text-gray-400 flex items-center justify-center transition-colors">
+              className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-[var(--clr-emergency)] text-gray-500 dark:text-gray-400 flex items-center justify-center transition-colors">
               <Trash className="w-3.5 h-3.5" />
             </button>
             <button onClick={onClose} className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center">
@@ -46,12 +46,12 @@ export const NotifDrawer = ({
             <div key={n.id}
               className={`px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-colors flex items-start gap-2 ${n.read ? "opacity-60" : ""}`}
               onClick={() => onMarkRead(n.id)}>
-              <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${n.type === "alert" ? "bg-red-500" : n.type === "update" ? "bg-blue-500" : n.type === "system" ? "bg-gray-400" : "bg-green-500"}`} />
+              <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${n.type === "alert" ? "bg-[var(--clr-emergency)]" : n.type === "update" ? "bg-[var(--clr-info)]" : n.type === "system" ? "bg-gray-400" : "bg-[var(--clr-success)]"}`} />
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-gray-700 dark:text-gray-300 leading-snug">{n.message}</p>
                 <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{n.time}</p>
               </div>
-              {!n.read && <div className="w-1.5 h-1.5 rounded-full bg-[#8B0000] mt-2 flex-shrink-0" />}
+              {!n.read && <div className="w-1.5 h-1.5 rounded-full bg-[var(--clr-brand)] mt-2 flex-shrink-0" />}
             </div>
           ))}
         </div>

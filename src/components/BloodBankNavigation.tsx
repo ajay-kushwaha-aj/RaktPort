@@ -68,11 +68,11 @@ export const BloodBankNavigation = ({
         }
         .bbn-tab:hover:not(.bbn-active) {
           background:rgba(139,0,0,0.06);
-          color:#8B0000;
+          color:var(--clr-brand);
           transform:translateY(-1px);
         }
         .bbn-active {
-          background:linear-gradient(135deg,#8B0000,#b30000);
+          background:linear-gradient(135deg,var(--clr-brand),#b30000);
           color:#fff !important;
           font-weight:600;
           box-shadow:0 4px 12px rgba(139,0,0,0.3), 0 1px 3px rgba(139,0,0,0.2);
@@ -84,7 +84,7 @@ export const BloodBankNavigation = ({
 
         .bbn-badge {
           min-width:17px; height:17px; padding:0 4px;
-          background:#ef4444; border-radius:999px;
+          background:var(--clr-emergency); border-radius:999px;
           font-size:9px; font-weight:800; color:#fff;
           display:flex; align-items:center; justify-content:center;
           animation:bbn-pop 0.3s cubic-bezier(0.68,-0.55,0.27,1.55);

@@ -86,10 +86,10 @@ export const InventoryTab = ({ inventory }: InventoryTabProps) => {
               <div className="w-full bg-black/5 rounded-full h-2 overflow-hidden">
                 <div
                   className={`h-2 rounded-full transition-all duration-500 ${status === 'good'
-                    ? 'bg-green-600'
+                    ? 'bg-[var(--clr-success)]'
                     : status === 'low'
-                      ? 'bg-orange-500'
-                      : 'bg-red-600'
+                      ? 'bg-[var(--clr-emergency)]'
+                      : 'bg-[var(--clr-emergency)]'
                     }`}
                   style={{
                     width: `${item.total > 0 ? (item.available / item.total) * 100 : 0}%`,
@@ -106,15 +106,15 @@ export const InventoryTab = ({ inventory }: InventoryTabProps) => {
         <h3 className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wide">Inventory Status Thresholds</h3>
         <div className="flex flex-wrap gap-6">
           <div className="flex items-center gap-3">
-            <div className="w-4 h-4 rounded-full bg-red-500 shadow-sm border border-red-600"></div>
+            <div className="w-4 h-4 rounded-full bg-[var(--clr-emergency)] shadow-sm border border-[var(--clr-emergency)]"></div>
             <span className="text-sm text-foreground font-medium">Critical: &lt; 30 Units</span>
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-4 h-4 rounded-full bg-orange-500 shadow-sm border border-orange-600"></div>
+            <div className="w-4 h-4 rounded-full bg-[var(--clr-emergency)] shadow-sm border border-[var(--clr-emergency)]"></div>
             <span className="text-sm text-foreground font-medium">Low: 30 - 50 Units</span>
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-4 h-4 rounded-full bg-green-600 shadow-sm border border-green-700"></div>
+            <div className="w-4 h-4 rounded-full bg-[var(--clr-success)] shadow-sm border border-green-700"></div>
             <span className="text-sm text-foreground font-medium">Good: &gt; 50 Units</span>
           </div>
         </div>

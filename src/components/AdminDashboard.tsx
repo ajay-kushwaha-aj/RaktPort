@@ -77,9 +77,9 @@ const getStatusClasses = (status: string): string => {
 
 const getInventoryLevel = (units: number): { label: string; color: string; bg: string; bar: string } => {
   if (units >= 50) return { label: 'Excellent', color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200', bar: 'bg-emerald-500' };
-  if (units >= 20) return { label: 'Good', color: 'text-blue-700', bg: 'bg-blue-50 border-blue-200', bar: 'bg-blue-500' };
+  if (units >= 20) return { label: 'Good', color: 'text-blue-700', bg: 'bg-blue-50 border-blue-200', bar: 'bg-[var(--clr-info)]' };
   if (units >= 10) return { label: 'Low', color: 'text-amber-700', bg: 'bg-amber-50 border-amber-200', bar: 'bg-amber-500' };
-  return { label: 'Critical', color: 'text-red-700', bg: 'bg-red-50 border-red-200', bar: 'bg-red-500' };
+  return { label: 'Critical', color: 'text-red-700', bg: 'bg-red-50 border-red-200', bar: 'bg-[var(--clr-emergency)]' };
 };
 
 const downloadCSV = (data: any[], filename: string) => {
@@ -159,7 +159,7 @@ const OrgListModal = ({
             <input
               type="text" placeholder="Search organizations..."
               value={search} onChange={e => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-blue-500 outline-none text-sm"
+              className="w-full pl-9 pr-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-[var(--clr-info)] outline-none text-sm"
             />
           </div>
         </div>
@@ -180,7 +180,7 @@ const OrgListModal = ({
                       org.type === 'Hospital' ? 'bg-blue-100' : 'bg-purple-100'
                     }`}>
                       {org.type === 'Hospital'
-                        ? <Building2 className="w-5 h-5 text-blue-600" />
+                        ? <Building2 className="w-5 h-5 text-[var(--clr-info)]" />
                         : <Droplet className="w-5 h-5 text-purple-600" />
                       }
                     </div>
@@ -210,7 +210,7 @@ const OrgListModal = ({
                           <FileText className="w-3 h-3" /> License: {org.license}
                         </p>
                         {org.verifiedAt && (
-                          <p className="text-xs text-green-600 flex items-center gap-1.5">
+                          <p className="text-xs text-[var(--clr-success)] flex items-center gap-1.5">
                             <CheckCircle className="w-3 h-3" /> Verified: {formatDate(org.verifiedAt)}
                           </p>
                         )}
@@ -246,7 +246,7 @@ const OrgListModal = ({
           >
             <Download className="w-4 h-4" /> Export CSV
           </button>
-          <button onClick={onClose} className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl">
+          <button onClick={onClose} className="px-4 py-2 text-sm font-semibold text-white bg-[var(--clr-info)] hover:bg-blue-700 rounded-xl">
             Close
           </button>
         </div>
@@ -264,7 +264,7 @@ const BloodGroupCard = ({ group, units, maxUnits }: { group: string; units: numb
     <div className={`rounded-2xl border-2 p-5 ${level.bg} hover:shadow-lg transition-all`}>
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <Droplet className="w-5 h-5 text-red-500" fill="currentColor" />
+          <Droplet className="w-5 h-5 text-[var(--clr-emergency)]" fill="currentColor" />
           <span className="text-2xl font-black text-gray-900">{group}</span>
         </div>
         <span className={`text-xs font-bold px-2 py-1 rounded-full ${level.color} bg-white/70`}>
@@ -656,7 +656,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
         title: action === 'verified' ? 'Approve Organization?' : 'Reject Organization?',
         text: action === 'verified' ? 'This organization will get access to the platform' : 'This organization will be rejected',
         icon: 'question', showCancelButton: true,
-        confirmButtonColor: action === 'verified' ? '#10B981' : '#EF4444',
+        confirmButtonColor: action === 'verified' ? 'var(--clr-success)' : 'var(--clr-emergency)',
         cancelButtonColor: '#6B7280',
         confirmButtonText: action === 'verified' ? 'Approve' : 'Reject'
       });
@@ -824,7 +824,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             <div className="flex items-center gap-3">
               <button onClick={() => fetchData(true)} disabled={loading}
                 className="p-2.5 hover:bg-gray-100 rounded-xl transition-all group" title="Refresh">
-                <RefreshCw className={`w-5 h-5 text-gray-600 group-hover:text-blue-600 ${loading ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`w-5 h-5 text-gray-600 group-hover:text-[var(--clr-info)] ${loading ? 'animate-spin' : ''}`} />
               </button>
 
               {/* Notifications */}
@@ -833,7 +833,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   className="relative p-2.5 hover:bg-gray-100 rounded-xl transition-all">
                   <Bell className="w-5 h-5 text-gray-600" />
                   {notifications.length > 0 && (
-                    <span className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
+                    <span className="absolute top-1 right-1 w-5 h-5 bg-[var(--clr-emergency)] text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
                       {notifications.length}
                     </span>
                   )}
@@ -843,7 +843,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     <div className="p-4 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
                       <h3 className="font-bold text-gray-800 flex items-center gap-2">
                         <Bell className="w-4 h-4" /> Notifications
-                        <span className="ml-auto text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full">{notifications.length}</span>
+                        <span className="ml-auto text-xs bg-[var(--clr-info)] text-white px-2 py-0.5 rounded-full">{notifications.length}</span>
                       </h3>
                     </div>
                     <div className="max-h-64 overflow-y-auto">
@@ -851,7 +851,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         <div key={n.id} onClick={() => setShowNotifications(false)}
                           className="p-4 border-b hover:bg-gray-50 cursor-pointer">
                           <div className="flex items-start gap-3">
-                            <div className={`w-2 h-2 rounded-full mt-2 ${n.type === 'warning' ? 'bg-yellow-400' : n.type === 'success' ? 'bg-green-400' : 'bg-blue-400'}`} />
+                            <div className={`w-2 h-2 rounded-full mt-2 ${n.type === 'warning' ? 'bg-yellow-400' : n.type === 'success' ? 'bg-[var(--clr-success)]' : 'bg-[var(--clr-info)]'}`} />
                             <div>
                               <p className="text-sm font-semibold text-gray-800">{n.title}</p>
                               <p className="text-xs text-gray-500 mt-0.5">{n.message}</p>
@@ -904,7 +904,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   <Icon className="w-4 h-4" />
                   <span className="text-sm">{tab.label}</span>
                   {(tab as any).badge > 0 && (
-                    <span className={`px-1.5 py-0.5 text-xs font-bold rounded-full ${isActive ? 'bg-white text-blue-600' : 'bg-blue-600 text-white'}`}>
+                    <span className={`px-1.5 py-0.5 text-xs font-bold rounded-full ${isActive ? 'bg-white text-[var(--clr-info)]' : 'bg-[var(--clr-info)] text-white'}`}>
                       {(tab as any).badge}
                     </span>
                   )}
@@ -919,7 +919,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       {loading && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="bg-white rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-4">
-            <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
+            <Loader2 className="w-12 h-12 text-[var(--clr-info)] animate-spin" />
             <p className="text-gray-800 font-semibold">Loading Dashboard...</p>
           </div>
         </div>
@@ -934,15 +934,15 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
             {/* Critical alert */}
             {criticalGroups.length > 0 && (
-              <div className="bg-gradient-to-r from-red-50 to-rose-50 rounded-2xl p-5 border-l-4 border-red-500 shadow-lg flex items-center gap-4">
-                <AlertOctagon className="w-6 h-6 text-red-600 flex-shrink-0" />
+              <div className="bg-gradient-to-r from-red-50 to-rose-50 rounded-2xl p-5 border-l-4 border-[var(--clr-emergency)] shadow-lg flex items-center gap-4">
+                <AlertOctagon className="w-6 h-6 text-[var(--clr-emergency)] flex-shrink-0" />
                 <div>
                   <p className="font-bold text-red-900">🚨 Critical Blood Shortage Alert</p>
                   <p className="text-sm text-red-700 mt-0.5">
                     Groups with &lt;10 units nationally: <strong>{criticalGroups.join(', ')}</strong>
                   </p>
                 </div>
-                <button onClick={() => setActiveTab('inventory')} className="ml-auto px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-bold hover:bg-red-700">
+                <button onClick={() => setActiveTab('inventory')} className="ml-auto px-4 py-2 bg-[var(--clr-emergency)] text-white rounded-xl text-sm font-bold hover:bg-red-700">
                   View Inventory
                 </button>
               </div>
@@ -1011,18 +1011,18 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         <p className="text-2xl font-black text-gray-900">{stat.value}</p>
                         <p className="text-sm text-gray-500">{stat.label}</p>
                       </div>
-                      <ArrowRight className="w-5 h-5 text-gray-300 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" />
+                      <ArrowRight className="w-5 h-5 text-gray-300 group-hover:text-[var(--clr-info)] group-hover:translate-x-1 transition-all" />
                     </div>
                     <div className="space-y-1">
                       <div className="flex justify-between text-xs text-gray-500">
                         <span>{stat.value} of {stat.total}</span>
-                        <span className="font-semibold text-blue-600">{pct}% verified</span>
+                        <span className="font-semibold text-[var(--clr-info)]">{pct}% verified</span>
                       </div>
                       <div className="w-full bg-gray-100 rounded-full h-2">
                         <div className={`bg-gradient-to-r ${stat.gradient} h-2 rounded-full transition-all`} style={{ width: `${pct}%` }} />
                       </div>
                     </div>
-                    <p className="text-xs text-blue-500 font-semibold mt-3 group-hover:underline">
+                    <p className="text-xs text-[var(--clr-info)] font-semibold mt-3 group-hover:underline">
                       Click to view details →
                     </p>
                   </button>
@@ -1035,12 +1035,12 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
               <div className="flex items-center justify-between mb-5">
                 <div>
                   <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                    <Droplet className="w-5 h-5 text-red-500" fill="currentColor" /> National Blood Inventory
+                    <Droplet className="w-5 h-5 text-[var(--clr-emergency)]" fill="currentColor" /> National Blood Inventory
                   </h3>
                   <p className="text-sm text-gray-500 mt-0.5">{totalNatUnits.toLocaleString()} total units available across India</p>
                 </div>
                 <button onClick={() => setActiveTab('inventory')}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-all flex items-center gap-2">
+                  className="px-4 py-2 bg-[var(--clr-info)] text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-all flex items-center gap-2">
                   Full Inventory <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -1103,11 +1103,11 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-4 bg-green-50 rounded-xl border border-green-200">
                     <p className="text-sm font-semibold text-green-800">Donations Today</p>
-                    <p className="text-3xl font-black text-green-600 mt-1">{todayDonations.length}</p>
+                    <p className="text-3xl font-black text-[var(--clr-success)] mt-1">{todayDonations.length}</p>
                   </div>
                   <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
                     <p className="text-sm font-semibold text-blue-800">Requests Today</p>
-                    <p className="text-3xl font-black text-blue-600 mt-1">{todayRequests.length}</p>
+                    <p className="text-3xl font-black text-[var(--clr-info)] mt-1">{todayRequests.length}</p>
                   </div>
                 </div>
               </div>
@@ -1139,7 +1139,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                  <Droplet className="w-7 h-7 text-red-500" fill="currentColor" /> National Blood Inventory
+                  <Droplet className="w-7 h-7 text-[var(--clr-emergency)]" fill="currentColor" /> National Blood Inventory
                 </h2>
                 <p className="text-sm text-gray-500 mt-1">
                   Real-time inventory across all registered blood banks
@@ -1156,7 +1156,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             {/* Alerts */}
             {criticalGroups.length > 0 && (
               <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-5 flex items-center gap-4">
-                <AlertOctagon className="w-6 h-6 text-red-600 flex-shrink-0" />
+                <AlertOctagon className="w-6 h-6 text-[var(--clr-emergency)] flex-shrink-0" />
                 <div>
                   <p className="font-bold text-red-900">Critical Shortage</p>
                   <p className="text-sm text-red-700">{criticalGroups.join(', ')} — Immediate procurement required</p>
@@ -1179,7 +1179,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
               </div>
               <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-5 border border-blue-200">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center shadow">
+                  <div className="w-12 h-12 bg-[var(--clr-info)] rounded-xl flex items-center justify-center shadow">
                     <Globe className="w-6 h-6 text-white" />
                   </div>
                   <div>
@@ -1250,11 +1250,11 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                       <input type="text" placeholder="Search city..."
                         value={inventorySearchTerm} onChange={e => setInventorySearchTerm(e.target.value)}
-                        className="pl-9 pr-4 py-2 border-2 border-gray-200 rounded-xl text-sm focus:border-blue-500 outline-none w-44" />
+                        className="pl-9 pr-4 py-2 border-2 border-gray-200 rounded-xl text-sm focus:border-[var(--clr-info)] outline-none w-44" />
                     </div>
                     {/* City dropdown */}
                     <select value={selectedCity} onChange={e => setSelectedCity(e.target.value)}
-                      className="px-4 py-2 border-2 border-gray-200 rounded-xl text-sm font-medium focus:border-blue-500 outline-none bg-white min-w-[160px]">
+                      className="px-4 py-2 border-2 border-gray-200 rounded-xl text-sm font-medium focus:border-[var(--clr-info)] outline-none bg-white min-w-[160px]">
                       <option value="">— Select City —</option>
                       {cityInvFiltered.map(city => (
                         <option key={city} value={city}>{city}</option>
@@ -1368,7 +1368,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                 const u = cityInventory[city]?.[bg] || 0;
                                 return (
                                   <td key={bg} className={`text-center px-2 py-2.5 font-bold text-xs ${
-                                    u === 0 ? 'text-gray-300' : u < 10 ? 'text-red-600' : u < 20 ? 'text-amber-600' : 'text-green-600'
+                                    u === 0 ? 'text-gray-300' : u < 10 ? 'text-[var(--clr-emergency)]' : u < 20 ? 'text-amber-600' : 'text-[var(--clr-success)]'
                                   }`}>{u || '—'}</td>
                                 );
                               })}
@@ -1404,17 +1404,17 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input type="text" placeholder="Search..." value={orgSearchTerm} onChange={e => setOrgSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-blue-500 outline-none text-sm" />
+                    className="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-[var(--clr-info)] outline-none text-sm" />
                 </div>
                 <select value={verifyFilter} onChange={e => setVerifyFilter(e.target.value)}
-                  className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-blue-500 outline-none text-sm font-medium">
+                  className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
                   <option value="all">All Status</option>
                   <option value="pending">Pending</option>
                   <option value="verified">Verified</option>
                   <option value="rejected">Rejected</option>
                 </select>
                 <select value={verifySort} onChange={e => setVerifySort(e.target.value)}
-                  className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-blue-500 outline-none text-sm font-medium">
+                  className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
                   <option value="name_asc">Name (A-Z)</option>
                   <option value="name_desc">Name (Z-A)</option>
                   <option value="type">By Type</option>
@@ -1462,7 +1462,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
               </div>
             ) : (
               <div className="bg-white rounded-2xl p-12 text-center shadow-lg border border-gray-100">
-                <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+                <CheckCircle className="w-16 h-16 text-[var(--clr-success)] mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-gray-900 mb-2">All Caught Up!</h3>
                 <p className="text-gray-500">No organizations pending verification</p>
               </div>
@@ -1493,10 +1493,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input type="text" placeholder="Search RTID, blood group, city..."
                     value={ledgerSearchTerm} onChange={e => setLedgerSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-blue-500 outline-none text-sm" />
+                    className="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-[var(--clr-info)] outline-none text-sm" />
                 </div>
                 <select value={ledgerFilterStatus} onChange={e => setLedgerFilterStatus(e.target.value)}
-                  className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-blue-500 outline-none text-sm font-medium">
+                  className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
                   <option value="all">All Status</option>
                   <option value="pending">Pending</option>
                   <option value="available">Available</option>
@@ -1504,7 +1504,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   <option value="completed">Completed</option>
                 </select>
                 <select value={ledgerSort} onChange={e => setLedgerSort(e.target.value)}
-                  className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-blue-500 outline-none text-sm font-medium">
+                  className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
                   <option value="newest">Newest First</option>
                   <option value="oldest">Oldest First</option>
                   <option value="bloodgroup">By Blood Group</option>
@@ -1616,10 +1616,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             {/* Key Metrics Summary */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { label: 'Fulfillment Rate', value: `${metrics.totalRequests > 0 ? Math.round((metrics.totalRedemptions / metrics.totalRequests) * 100) : 0}%`, icon: Target, color: 'text-green-600', bg: 'bg-green-50' },
-                { label: 'Avg Daily Donations', value: Math.round(metrics.totalDonations / 30), icon: TrendingUp, color: 'text-blue-600', bg: 'bg-blue-50' },
+                { label: 'Fulfillment Rate', value: `${metrics.totalRequests > 0 ? Math.round((metrics.totalRedemptions / metrics.totalRequests) * 100) : 0}%`, icon: Target, color: 'text-[var(--clr-success)]', bg: 'bg-green-50' },
+                { label: 'Avg Daily Donations', value: Math.round(metrics.totalDonations / 30), icon: TrendingUp, color: 'text-[var(--clr-info)]', bg: 'bg-blue-50' },
                 { label: 'Pending Requests', value: metrics.activeRTIDs, icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50' },
-                { label: 'Fraud Attempts', value: metrics.fraudAttempts, icon: Flag, color: 'text-red-600', bg: 'bg-red-50' }
+                { label: 'Fraud Attempts', value: metrics.fraudAttempts, icon: Flag, color: 'text-[var(--clr-emergency)]', bg: 'bg-red-50' }
               ].map((m, i) => {
                 const Icon = m.icon;
                 return (
@@ -1673,10 +1673,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input type="text" placeholder="Search donors by name, blood group, city..."
                     value={donorSearch} onChange={e => setDonorSearch(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-blue-500 outline-none text-sm" />
+                    className="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-[var(--clr-info)] outline-none text-sm" />
                 </div>
                 <select value={donorFilter} onChange={e => setDonorFilter(e.target.value)}
-                  className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-blue-500 outline-none text-sm font-medium">
+                  className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
                   <option value="all">All Blood Groups</option>
                   {BLOOD_GROUPS.map(bg => <option key={bg} value={bg}>{bg}</option>)}
                 </select>
@@ -1719,7 +1719,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           <span className="text-sm font-bold text-gray-900">{d.donationsCount || 0}</span>
                         </td>
                         <td className="px-4 py-3">
-                          <span className="text-sm font-bold text-green-600">{d.credits || 0}</span>
+                          <span className="text-sm font-bold text-[var(--clr-success)]">{d.credits || 0}</span>
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-500">
                           {d.lastDonationDate ? formatDate(d.lastDonationDate) : '—'}
@@ -1754,14 +1754,14 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 <div className="grid grid-cols-2 gap-4">
                   {(['D', 'H'] as const).map(p => (
                     <button key={p} onClick={() => setRtidPrefix(p)}
-                      className={`p-4 rounded-xl border-2 transition-all ${rtidPrefix === p ? (p === 'D' ? 'border-green-500 bg-green-50' : 'border-blue-500 bg-blue-50') : 'border-gray-200 hover:border-gray-300'}`}>
+                      className={`p-4 rounded-xl border-2 transition-all ${rtidPrefix === p ? (p === 'D' ? 'border-[var(--clr-success)] bg-green-50' : 'border-[var(--clr-info)] bg-blue-50') : 'border-gray-200 hover:border-gray-300'}`}>
                       <div className="flex items-center gap-3">
-                        {p === 'D' ? <Droplet className={`w-6 h-6 ${rtidPrefix === 'D' ? 'text-green-600' : 'text-gray-400'}`} /> : <Building2 className={`w-6 h-6 ${rtidPrefix === 'H' ? 'text-blue-600' : 'text-gray-400'}`} />}
+                        {p === 'D' ? <Droplet className={`w-6 h-6 ${rtidPrefix === 'D' ? 'text-[var(--clr-success)]' : 'text-gray-400'}`} /> : <Building2 className={`w-6 h-6 ${rtidPrefix === 'H' ? 'text-[var(--clr-info)]' : 'text-gray-400'}`} />}
                         <div className="text-left">
                           <p className="font-bold text-sm">{p}-RTID</p>
                           <p className="text-xs text-gray-500">{p === 'D' ? 'Donation' : 'Hospital Request'}</p>
                         </div>
-                        {rtidPrefix === p && <CheckCircle className={`w-4 h-4 ml-auto ${p === 'D' ? 'text-green-600' : 'text-blue-600'}`} />}
+                        {rtidPrefix === p && <CheckCircle className={`w-4 h-4 ml-auto ${p === 'D' ? 'text-[var(--clr-success)]' : 'text-[var(--clr-info)]'}`} />}
                       </div>
                     </button>
                   ))}
@@ -1776,7 +1776,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   <input type="text" value={rtidCheckInput} onChange={e => setRtidCheckInput(e.target.value.toUpperCase())}
                     placeholder="Enter RTID code"
                     onKeyPress={e => e.key === 'Enter' && handleRTIDCheck()}
-                    className="w-full pl-36 pr-4 py-4 border-2 border-gray-300 rounded-xl focus:border-blue-500 outline-none text-sm font-mono" />
+                    className="w-full pl-36 pr-4 py-4 border-2 border-gray-300 rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-mono" />
                 </div>
 
                 <button onClick={handleRTIDCheck} disabled={rtidLoading || !rtidCheckInput.trim()}
@@ -1791,7 +1791,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   {rtidCheckResult.found ? (
                     <>
                       <div className="flex items-center gap-3 mb-4">
-                        <CheckCircle className="w-8 h-8 text-green-600" />
+                        <CheckCircle className="w-8 h-8 text-[var(--clr-success)]" />
                         <h3 className="text-lg font-bold text-green-900">RTID Verified ✓</h3>
                       </div>
                       <div className="grid grid-cols-2 gap-3 bg-white/80 rounded-xl p-4 text-sm">
@@ -1814,7 +1814,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     </>
                   ) : (
                     <div className="flex items-center gap-3">
-                      <XCircle className="w-8 h-8 text-red-600" />
+                      <XCircle className="w-8 h-8 text-[var(--clr-emergency)]" />
                       <div>
                         <h3 className="text-lg font-bold text-red-900">RTID Not Found</h3>
                         <p className="text-sm text-red-700 mt-1">⚠️ Potential fraud alert — this RTID is not in the National Ledger</p>
@@ -1832,31 +1832,31 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
           <div className="space-y-6 animate-in fade-in duration-500">
             <div>
               <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                <AlertOctagon className="w-7 h-7 text-red-600" /> Fraud Alerts
+                <AlertOctagon className="w-7 h-7 text-[var(--clr-emergency)]" /> Fraud Alerts
               </h2>
               <p className="text-sm text-gray-500 mt-1">{fraudAlerts.length} suspicious activities detected</p>
             </div>
 
             {fraudAlerts.length === 0 ? (
               <div className="bg-white rounded-2xl p-12 text-center shadow-lg border border-gray-100">
-                <ShieldCheck className="w-16 h-16 text-green-500 mx-auto mb-4" />
+                <ShieldCheck className="w-16 h-16 text-[var(--clr-success)] mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-gray-900 mb-2">No Fraud Alerts</h3>
                 <p className="text-gray-500">System is operating normally. No suspicious activities detected.</p>
               </div>
             ) : (
               <div className="space-y-4">
                 {fraudAlerts.map(alert => (
-                  <div key={alert.id} className="bg-white rounded-2xl p-6 shadow-lg border-l-4 border-red-500">
+                  <div key={alert.id} className="bg-white rounded-2xl p-6 shadow-lg border-l-4 border-[var(--clr-emergency)]">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-start gap-4">
                         <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                          <AlertOctagon className="w-5 h-5 text-red-600" />
+                          <AlertOctagon className="w-5 h-5 text-[var(--clr-emergency)]" />
                         </div>
                         <div>
-                          <p className="font-bold text-gray-900">Suspicious Request: <span className="font-mono text-red-600">{alert.rtid}</span></p>
+                          <p className="font-bold text-gray-900">Suspicious Request: <span className="font-mono text-[var(--clr-emergency)]">{alert.rtid}</span></p>
                           <p className="text-sm text-gray-500 mt-1">Hospital: {alert.hospital}</p>
                           <p className="text-sm text-gray-500">Blood Group: <strong>{alert.bloodGroup}</strong></p>
-                          <p className="text-sm text-red-600 mt-2 font-medium">{alert.reason}</p>
+                          <p className="text-sm text-[var(--clr-emergency)] mt-2 font-medium">{alert.reason}</p>
                           <p className="text-xs text-gray-400 mt-1">{formatDateTime(alert.createdAt)}</p>
                         </div>
                       </div>
@@ -1887,14 +1887,14 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             <div className="bg-white rounded-2xl p-4 shadow-lg border border-gray-100">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <select value={auditFilter} onChange={e => setAuditFilter(e.target.value)}
-                  className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-blue-500 outline-none text-sm font-medium">
+                  className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
                   <option value="all">All Activities</option>
                   <option value="verification">Verifications</option>
                   <option value="donation">Donations</option>
                   <option value="request">Requests</option>
                 </select>
                 <select value={auditSort} onChange={e => setAuditSort(e.target.value)}
-                  className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-blue-500 outline-none text-sm font-medium">
+                  className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-[var(--clr-info)] outline-none text-sm font-medium">
                   <option value="newest">Newest First</option>
                   <option value="oldest">Oldest First</option>
                 </select>
@@ -1908,9 +1908,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
                       log.type === 'verification' ? 'bg-green-100' : log.type === 'donation' ? 'bg-red-100' : 'bg-blue-100'
                     }`}>
-                      {log.type === 'verification' ? <CheckSquare className="w-4 h-4 text-green-600" />
-                        : log.type === 'donation' ? <Droplet className="w-4 h-4 text-red-600" />
-                        : <Activity className="w-4 h-4 text-blue-600" />}
+                      {log.type === 'verification' ? <CheckSquare className="w-4 h-4 text-[var(--clr-success)]" />
+                        : log.type === 'donation' ? <Droplet className="w-4 h-4 text-[var(--clr-emergency)]" />
+                        : <Activity className="w-4 h-4 text-[var(--clr-info)]" />}
                     </div>
                     <div className="flex-1">
                       <p className="font-semibold text-gray-900 text-sm">{log.action}</p>
@@ -1930,7 +1930,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       <footer className="bg-gradient-to-r from-gray-900 to-gray-800 text-white py-8 mt-16">
         <div className="max-w-[1400px] mx-auto px-6 text-center">
           <div className="flex justify-center items-center gap-2 mb-2">
-            <Droplet className="text-red-400" size={20} fill="#ef4444" />
+            <Droplet className="text-[var(--clr-emergency)]" size={20} fill="var(--clr-emergency)" />
             <span className="font-bold">RaktPort Admin Dashboard</span>
           </div>
           <p className="text-sm text-gray-400">National Blood Management System | Government of India</p>
@@ -1983,7 +1983,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
               {selectedOrg.type === 'Hospital' && selectedOrg.totalBeds !== 'N/A' && (
                 <div className="grid grid-cols-2 gap-3">
                   <div className="p-3 bg-blue-50 rounded-xl text-center">
-                    <p className="text-xs text-blue-500 font-medium">Total Beds</p>
+                    <p className="text-xs text-[var(--clr-info)] font-medium">Total Beds</p>
                     <p className="text-xl font-black text-blue-700">{selectedOrg.totalBeds}</p>
                   </div>
                   <div className="p-3 bg-cyan-50 rounded-xl text-center">

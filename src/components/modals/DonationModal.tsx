@@ -265,7 +265,7 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
           <div className="bg-white rounded-xl border-2 border-blue-100 shadow-sm">
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-3 border-b border-blue-100">
               <div className="flex items-center gap-2">
-                <User className="h-5 w-5 text-blue-600" />
+                <User className="h-5 w-5 text-[var(--clr-info)]" />
                 <h3 className="font-bold text-gray-900">Donor Information</h3>
                 {isCheckIn && (
                   <Badge className="ml-auto bg-blue-100 text-blue-700 border-blue-200">
@@ -280,7 +280,7 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
               {/* Donor Name */}
               <div>
                 <Label htmlFor="donorName" className="text-sm font-semibold text-gray-700">
-                  Donor Full Name {isCheckIn && <span className="text-xs text-blue-600">(Registered)</span>}
+                  Donor Full Name {isCheckIn && <span className="text-xs text-[var(--clr-info)]">(Registered)</span>}
                 </Label>
                 <Input
                   id="donorName"
@@ -295,7 +295,7 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
               {/* Blood Group */}
               <div>
                 <Label htmlFor="bloodGroup" className="text-sm font-semibold text-gray-700">
-                  Blood Group {isCheckIn && <span className="text-xs text-blue-600">(Registered)</span>}
+                  Blood Group {isCheckIn && <span className="text-xs text-[var(--clr-info)]">(Registered)</span>}
                 </Label>
                 <Select value={bloodGroup} onValueChange={setBloodGroup} disabled={isCheckIn}>
                   <SelectTrigger className={`mt-1.5 ${isCheckIn ? 'bg-blue-50 border-blue-200 cursor-not-allowed' : ''}`}>
@@ -313,7 +313,7 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
                   </SelectContent>
                 </Select>
                 {isCheckIn && bloodGroup && (
-                  <p className="text-xs text-blue-600 mt-1 flex items-center gap-1">
+                  <p className="text-xs text-[var(--clr-info)] mt-1 flex items-center gap-1">
                     <Shield className="h-3 w-3" />
                     Verified from donor registration
                   </p>
@@ -341,7 +341,7 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
           <div className="bg-white rounded-xl border-2 border-red-100 shadow-sm">
             <div className="bg-gradient-to-r from-red-50 to-pink-50 px-6 py-3 border-b border-red-100">
               <div className="flex items-center gap-2">
-                <Droplet className="h-5 w-5 text-red-600" />
+                <Droplet className="h-5 w-5 text-[var(--clr-emergency)]" />
                 <h3 className="font-bold text-gray-900">Donation Details</h3>
               </div>
             </div>
@@ -420,17 +420,17 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
                       placeholder="H-RTID-250126-Q1099"
                       value={hRtid}
                       onChange={(e) => setHRtid(e.target.value.toUpperCase())}
-                      className={`flex-1 ${hRtidValid ? 'border-green-500 bg-green-50' :
-                        hRtidError ? 'border-red-500 bg-red-50' :
+                      className={`flex-1 ${hRtidValid ? 'border-[var(--clr-success)] bg-green-50' :
+                        hRtidError ? 'border-[var(--clr-emergency)] bg-red-50' :
                           'border-purple-200'
                         }`}
                     />
                     {hRtidLoading && <Loader2 className="w-6 h-6 animate-spin text-purple-600 mt-2" />}
-                    {hRtidValid && <CheckCircle2 className="w-6 h-6 text-green-600 mt-2" />}
-                    {hRtidError && <AlertCircle className="w-6 h-6 text-red-600 mt-2" />}
+                    {hRtidValid && <CheckCircle2 className="w-6 h-6 text-[var(--clr-success)] mt-2" />}
+                    {hRtidError && <AlertCircle className="w-6 h-6 text-[var(--clr-emergency)] mt-2" />}
                   </div>
                   {hRtidError && (
-                    <p className="text-sm text-red-600 mt-2 flex items-center gap-1">
+                    <p className="text-sm text-[var(--clr-emergency)] mt-2 flex items-center gap-1">
                       <AlertCircle className="h-4 w-4" />
                       {hRtidError}
                     </p>
@@ -441,7 +441,7 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
                 {hRtidValid && hRtidData && (
                   <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-5 shadow-sm">
                     <div className="flex items-center gap-2 mb-4">
-                      <CheckCircle2 className="h-5 w-5 text-green-600" />
+                      <CheckCircle2 className="h-5 w-5 text-[var(--clr-success)]" />
                       <span className="font-bold text-green-800">Request Validated Successfully</span>
                     </div>
 
@@ -453,7 +453,7 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
 
                       <div className="bg-white rounded-lg p-3 border border-green-100">
                         <span className="text-xs text-gray-600 font-medium">Blood Group</span>
-                        <p className="font-bold text-red-600 text-xl mt-1">{hRtidData.bloodGroup}</p>
+                        <p className="font-bold text-[var(--clr-emergency)] text-xl mt-1">{hRtidData.bloodGroup}</p>
                       </div>
 
                       <div className="bg-white rounded-lg p-3 border border-green-100">
@@ -476,7 +476,7 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
                           <Calendar className="h-3 w-3" />
                           Required By
                         </span>
-                        <p className="font-bold text-orange-600 mt-1 text-sm">{hRtidData.requiredBy}</p>
+                        <p className="font-bold text-[var(--clr-emergency)] mt-1 text-sm">{hRtidData.requiredBy}</p>
                       </div>
 
                       {(hRtidData.district || hRtidData.state) && (

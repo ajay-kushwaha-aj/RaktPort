@@ -15,9 +15,9 @@ interface InventoryItem {
 
 // Original stock level meta — refreshed colors
 const STOCK_META = {
-  sufficient: { bg: "var(--c-success-bg)", text: "var(--c-success)", border: "var(--c-success-bdr)", label: "Sufficient", strip: "linear-gradient(90deg,#059669,#10B981)" },
+  sufficient: { bg: "var(--c-success-bg)", text: "var(--c-success)", border: "var(--c-success-bdr)", label: "Sufficient", strip: "linear-gradient(90deg,var(--clr-success),var(--clr-success))" },
   low: { bg: "var(--c-warn-bg)", text: "var(--c-warn)", border: "var(--c-warn-bdr)", label: "Low Stock", strip: "linear-gradient(90deg,#D97706,#F59E0B)" },
-  critical: { bg: "var(--c-danger-bg)", text: "var(--c-danger)", border: "var(--c-danger-bdr)", label: "Critical", strip: "linear-gradient(90deg,#DC2626,#EF4444)" },
+  critical: { bg: "var(--c-danger-bg)", text: "var(--c-danger)", border: "var(--c-danger-bdr)", label: "Critical", strip: "linear-gradient(90deg,var(--clr-emergency),var(--clr-emergency))" },
   none: { bg: "var(--c-surface-2)", text: "var(--c-text-4)", border: "var(--c-border)", label: "No Demand", strip: "var(--c-border)" },
 };
 
@@ -78,12 +78,12 @@ export function InventoryView({ requests }: InventoryViewProps) {
           }}>⚠️</div>
           <div style={{ flex: 1 }}>
             <p style={{ fontWeight: 700, color: "var(--c-danger)", fontSize: "0.85rem", fontFamily: "var(--f-display)" }}>Critical Blood Shortage</p>
-            <p style={{ fontSize: "0.72rem", color: "#DC2626", marginTop: "2px", opacity: 0.8 }}>
+            <p style={{ fontSize: "0.72rem", color: "var(--clr-emergency)", marginTop: "2px", opacity: 0.8 }}>
               {criticalCount} blood group{criticalCount > 1 ? "s" : ""} with unfulfilled demand and zero available units
             </p>
           </div>
           <span style={{
-            fontSize: "0.7rem", fontWeight: 800, background: "#DC2626", color: "#fff",
+            fontSize: "0.7rem", fontWeight: 800, background: "var(--clr-emergency)", color: "#fff",
             padding: "5px 12px", borderRadius: "var(--r-pill)",
             animation: "hd-pulse-em 1.5s ease-in-out infinite",
           }}>
@@ -180,8 +180,8 @@ export function InventoryView({ requests }: InventoryViewProps) {
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                   {[
                     { label: "Required", val: item.totalRequired, color: "var(--c-brand)" },
-                    { label: "Fulfilled", val: item.totalFulfilled, color: "#10B981" },
-                    { label: "Administered", val: item.totalAdministered, color: "#3B82F6" },
+                    { label: "Fulfilled", val: item.totalFulfilled, color: "var(--clr-success)" },
+                    { label: "Administered", val: item.totalAdministered, color: "var(--clr-info)" },
                   ].map(b => (
                     <div key={b.label}>
                       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "3px" }}>
@@ -207,7 +207,7 @@ export function InventoryView({ requests }: InventoryViewProps) {
                 }}>
                   {[
                     { label: "Available", val: item.available, color: "#D97706" },
-                    { label: "Pending", val: item.pending, color: "#DC2626" },
+                    { label: "Pending", val: item.pending, color: "var(--clr-emergency)" },
                     { label: "Active", val: item.activeRequests, color: "var(--c-text-3)" },
                   ].map(s => (
                     <div key={s.label} style={{ textAlign: "center" }}>
@@ -265,8 +265,8 @@ export function InventoryView({ requests }: InventoryViewProps) {
                     <td style={{ padding: "10px 14px", fontWeight: 600, color: "var(--c-text)" }}>{ct}</td>
                     <td style={{ padding: "10px 14px", textAlign: "center", color: "var(--c-text-3)" }}>{ctReqs.length}</td>
                     <td style={{ padding: "10px 14px", textAlign: "center", fontWeight: 700, color: "var(--c-brand)", fontFamily: "var(--f-display)" }}>{req}u</td>
-                    <td style={{ padding: "10px 14px", textAlign: "center", fontWeight: 700, color: "#059669", fontFamily: "var(--f-display)" }}>{ful}u</td>
-                    <td style={{ padding: "10px 14px", textAlign: "center", fontWeight: 700, color: "#2563EB", fontFamily: "var(--f-display)" }}>{adm}u</td>
+                    <td style={{ padding: "10px 14px", textAlign: "center", fontWeight: 700, color: "var(--clr-success)", fontFamily: "var(--f-display)" }}>{ful}u</td>
+                    <td style={{ padding: "10px 14px", textAlign: "center", fontWeight: 700, color: "var(--clr-info)", fontFamily: "var(--f-display)" }}>{adm}u</td>
                   </tr>
                 );
               })}

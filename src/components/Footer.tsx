@@ -62,9 +62,7 @@ export function Footer() {
         }
       `}</style>
 
-      <footer className="rp-footer" style={{ background:'#120303' }}>
-        {/* Accent line */}
-        <div style={{ height:2, background:'linear-gradient(to right, transparent, #8B0000 30%, #c0392b 50%, #8B0000 70%, transparent)' }} />
+      <footer className="rp-footer" style={{ borderTop: '3px solid var(--clr-brand)', background: 'var(--clr-navy)' }}>
 
         <div className="container mx-auto px-4" style={{ paddingTop:50, paddingBottom:32 }}>
 
@@ -80,7 +78,7 @@ export function Footer() {
               </div>
             </div>
             <a href="tel:1800-180-1104"
-              style={{ color:'white', fontWeight:800, fontSize:'1rem', textDecoration:'none', background:'linear-gradient(135deg,#8B0000,#c0392b)', padding:'9px 20px', borderRadius:999, boxShadow:'0 3px 12px rgba(139,0,0,0.45)', whiteSpace:'nowrap', fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
+              style={{ color:'white', fontWeight:800, fontSize:'1rem', textDecoration:'none', background:'linear-gradient(135deg,var(--clr-brand),#c0392b)', padding:'9px 20px', borderRadius:999, boxShadow:'0 3px 12px rgba(139,0,0,0.45)', whiteSpace:'nowrap', fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
               1800-180-1104
             </a>
           </div>

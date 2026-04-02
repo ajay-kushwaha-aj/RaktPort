@@ -25,9 +25,9 @@ interface PremiumDashboardProps {
 
 /* ── Thin color strip per urgency ── */
 const URGENCY_STRIP: Record<string, string> = {
-  Emergency: "linear-gradient(90deg,#DC2626,#EF4444)",
+  Emergency: "linear-gradient(90deg,var(--clr-emergency),var(--clr-emergency))",
   Urgent: "linear-gradient(90deg,#EA580C,#F97316)",
-  Routine: "linear-gradient(90deg,#059669,#10B981)",
+  Routine: "linear-gradient(90deg,var(--clr-success),var(--clr-success))",
 };
 
 /* ── Active Request Card component ── */
@@ -46,7 +46,7 @@ function ActiveRequestCard({
   const urg = request.urgency || "Routine";
   const uc = URGENCY_CONFIG[urg];
   const isEM = urg === "Emergency";
-  const barColor = pct > 50 ? "#10B981" : pct > 20 ? "#F59E0B" : "#EF4444";
+  const barColor = pct > 50 ? "var(--clr-success)" : pct > 20 ? "#F59E0B" : "var(--clr-emergency)";
 
   const redeemedAvailable = Math.max(0, (request.unitsFulfilled || 0) - (request.unitsAdministered || 0));
   const canAdmin = redeemedAvailable > 0 && ["REDEEMED", "PARTIAL REDEEMED", "HOSPITAL VERIFIED", "PARTIALLY ADMINISTERED"].includes(request.status);
@@ -92,7 +92,7 @@ function ActiveRequestCard({
               </span>
               {isEM && (
                 <span style={{
-                  fontSize: "0.58rem", fontWeight: 800, background: "#DC2626",
+                  fontSize: "0.58rem", fontWeight: 800, background: "var(--clr-emergency)",
                   color: "#fff", padding: "2px 7px", borderRadius: "var(--r-pill)",
                   animation: "hd-pulse-em 1.5s ease-in-out infinite", letterSpacing: "0.04em",
                 }}>
@@ -128,7 +128,7 @@ function ActiveRequestCard({
         <div style={{ marginTop: "10px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
             <span style={{ fontSize: "0.61rem", color: "var(--c-text-4)" }}>Validity</span>
-            <span style={{ fontSize: "0.61rem", fontWeight: 600, color: isV ? barColor : "#EF4444" }}>{rem}</span>
+            <span style={{ fontSize: "0.61rem", fontWeight: 600, color: isV ? barColor : "var(--clr-emergency)" }}>{rem}</span>
           </div>
           <div className="hd-validity">
             <div className="hd-validity-fill" style={{ width: `${pct}%`, background: barColor }} />
@@ -141,7 +141,7 @@ function ActiveRequestCard({
             <div className="hd-prog">
               <div className="hd-prog-fill" style={{
                 width: `${(request.unitsAdministered / request.unitsRequired) * 100}%`,
-                background: "linear-gradient(90deg,#2563EB,#60A5FA)",
+                background: "linear-gradient(90deg,var(--clr-info),#60A5FA)",
               }} />
             </div>
           </div>
@@ -283,7 +283,7 @@ export function PremiumDashboard({
             <p style={{ fontWeight: 700, color: "var(--c-danger)", fontSize: "0.85rem", fontFamily: "var(--f-display)" }}>
               Emergency Blood Request Active
             </p>
-            <p style={{ fontSize: "0.72rem", color: "#DC2626", marginTop: "2px", opacity: 0.8 }}>
+            <p style={{ fontSize: "0.72rem", color: "var(--clr-emergency)", marginTop: "2px", opacity: 0.8 }}>
               {emergencyCount} emergency request{emergencyCount > 1 ? "s" : ""} require immediate action
             </p>
           </div>
@@ -291,7 +291,7 @@ export function PremiumDashboard({
             onClick={() => onNewRequest("Emergency")}
             style={{
               padding: "7px 14px", borderRadius: "var(--r-md)",
-              background: "#DC2626", color: "#fff", border: "none",
+              background: "var(--clr-emergency)", color: "#fff", border: "none",
               fontSize: "0.73rem", fontWeight: 700, cursor: "pointer",
               whiteSpace: "nowrap", fontFamily: "var(--f-body)",
               transition: "all var(--t-fast)",
@@ -378,7 +378,7 @@ export function PremiumDashboard({
           {emergencyCount > 0 && (
             <span style={{
               display: "inline-flex", alignItems: "center", gap: "5px",
-              fontSize: "0.7rem", fontWeight: 700, color: "#DC2626",
+              fontSize: "0.7rem", fontWeight: 700, color: "var(--clr-emergency)",
               background: "var(--c-danger-bg)", padding: "4px 10px",
               borderRadius: "var(--r-pill)", border: "1px solid var(--c-danger-bdr)",
               animation: "hd-pulse-em 1.5s ease-in-out infinite",
@@ -442,7 +442,7 @@ export function PremiumDashboard({
             <div className="hd-card hd-enter hd-s2" style={{ padding: "20px" }}>
               <div className="hd-sec-hdr" style={{ marginBottom: "16px" }}>
                 <span className="hd-sec-title">
-                  <TrendingUp size={15} style={{ color: "#059669" }} /> Request Fulfillment
+                  <TrendingUp size={15} style={{ color: "var(--clr-success)" }} /> Request Fulfillment
                 </span>
                 <span style={{
                   fontFamily: "var(--f-display)", fontWeight: 800,
@@ -476,8 +476,8 @@ export function PremiumDashboard({
 
                 <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "10px" }}>
                   {[
-                    { label: "Administered", val: kpis.administered, color: "#2563EB" },
-                    { label: "Redeemed", val: kpis.requestsRedeemed, color: "#059669" },
+                    { label: "Administered", val: kpis.administered, color: "var(--clr-info)" },
+                    { label: "Redeemed", val: kpis.requestsRedeemed, color: "var(--clr-success)" },
                     { label: "Active", val: kpis.activeRequests, color: "#D97706" },
                   ].map(s => (
                     <div key={s.label}>
@@ -526,7 +526,7 @@ export function PremiumDashboard({
                     const sm = getStatusMeta(isRequestValid(r) ? r.status : "EXPIRED");
                     const uc2 = URGENCY_CONFIG[r.urgency || "Routine"];
                     const pct = getValidityPct(r);
-                    const barC = pct > 50 ? "#10B981" : pct > 20 ? "#F59E0B" : "#EF4444";
+                    const barC = pct > 50 ? "var(--clr-success)" : pct > 20 ? "#F59E0B" : "var(--clr-emergency)";
                     return (
                       <div
                         key={r.id}

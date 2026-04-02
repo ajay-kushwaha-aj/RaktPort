@@ -53,7 +53,7 @@ export const CompleteModal = ({
       <DialogContent className="sm:max-w-lg rounded-2xl max-h-[92vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-blue-800 dark:text-blue-300" style={{ fontFamily: "Outfit,sans-serif" }}>
-            <HeartHandshake className="w-5 h-5 text-blue-600 dark:text-blue-400" /> Record Blood Administration
+            <HeartHandshake className="w-5 h-5 text-[var(--clr-info)] dark:text-[var(--clr-info)]" /> Record Blood Administration
           </DialogTitle>
           <DialogDescription>MoHFW post-transfusion confirmation — updates all dashboards in real time</DialogDescription>
         </DialogHeader>
@@ -109,7 +109,7 @@ export const CompleteModal = ({
               </button>
               <button type="button" onClick={handleConfirm} disabled={isLoading}
                 className={`flex-1 py-3 rounded-xl text-sm font-bold text-white transition-all flex items-center justify-center gap-2 ${
-                  isLoading ? "bg-gray-400 cursor-not-allowed" : willComplete ? "bg-green-600 hover:bg-green-700 active:scale-[0.98]" : "bg-blue-600 hover:bg-blue-700 active:scale-[0.98]"
+                  isLoading ? "bg-gray-400 cursor-not-allowed" : willComplete ? "bg-[var(--clr-success)] hover:bg-green-700 active:scale-[0.98]" : "bg-[var(--clr-info)] hover:bg-blue-700 active:scale-[0.98]"
                 }`}>
                 {isLoading
                   ? <><Clock className="w-4 h-4 animate-spin" />Saving…</>
@@ -138,11 +138,11 @@ export const CompleteModal = ({
                   <span className="text-blue-700 dark:text-blue-300">{already} / {required} administered</span>
                 </div>
                 <div className="h-2.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden flex">
-                  <div className="h-full bg-blue-500 rounded-full transition-all" style={{ width: `${(already / required) * 100}%` }} title="Administered" />
+                  <div className="h-full bg-[var(--clr-info)] rounded-full transition-all" style={{ width: `${(already / required) * 100}%` }} title="Administered" />
                   <div className="h-full bg-amber-400 transition-all" style={{ width: `${(Math.max(0, redeemed - already) / required) * 100}%` }} title="Redeemed, pending" />
                 </div>
                 <div className="flex items-center gap-3 text-[10px] text-gray-500 dark:text-gray-400">
-                  <span className="flex items-center gap-1"><span className="w-2 h-2 bg-blue-500 rounded-full inline-block" />Administered</span>
+                  <span className="flex items-center gap-1"><span className="w-2 h-2 bg-[var(--clr-info)] rounded-full inline-block" />Administered</span>
                   <span className="flex items-center gap-1"><span className="w-2 h-2 bg-amber-400 rounded-full inline-block" />Redeemed</span>
                   <span className="flex items-center gap-1"><span className="w-2 h-2 bg-gray-200 dark:bg-gray-600 rounded-full inline-block" />Pending</span>
                 </div>
@@ -172,16 +172,16 @@ export const CompleteModal = ({
             {/* MoHFW checklist */}
             <div className="space-y-2">
               <p className="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wide flex items-center gap-1.5">
-                <CheckSquare className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" /> Post-Transfusion Checklist
+                <CheckSquare className="w-3.5 h-3.5 text-[var(--clr-info)] dark:text-[var(--clr-info)]" /> Post-Transfusion Checklist
               </p>
               {[
                 { id: "admin", label: `Blood (${unitsNow} unit${unitsNow > 1 ? "s" : ""}) administered`, checked: administered, set: setAdministered, required: true },
                 { id: "react", label: "No adverse reaction observed", checked: noReaction, set: setNoReaction, required: true },
                 { id: "consent", label: "Patient / guardian informed", checked: consentDone, set: setConsentDone, required: false },
               ].map(item => (
-                <label key={item.id} className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${item.checked ? "border-green-400 dark:border-green-600 bg-green-50 dark:bg-green-950/30" : "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 hover:border-gray-300 dark:hover:border-gray-600"}`}>
+                <label key={item.id} className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${item.checked ? "border-[var(--clr-success)] dark:border-[var(--clr-success)] bg-green-50 dark:bg-green-950/30" : "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 hover:border-gray-300 dark:hover:border-gray-600"}`}>
                   <input type="checkbox" className="w-4 h-4 accent-green-600 flex-shrink-0 rounded" checked={item.checked} onChange={e => item.set(e.target.checked)} />
-                  <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">{item.label}{item.required && <span className="text-red-500 ml-0.5">*</span>}</span>
+                  <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">{item.label}{item.required && <span className="text-[var(--clr-emergency)] ml-0.5">*</span>}</span>
                 </label>
               ))}
             </div>
@@ -198,7 +198,7 @@ export const CompleteModal = ({
                 Cancel
               </button>
               <button type="button" onClick={() => setShowConfirmation(true)} disabled={!canSubmit || isLoading}
-                className={`flex-1 py-2.5 rounded-xl text-sm font-bold text-white transition-all flex items-center justify-center gap-2 ${canSubmit && !isLoading ? (willComplete ? "bg-green-600 hover:bg-green-700 active:scale-[0.98]" : "bg-blue-600 hover:bg-blue-700 active:scale-[0.98]") : "bg-gray-300 dark:bg-gray-700 cursor-not-allowed"}`}>
+                className={`flex-1 py-2.5 rounded-xl text-sm font-bold text-white transition-all flex items-center justify-center gap-2 ${canSubmit && !isLoading ? (willComplete ? "bg-[var(--clr-success)] hover:bg-green-700 active:scale-[0.98]" : "bg-[var(--clr-info)] hover:bg-blue-700 active:scale-[0.98]") : "bg-gray-300 dark:bg-gray-700 cursor-not-allowed"}`}>
                 {willComplete
                   ? <><CheckCircle2 className="w-4 h-4" />Confirm & Close Request</>
                   : <><BadgeCheck className="w-4 h-4" />Record Partial Administration</>}

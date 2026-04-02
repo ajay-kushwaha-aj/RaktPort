@@ -50,8 +50,8 @@ export const logAuditAction = async (
 export const AUDIT_ACTION_LABELS: Record<AuditAction, { label: string; emoji: string; color: string }> = {
   REQUEST_CREATED: { label: "Request Created", emoji: "📝", color: "#22c55e" },
   REQUEST_EDITED: { label: "Request Edited", emoji: "✏️", color: "#f59e0b" },
-  REQUEST_DELETED: { label: "Request Deleted", emoji: "🗑️", color: "#ef4444" },
-  RECEIPT_CONFIRMED: { label: "Receipt Confirmed", emoji: "✅", color: "#3b82f6" },
+  REQUEST_DELETED: { label: "Request Deleted", emoji: "🗑️", color: "var(--clr-emergency)" },
+  RECEIPT_CONFIRMED: { label: "Receipt Confirmed", emoji: "✅", color: "var(--clr-info)" },
   BLOOD_ADMINISTERED: { label: "Blood Administered", emoji: "💉", color: "#8b5cf6" },
   CSV_EXPORTED: { label: "CSV Exported", emoji: "📥", color: "#6b7280" },
   PRINT_SLIP: { label: "Slip Printed", emoji: "🖨️", color: "#6b7280" },

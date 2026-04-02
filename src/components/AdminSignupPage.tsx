@@ -459,7 +459,7 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
 
             {/* Error Message */}
             {error && (
-              <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6 rounded-r-lg animate-in fade-in duration-300">
+              <div className="bg-red-50 border-l-4 border-[var(--clr-emergency)] p-4 mb-6 rounded-r-lg animate-in fade-in duration-300">
                 <div className="flex items-start">
                   <AlertCircle className="w-5 h-5 mr-3 mt-0.5 text-red-700 flex-shrink-0" />
                   <p className="text-red-700 text-sm">{error}</p>
@@ -505,7 +505,7 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
                     </p>
                   </div>
 
-                  <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                  <div className="bg-blue-50 border-l-4 border-[var(--clr-info)] p-4 rounded-r-lg">
                     <p className="text-sm text-blue-800">
                       <strong>Security Notice:</strong> Admin keys are confidential and should not be shared.
                       Each key can only be used for authorized personnel.
@@ -704,7 +704,7 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
                             onKeyDown={(e) => handleOtpKeyDown(index, e)}
                             disabled={otpVerified}
                             className={`w-12 h-14 text-center text-xl font-bold border-2 rounded-xl transition-all outline-none ${otpVerified
-                              ? 'bg-green-50 border-green-500 text-green-700'
+                              ? 'bg-green-50 border-[var(--clr-success)] text-green-700'
                               : 'bg-white border-gray-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-200'
                               }`}
                           />
@@ -712,7 +712,7 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
                       </div>
 
                       {otpVerified ? (
-                        <div className="flex items-center justify-center gap-2 text-green-600 font-semibold bg-green-50 py-3 rounded-lg">
+                        <div className="flex items-center justify-center gap-2 text-[var(--clr-success)] font-semibold bg-green-50 py-3 rounded-lg">
                           <CheckCircle2 className="w-5 h-5" />
                           <span>Phone Verified Successfully!</span>
                         </div>
@@ -824,7 +824,7 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
                     </div>
                   </div>
 
-                  <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                  <div className="bg-blue-50 border-l-4 border-[var(--clr-info)] p-4 rounded-r-lg">
                     <p className="text-sm text-blue-800">
                       <strong>Password Requirements:</strong>
                     </p>

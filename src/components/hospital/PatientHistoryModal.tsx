@@ -47,7 +47,7 @@ export function PatientHistoryModal({ isOpen, onClose, requests }: Props) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-2xl max-h-[92vh] overflow-y-auto rounded-2xl p-0">
         <DialogHeader className="p-5 pb-0">
-          <DialogTitle className="flex items-center gap-2 text-[#8B0000]" style={{ fontFamily: "Outfit,sans-serif" }}>
+          <DialogTitle className="flex items-center gap-2 text-[var(--clr-brand)]" style={{ fontFamily: "Outfit,sans-serif" }}>
             <User className="w-5 h-5" /> Patient History Lookup
           </DialogTitle>
           <DialogDescription>View all blood requests for a specific patient</DialogDescription>
@@ -84,7 +84,7 @@ export function PatientHistoryModal({ isOpen, onClose, requests }: Props) {
                 <button
                   key={`${p.name}|${p.mobile}`}
                   onClick={() => setSelectedPatient(`${p.name}|${p.mobile}`)}
-                  className="w-full hd-card p-4 text-left hover:border-[#8B0000]/20 transition-all group"
+                  className="w-full hd-card p-4 text-left hover:border-[var(--clr-brand)]/20 transition-all group"
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-950/30 flex items-center justify-center text-lg flex-shrink-0 border border-red-100 dark:border-red-800">
@@ -94,14 +94,14 @@ export function PatientHistoryModal({ isOpen, onClose, requests }: Props) {
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-semibold text-gray-800 dark:text-gray-200 text-sm">{p.name}</span>
                         {bloodGroups.map(bg => (
-                          <span key={bg} className="text-[10px] font-black px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 border border-red-100 dark:border-red-800">{bg}</span>
+                          <span key={bg} className="text-[10px] font-black px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-[var(--clr-emergency)] border border-red-100 dark:border-red-800">{bg}</span>
                         ))}
                       </div>
                       <div className="text-[11px] text-gray-400 mt-0.5">
                         {p.requests.length} request{p.requests.length > 1 ? "s" : ""} · {totalUnits}u required · {administeredUnits}u administered · Last: {formatDate(lastReq.createdAt)}
                       </div>
                     </div>
-                    <span className="text-xs text-gray-400 group-hover:text-[#8B0000] transition-colors">→</span>
+                    <span className="text-xs text-gray-400 group-hover:text-[var(--clr-brand)] transition-colors">→</span>
                   </div>
                 </button>
               );
@@ -109,12 +109,12 @@ export function PatientHistoryModal({ isOpen, onClose, requests }: Props) {
           ) : (
             /* Patient detail view */
             <div className="space-y-4">
-              <button onClick={() => setSelectedPatient(null)} className="text-xs text-[#8B0000] dark:text-red-400 font-semibold hover:underline">← Back to list</button>
+              <button onClick={() => setSelectedPatient(null)} className="text-xs text-[var(--clr-brand)] dark:text-[var(--clr-emergency)] font-semibold hover:underline">← Back to list</button>
 
               {/* Patient summary card */}
               <div className="bg-red-50 dark:bg-red-950/30 rounded-xl p-4 border border-red-100 dark:border-red-900/40">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-12 h-12 rounded-xl bg-[#8B0000] flex items-center justify-center text-white text-xl font-black" style={{ fontFamily: "Outfit,sans-serif" }}>
+                  <div className="w-12 h-12 rounded-xl bg-[var(--clr-brand)] flex items-center justify-center text-white text-xl font-black" style={{ fontFamily: "Outfit,sans-serif" }}>
                     {activePatient.name[0]?.toUpperCase()}
                   </div>
                   <div>
@@ -141,7 +141,7 @@ export function PatientHistoryModal({ isOpen, onClose, requests }: Props) {
               {/* Request timeline */}
               <div className="space-y-2">
                 <p className="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wide flex items-center gap-1.5">
-                  <Activity className="w-3.5 h-3.5 text-[#8B0000]" /> Request History
+                  <Activity className="w-3.5 h-3.5 text-[var(--clr-brand)]" /> Request History
                 </p>
                 {activePatient.requests.map((r, i) => {
                   const sm = getStatusMeta(isRequestValid(r) ? r.status : "EXPIRED");
@@ -154,7 +154,7 @@ export function PatientHistoryModal({ isOpen, onClose, requests }: Props) {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-xs font-black px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 border border-red-100 dark:border-red-800">{r.bloodGroup}</span>
+                            <span className="text-xs font-black px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-[var(--clr-emergency)] border border-red-100 dark:border-red-800">{r.bloodGroup}</span>
                             <span className="text-xs text-gray-600 dark:text-gray-400">{r.componentType || "Whole Blood"} × {r.unitsRequired}u</span>
                             <span className="hd-status border text-[10px]" style={{ background: sm.bg, color: sm.text, borderColor: sm.border }}>{sm.label}</span>
                           </div>
@@ -164,7 +164,7 @@ export function PatientHistoryModal({ isOpen, onClose, requests }: Props) {
                             <span>{formatDate(r.createdAt)} {formatTime(r.createdAt)}</span>
                           </div>
                           {r.unitsAdministered > 0 && (
-                            <div className="text-[11px] text-blue-600 dark:text-blue-400 font-semibold mt-0.5">
+                            <div className="text-[11px] text-[var(--clr-info)] dark:text-[var(--clr-info)] font-semibold mt-0.5">
                               💉 {r.unitsAdministered}/{r.unitsRequired} units administered
                               {r.administeredAt && ` · ${formatDate(r.administeredAt)}`}
                             </div>

@@ -39,7 +39,7 @@ class ErrorBoundary extends React.Component<
     if (this.state.hasError) {
       return (
         <div style={{ padding: '2rem', textAlign: 'center', fontFamily: 'sans-serif' }}>
-          <h1 style={{ color: '#8B0000', fontSize: '1.5rem', marginBottom: '1rem' }}>
+          <h1 style={{ color: 'var(--clr-brand)', fontSize: '1.5rem', marginBottom: '1rem' }}>
             Something went wrong
           </h1>
           <p style={{ color: '#555', marginBottom: '1rem' }}>
@@ -49,7 +49,7 @@ class ErrorBoundary extends React.Component<
             onClick={() => window.location.reload()}
             style={{
               padding: '0.5rem 1.5rem',
-              backgroundColor: '#8B0000',
+              backgroundColor: 'var(--clr-brand)',
               color: 'white',
               border: 'none',
               borderRadius: '0.375rem',
@@ -177,11 +177,11 @@ function AppContent() {
         return (
           <div className="min-h-screen flex items-center justify-center bg-gray-50">
             <div className="text-center">
-              <h1 className="text-3xl text-[#8B0000] mb-4">Dashboard Not Found</h1>
+              <h1 className="text-3xl text-[var(--clr-brand)] mb-4">Dashboard Not Found</h1>
               <p className="text-gray-600 mb-6">Could not find dashboard for role: {selectedRole}</p>
               <Button
                 onClick={handleLogout}
-                className="px-6 py-2 bg-[#8B0000] text-white rounded hover:bg-[#6B0000]"
+                className="px-6 py-2 bg-[var(--clr-brand)] text-white rounded hover:bg-[#6B0000]"
               >
                 Logout
               </Button>

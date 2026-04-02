@@ -105,7 +105,7 @@ export function StatusTimeline({ request }: { request: BloodRequest }) {
                       zIndex: 0,
                       background:
                         isPast || isCurrent
-                          ? "linear-gradient(90deg,#10B981,#059669)"
+                          ? "linear-gradient(90deg,var(--clr-success),var(--clr-success))"
                           : "var(--c-surface-3)",
                       transition: "background 0.4s ease",
                     }}
@@ -131,7 +131,7 @@ export function StatusTimeline({ request }: { request: BloodRequest }) {
                       background: isCurrent
                         ? "var(--c-brand)"
                         : isPast
-                          ? "#10B981"
+                          ? "var(--clr-success)"
                           : "var(--c-surface-3)",
                       color: isCurrent || isPast ? "#fff" : "var(--c-text-4)",
                       border: isCurrent
@@ -155,7 +155,7 @@ export function StatusTimeline({ request }: { request: BloodRequest }) {
                       color: isCurrent
                         ? "var(--c-brand)"
                         : isPast
-                          ? "#059669"
+                          ? "var(--clr-success)"
                           : "var(--c-text-4)",
                     }}
                   >

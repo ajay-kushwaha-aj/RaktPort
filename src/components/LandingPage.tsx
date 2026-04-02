@@ -38,7 +38,7 @@ const BLOOD_TYPES = [
   { type: 'A−', donateTo: 'A+, A−, AB+, AB−', receiveFrom: 'A−, O−', color: '#922b21' },
   { type: 'B+', donateTo: 'B+, AB+', receiveFrom: 'B+, B−, O+, O−', color: '#c0392b' },
   { type: 'B−', donateTo: 'B+, B−, AB+, AB−', receiveFrom: 'B−, O−', color: '#922b21' },
-  { type: 'AB+', donateTo: 'AB+ only', receiveFrom: 'All blood types', color: '#8B0000' },
+  { type: 'AB+', donateTo: 'AB+ only', receiveFrom: 'All blood types', color: 'var(--clr-brand)' },
   { type: 'AB−', donateTo: 'AB+, AB−', receiveFrom: 'AB−, A−, B−, O−', color: '#6b0000' },
   { type: 'O+', donateTo: 'A+, B+, O+, AB+', receiveFrom: 'O+, O−', color: '#c0392b' },
   { type: 'O−', donateTo: 'All blood types', receiveFrom: 'O− only', color: '#922b21' },
@@ -306,7 +306,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
 
         /* Carousel dots */
         .c-dot { height:7px; border-radius:999px; transition:all 0.3s ease; cursor:pointer; border:none; outline:none; padding:0; }
-        .c-dot.on  { background:#8B0000; width:24px; }
+        .c-dot.on  { background:var(--clr-brand); width:24px; }
         .c-dot.off { background:rgba(255,255,255,0.45); width:7px; }
         .c-dot.off:hover { background:rgba(255,255,255,0.8); }
 
@@ -322,33 +322,33 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
         /* Service cards */
         .svc-card { background:white; border:1.5px solid #f0e8e4; border-radius:18px; padding:24px 18px; text-align:center; transition:transform 0.26s cubic-bezier(.25,.8,.25,1),border-color 0.22s,box-shadow 0.26s; cursor:pointer; display:flex; flex-direction:column; align-items:center; height:100%; position:relative; overflow:hidden; }
         .svc-card::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(139,0,0,0.04),transparent 60%); opacity:0; transition:opacity 0.22s; }
-        .svc-card:hover { transform:translateY(-4px); border-color:#8B0000; box-shadow:0 14px 30px rgba(139,0,0,0.1); }
+        .svc-card:hover { transform:translateY(-4px); border-color:var(--clr-brand); box-shadow:0 14px 30px rgba(139,0,0,0.1); }
         .svc-card:hover::before { opacity:1; }
-        .svc-icon { color:#8B0000; margin-bottom:12px; transition:transform 0.22s; }
+        .svc-icon { color:var(--clr-brand); margin-bottom:12px; transition:transform 0.22s; }
         .svc-card:hover .svc-icon { transform:scale(1.1); }
 
         /* Blood cards */
         .blood-card { border-radius:14px; border:1.5px solid #f0e8e4; background:white; padding:16px 6px 12px; text-align:center; cursor:pointer; transition:all 0.22s ease; position:relative; min-height:76px; display:flex; flex-direction:column; align-items:center; justify-content:center; user-select:none; -webkit-tap-highlight-color:transparent; }
         .blood-card:hover  { border-color:#c0392b; box-shadow:0 6px 18px rgba(139,0,0,0.12); transform:translateY(-2px); }
-        .blood-card.sel    { border-color:#8B0000; background:linear-gradient(145deg,#fff5f5,#fff0ee); box-shadow:0 8px 26px rgba(139,0,0,0.16); transform:translateY(-3px); }
+        .blood-card.sel    { border-color:var(--clr-brand); background:linear-gradient(145deg,#fff5f5,#fff0ee); box-shadow:0 8px 26px rgba(139,0,0,0.16); transform:translateY(-3px); }
         .blood-type-lbl    { font-family:'Sora',sans-serif; font-weight:800; letter-spacing:-0.04em; line-height:1; }
         .blood-sub         { font-size:9px; color:#9a8a82; margin-top:4px; }
         .blood-info-panel  { background:white; border:1.5px solid #e8d8d5; border-radius:16px; padding:18px 20px; margin:14px auto 0; max-width:540px; animation:pan-in 0.22s ease; box-shadow:0 8px 26px rgba(139,0,0,0.09); }
         @keyframes pan-in { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
 
         /* Step circle */
-        .step-num { width:46px; height:46px; border-radius:50%; background:linear-gradient(135deg,#8B0000,#c0392b); color:white; font-family:'Sora',sans-serif; font-weight:800; font-size:1.1rem; display:flex; align-items:center; justify-content:center; box-shadow:0 5px 14px rgba(139,0,0,0.3); }
+        .step-num { width:46px; height:46px; border-radius:50%; background:linear-gradient(135deg,var(--clr-brand),#c0392b); color:white; font-family:'Sora',sans-serif; font-weight:800; font-size:1.1rem; display:flex; align-items:center; justify-content:center; box-shadow:0 5px 14px rgba(139,0,0,0.3); }
 
         /* Role cards */
         .role-card { border-radius:18px; border:2px solid #f0e5e3; padding:26px 18px; background:white; cursor:pointer; transition:all 0.3s cubic-bezier(.25,.8,.25,1); display:flex; flex-direction:column; align-items:center; text-align:center; position:relative; overflow:hidden; width:100%; }
         .role-card::after { content:''; position:absolute; bottom:-70px; right:-70px; width:160px; height:160px; border-radius:50%; background:rgba(139,0,0,0.04); transition:transform 0.4s; }
-        .role-card:hover { border-color:#8B0000; transform:translateY(-4px); box-shadow:0 18px 38px rgba(139,0,0,0.11); background:linear-gradient(160deg,#fff5f5,white); }
+        .role-card:hover { border-color:var(--clr-brand); transform:translateY(-4px); box-shadow:0 18px 38px rgba(139,0,0,0.11); background:linear-gradient(160deg,#fff5f5,white); }
         .role-card:hover::after { transform:scale(2.8); }
-        .role-icon { color:#8B0000; margin-bottom:12px; transition:transform 0.22s; }
+        .role-icon { color:var(--clr-brand); margin-bottom:12px; transition:transform 0.22s; }
         .role-card:hover .role-icon { transform:scale(1.1); color:#6b0000; }
 
         /* Eyebrow */
-        .ey { font-size:10.5px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:#8B0000; display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:10px; }
+        .ey { font-size:10.5px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:var(--clr-brand); display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:10px; }
         .ey::before,.ey::after { content:''; display:block; width:24px; height:1px; background:currentColor; opacity:0.35; }
 
         /* Why donate */
@@ -371,7 +371,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
 
         /* Form inputs */
         .fi { width:100%; padding:10px 13px; border-radius:10px; border:1.5px solid #e8ddd5; background:white; font-size:13px; font-family:'Plus Jakarta Sans',sans-serif; transition:border-color 0.18s; outline:none; color:#1a0505; }
-        .fi:focus { border-color:#8B0000; }
+        .fi:focus { border-color:var(--clr-brand); }
         .fi-dark { background:rgba(255,255,255,0.09); border:1px solid rgba(255,255,255,0.22); color:white; font-size:12px; }
         .fi-dark::placeholder { color:rgba(255,255,255,0.38); }
         .fi-dark:focus { border-color:rgba(192,57,43,0.8); }
@@ -379,7 +379,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
         .sel-arrow { appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238B0000' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; padding-right:30px !important; }
 
         /* Buttons */
-        .btn-p { background:linear-gradient(135deg,#8B0000,#c0392b); color:white; border:none; border-radius:10px; padding:11px 24px; font-size:13.5px; font-weight:700; cursor:pointer; font-family:'Plus Jakarta Sans',sans-serif; transition:all 0.2s; box-shadow:0 4px 14px rgba(139,0,0,0.3); }
+        .btn-p { background:linear-gradient(135deg,var(--clr-brand),#c0392b); color:white; border:none; border-radius:10px; padding:11px 24px; font-size:13.5px; font-weight:700; cursor:pointer; font-family:'Plus Jakarta Sans',sans-serif; transition:all 0.2s; box-shadow:0 4px 14px rgba(139,0,0,0.3); }
         .btn-p:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 6px 20px rgba(139,0,0,0.4); }
         .btn-p:disabled { opacity:0.65; cursor:not-allowed; }
         .btn-ow { background:transparent; color:white; border:1.5px solid rgba(255,255,255,0.65); border-radius:10px; padding:10px 18px; font-size:13px; font-weight:600; cursor:pointer; font-family:'Plus Jakarta Sans',sans-serif; transition:all 0.2s; }
@@ -403,7 +403,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
         /* Service cards */
         .dark .svc-card { background:#1a1a1a !important; border-color:#2a2a2a !important; }
         .dark .svc-card::before { background:linear-gradient(135deg,rgba(192,57,43,0.08),transparent 60%) !important; }
-        .dark .svc-card:hover { border-color:#8B0000 !important; box-shadow:0 14px 30px rgba(139,0,0,0.2) !important; }
+        .dark .svc-card:hover { border-color:var(--clr-brand) !important; box-shadow:0 14px 30px rgba(139,0,0,0.2) !important; }
         .dark .svc-card h3 { color:#f0e0dd !important; }
         .dark .svc-card p { color:#9a8a82 !important; }
 
@@ -421,7 +421,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
         .dark .lp-section-cream p { color:#9a8a82 !important; }
         .dark .blood-card { background:#1a1a1a !important; border-color:#2a2a2a !important; }
         .dark .blood-card:hover { border-color:#c0392b !important; box-shadow:0 6px 18px rgba(139,0,0,0.25) !important; }
-        .dark .blood-card.sel { background:linear-gradient(145deg,#2a1515,#1f1010) !important; border-color:#8B0000 !important; box-shadow:0 8px 26px rgba(139,0,0,0.3) !important; }
+        .dark .blood-card.sel { background:linear-gradient(145deg,#2a1515,#1f1010) !important; border-color:var(--clr-brand) !important; box-shadow:0 8px 26px rgba(139,0,0,0.3) !important; }
         .dark .blood-sub { color:#7a6a62 !important; }
         .dark .blood-info-panel { background:#1a1a1a !important; border-color:#2a2a2a !important; box-shadow:0 8px 26px rgba(0,0,0,0.3) !important; }
         .dark .blood-info-panel .lp-d { color:#c0392b !important; }
@@ -430,7 +430,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
         /* Eligibility checker */
         .dark .lp-eli-card { background:#1a1a1a !important; border-color:#2a2a2a !important; box-shadow:0 10px 40px rgba(0,0,0,0.3) !important; }
         .dark .fi { background:#222 !important; border-color:#333 !important; color:#e0d0cc !important; }
-        .dark .fi:focus { border-color:#8B0000 !important; }
+        .dark .fi:focus { border-color:var(--clr-brand) !important; }
         .dark .fl { color:#b0a098 !important; }
 
         /* Leaderboard */
@@ -441,7 +441,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
         /* Role selection section */
         .dark .lp-role-wrap { background:#1a1a1a !important; border-color:#2a2a2a !important; box-shadow:0 18px 55px rgba(0,0,0,0.3) !important; }
         .dark .role-card { background:#1e1e1e !important; border-color:#2a2a2a !important; }
-        .dark .role-card:hover { border-color:#8B0000 !important; box-shadow:0 18px 38px rgba(139,0,0,0.2) !important; background:linear-gradient(160deg,#2a1515,#1e1e1e) !important; }
+        .dark .role-card:hover { border-color:var(--clr-brand) !important; box-shadow:0 18px 38px rgba(139,0,0,0.2) !important; background:linear-gradient(160deg,#2a1515,#1e1e1e) !important; }
         .dark .role-card h4 { color:#f0e0dd !important; }
         .dark .role-card p { color:#9a8a82 !important; }
         .dark .role-card .role-icon { color:#c0392b !important; }
@@ -451,7 +451,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
         .dark .modal-box { background:#1a1a1a !important; }
         .dark .modal-box .fl { color:#b0a098 !important; }
         .dark .modal-box .fi { background:#222 !important; border-color:#333 !important; color:#e0d0cc !important; }
-        .dark .modal-box .fi:focus { border-color:#8B0000 !important; }
+        .dark .modal-box .fi:focus { border-color:var(--clr-brand) !important; }
       `}</style>
 
       <div className="lp" id="main-content">
@@ -662,7 +662,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
           <div className="container mx-auto px-4">
             <div style={{ textAlign: 'center', marginBottom: 44 }}>
               <div className="ey">What We Offer</div>
-              <h2 className="lp-d lp-st" style={{ fontSize: '2.5rem', color: '#1a0505', lineHeight: 1.15 }}>Our <span style={{ color: '#8B0000' }}>Services</span></h2>
+              <h2 className="lp-d lp-st" style={{ fontSize: '2.5rem', color: '#1a0505', lineHeight: 1.15 }}>Our <span style={{ color: 'var(--clr-brand)' }}>Services</span></h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <SvcCard href="/compatibility.html" icon={<Search className="w-8 h-8" />} title="Blood Compatibility Chart" desc="Find compatible blood groups instantly for donors and recipients." />
@@ -680,7 +680,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
           <div className="container mx-auto px-4">
             <div style={{ textAlign: 'center', marginBottom: 44 }}>
               <div className="ey">Simple Process</div>
-              <h2 className="lp-d lp-st" style={{ fontSize: '2.5rem', color: '#1a0505', lineHeight: 1.15 }}>How It <span style={{ color: '#8B0000' }}>Works</span></h2>
+              <h2 className="lp-d lp-st" style={{ fontSize: '2.5rem', color: '#1a0505', lineHeight: 1.15 }}>How It <span style={{ color: 'var(--clr-brand)' }}>Works</span></h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
               {[
@@ -691,7 +691,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
               ].map(s => (
                 <div key={s.n} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
                   <div className="step-num">{s.n}</div>
-                  <div style={{ color: '#8B0000', margin: '10px 0 5px' }}>{s.icon}</div>
+                  <div style={{ color: 'var(--clr-brand)', margin: '10px 0 5px' }}>{s.icon}</div>
                   <h4 style={{ fontWeight: 700, color: '#1a0505', fontSize: '0.92rem', marginBottom: 5 }}>{s.t}</h4>
                   <p style={{ fontSize: '12px', color: '#7a6868', lineHeight: 1.65 }}>{s.d}</p>
                 </div>
@@ -705,7 +705,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
           <div className="container mx-auto px-4">
             <div style={{ textAlign: 'center', marginBottom: 10 }}>
               <div className="ey">Quick Reference</div>
-              <h2 className="lp-d lp-st" style={{ fontSize: '2.5rem', color: '#1a0505', lineHeight: 1.15 }}>Blood Group <span style={{ color: '#8B0000' }}>Guide</span></h2>
+              <h2 className="lp-d lp-st" style={{ fontSize: '2.5rem', color: '#1a0505', lineHeight: 1.15 }}>Blood Group <span style={{ color: 'var(--clr-brand)' }}>Guide</span></h2>
               <p style={{ fontSize: '12px', color: '#7a6868', marginTop: 8 }}>Tap any card to see compatibility info.</p>
             </div>
 
@@ -715,12 +715,12 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
                 <div className="blood-info-panel">
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, marginBottom: 14 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <div style={{ width: 48, height: 48, borderRadius: 10, background: 'linear-gradient(135deg,#8B0000,#c0392b)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <div style={{ width: 48, height: 48, borderRadius: 10, background: 'linear-gradient(135deg,var(--clr-brand),#c0392b)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <span className="lp-d" style={{ fontSize: '1.1rem', color: 'white' }}>{info.type}</span>
                       </div>
-                      <p className="lp-d" style={{ fontSize: '1.6rem', color: '#8B0000', lineHeight: 1 }}>{info.type}</p>
+                      <p className="lp-d" style={{ fontSize: '1.6rem', color: 'var(--clr-brand)', lineHeight: 1 }}>{info.type}</p>
                     </div>
-                    <button onClick={() => setSelectedBlood(null)} style={{ background: '#fdf0ee', border: '1px solid #f0d5d0', borderRadius: 8, padding: '4px 11px', fontSize: '11px', color: '#8B0000', fontWeight: 600, cursor: 'pointer', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>✕ Close</button>
+                    <button onClick={() => setSelectedBlood(null)} style={{ background: '#fdf0ee', border: '1px solid #f0d5d0', borderRadius: 8, padding: '4px 11px', fontSize: '11px', color: 'var(--clr-brand)', fontWeight: 600, cursor: 'pointer', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>✕ Close</button>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div style={{ background: '#fff5f5', borderRadius: 10, padding: '12px 14px', border: '1px solid #f5ddd8' }}>
@@ -741,12 +741,12 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
                 <button key={b.type} className={`blood-card${selectedBlood === b.type ? ' sel' : ''}`} onClick={() => setSelectedBlood(p => p === b.type ? null : b.type)} aria-pressed={selectedBlood === b.type}>
                   <span className="blood-type-lbl" style={{ fontSize: '1.4rem', color: b.color }}>{b.type}</span>
                   <span className="blood-sub">{selectedBlood === b.type ? '▲' : 'Tap'}</span>
-                  {selectedBlood === b.type && <div style={{ position: 'absolute', top: 5, right: 5, width: 7, height: 7, borderRadius: '50%', background: '#8B0000' }} />}
+                  {selectedBlood === b.type && <div style={{ position: 'absolute', top: 5, right: 5, width: 7, height: 7, borderRadius: '50%', background: 'var(--clr-brand)' }} />}
                 </button>
               ))}
             </div>
             <p style={{ textAlign: 'center', fontSize: '12px', color: '#9a8a82', marginTop: 14 }}>
-              <a href="/compatibility.html" style={{ color: '#8B0000', fontWeight: 700, textDecoration: 'none' }}>View Full Compatibility Chart →</a>
+              <a href="/compatibility.html" style={{ color: 'var(--clr-brand)', fontWeight: 700, textDecoration: 'none' }}>View Full Compatibility Chart →</a>
             </p>
           </div>
         </section>
@@ -756,7 +756,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
           <div className="container mx-auto px-4" style={{ maxWidth: 700 }}>
             <div style={{ textAlign: 'center', marginBottom: 28 }}>
               <div className="ey">Donor Tool</div>
-              <h2 className="lp-d lp-st" style={{ fontSize: '2.5rem', color: '#1a0505', lineHeight: 1.15 }}>Next Donation <span style={{ color: '#8B0000' }}>Eligibility</span></h2>
+              <h2 className="lp-d lp-st" style={{ fontSize: '2.5rem', color: '#1a0505', lineHeight: 1.15 }}>Next Donation <span style={{ color: 'var(--clr-brand)' }}>Eligibility</span></h2>
               <p style={{ fontSize: '13px', color: '#7a6868', marginTop: 8 }}>When Can I Donate Again?</p>
             </div>
             <div className="lp-eli-card" style={{ background: 'white', borderRadius: 20, border: '1.5px solid #f0e5e2', boxShadow: '0 10px 40px rgba(139,0,0,0.08)', padding: '28px 24px' }}>
@@ -804,11 +804,11 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
           <div className="container mx-auto px-4" style={{ maxWidth: 700 }}>
             <div style={{ textAlign: 'center', marginBottom: 28 }}>
               <div className="ey">Community</div>
-              <h2 className="lp-d lp-st" style={{ fontSize: '2.5rem', color: '#1a0505', lineHeight: 1.15 }}>Donor <span style={{ color: '#8B0000' }}>Leaderboard</span></h2>
+              <h2 className="lp-d lp-st" style={{ fontSize: '2.5rem', color: '#1a0505', lineHeight: 1.15 }}>Donor <span style={{ color: 'var(--clr-brand)' }}>Leaderboard</span></h2>
               <p style={{ fontSize: '13px', color: '#7a6868', marginTop: 8 }}>Recognising India's most dedicated life-savers</p>
             </div>
             <div className="lp-leaderboard" style={{ background: 'white', borderRadius: 20, border: '1.5px solid #f0e5e2', boxShadow: '0 10px 40px rgba(139,0,0,0.07)', overflow: 'hidden' }}>
-              <div style={{ background: 'linear-gradient(100deg,#6b0000,#8B0000)', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ background: 'linear-gradient(100deg,#6b0000,var(--clr-brand))', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Trophy size={17} color="rgba(255,230,180,0.9)" />
                 <span style={{ color: 'white', fontWeight: 700, fontSize: '0.88rem', letterSpacing: '0.05em' }}>TOP DONORS — THIS MONTH</span>
                 <span style={{ marginLeft: 'auto', background: 'rgba(255,255,255,0.14)', color: 'rgba(255,255,255,0.8)', fontSize: '10px', fontWeight: 700, padding: '3px 10px', borderRadius: 999, letterSpacing: '0.1em' }}>LIVE</span>
@@ -827,12 +827,12 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
                         <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap' }}>
                           <span style={{ fontWeight: 700, fontSize: '0.88rem', color: '#1a0505' }}>{donor.name}</span>
                           <span style={{ fontSize: '10px', fontWeight: 700, background: bc.bg, color: bc.c, padding: '2px 7px', borderRadius: 999 }}>{donor.badge}</span>
-                          <span style={{ fontSize: '10px', fontWeight: 700, background: '#fff0ee', color: '#8B0000', padding: '2px 7px', borderRadius: 999 }}>{donor.bloodType}</span>
+                          <span style={{ fontSize: '10px', fontWeight: 700, background: '#fff0ee', color: 'var(--clr-brand)', padding: '2px 7px', borderRadius: 999 }}>{donor.bloodType}</span>
                         </div>
                         <div style={{ fontSize: '11px', color: '#9a8a82', marginTop: 2, display: 'flex', alignItems: 'center', gap: 4 }}><MapPin size={10} />{donor.city}</div>
                       </div>
                       <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                        <div className="lp-d" style={{ fontSize: '1.3rem', color: '#8B0000', lineHeight: 1 }}>{donor.donations}</div>
+                        <div className="lp-d" style={{ fontSize: '1.3rem', color: 'var(--clr-brand)', lineHeight: 1 }}>{donor.donations}</div>
                         <div style={{ fontSize: '10px', color: '#9a8a82' }}>donations</div>
                       </div>
                     </div>
@@ -840,7 +840,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
                 })}
               </div>
               <div style={{ borderTop: '1px solid #f5eee8', padding: '12px 20px', textAlign: 'center' }}>
-                <button onClick={onDonorSignupClick} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#8B0000', fontSize: '13px', fontWeight: 700, fontFamily: "'Plus Jakarta Sans',sans-serif", display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                <button onClick={onDonorSignupClick} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--clr-brand)', fontSize: '13px', fontWeight: 700, fontFamily: "'Plus Jakarta Sans',sans-serif", display: 'inline-flex', alignItems: 'center', gap: 5 }}>
                   Join the leaderboard — Register as Donor <ChevronRight size={14} />
                 </button>
               </div>
@@ -852,7 +852,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
         <section className="lp-section-white" style={{ padding: '64px 0', background: 'white' }}>
           <div className="container mx-auto px-4">
             <div className="lp-role-wrap" style={{ background: 'white', borderRadius: 22, border: '1px solid #f0e5e2', boxShadow: '0 18px 55px rgba(139,0,0,0.08)', overflow: 'hidden' }}>
-              <div style={{ background: 'linear-gradient(100deg,#6b0000,#8B0000)', padding: '36px 28px', textAlign: 'center' }}>
+              <div style={{ background: 'linear-gradient(100deg,#6b0000,var(--clr-brand))', padding: '36px 28px', textAlign: 'center' }}>
                 <div className="ey" style={{ color: 'rgba(255,210,200,0.75)' }}>
                   <span style={{ background: 'rgba(255,210,200,0.35)', width: 22, height: 1, display: 'block' }} />Choose Your Role<span style={{ background: 'rgba(255,210,200,0.35)', width: 22, height: 1, display: 'block' }} />
                 </div>
@@ -906,7 +906,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
         <div className="modal-bd" onClick={e => e.target === e.currentTarget && closeEmergency()}>
           <div className="modal-box">
             {/* Header */}
-            <div style={{ background: 'linear-gradient(135deg,#8B0000,#c0392b)', padding: '20px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ background: 'linear-gradient(135deg,var(--clr-brand),#c0392b)', padding: '20px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
                 <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 2 }}>🔴 Emergency Request</p>
                 <h3 style={{ color: 'white', fontWeight: 800, fontSize: '1.2rem', fontFamily: "'Sora',sans-serif", letterSpacing: '-0.03em' }}>Request Emergency Blood</h3>
@@ -955,7 +955,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
                     <div style={{ display: 'flex', gap: 8 }}>
                       {['Critical', 'Urgent', 'Moderate'].map(lvl => (
                         <button key={lvl} onClick={() => setEmergencyForm(f => ({ ...f, urgency: lvl }))}
-                          style={{ flex: 1, padding: '9px 0', borderRadius: 9, border: `1.5px solid ${emergencyForm.urgency === lvl ? '#8B0000' : '#e0d0ca'}`, background: emergencyForm.urgency === lvl ? '#fff0ee' : 'white', color: emergencyForm.urgency === lvl ? '#8B0000' : '#5a4a42', fontWeight: emergencyForm.urgency === lvl ? 700 : 500, fontSize: '12.5px', cursor: 'pointer', fontFamily: "'Plus Jakarta Sans',sans-serif", transition: 'all 0.18s' }}>
+                          style={{ flex: 1, padding: '9px 0', borderRadius: 9, border: `1.5px solid ${emergencyForm.urgency === lvl ? 'var(--clr-brand)' : '#e0d0ca'}`, background: emergencyForm.urgency === lvl ? '#fff0ee' : 'white', color: emergencyForm.urgency === lvl ? 'var(--clr-brand)' : '#5a4a42', fontWeight: emergencyForm.urgency === lvl ? 700 : 500, fontSize: '12.5px', cursor: 'pointer', fontFamily: "'Plus Jakarta Sans',sans-serif", transition: 'all 0.18s' }}>
                           {lvl === 'Critical' ? '🔴' : lvl === 'Urgent' ? '🟠' : '🟡'} {lvl}
                         </button>
                       ))}
@@ -992,7 +992,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
                   {/* RTID display */}
                   <div style={{ background: '#fdf8f6', border: '1.5px solid #f0d5ca', borderRadius: 14, padding: '16px 20px', marginBottom: 18 }}>
                     <p style={{ fontSize: '10px', fontWeight: 700, color: '#9a8a82', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 6 }}>Your RaktPort RTID</p>
-                    <p style={{ fontFamily: 'monospace', fontWeight: 800, fontSize: '1.25rem', color: '#8B0000', letterSpacing: '0.05em', wordBreak: 'break-all' }}>{generatedRTID}</p>
+                    <p style={{ fontFamily: 'monospace', fontWeight: 800, fontSize: '1.25rem', color: 'var(--clr-brand)', letterSpacing: '0.05em', wordBreak: 'break-all' }}>{generatedRTID}</p>
                     <p style={{ fontSize: '11px', color: '#9a8a82', marginTop: 5 }}>Use this to track your blood request status in the RTID Tracker</p>
                   </div>
 
@@ -1003,7 +1003,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
                       </div>
                     ))}
                   </div>
-                  <button onClick={closeEmergency} style={{ background: '#8B0000', color: 'white', border: 'none', borderRadius: 10, padding: '11px 32px', fontWeight: 700, fontSize: '13.5px', cursor: 'pointer', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
+                  <button onClick={closeEmergency} style={{ background: 'var(--clr-brand)', color: 'white', border: 'none', borderRadius: 10, padding: '11px 32px', fontWeight: 700, fontSize: '13.5px', cursor: 'pointer', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
                     Close
                   </button>
                 </div>
@@ -1034,7 +1034,7 @@ function SvcCard({ icon, title, desc, href, onClick }: { icon: React.ReactNode; 
 function RoleCard({ title, desc, icon, onClick, badge }: { title: string; desc: string; icon: React.ReactNode; onClick: () => void; badge?: string; }) {
   return (
     <button onClick={onClick} className="role-card">
-      {badge && <span style={{ position: 'absolute', top: 10, right: 10, fontSize: '9px', fontWeight: 700, background: '#fff0ee', color: '#8B0000', border: '1px solid #f0d0ca', padding: '2px 8px', borderRadius: 999, fontFamily: "'Plus Jakarta Sans',sans-serif" }}>{badge}</span>}
+      {badge && <span style={{ position: 'absolute', top: 10, right: 10, fontSize: '9px', fontWeight: 700, background: '#fff0ee', color: 'var(--clr-brand)', border: '1px solid #f0d0ca', padding: '2px 8px', borderRadius: 999, fontFamily: "'Plus Jakarta Sans',sans-serif" }}>{badge}</span>}
       <div className="role-icon">{icon}</div>
       <h4 className="role-title" style={{ fontWeight: 700, color: '#1a0505', fontSize: '0.95rem', marginBottom: 6, lineHeight: 1.2 }}>{title}</h4>
       <p className="role-desc" style={{ fontSize: '11.5px', color: '#7a6868', lineHeight: 1.65 }}>{desc}</p>

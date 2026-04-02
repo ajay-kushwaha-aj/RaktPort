@@ -208,7 +208,7 @@ export function TransfusionHistoryView({ requests }: { requests: BloodRequest[] 
                             className="hd-prog-fill"
                             style={{
                               width: `${adminPct}%`,
-                              background: "linear-gradient(90deg,#2563EB,#60A5FA)",
+                              background: "linear-gradient(90deg,var(--clr-info),#60A5FA)",
                             }}
                           />
                         </div>

@@ -30,7 +30,7 @@ export function KeyboardShortcuts({ isOpen, onClose }: Props) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md rounded-2xl">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-[#8B0000]" style={{ fontFamily: "Outfit,sans-serif" }}>
+          <DialogTitle className="flex items-center gap-2 text-[var(--clr-brand)]" style={{ fontFamily: "Outfit,sans-serif" }}>
             <Keyboard className="w-5 h-5" /> Keyboard Shortcuts
           </DialogTitle>
           <DialogDescription>Quick access keys for power users</DialogDescription>

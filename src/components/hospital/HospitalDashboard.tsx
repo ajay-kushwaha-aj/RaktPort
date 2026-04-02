@@ -686,7 +686,7 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
             { id: "_profile", icon: "👤", label: "Profile" },
           ].map(item => {
             if (item.emergency) return (
-              <button key="emg" className="hd-bnav-btn" onClick={() => openNewRequest("Emergency")} style={{ color: "#DC2626" }}>
+              <button key="emg" className="hd-bnav-btn" onClick={() => openNewRequest("Emergency")} style={{ color: "var(--clr-emergency)" }}>
                 <span className="bnav-icon">{item.icon}</span>
                 <span className="hd-bnav-lbl">{item.label}</span>
               </button>

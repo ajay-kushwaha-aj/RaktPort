@@ -109,7 +109,7 @@ export function PWAInstallPrompt() {
         className="fixed bottom-4 left-4 right-4 z-[9999] animate-in slide-in-from-bottom-6 duration-500"
         style={{ maxWidth: 420, margin: '0 auto' }}
       >
-        <div className="relative bg-gradient-to-br from-[#8B0000] via-[#a01010] to-[#6a0000] text-white rounded-2xl shadow-2xl overflow-hidden border border-white/10">
+        <div className="relative bg-gradient-to-br from-[var(--clr-brand)] via-[#a01010] to-[#6a0000] text-white rounded-2xl shadow-2xl overflow-hidden border border-white/10">
           {/* Shimmer accent */}
           <div className="absolute inset-0 bg-[linear-gradient(120deg,transparent_30%,rgba(255,255,255,0.08)_50%,transparent_70%)] pointer-events-none" />
 
@@ -145,7 +145,7 @@ export function PWAInstallPrompt() {
             <button
               onClick={handleInstall}
               disabled={installing}
-              className="flex-shrink-0 bg-white text-[#8B0000] font-bold text-xs px-4 py-2 rounded-xl hover:bg-red-50 active:scale-95 transition-all shadow-md disabled:opacity-60"
+              className="flex-shrink-0 bg-white text-[var(--clr-brand)] font-bold text-xs px-4 py-2 rounded-xl hover:bg-red-50 active:scale-95 transition-all shadow-md disabled:opacity-60"
             >
               {installing ? (
                 <span className="flex items-center gap-1.5">
@@ -180,7 +180,7 @@ export function PWAInstallPrompt() {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-[#8B0000] to-[#a01010] text-white px-5 py-4 flex items-center gap-3">
+            <div className="bg-gradient-to-r from-[var(--clr-brand)] to-[#a01010] text-white px-5 py-4 flex items-center gap-3">
               <div className="w-12 h-12 rounded-xl overflow-hidden border-2 border-white/20 bg-white/10">
                 <img src="/icon-192.png" alt="RaktPort" className="w-full h-full object-cover" />
               </div>
@@ -201,12 +201,12 @@ export function PWAInstallPrompt() {
                 { icon: <Plus className="w-5 h-5" />, step: '3', text: 'Tap', bold: '"Add"', after: 'in the top-right corner' },
               ].map((s) => (
                 <div key={s.step} className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[#8B0000]/10 flex items-center justify-center flex-shrink-0 text-[#8B0000]">
+                  <div className="w-8 h-8 rounded-full bg-[var(--clr-brand)]/10 flex items-center justify-center flex-shrink-0 text-[var(--clr-brand)]">
                     {s.icon}
                   </div>
                   <div className="pt-1">
                     <span className="text-sm text-gray-700 dark:text-gray-300">
-                      {s.text} <strong className="text-[#8B0000]">{s.bold}</strong> {s.after}
+                      {s.text} <strong className="text-[var(--clr-brand)]">{s.bold}</strong> {s.after}
                     </span>
                   </div>
                 </div>

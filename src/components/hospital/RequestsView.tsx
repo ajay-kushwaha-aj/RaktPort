@@ -212,7 +212,7 @@ export function RequestsView({
             {/* Urgency */}
             {[
               { val: "All", label: "All", color: undefined },
-              { val: "Emergency", label: "Emergency", color: "#DC2626" },
+              { val: "Emergency", label: "Emergency", color: "var(--clr-emergency)" },
               { val: "Urgent", label: "Urgent", color: "#EA580C" },
               { val: "Routine", label: "Routine", color: "#15803D" },
             ].map(u => (
@@ -304,7 +304,7 @@ export function RequestsView({
             const pct = getValidityPct(r);
             const isEM = r.urgency === "Emergency";
             const isExp = expanded === r.id;
-            const barC = pct > 50 ? "#10B981" : pct > 20 ? "#F59E0B" : "#EF4444";
+            const barC = pct > 50 ? "var(--clr-success)" : pct > 20 ? "#F59E0B" : "var(--clr-emergency)";
             const redeemedAvail = Math.max(0, (r.unitsFulfilled || 0) - (r.unitsAdministered || 0));
             const canComplete = redeemedAvail > 0 && ["REDEEMED", "PARTIAL REDEEMED", "HOSPITAL VERIFIED", "PARTIALLY ADMINISTERED"].includes(r.status);
             const fulfPct = r.unitsRequired > 0 ? ((r.unitsAdministered || 0) / r.unitsRequired) * 100 : 0;
@@ -319,7 +319,7 @@ export function RequestsView({
                 <div style={{
                   height: "2px",
                   background: isEM
-                    ? "linear-gradient(90deg,#DC2626,#EF4444)"
+                    ? "linear-gradient(90deg,var(--clr-emergency),var(--clr-emergency))"
                     : r.urgency === "Urgent"
                       ? "linear-gradient(90deg,#EA580C,#F97316)"
                       : "var(--c-border)",
@@ -358,7 +358,7 @@ export function RequestsView({
                         </span>
                         {isEM && (
                           <span style={{
-                            fontSize: "0.58rem", fontWeight: 800, background: "#DC2626",
+                            fontSize: "0.58rem", fontWeight: 800, background: "var(--clr-emergency)",
                             color: "#fff", padding: "2px 7px", borderRadius: "var(--r-pill)",
                             animation: "hd-pulse-em 1.5s ease-in-out infinite", letterSpacing: "0.04em",
                           }}>EMERGENCY</span>
@@ -375,14 +375,14 @@ export function RequestsView({
                         <div className="hd-validity" style={{ flex: 1 }}>
                           <div className="hd-validity-fill" style={{ width: `${pct}%`, background: barC }} />
                         </div>
-                        <span style={{ fontSize: "0.64rem", fontWeight: 600, color: isV ? barC : "#EF4444", flexShrink: 0 }}>
+                        <span style={{ fontSize: "0.64rem", fontWeight: 600, color: isV ? barC : "var(--clr-emergency)", flexShrink: 0 }}>
                           {getTimeRemaining(r)}
                         </span>
                       </div>
                       {r.unitsFulfilled > 0 && (
                         <div className="hd-prog" style={{ marginTop: "4px" }}>
                           <div className="hd-prog-fill" style={{
-                            width: `${fulfPct}%`, background: "linear-gradient(90deg,#2563EB,#60A5FA)",
+                            width: `${fulfPct}%`, background: "linear-gradient(90deg,var(--clr-info),#60A5FA)",
                           }} />
                         </div>
                       )}

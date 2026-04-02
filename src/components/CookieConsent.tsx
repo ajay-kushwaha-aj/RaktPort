@@ -82,7 +82,7 @@ export function CookieConsent() {
               </button>
               <button
                 onClick={() => handleAccept('all')}
-                className="flex-1 sm:flex-initial text-xs font-bold px-4 py-2 rounded-xl bg-gradient-to-r from-[#8B0000] to-[#a01010] text-white hover:from-[#7a0000] hover:to-[#900e0e] shadow-md transition active:scale-95"
+                className="flex-1 sm:flex-initial text-xs font-bold px-4 py-2 rounded-xl bg-gradient-to-r from-[var(--clr-brand)] to-[#a01010] text-white hover:from-[#7a0000] hover:to-[#900e0e] shadow-md transition active:scale-95"
               >
                 Accept All
               </button>
@@ -104,7 +104,7 @@ export function CookieConsent() {
                 {
                   name: 'Essential',
                   required: true,
-                  icon: <Shield className="w-4 h-4 text-green-600" />,
+                  icon: <Shield className="w-4 h-4 text-[var(--clr-success)]" />,
                   desc: 'Login sessions, security tokens, and user preferences. These cannot be disabled.',
                 },
                 {
@@ -116,7 +116,7 @@ export function CookieConsent() {
                 {
                   name: 'Analytics',
                   required: false,
-                  icon: <Cookie className="w-4 h-4 text-blue-500" />,
+                  icon: <Cookie className="w-4 h-4 text-[var(--clr-info)]" />,
                   desc: 'Anonymous usage data to help us improve the platform. No personal data is shared.',
                 },
               ].map((c) => (
@@ -126,7 +126,7 @@ export function CookieConsent() {
                     <span className="font-semibold text-gray-800 dark:text-gray-200">
                       {c.name}
                       {c.required && (
-                        <span className="ml-1.5 text-[10px] bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400 px-1.5 py-0.5 rounded-full">
+                        <span className="ml-1.5 text-[10px] bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-[var(--clr-success)] px-1.5 py-0.5 rounded-full">
                           Required
                         </span>
                       )}
@@ -138,9 +138,9 @@ export function CookieConsent() {
 
               <p className="text-[10px] text-gray-400 pt-1">
                 By continuing to use RaktPort, you agree to our{' '}
-                <a href="/privacy.html" className="underline hover:text-[#8B0000]" target="_blank">Privacy Policy</a>{' '}
+                <a href="/privacy.html" className="underline hover:text-[var(--clr-brand)]" target="_blank">Privacy Policy</a>{' '}
                 and{' '}
-                <a href="/terms.html" className="underline hover:text-[#8B0000]" target="_blank">Terms of Service</a>.
+                <a href="/terms.html" className="underline hover:text-[var(--clr-brand)]" target="_blank">Terms of Service</a>.
               </p>
             </div>
           )}

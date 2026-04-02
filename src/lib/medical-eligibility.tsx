@@ -352,9 +352,9 @@ export default function MedicalEligibilityDemo() {
                                         <CardContent className="pt-6">
                                             <div className="flex items-start gap-4">
                                                 {result.eligible ? (
-                                                    <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
+                                                    <CheckCircle2 className="w-6 h-6 text-[var(--clr-success)] flex-shrink-0 mt-1" />
                                                 ) : (
-                                                    <XCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-1" />
+                                                    <XCircle className="w-6 h-6 text-[var(--clr-emergency)] flex-shrink-0 mt-1" />
                                                 )}
 
                                                 <div className="flex-1">
@@ -369,7 +369,7 @@ export default function MedicalEligibilityDemo() {
 
                                                     {result.eligible ? (
                                                         <Alert className="bg-green-50 border-green-300">
-                                                            <CheckCircle2 className="h-4 w-4 text-green-600" />
+                                                            <CheckCircle2 className="h-4 w-4 text-[var(--clr-success)]" />
                                                             <AlertDescription className="text-green-800">
                                                                 ✅ <strong>ELIGIBLE</strong> - Donor may proceed with {testCase.donationType} donation.
                                                             </AlertDescription>
@@ -377,7 +377,7 @@ export default function MedicalEligibilityDemo() {
                                                     ) : (
                                                         <div className="space-y-2">
                                                             <Alert className="bg-red-50 border-red-300">
-                                                                <XCircle className="h-4 w-4 text-red-600" />
+                                                                <XCircle className="h-4 w-4 text-[var(--clr-emergency)]" />
                                                                 <AlertDescription className="text-red-800">
                                                                     <strong>NOT ELIGIBLE</strong>
                                                                     <div className="mt-2 text-sm">{result.rejectionReason}</div>
@@ -386,7 +386,7 @@ export default function MedicalEligibilityDemo() {
 
                                                             {result.nextEligibleDate && (
                                                                 <Alert className="bg-blue-50 border-blue-300">
-                                                                    <Calendar className="h-4 w-4 text-blue-600" />
+                                                                    <Calendar className="h-4 w-4 text-[var(--clr-info)]" />
                                                                     <AlertDescription className="text-blue-800 text-sm">
                                                                         Next eligible for {testCase.donationType}:
                                                                         <strong> {result.nextEligibleDate.toLocaleDateString()}</strong>

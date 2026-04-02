@@ -118,9 +118,9 @@ export function AnalyticsView({ requests }: AnalyticsViewProps) {
     const counts: Record<UrgencyLevel, number> = { Emergency: 0, Urgent: 0, Routine: 0 };
     activeReqs.forEach(r => { counts[r.urgency || "Routine"]++; });
     return [
-      { label: "Emergency", value: counts.Emergency, color: "#EF4444" },
+      { label: "Emergency", value: counts.Emergency, color: "var(--clr-emergency)" },
       { label: "Urgent", value: counts.Urgent, color: "#F97316" },
-      { label: "Routine", value: counts.Routine, color: "#10B981" },
+      { label: "Routine", value: counts.Routine, color: "var(--clr-success)" },
     ];
   }, [activeReqs]);
 
@@ -129,14 +129,14 @@ export function AnalyticsView({ requests }: AnalyticsViewProps) {
     BLOOD_GROUPS.forEach((bg: string) => { counts[bg] = 0; });
     activeReqs.forEach(r => { counts[r.bloodGroup] = (counts[r.bloodGroup] || 0) + 1; });
     const max = Math.max(...Object.values(counts), 1);
-    const colors = ["#EF4444", "#F97316", "#EAB308", "#22C55E", "#06B6D4", "#3B82F6", "#8B5CF6", "#EC4899"];
+    const colors = ["var(--clr-emergency)", "#F97316", "#EAB308", "#22C55E", "#06B6D4", "var(--clr-info)", "#8B5CF6", "#EC4899"];
     return BLOOD_GROUPS.map((bg: string, i: number) => ({ label: bg, value: counts[bg], color: colors[i % colors.length], max }));
   }, [activeReqs]);
 
   const compData = useMemo(() => {
     const counts: Record<string, number> = {};
     activeReqs.forEach(r => { const ct = r.componentType || "Whole Blood"; counts[ct] = (counts[ct] || 0) + 1; });
-    const cm: Record<string, string> = { "Whole Blood": "#EF4444", PRBC: "#F97316", Platelets: "#10B981", FFP: "#3B82F6", Cryoprecipitate: "#8B5CF6" };
+    const cm: Record<string, string> = { "Whole Blood": "var(--clr-emergency)", PRBC: "#F97316", Platelets: "var(--clr-success)", FFP: "var(--clr-info)", Cryoprecipitate: "#8B5CF6" };
     return Object.entries(counts).map(([k, v]) => ({ label: k, value: v, color: cm[k] || "#6B7280" }));
   }, [activeReqs]);
 
@@ -155,9 +155,9 @@ export function AnalyticsView({ requests }: AnalyticsViewProps) {
 
   const statusData = useMemo(() => [
     { label: "Active", value: activeReqs.filter(r => ["CREATED", "PENDING", "PROCESSING", "PLEDGED", "PARTIAL"].includes(r.status)).length, color: "#F59E0B" },
-    { label: "Fulfilled", value: activeReqs.filter(r => ["REDEEMED", "HOSPITAL VERIFIED", "PARTIAL REDEEMED"].includes(r.status)).length, color: "#10B981" },
-    { label: "Administered", value: activeReqs.filter(r => ["ADMINISTERED", "PARTIALLY ADMINISTERED", "CLOSED"].includes(r.status)).length, color: "#3B82F6" },
-    { label: "Expired", value: activeReqs.filter(r => r.status === "EXPIRED").length, color: "#EF4444" },
+    { label: "Fulfilled", value: activeReqs.filter(r => ["REDEEMED", "HOSPITAL VERIFIED", "PARTIAL REDEEMED"].includes(r.status)).length, color: "var(--clr-success)" },
+    { label: "Administered", value: activeReqs.filter(r => ["ADMINISTERED", "PARTIALLY ADMINISTERED", "CLOSED"].includes(r.status)).length, color: "var(--clr-info)" },
+    { label: "Expired", value: activeReqs.filter(r => r.status === "EXPIRED").length, color: "var(--clr-emergency)" },
   ], [activeReqs]);
 
   const stats = useMemo(() => {
@@ -233,7 +233,7 @@ export function AnalyticsView({ requests }: AnalyticsViewProps) {
             <div style={{ display: "flex", gap: "16px", marginBottom: "6px" }}>
               {[
                 { color: "var(--c-brand)", label: "Created" },
-                { color: "#10B981", label: "Fulfilled" },
+                { color: "var(--clr-success)", label: "Fulfilled" },
               ].map(l => (
                 <div key={l.label} style={{ display: "flex", alignItems: "center", gap: "5px" }}>
                   <div style={{ width: "14px", height: "2px", background: l.color, borderRadius: "2px" }} />
@@ -243,7 +243,7 @@ export function AnalyticsView({ requests }: AnalyticsViewProps) {
             </div>
             <Sparkline data={monthlyTrend.map(m => m.created)} color="var(--c-brand)" />
             <div style={{ marginTop: "4px" }}>
-              <Sparkline data={monthlyTrend.map(m => m.fulfilled)} color="#10B981" />
+              <Sparkline data={monthlyTrend.map(m => m.fulfilled)} color="var(--clr-success)" />
             </div>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px" }}>
@@ -269,7 +269,7 @@ export function AnalyticsView({ requests }: AnalyticsViewProps) {
                   <tr key={m.label} style={{ borderBottom: "1px solid var(--c-border)" }}>
                     <td style={{ padding: "5px 6px", fontWeight: 500, color: "var(--c-text-2)" }}>{m.label}</td>
                     <td style={{ padding: "5px 6px", textAlign: "center", fontWeight: 700, color: "var(--c-brand)", fontFamily: "var(--f-display)" }}>{m.created}</td>
-                    <td style={{ padding: "5px 6px", textAlign: "center", fontWeight: 700, color: "#059669", fontFamily: "var(--f-display)" }}>{m.fulfilled}</td>
+                    <td style={{ padding: "5px 6px", textAlign: "center", fontWeight: 700, color: "var(--clr-success)", fontFamily: "var(--f-display)" }}>{m.fulfilled}</td>
                   </tr>
                 ))}
               </tbody>
@@ -287,8 +287,8 @@ export function AnalyticsView({ requests }: AnalyticsViewProps) {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "20px", textAlign: "center" }}>
           {[
             { val: stats.totalUnits, label: "Total Required", color: "var(--c-brand)", pct: 100, barC: "var(--c-brand)" },
-            { val: stats.fulfilledUnits, label: "Fulfilled", color: "#059669", pct: stats.fulfillRate, barC: "#10B981" },
-            { val: stats.administeredUnits, label: "Administered", color: "#2563EB", pct: stats.adminRate, barC: "#3B82F6" },
+            { val: stats.fulfilledUnits, label: "Fulfilled", color: "var(--clr-success)", pct: stats.fulfillRate, barC: "var(--clr-success)" },
+            { val: stats.administeredUnits, label: "Administered", color: "var(--clr-info)", pct: stats.adminRate, barC: "var(--clr-info)" },
           ].map(s => (
             <div key={s.label}>
               <div style={{ fontFamily: "var(--f-display)", fontSize: "2rem", fontWeight: 800, color: s.color, lineHeight: 1, letterSpacing: "-0.02em" }}>

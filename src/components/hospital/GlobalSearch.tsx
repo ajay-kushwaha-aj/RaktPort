@@ -90,7 +90,7 @@ export function GlobalSearch({ requests, onSelectRequest, onClose, isOpen }: Glo
         <div className="w-full max-w-xl mx-4 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden hd-enter-sm" style={{ maxHeight: "70vh" }}>
           {/* Search input */}
           <div className="flex items-center gap-3 p-4 border-b border-gray-100 dark:border-gray-800">
-            <Search className="w-5 h-5 text-[#8B0000] flex-shrink-0" />
+            <Search className="w-5 h-5 text-[var(--clr-brand)] flex-shrink-0" />
             <input
               ref={inputRef}
               type="text"
@@ -135,13 +135,13 @@ export function GlobalSearch({ requests, onSelectRequest, onClose, isOpen }: Glo
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate">{r.patientName}</span>
-                          <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 border border-red-100 dark:border-red-800">{r.bloodGroup}</span>
+                          <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-[var(--clr-emergency)] border border-red-100 dark:border-red-800">{r.bloodGroup}</span>
                           <span className="hd-status border text-[10px]" style={{ background: sm.bg, color: sm.text, borderColor: sm.border }}>{sm.label}</span>
                         </div>
                         <div className="flex items-center gap-2 text-[11px] text-gray-400 mt-0.5">
                           <span className="font-mono">{r.rtid}</span>
                           <span>·</span>
-                          <span className="font-semibold text-[#8B0000] dark:text-red-400">Matched: {result.matchField}</span>
+                          <span className="font-semibold text-[var(--clr-brand)] dark:text-[var(--clr-emergency)]">Matched: {result.matchField}</span>
                           <span className="text-gray-500 truncate">({result.matchValue})</span>
                         </div>
                       </div>

@@ -78,7 +78,7 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
           color:#5a4a42; font-size:11.5px; font-weight:600; cursor:pointer;
           transition:all 0.18s; font-family:'Plus Jakarta Sans',sans-serif; white-space:nowrap;
         }
-        .rph-lang:hover { border-color:#8B0000; color:#8B0000; }
+        .rph-lang:hover { border-color:var(--clr-brand); color:var(--clr-brand); }
 
         /* ── Tagline — always visible, shrinks gracefully ── */
         .rph-tagline {
@@ -109,7 +109,7 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
 
         /* ── Login button ── */
         .rph-login {
-          background:white; color:#7B0000; font-size:0.75rem; font-weight:700;
+          background:white; color:var(--clr-brand); font-size:0.75rem; font-weight:700;
           padding:8px 20px; border-radius:999px; letter-spacing:0.03em;
           transition:all 0.2s; white-space:nowrap; border:none; cursor:pointer;
           box-shadow:0 2px 8px rgba(0,0,0,0.14); font-family:'Plus Jakarta Sans',sans-serif;
@@ -131,7 +131,7 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
         .dark .rph-brand { color:#ff6b6b !important; }
         .dark .rph-tagline { color:#9a8a82 !important; }
         .dark .rph-lang { background:#2a2a2a !important; border-color:#3a3a3a !important; color:#c0a8a0 !important; }
-        .dark .rph-lang:hover { border-color:#8B0000 !important; color:#ff6b6b !important; }
+        .dark .rph-lang:hover { border-color:var(--clr-brand) !important; color:#ff6b6b !important; }
         .dark .rph-mwrap { background:#1c1a14 !important; border-color:#3a3520 !important; }
         .dark .rph-mtrack { color:#b89a30 !important; }
         .dark .rph-logo-wrap { border-color:#2a2a2a !important; background:#1a1a1a !important; }
@@ -159,7 +159,7 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
                 <img src={raktportLogo} alt="RaktPort" style={{ width:'100%', height:'100%', objectFit:'contain' }} />
               </div>
               <div style={{ minWidth:0 }}>
-                <div className="rph-brand" style={{ fontSize:'1.5rem', color:'#8B0000', lineHeight:1 }}>RaktPort</div>
+                <div className="rph-brand" style={{ fontSize:'1.5rem', color:'var(--clr-brand)', lineHeight:1 }}>RaktPort</div>
                 {/* Tagline — always rendered, hides only below 320px */}
                 <p className="rph-tagline">{t.tagline}</p>
               </div>
@@ -177,7 +177,7 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
                   onClick={() => setMobileMenuOpen(v => !v)}
                   aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
                   aria-expanded={mobileMenuOpen}
-                  style={{ padding:8, borderRadius:8, border:'1.5px solid #e8ddd5', color:'#8B0000', background:'white', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}
+                  style={{ padding:8, borderRadius:8, border:'1.5px solid #e8ddd5', color:'var(--clr-brand)', background:'white', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}
                 >
                   {mobileMenuOpen ? <X size={20}/> : <Menu size={20}/>}
                 </button>
@@ -187,7 +187,7 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
         </div>
 
         {/* ─ Nav bar ─ */}
-        <nav style={{ background:'#7B0000' }} aria-label="Main navigation">
+        <nav style={{ background:'var(--clr-navy)', borderLeft:'3px solid var(--clr-brand)' }} aria-label="Main navigation">
           <div className="container mx-auto" style={{ padding:'0 16px' }}>
 
             {/* Desktop */}
@@ -234,7 +234,7 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
                 {onLoginClick && (
                   <button
                     onClick={() => { onLoginClick(); setMobileMenuOpen(false); }}
-                    style={{ width:'100%', marginTop:8, background:'white', color:'#7B0000', fontSize:'0.85rem', fontWeight:700, padding:'11px 16px', borderRadius:10, border:'none', cursor:'pointer', fontFamily:"'Plus Jakarta Sans',sans-serif" }}
+                    style={{ width:'100%', marginTop:8, background:'white', color:'var(--clr-brand)', fontSize:'0.85rem', fontWeight:700, padding:'11px 16px', borderRadius:10, border:'none', cursor:'pointer', fontFamily:"'Plus Jakarta Sans',sans-serif" }}
                   >
                     {t.login}
                   </button>

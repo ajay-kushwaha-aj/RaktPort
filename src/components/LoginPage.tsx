@@ -544,7 +544,7 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
                   <div className="space-y-1.5">
                     <div className="flex justify-between items-center">
                       <label htmlFor="lp-password" className="block text-xs sm:text-sm font-semibold text-gray-700">Password</label>
-                      <button type="button" onClick={() => setShowForgotPwd(true)} tabIndex={-1} className="text-[10px] sm:text-xs font-semibold text-blue-600 hover:text-blue-800 hover:underline">Forgot password?</button>
+                      <button type="button" onClick={() => setShowForgotPwd(true)} tabIndex={-1} className="text-[10px] sm:text-xs font-semibold text-[var(--clr-info)] hover:text-blue-800 hover:underline">Forgot password?</button>
                     </div>
                     <div className="relative group">
                       <Lock className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-focus-within:text-gray-600 pointer-events-none" />
@@ -626,7 +626,7 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
                   toast.error('Error', { description: res.error });
                 }
               }} disabled={forgotLoading}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-bold shadow-md hover:bg-blue-700 disabled:opacity-50">
+                className="flex-1 px-4 py-2 bg-[var(--clr-info)] text-white rounded-xl text-sm font-bold shadow-md hover:bg-blue-700 disabled:opacity-50">
                 {forgotLoading ? 'Sending...' : 'Send Link'}
               </button>
             </div>

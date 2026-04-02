@@ -18,7 +18,7 @@ export const QRModal = ({ isOpen, onClose, request }: { isOpen: boolean; onClose
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md max-h-[95vh] overflow-y-auto rounded-2xl">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-[#8B0000]" style={{ fontFamily: "Outfit,sans-serif" }}>
+          <DialogTitle className="flex items-center gap-2 text-[var(--clr-brand)]" style={{ fontFamily: "Outfit,sans-serif" }}>
             <QrCode className="w-5 h-5" /> QR Code · {request.rtid}
           </DialogTitle>
           <DialogDescription>Scan at any blood bank to verify this requisition</DialogDescription>
@@ -30,10 +30,10 @@ export const QRModal = ({ isOpen, onClose, request }: { isOpen: boolean; onClose
           <div className="w-full space-y-1">
             <div className="flex justify-between text-xs">
               <span className="text-gray-500 dark:text-gray-400 font-medium">Validity remaining</span>
-              <span className={`font-bold ${isV ? "text-green-600" : "text-red-600"}`}>{rem}</span>
+              <span className={`font-bold ${isV ? "text-[var(--clr-success)]" : "text-[var(--clr-emergency)]"}`}>{rem}</span>
             </div>
             <div className="hd-validity">
-              <div className="hd-validity-fill" style={{ width: `${pct}%`, background: pct > 50 ? "#22c55e" : pct > 20 ? "#f59e0b" : "#ef4444" }} />
+              <div className="hd-validity-fill" style={{ width: `${pct}%`, background: pct > 50 ? "#22c55e" : pct > 20 ? "#f59e0b" : "var(--clr-emergency)" }} />
             </div>
           </div>
           <div className="w-full bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3 border dark:border-gray-700 text-sm space-y-2">
@@ -48,7 +48,7 @@ export const QRModal = ({ isOpen, onClose, request }: { isOpen: boolean; onClose
             </div>
           </div>
         </div>
-        <Button onClick={onClose} className="w-full bg-[#8B0000] hover:bg-[#6b0000]">Close</Button>
+        <Button onClick={onClose} className="w-full bg-[var(--clr-brand)] hover:bg-[#6b0000]">Close</Button>
       </DialogContent>
     </Dialog>
   );

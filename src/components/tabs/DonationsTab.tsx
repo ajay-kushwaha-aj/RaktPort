@@ -87,7 +87,7 @@ export const DonationsTab = ({ donations }: DonationsTabProps) => {
                 borderLeftColor:
                   donation.status === 'REDEEMED' ? '#9333ea' :
                     donation.status === 'AVAILABLE' || donation.status === 'Donated' ? '#16a34a' :
-                      donation.status === 'SCHEDULED' ? '#3b82f6' :
+                      donation.status === 'SCHEDULED' ? 'var(--clr-info)' :
                         donation.status === 'COMPLETED' ? '#6b7280' : '#d1d5db'
               }}
             >

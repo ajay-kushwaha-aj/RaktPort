@@ -6,13 +6,13 @@ export const ProfileModal = ({ isOpen, onClose, hospital }: { isOpen: boolean; o
   <Dialog open={isOpen} onOpenChange={onClose}>
     <DialogContent className="sm:max-w-sm rounded-2xl">
       <DialogHeader>
-        <DialogTitle className="flex items-center gap-2 text-[#8B0000]" style={{ fontFamily: "Outfit,sans-serif" }}>
+        <DialogTitle className="flex items-center gap-2 text-[var(--clr-brand)]" style={{ fontFamily: "Outfit,sans-serif" }}>
           <Building2 className="w-5 h-5" /> Hospital Profile
         </DialogTitle>
       </DialogHeader>
       <div className="space-y-3">
         <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-950/30 rounded-xl border border-red-100 dark:border-red-900/40">
-          <div className="w-12 h-12 rounded-xl bg-[#8B0000] flex items-center justify-center text-white text-2xl font-black" style={{ fontFamily: "Outfit,sans-serif" }}>
+          <div className="w-12 h-12 rounded-xl bg-[var(--clr-brand)] flex items-center justify-center text-white text-2xl font-black" style={{ fontFamily: "Outfit,sans-serif" }}>
             {(hospital?.fullName || "H")[0]}
           </div>
           <div>

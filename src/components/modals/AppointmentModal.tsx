@@ -280,7 +280,7 @@ export const AppointmentModal = ({
                       type="button" 
                       disabled
                       variant="default"
-                      className="bg-green-600 hover:bg-green-700 text-white"
+                      className="bg-[var(--clr-success)] hover:bg-green-700 text-white"
                     >
                       <CheckCircle className="w-4 h-4 mr-2" /> Verified
                     </Button>

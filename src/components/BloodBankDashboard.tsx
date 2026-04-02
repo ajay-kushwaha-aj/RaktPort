@@ -83,8 +83,8 @@ const dashStyles = `
 }
 .dark .bbd-kpi-card { background:#1e0505; border-color:rgba(255,255,255,0.07); }
 
-.bbd-kpi-card.c-crimson::before { background:linear-gradient(90deg,#8B0000,#c41e3a); }
-.bbd-kpi-card.c-emerald::before { background:linear-gradient(90deg,#059669,#10b981); }
+.bbd-kpi-card.c-crimson::before { background:linear-gradient(90deg,var(--clr-brand),#c41e3a); }
+.bbd-kpi-card.c-emerald::before { background:linear-gradient(90deg,var(--clr-success),var(--clr-success)); }
 .bbd-kpi-card.c-blue::before    { background:linear-gradient(90deg,#0284c7,#38bdf8); }
 .bbd-kpi-card.c-amber::before   { background:linear-gradient(90deg,#d97706,#fbbf24); }
 .bbd-kpi-card.c-purple::before  { background:linear-gradient(90deg,#7c3aed,#a78bfa); }
@@ -107,7 +107,7 @@ const dashStyles = `
 
 /* ── Welcome Banner ── */
 .bbd-welcome {
-  background: linear-gradient(135deg,#8B0000 0%,#a00000 50%,#7b0000 100%);
+  background: linear-gradient(135deg,var(--clr-brand) 0%,#a00000 50%,#7b0000 100%);
   border-radius: 20px;
   padding: 24px 28px;
   position: relative; overflow: hidden;
@@ -161,7 +161,7 @@ const dashStyles = `
   display:flex; align-items:center; gap:7px;
 }
 .dark .bbd-section-title { color:#fff5f5; }
-.bbd-section-link { font-size:0.75rem; color:#8B0000; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:3px; transition:gap 0.2s; }
+.bbd-section-link { font-size:0.75rem; color:var(--clr-brand); font-weight:600; cursor:pointer; display:flex; align-items:center; gap:3px; transition:gap 0.2s; }
 .bbd-section-link:hover { gap:6px; }
 
 /* ── Quick Actions ── */
@@ -220,7 +220,7 @@ const dashStyles = `
 }
 .bbd-appt-card:hover { transform:translateX(3px); box-shadow:0 4px 14px rgba(139,0,0,0.1); border-color:rgba(139,0,0,0.2); }
 .dark .bbd-appt-card { background:#1e0505; border-color:rgba(255,255,255,0.07); }
-.bbd-appt-date { width:44px; height:44px; border-radius:10px; background:linear-gradient(135deg,#8B0000,#b30000); color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; flex-shrink:0; font-family:'Outfit',sans-serif; }
+.bbd-appt-date { width:44px; height:44px; border-radius:10px; background:linear-gradient(135deg,var(--clr-brand),#b30000); color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; flex-shrink:0; font-family:'Outfit',sans-serif; }
 .bbd-appt-dd { font-size:1rem; font-weight:800; line-height:1; }
 .bbd-appt-mo { font-size:0.52rem; font-weight:600; opacity:0.75; letter-spacing:0.05em; text-transform:uppercase; }
 
@@ -237,7 +237,7 @@ const dashStyles = `
 .bbd-fab {
   position:fixed; bottom:24px; right:24px; z-index:50;
   width:54px; height:54px; border-radius:50%;
-  background:linear-gradient(135deg,#8B0000,#c41e3a);
+  background:linear-gradient(135deg,var(--clr-brand),#c41e3a);
   color:#fff; border:none; cursor:pointer;
   display:flex; align-items:center; justify-content:center;
   box-shadow:0 6px 20px rgba(139,0,0,0.4), 0 2px 6px rgba(0,0,0,0.15);
@@ -270,9 +270,9 @@ const dashStyles = `
 const BLOOD_GROUPS = ['A+','A-','B+','B-','O+','O-','AB+','AB-'];
 
 const BG_COLORS: Record<string, { bg:string; text:string; border:string; bar:string }> = {
-  'A+': { bg:'#fff5f5', text:'#b91c1c', border:'#fca5a5', bar:'#ef4444' },
+  'A+': { bg:'#fff5f5', text:'#b91c1c', border:'#fca5a5', bar:'var(--clr-emergency)' },
   'A-': { bg:'#fff1f2', text:'#be185d', border:'#fda4af', bar:'#f43f5e' },
-  'B+': { bg:'#eff6ff', text:'#1d4ed8', border:'#93c5fd', bar:'#3b82f6' },
+  'B+': { bg:'#eff6ff', text:'#1d4ed8', border:'#93c5fd', bar:'var(--clr-info)' },
   'B-': { bg:'#f0f9ff', text:'#0369a1', border:'#7dd3fc', bar:'#0ea5e9' },
   'O+': { bg:'#f0fdf4', text:'#166534', border:'#86efac', bar:'#22c55e' },
   'O-': { bg:'#f0fdfa', text:'#0f766e', border:'#5eead4', bar:'#14b8a6' },
@@ -282,9 +282,9 @@ const BG_COLORS: Record<string, { bg:string; text:string; border:string; bar:str
 
 function getLevel(units: number) {
   if (units >= 50) return { label:'Good',    cls:'text-emerald-600', barClass:'bg-emerald-500' };
-  if (units >= 30) return { label:'Moderate', cls:'text-blue-600',    barClass:'bg-blue-500'    };
+  if (units >= 30) return { label:'Moderate', cls:'text-[var(--clr-info)]',    barClass:'bg-[var(--clr-info)]'    };
   if (units >= 10) return { label:'Low',      cls:'text-amber-600',   barClass:'bg-amber-500'   };
-  return                    { label:'Critical', cls:'text-red-600',    barClass:'bg-red-500'     };
+  return                    { label:'Critical', cls:'text-[var(--clr-emergency)]',    barClass:'bg-[var(--clr-emergency)]'     };
 }
 
 /* ─── Premium Overview ─────────────────────────────── */
@@ -335,9 +335,9 @@ function PremiumOverview({
   ];
 
   const quickActions = [
-    { icon:'📅', label:'New Appointment',   sub:'Schedule a donor',  color:'#8B0000', bg:'#fff5f5',  action: onAppointmentOpen },
-    { icon:'🩸', label:'Record Donation',   sub:'Walk-in / Check-in',color:'#dc2626', bg:'#fff0f0',  action: onDonationOpen    },
-    { icon:'✅', label:'Verify & Redeem',   sub:'RTID verification', color:'#059669', bg:'#f0fdf4',  action: () => onNavigate('verify')     },
+    { icon:'📅', label:'New Appointment',   sub:'Schedule a donor',  color:'var(--clr-brand)', bg:'#fff5f5',  action: onAppointmentOpen },
+    { icon:'🩸', label:'Record Donation',   sub:'Walk-in / Check-in',color:'var(--clr-emergency)', bg:'#fff0f0',  action: onDonationOpen    },
+    { icon:'✅', label:'Verify & Redeem',   sub:'RTID verification', color:'var(--clr-success)', bg:'#f0fdf4',  action: () => onNavigate('verify')     },
     { icon:'📊', label:'View Reports',      sub:'Analytics & export',color:'#0284c7', bg:'#f0f9ff',  action: () => onNavigate('reports')    },
   ];
 
@@ -350,7 +350,7 @@ function PremiumOverview({
           <div className="w-9 h-9 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0 text-lg">🚨</div>
           <div className="flex-1">
             <p className="text-sm font-bold text-red-800">Critical Blood Shortage</p>
-            <p className="text-xs text-red-600 mt-0.5">
+            <p className="text-xs text-[var(--clr-emergency)] mt-0.5">
               {criticalGroups.join(', ')} below 10 units. Immediate procurement required.
             </p>
           </div>
@@ -417,7 +417,7 @@ function PremiumOverview({
               </div>
               <div className="bbd-kpi-val">{m.val.toLocaleString()}</div>
               <div className="bbd-kpi-label">{m.label}</div>
-              <div className="bbd-kpi-trend" style={{ color: m.trend === 'up' ? '#059669' : '#9ca3af' }}>
+              <div className="bbd-kpi-trend" style={{ color: m.trend === 'up' ? 'var(--clr-success)' : '#9ca3af' }}>
                 {m.trend === 'up' && <TrendingUp className="w-3 h-3" />}
                 <span>{m.subtext}</span>
               </div>
@@ -470,9 +470,9 @@ function PremiumOverview({
             {/* Legend */}
             <div className="flex flex-wrap gap-3 mt-4 pt-3 border-t border-gray-100">
               {[
-                { label:'Critical (<10)', color:'#ef4444' },
+                { label:'Critical (<10)', color:'var(--clr-emergency)' },
                 { label:'Low (<30)',       color:'#f59e0b' },
-                { label:'Moderate (<50)', color:'#3b82f6' },
+                { label:'Moderate (<50)', color:'var(--clr-info)' },
                 { label:'Good (50+)',      color:'#22c55e' },
               ].map(l => (
                 <div key={l.label} className="flex items-center gap-1.5 text-xs text-gray-500">
@@ -522,7 +522,7 @@ function PremiumOverview({
               <div className="text-center py-8">
                 <div className="text-4xl mb-2 opacity-30">🩸</div>
                 <p className="text-sm text-gray-400 font-medium">No donations yet</p>
-                <button onClick={onDonationOpen} className="mt-3 text-xs text-red-600 font-semibold hover:underline">Record first donation →</button>
+                <button onClick={onDonationOpen} className="mt-3 text-xs text-[var(--clr-emergency)] font-semibold hover:underline">Record first donation →</button>
               </div>
             ) : (
               recentDonations.map((d, i) => {
@@ -570,14 +570,14 @@ function PremiumOverview({
           {/* Inventory Summary Card */}
           <div className="bbd-card p-5">
             <div className="bbd-section-hdr">
-              <span className="bbd-section-title"><Package className="w-4 h-4 text-blue-600" /> Stock Summary</span>
+              <span className="bbd-section-title"><Package className="w-4 h-4 text-[var(--clr-info)]" /> Stock Summary</span>
             </div>
             <div className="space-y-3">
               {[
-                { label:'Total Units',     val: kpi.totalInventory,   color:'#8B0000', icon:'📦' },
-                { label:'Available',       val: kpi.availableUnits,   color:'#059669', icon:'✅' },
+                { label:'Total Units',     val: kpi.totalInventory,   color:'var(--clr-brand)', icon:'📦' },
+                { label:'Available',       val: kpi.availableUnits,   color:'var(--clr-success)', icon:'✅' },
                 { label:'Reserved',        val: Math.max(0, kpi.totalInventory - kpi.availableUnits), color:'#d97706', icon:'🔒' },
-                { label:'Critical Groups', val: criticalGroups.length, color: criticalGroups.length > 0 ? '#ef4444' : '#6b7280', icon:'🚨' },
+                { label:'Critical Groups', val: criticalGroups.length, color: criticalGroups.length > 0 ? 'var(--clr-emergency)' : '#6b7280', icon:'🚨' },
               ].map(s => (
                 <div key={s.label} className="flex items-center justify-between py-1.5 border-b border-gray-50 last:border-0">
                   <span className="text-xs text-gray-500 flex items-center gap-2">
@@ -598,7 +598,7 @@ function PremiumOverview({
           {/* Today's Appointments */}
           <div className="bbd-card p-5">
             <div className="bbd-section-hdr">
-              <span className="bbd-section-title"><CalendarCheck className="w-4 h-4 text-blue-600" /> Today's Appointments</span>
+              <span className="bbd-section-title"><CalendarCheck className="w-4 h-4 text-[var(--clr-info)]" /> Today's Appointments</span>
               <button onClick={() => onNavigate('appointments')} className="bbd-section-link">
                 All <ChevronRight className="w-3.5 h-3.5" />
               </button>
@@ -607,7 +607,7 @@ function PremiumOverview({
               <div className="text-center py-6">
                 <div className="text-3xl opacity-25 mb-2">📅</div>
                 <p className="text-xs text-gray-400">No appointments today</p>
-                <button onClick={onAppointmentOpen} className="mt-2 text-xs text-blue-600 font-semibold hover:underline">Schedule one →</button>
+                <button onClick={onAppointmentOpen} className="mt-2 text-xs text-[var(--clr-info)] font-semibold hover:underline">Schedule one →</button>
               </div>
             ) : (
               <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
@@ -627,7 +627,7 @@ function PremiumOverview({
                           <span className="text-[10px] text-gray-400">{a.time || ''}</span>
                         </div>
                       </div>
-                      <span className="text-[10px] bg-blue-50 text-blue-600 font-semibold px-2 py-1 rounded-full flex-shrink-0">Upcoming</span>
+                      <span className="text-[10px] bg-blue-50 text-[var(--clr-info)] font-semibold px-2 py-1 rounded-full flex-shrink-0">Upcoming</span>
                     </div>
                   );
                 })}
@@ -645,7 +645,7 @@ function PremiumOverview({
                 const rate = kpi.totalBloodRequests > 0
                   ? Math.round((kpi.totalRedemptions / kpi.totalBloodRequests) * 100)
                   : 0;
-                const color = rate >= 80 ? '#059669' : rate >= 50 ? '#d97706' : '#ef4444';
+                const color = rate >= 80 ? 'var(--clr-success)' : rate >= 50 ? '#d97706' : 'var(--clr-emergency)';
                 return (
                   <>
                     <div className="relative w-24 h-24 mx-auto mb-3">
@@ -673,11 +673,11 @@ function PremiumOverview({
             <div className="grid grid-cols-2 gap-2 mt-2">
               <div className="bg-green-50 rounded-xl p-3 text-center">
                 <div className="text-lg font-black text-green-700" style={{fontFamily:'Outfit,sans-serif'}}>{kpi.totalRedemptions}</div>
-                <div className="text-[10px] text-green-600 font-medium">Redeemed</div>
+                <div className="text-[10px] text-[var(--clr-success)] font-medium">Redeemed</div>
               </div>
               <div className="bg-red-50 rounded-xl p-3 text-center">
                 <div className="text-lg font-black text-red-700" style={{fontFamily:'Outfit,sans-serif'}}>{Math.max(0, kpi.totalBloodRequests - kpi.totalRedemptions)}</div>
-                <div className="text-[10px] text-red-600 font-medium">Pending</div>
+                <div className="text-[10px] text-[var(--clr-emergency)] font-medium">Pending</div>
               </div>
             </div>
           </div>
@@ -871,13 +871,13 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
                <p class="text-xs text-gray-500 uppercase font-bold mb-1">Patient Info</p>
                <p class="font-bold text-gray-800">${reqData.patientName}</p>
                <p class="text-xs text-gray-600 mt-1">Hospital: ${reqData.hospitalName || bloodBankData?.fullName || 'Hospital'}</p>
-               <p class="text-xs text-gray-600">Request: <span class="font-bold text-red-600">${reqData.bloodGroup}</span></p>
+               <p class="text-xs text-gray-600">Request: <span class="font-bold text-[var(--clr-emergency)]">${reqData.bloodGroup}</span></p>
              </div>
              <div class="bg-blue-50 p-3 rounded-lg border border-blue-200">
-               <p class="text-xs text-blue-600/70 uppercase font-bold mb-1">Donor Source</p>
+               <p class="text-xs text-[var(--clr-info)]/70 uppercase font-bold mb-1">Donor Source</p>
                <p class="font-bold text-blue-900">${donData.donorName || 'Anonymous'}</p>
                <p class="text-xs text-blue-700 mt-1">D-RTID: <span class="font-mono">${donData.dRtid || donData.rtid}</span></p>
-               <p class="text-xs text-blue-700">Donated: <span class="font-bold text-red-600">${donData.bloodGroup}</span></p>
+               <p class="text-xs text-blue-700">Donated: <span class="font-bold text-[var(--clr-emergency)]">${donData.bloodGroup}</span></p>
              </div>
            </div>`
         : `<div class="text-left text-sm space-y-3 mt-4">
@@ -893,7 +893,7 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
         html: confirmText,
         icon: 'question',
         showCancelButton: true,
-        confirmButtonColor: '#10b981',
+        confirmButtonColor: 'var(--clr-success)',
         cancelButtonColor: '#d1d5db',
         confirmButtonText: 'Yes, Complete Transfer',
         cancelButtonText: 'Cancel'
@@ -940,14 +940,14 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
         }
       }
       if (!data) throw new Error('RTID not found');
-      const sc=data.status==='AVAILABLE'?'text-green-600':data.status==='REDEEMED'?'text-orange-600':'text-yellow-600';
+      const sc=data.status==='AVAILABLE'?'text-[var(--clr-success)]':data.status==='REDEEMED'?'text-[var(--clr-emergency)]':'text-yellow-600';
       await Swal.fire({
-        title:'✅ Verified', icon:'success', confirmButtonColor:'#10b981',
+        title:'✅ Verified', icon:'success', confirmButtonColor:'var(--clr-success)',
         html:`<div class="text-left space-y-3 p-4">
           <div class="bg-blue-50 p-3 rounded-lg border border-blue-200"><p class="text-sm text-gray-600 mb-1">Type</p><p class="font-bold text-lg">${type}</p></div>
           <div class="bg-gray-50 p-3 rounded-lg border border-gray-200"><p class="text-sm text-gray-600 mb-1">ID</p><p class="font-mono font-bold">${data.rtid||rtid}</p></div>
           <div class="bg-gray-50 p-3 rounded-lg border border-gray-200"><p class="text-sm text-gray-600 mb-1">Name</p><p class="font-semibold">${data.patientName||data.donorName||'N/A'}</p></div>
-          <div class="bg-gray-50 p-3 rounded-lg border border-gray-200"><p class="text-sm text-gray-600 mb-1">Blood Group</p><p class="font-bold text-red-600 text-xl">${data.bloodGroup||'N/A'}</p></div>
+          <div class="bg-gray-50 p-3 rounded-lg border border-gray-200"><p class="text-sm text-gray-600 mb-1">Blood Group</p><p class="font-bold text-[var(--clr-emergency)] text-xl">${data.bloodGroup||'N/A'}</p></div>
           <div class="bg-gray-50 p-3 rounded-lg border border-gray-200"><p class="text-sm text-gray-600 mb-1">Status</p><p class="font-bold ${sc}">${data.status||'N/A'}</p></div>
         </div>`
       });
@@ -1021,7 +1021,7 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
           {/* Critical Alert Banner (non-overview tabs) */}
           {activeTab !== 'overview' && criticalGroups.length > 0 && (
             <div className="mb-5 p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 text-sm text-red-800">
-              <AlertTriangle className="w-4 h-4 text-red-600 flex-shrink-0" />
+              <AlertTriangle className="w-4 h-4 text-[var(--clr-emergency)] flex-shrink-0" />
               <span><strong>Critical:</strong> {criticalGroups.join(', ')} below 30 units.</span>
               <button onClick={() => handleTabChange('inventory')} className="ml-auto text-xs font-bold text-red-700 hover:underline">View →</button>
             </div>

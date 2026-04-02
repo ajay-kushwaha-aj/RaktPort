@@ -32,26 +32,26 @@ function buildReportHTML(requests: BloodRequest[], hospitalName: string, hospita
   *{margin:0;padding:0;box-sizing:border-box}
   body{font-family:'Segoe UI',Tahoma,sans-serif;color:#1a1a1a;font-size:11px;line-height:1.5}
   .page{padding:40px;max-width:800px;margin:0 auto}
-  .hdr{text-align:center;border-bottom:3px solid #8B0000;padding-bottom:16px;margin-bottom:20px}
-  .hdr h1{font-size:22px;color:#8B0000;margin:4px 0}
+  .hdr{text-align:center;border-bottom:3px solid var(--clr-brand);padding-bottom:16px;margin-bottom:20px}
+  .hdr h1{font-size:22px;color:var(--clr-brand);margin:4px 0}
   .hdr .sub{font-size:10px;color:#666}
   .section{margin:16px 0}
-  .section h2{font-size:13px;color:#8B0000;border-bottom:1px solid #ddd;padding-bottom:4px;margin-bottom:8px}
+  .section h2{font-size:13px;color:var(--clr-brand);border-bottom:1px solid #ddd;padding-bottom:4px;margin-bottom:8px}
   table{width:100%;border-collapse:collapse;font-size:10px}
   th{background:#f5f5f5;text-align:left;padding:6px 8px;font-weight:700;color:#555;border-bottom:2px solid #ddd;text-transform:uppercase;font-size:9px}
   td{padding:5px 8px;border-bottom:1px solid #eee}
   tr:nth-child(even){background:#fafafa}
   .kpi-row{display:flex;gap:16px;margin:12px 0}
   .kpi{flex:1;text-align:center;padding:12px;background:#fef2f2;border-radius:8px;border:1px solid #fecaca}
-  .kpi .val{font-size:24px;font-weight:900;color:#8B0000}
+  .kpi .val{font-size:24px;font-weight:900;color:var(--clr-brand)}
   .kpi .lbl{font-size:9px;color:#888;text-transform:uppercase;letter-spacing:0.5px}
-  .foot{text-align:center;margin-top:24px;padding-top:12px;border-top:2px solid #8B0000;font-size:9px;color:#999}
-  .stamp{display:inline-block;padding:4px 12px;border:2px solid #8B0000;border-radius:4px;color:#8B0000;font-weight:700;font-size:10px;margin-top:8px}
+  .foot{text-align:center;margin-top:24px;padding-top:12px;border-top:2px solid var(--clr-brand);font-size:9px;color:#999}
+  .stamp{display:inline-block;padding:4px 12px;border:2px solid var(--clr-brand);border-radius:4px;color:var(--clr-brand);font-weight:700;font-size:10px;margin-top:8px}
   @media print{.no-print{display:none!important} body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 </style></head><body>
 <div class="page">
   <div class="hdr">
-    <div style="font-size:10px;color:#8B0000;font-weight:700;letter-spacing:2px">RAKTPORT</div>
+    <div style="font-size:10px;color:var(--clr-brand);font-weight:700;letter-spacing:2px">RAKTPORT</div>
     <h1>${hospitalName}</h1>
     <div class="sub">${hospitalLocation} · Generated: ${now.toLocaleString("en-IN")} · ${activeReqs.length} Request(s)</div>
   </div>

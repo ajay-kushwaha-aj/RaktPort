@@ -8,11 +8,20 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
+    /* New Global Color Variables */
+    --clr-navy: #1A2332;
+    --clr-brand: #B81C2E;
+    --clr-bg-page: #F5F7FA;
+    --clr-brand-tint: #FEE2E6;
+    --clr-emergency: #DC4E0A;
+    --clr-info: #1E4DA1;
+    --clr-success: #1A6B3C;
+
     /* RaktPort Theme Colors */
-    --maroon: 0 100% 27%;         /* Primary Brand - #8B0000 */
+    --maroon: 0 100% 27%;         /* Primary Brand - var(--clr-brand) */
     --maroon-dark: 0 100% 35%;    /* Secondary Red - #B30000 */
     --cream: 33 100% 97%;         /* Light Background - #FAF5F0 */
-    --success: 122 39% 33%;       /* Success Green - #2E7D32 */
+    --success: 122 39% 33%;       /* Success Green - var(--clr-success) */
     --warn: 45 100% 51%;          /* Warning Yellow - #FFC107 */
     --info: 191 100% 29%;         /* Info Blue - #007792 */
     
@@ -196,7 +205,7 @@ All colors MUST be HSL.
   .print-header {
     display: flex;
     align-items: center;
-    border-bottom: 2px solid #8B0000;
+    border-bottom: 2px solid var(--clr-brand);
     padding-bottom: 10px;
     margin-bottom: 20px;
   }
@@ -207,7 +216,7 @@ All colors MUST be HSL.
   }
   .print-header h2 {
     font-size: 24px;
-    color: #8B0000;
+    color: var(--clr-brand);
     margin: 0;
   }
   .print-header p {
@@ -237,7 +246,7 @@ All colors MUST be HSL.
     text-align: center;
   }
   .print-qr canvas {
-    border: 2px solid #8B0000;
+    border: 2px solid var(--clr-brand);
     border-radius: 8px;
   }
   .print-footer {

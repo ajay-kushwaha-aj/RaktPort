@@ -56,7 +56,7 @@ export const AppointmentsTab = ({ appointments, onCheckIn }: AppointmentsTabProp
                 {/* Header */}
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                    <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-[var(--clr-info)]">
                       <User className="h-5 w-5" />
                     </div>
                     <div>
@@ -146,7 +146,7 @@ export const AppointmentsTab = ({ appointments, onCheckIn }: AppointmentsTabProp
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                    <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center text-[var(--clr-success)]">
                       <User className="h-5 w-5" />
                     </div>
                     <div>

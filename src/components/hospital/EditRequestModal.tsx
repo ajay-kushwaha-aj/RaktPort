@@ -147,7 +147,7 @@ export const EditRequestModal = ({ isOpen, onClose, onSave, request }: Props) =>
 
             {/* Patient Info */}
             <div className="space-y-3">
-              <div className="flex items-center gap-2"><User className="w-4 h-4 text-blue-600" /><span className="text-sm font-bold text-gray-800 dark:text-gray-200">Patient Information</span></div>
+              <div className="flex items-center gap-2"><User className="w-4 h-4 text-[var(--clr-info)]" /><span className="text-sm font-bold text-gray-800 dark:text-gray-200">Patient Information</span></div>
               <div><label className="hd-label">Patient Name <span className="hd-required">*</span></label><input className="hd-input" value={patientName} onChange={e => setPatientName(e.target.value)} /></div>
               <div className="grid grid-cols-2 gap-3">
                 <div><label className="hd-label">Age</label><input className="hd-input" type="number" min="1" max="120" value={age} onChange={e => setAge(e.target.value)} /></div>
@@ -161,13 +161,13 @@ export const EditRequestModal = ({ isOpen, onClose, onSave, request }: Props) =>
 
             {/* Blood Details */}
             <div className="space-y-3">
-              <div className="flex items-center gap-2"><Droplet className="w-4 h-4 text-red-600" /><span className="text-sm font-bold text-gray-800 dark:text-gray-200">Blood Details</span></div>
+              <div className="flex items-center gap-2"><Droplet className="w-4 h-4 text-[var(--clr-emergency)]" /><span className="text-sm font-bold text-gray-800 dark:text-gray-200">Blood Details</span></div>
               <div>
                 <label className="hd-label">Blood Group <span className="hd-required">*</span></label>
                 <div className="grid grid-cols-4 gap-2 mt-1">
                   {BLOOD_GROUPS.map((bg: string) => (
                     <button key={bg} type="button" onClick={() => setBloodGroup(bg as BloodGroup)}
-                      className={`py-2 rounded-xl text-sm font-black border-2 transition-all ${bloodGroup === bg ? "bg-[#8B0000] text-white border-[#8B0000] scale-105 shadow-md" : "bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700"}`}>
+                      className={`py-2 rounded-xl text-sm font-black border-2 transition-all ${bloodGroup === bg ? "bg-[var(--clr-brand)] text-white border-[var(--clr-brand)] scale-105 shadow-md" : "bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700"}`}>
                       {bg}
                     </button>
                   ))}
@@ -189,7 +189,7 @@ export const EditRequestModal = ({ isOpen, onClose, onSave, request }: Props) =>
                 <div className="grid grid-cols-4 gap-1.5">
                   {TRANSFUSION_INDICATIONS.map(ind => (
                     <button key={ind} type="button" onClick={() => setTransfusionIndication(ind)}
-                      className={`py-2 rounded-xl text-[11px] font-semibold border-2 transition-all ${transfusionIndication === ind ? "bg-blue-600 text-white border-blue-600" : "bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700"}`}>
+                      className={`py-2 rounded-xl text-[11px] font-semibold border-2 transition-all ${transfusionIndication === ind ? "bg-[var(--clr-info)] text-white border-[var(--clr-info)]" : "bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700"}`}>
                       {ind}
                     </button>
                   ))}
@@ -199,7 +199,7 @@ export const EditRequestModal = ({ isOpen, onClose, onSave, request }: Props) =>
 
             {/* Doctor & Location */}
             <div className="space-y-3">
-              <div className="flex items-center gap-2"><Stethoscope className="w-4 h-4 text-green-600" /><span className="text-sm font-bold text-gray-800 dark:text-gray-200">Doctor & Location</span></div>
+              <div className="flex items-center gap-2"><Stethoscope className="w-4 h-4 text-[var(--clr-success)]" /><span className="text-sm font-bold text-gray-800 dark:text-gray-200">Doctor & Location</span></div>
               <div className="grid grid-cols-2 gap-3">
                 <div><label className="hd-label">Doctor Name</label><input className="hd-input" value={doctorName} onChange={e => setDoctorName(e.target.value)} /></div>
                 <div><label className="hd-label">MCI Reg.</label><input className="hd-input" value={doctorRegNo} onChange={e => setDoctorRegNo(e.target.value)} /></div>
@@ -219,7 +219,7 @@ export const EditRequestModal = ({ isOpen, onClose, onSave, request }: Props) =>
             {/* Actions */}
             <div className="flex gap-3 pt-2 border-t border-gray-100 dark:border-gray-800">
               <button type="button" onClick={onClose} disabled={saving} className="flex-1 py-2.5 border-2 border-gray-200 dark:border-gray-700 rounded-xl text-sm font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">Cancel</button>
-              <button type="button" onClick={handleSave} disabled={saving} className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white transition-all flex items-center justify-center gap-2" style={{ background: saving ? "#d1d5db" : "linear-gradient(135deg,#8B0000,#b30000)" }}>
+              <button type="button" onClick={handleSave} disabled={saving} className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white transition-all flex items-center justify-center gap-2" style={{ background: saving ? "#d1d5db" : "linear-gradient(135deg,var(--clr-brand),#b30000)" }}>
                 {saving ? <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving…</> : <><Save className="w-4 h-4" /> Save Changes</>}
               </button>
             </div>
