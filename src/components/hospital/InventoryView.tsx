@@ -1,52 +1,46 @@
-// hospital/InventoryView.tsx — Blood Inventory tab (Phase 2)
+// hospital/InventoryView.tsx — Blood Inventory tab v5.0 (all original logic preserved)
 import { useState, useMemo } from "react";
-import { Droplet, Package, AlertTriangle, TrendingUp, Filter } from "lucide-react";
+import { Droplet, Package, Filter } from "lucide-react";
 // @ts-ignore
 import { BLOOD_GROUPS } from "@/lib/bloodbank-utils";
 import { BLOOD_COMPONENT_TYPES } from "./constants";
 import type { BloodRequest, BloodComponentType } from "./types";
 
-interface InventoryViewProps {
-  requests: BloodRequest[];
-}
-
+interface InventoryViewProps { requests: BloodRequest[]; }
 interface InventoryItem {
   bloodGroup: string;
-  totalRequired: number;
-  totalFulfilled: number;
-  totalAdministered: number;
-  available: number; // fulfilled - administered
-  pending: number;   // required - fulfilled (outstanding demand)
-  activeRequests: number;
+  totalRequired: number; totalFulfilled: number; totalAdministered: number;
+  available: number; pending: number; activeRequests: number;
 }
+
+// Original stock level meta — refreshed colors
+const STOCK_META = {
+  sufficient: { bg: "var(--c-success-bg)", text: "var(--c-success)", border: "var(--c-success-bdr)", label: "Sufficient", strip: "linear-gradient(90deg,#059669,#10B981)" },
+  low: { bg: "var(--c-warn-bg)", text: "var(--c-warn)", border: "var(--c-warn-bdr)", label: "Low Stock", strip: "linear-gradient(90deg,#D97706,#F59E0B)" },
+  critical: { bg: "var(--c-danger-bg)", text: "var(--c-danger)", border: "var(--c-danger-bdr)", label: "Critical", strip: "linear-gradient(90deg,#DC2626,#EF4444)" },
+  none: { bg: "var(--c-surface-2)", text: "var(--c-text-4)", border: "var(--c-border)", label: "No Demand", strip: "var(--c-border)" },
+};
 
 export function InventoryView({ requests }: InventoryViewProps) {
   const [componentFilter, setComponentFilter] = useState<string>("All");
 
-  const activeRequests = useMemo(() =>
-    requests.filter(r => !["CANCELLED", "EXPIRED"].includes(r.status)),
-    [requests]
-  );
-
+  const activeRequests = useMemo(() => requests.filter(r => !["CANCELLED", "EXPIRED"].includes(r.status)), [requests]);
   const filtered = useMemo(() =>
-    componentFilter === "All"
-      ? activeRequests
-      : activeRequests.filter(r => (r.componentType || "Whole Blood") === componentFilter),
+    componentFilter === "All" ? activeRequests : activeRequests.filter(r => (r.componentType || "Whole Blood") === componentFilter),
     [activeRequests, componentFilter]
   );
 
-  const inventory: InventoryItem[] = useMemo(() => {
-    return BLOOD_GROUPS.map((bg: string) => {
-      const bgReqs = filtered.filter(r => r.bloodGroup === bg);
-      const totalRequired = bgReqs.reduce((s, r) => s + r.unitsRequired, 0);
-      const totalFulfilled = bgReqs.reduce((s, r) => s + (r.unitsFulfilled || 0), 0);
-      const totalAdministered = bgReqs.reduce((s, r) => s + (r.unitsAdministered || 0), 0);
-      const available = Math.max(0, totalFulfilled - totalAdministered);
-      const pending = Math.max(0, totalRequired - totalFulfilled);
-      const activeCount = bgReqs.filter(r => !["CLOSED", "ADMINISTERED"].includes(r.status)).length;
-      return { bloodGroup: bg, totalRequired, totalFulfilled, totalAdministered, available, pending, activeRequests: activeCount };
-    });
-  }, [filtered]);
+  // All original inventory calculation logic preserved
+  const inventory: InventoryItem[] = useMemo(() => BLOOD_GROUPS.map((bg: string) => {
+    const bgReqs = filtered.filter(r => r.bloodGroup === bg);
+    const totalRequired = bgReqs.reduce((s, r) => s + r.unitsRequired, 0);
+    const totalFulfilled = bgReqs.reduce((s, r) => s + (r.unitsFulfilled || 0), 0);
+    const totalAdministered = bgReqs.reduce((s, r) => s + (r.unitsAdministered || 0), 0);
+    const available = Math.max(0, totalFulfilled - totalAdministered);
+    const pending = Math.max(0, totalRequired - totalFulfilled);
+    const activeCount = bgReqs.filter(r => !["CLOSED", "ADMINISTERED"].includes(r.status)).length;
+    return { bloodGroup: bg, totalRequired, totalFulfilled, totalAdministered, available, pending, activeRequests: activeCount };
+  }), [filtered]);
 
   const totals = useMemo(() => ({
     required: inventory.reduce((s, i) => s + i.totalRequired, 0),
@@ -56,7 +50,7 @@ export function InventoryView({ requests }: InventoryViewProps) {
     pending: inventory.reduce((s, i) => s + i.pending, 0),
   }), [inventory]);
 
-  const getStockLevel = (item: InventoryItem) => {
+  const getLevel = (item: InventoryItem) => {
     if (item.pending === 0 && item.activeRequests === 0) return "none";
     if (item.available >= item.pending && item.pending > 0) return "sufficient";
     if (item.available > 0) return "low";
@@ -64,41 +58,51 @@ export function InventoryView({ requests }: InventoryViewProps) {
     return "none";
   };
 
-  const stockColors: Record<string, { bg: string; text: string; border: string; label: string }> = {
-    sufficient: { bg: "#f0fdf4", text: "#15803d", border: "#86efac", label: "Sufficient" },
-    low: { bg: "#fff7ed", text: "#c2410c", border: "#fdba74", label: "Low Stock" },
-    critical: { bg: "#fef2f2", text: "#b91c1c", border: "#fca5a5", label: "Critical" },
-    none: { bg: "#f9fafb", text: "#6b7280", border: "#d1d5db", label: "No Demand" },
-  };
-
-  const criticalCount = inventory.filter(i => getStockLevel(i) === "critical").length;
-  const lowCount = inventory.filter(i => getStockLevel(i) === "low").length;
+  const criticalCount = inventory.filter(i => getLevel(i) === "critical").length;
+  const lowCount = inventory.filter(i => getLevel(i) === "low").length;
 
   return (
-    <div className="space-y-5 hd-enter">
-      {/* Alert banner if critical */}
+    <div style={{ display: "flex", flexDirection: "column", gap: "18px" }} className="hd-enter">
+
+      {/* Critical banner */}
       {criticalCount > 0 && (
-        <div className="bg-red-50 dark:bg-red-950/30 border-2 border-red-200 dark:border-red-800 rounded-2xl p-4 flex items-center gap-3 hd-enter">
-          <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-900/50 flex items-center justify-center text-xl flex-shrink-0">⚠️</div>
-          <div className="flex-1">
-            <p className="font-bold text-red-800 dark:text-red-300 text-sm">Critical Blood Shortage</p>
-            <p className="text-xs text-red-600 dark:text-red-400 mt-0.5">{criticalCount} blood group{criticalCount > 1 ? "s" : ""} have unfulfilled demand with zero available units</p>
+        <div className="hd-enter" style={{
+          display: "flex", alignItems: "center", gap: "14px",
+          padding: "14px 18px", borderRadius: "var(--r-xl)",
+          background: "var(--c-danger-bg)", border: "1px solid var(--c-danger-bdr)",
+        }}>
+          <div style={{
+            width: "40px", height: "40px", borderRadius: "var(--r-lg)",
+            background: "rgba(220,38,38,0.1)", display: "flex",
+            alignItems: "center", justifyContent: "center", fontSize: "1.3rem", flexShrink: 0,
+          }}>⚠️</div>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontWeight: 700, color: "var(--c-danger)", fontSize: "0.85rem", fontFamily: "var(--f-display)" }}>Critical Blood Shortage</p>
+            <p style={{ fontSize: "0.72rem", color: "#DC2626", marginTop: "2px", opacity: 0.8 }}>
+              {criticalCount} blood group{criticalCount > 1 ? "s" : ""} with unfulfilled demand and zero available units
+            </p>
           </div>
-          <span className="text-xs font-bold bg-red-600 text-white px-3 py-1.5 rounded-lg animate-pulse">{criticalCount} CRITICAL</span>
+          <span style={{
+            fontSize: "0.7rem", fontWeight: 800, background: "#DC2626", color: "#fff",
+            padding: "5px 12px", borderRadius: "var(--r-pill)",
+            animation: "hd-pulse-em 1.5s ease-in-out infinite",
+          }}>
+            {criticalCount} CRITICAL
+          </span>
         </div>
       )}
 
-      {/* Summary KPIs */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+      {/* KPI row */}
+      <div className="hd-kpi-grid">
         {[
           { icon: "🩸", label: "Total Required", val: totals.required, cls: "k-red" },
           { icon: "✅", label: "Fulfilled", val: totals.fulfilled, cls: "k-green" },
           { icon: "💉", label: "Administered", val: totals.administered, cls: "k-blue" },
           { icon: "📦", label: "Available Stock", val: totals.available, cls: "k-amber" },
           { icon: "⏳", label: "Pending Demand", val: totals.pending, cls: "k-purple" },
-        ].map(k => (
-          <div key={k.label} className={`hd-kpi ${k.cls}`}>
-            <div className="text-2xl mb-1">{k.icon}</div>
+        ].map((k, i) => (
+          <div key={k.label} className={`hd-kpi ${k.cls} hd-enter hd-s${i + 1}`}>
+            <span style={{ fontSize: "1.35rem", display: "block", marginBottom: "8px" }}>{k.icon}</span>
             <div className="hd-kpi-val">{k.val}</div>
             <div className="hd-kpi-lbl">{k.label}</div>
           </div>
@@ -106,93 +110,113 @@ export function InventoryView({ requests }: InventoryViewProps) {
       </div>
 
       {/* Filter bar */}
-      <div className="hd-card p-4 flex items-center gap-3 flex-wrap">
-        <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
-          <Filter className="w-4 h-4 text-[#8B0000]" />
-          <span>Component Type:</span>
+      <div className="hd-card" style={{ padding: "14px 18px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <Filter size={14} style={{ color: "var(--c-brand)" }} />
+            <span style={{ fontSize: "0.78rem", fontWeight: 600, color: "var(--c-text-2)" }}>Component:</span>
+          </div>
+          <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+            {["All", ...BLOOD_COMPONENT_TYPES].map((ct: string) => (
+              <button
+                key={ct} onClick={() => setComponentFilter(ct)}
+                style={{
+                  padding: "5px 12px", borderRadius: "var(--r-pill)",
+                  border: `1.5px solid ${componentFilter === ct ? "var(--c-brand)" : "var(--c-border)"}`,
+                  background: componentFilter === ct ? "var(--c-brand)" : "var(--c-surface-2)",
+                  color: componentFilter === ct ? "#fff" : "var(--c-text-3)",
+                  fontSize: "0.7rem", fontWeight: componentFilter === ct ? 700 : 500,
+                  cursor: "pointer", transition: "all var(--t-fast)", fontFamily: "var(--f-body)",
+                }}
+              >
+                {ct}
+              </button>
+            ))}
+          </div>
+          {lowCount > 0 && (
+            <span style={{
+              marginLeft: "auto", fontSize: "0.7rem", fontWeight: 700,
+              color: "var(--c-warn)", background: "var(--c-warn-bg)",
+              padding: "4px 10px", borderRadius: "var(--r-pill)", border: "1px solid var(--c-warn-bdr)",
+            }}>
+              ⚡ {lowCount} Low Stock
+            </span>
+          )}
         </div>
-        <div className="flex gap-1.5 flex-wrap">
-          {["All", ...BLOOD_COMPONENT_TYPES].map((ct: string) => (
-            <button
-              key={ct}
-              onClick={() => setComponentFilter(ct)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold border-2 transition-all ${
-                componentFilter === ct
-                  ? "bg-[#8B0000] text-white border-[#8B0000] shadow"
-                  : "bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-[#8B0000]/40"
-              }`}
-            >
-              {ct}
-            </button>
-          ))}
-        </div>
-        {lowCount > 0 && (
-          <span className="ml-auto text-xs font-semibold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-2 py-1 rounded-lg border border-amber-200 dark:border-amber-800">
-            ⚡ {lowCount} Low Stock
-          </span>
-        )}
       </div>
 
-      {/* Inventory Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      {/* Inventory grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(180px,1fr))", gap: "12px" }}>
         {inventory.map((item, i) => {
-          const level = getStockLevel(item);
-          const sc = stockColors[level];
+          const level = getLevel(item);
+          const sc = STOCK_META[level];
           const maxBar = Math.max(item.totalRequired, 1);
           return (
             <div
               key={item.bloodGroup}
-              className="hd-card overflow-hidden hd-enter"
-              style={{ animationDelay: `${i * 0.04}s` }}
+              className="hd-card hd-enter"
+              style={{ overflow: "hidden", animationDelay: `${i * 0.04}s` }}
             >
-              {/* Top color strip */}
-              <div className="h-1.5" style={{ background: level === "critical" ? "linear-gradient(90deg,#ef4444,#b91c1c)" : level === "low" ? "linear-gradient(90deg,#f59e0b,#d97706)" : level === "sufficient" ? "linear-gradient(90deg,#22c55e,#16a34a)" : "#d1d5db" }} />
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-2xl font-black text-[#8B0000] dark:text-red-400" style={{ fontFamily: "Outfit,sans-serif" }}>
+              {/* Top strip */}
+              <div style={{ height: "3px", background: sc.strip }} />
+              <div style={{ padding: "16px" }}>
+                {/* Header */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
+                  <span style={{
+                    fontFamily: "var(--f-display)", fontWeight: 800, fontSize: "1.5rem",
+                    color: "var(--c-brand)", lineHeight: 1, letterSpacing: "-0.02em",
+                  }}>
                     {item.bloodGroup}
                   </span>
-                  <span
-                    className="text-[10px] font-bold px-2 py-0.5 rounded-full border"
-                    style={{ background: sc.bg, color: sc.text, borderColor: sc.border }}
-                  >
+                  <span style={{
+                    fontSize: "0.6rem", fontWeight: 700, padding: "3px 8px", borderRadius: "var(--r-pill)",
+                    background: sc.bg, color: sc.text, border: `1px solid ${sc.border}`,
+                  }}>
                     {sc.label}
                   </span>
                 </div>
 
-                {/* Mini progress bars */}
-                <div className="space-y-2">
+                {/* Progress bars */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                   {[
-                    { label: "Required", val: item.totalRequired, color: "#8B0000" },
-                    { label: "Fulfilled", val: item.totalFulfilled, color: "#22c55e" },
-                    { label: "Administered", val: item.totalAdministered, color: "#3b82f6" },
+                    { label: "Required", val: item.totalRequired, color: "var(--c-brand)" },
+                    { label: "Fulfilled", val: item.totalFulfilled, color: "#10B981" },
+                    { label: "Administered", val: item.totalAdministered, color: "#3B82F6" },
                   ].map(b => (
                     <div key={b.label}>
-                      <div className="flex justify-between text-[10px] mb-0.5">
-                        <span className="text-gray-500 dark:text-gray-400 font-medium">{b.label}</span>
-                        <span className="font-bold text-gray-700 dark:text-gray-300">{b.val}u</span>
+                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "3px" }}>
+                        <span style={{ fontSize: "0.6rem", color: "var(--c-text-4)", fontWeight: 500 }}>{b.label}</span>
+                        <span style={{ fontSize: "0.63rem", fontWeight: 700, color: "var(--c-text-2)", fontFamily: "var(--f-display)" }}>
+                          {b.val}u
+                        </span>
                       </div>
-                      <div className="h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
-                        <div className="h-full rounded-full transition-all duration-500" style={{ width: `${(b.val / maxBar) * 100}%`, background: b.color }} />
+                      <div style={{ height: "5px", background: "var(--c-surface-3)", borderRadius: "var(--r-pill)", overflow: "hidden" }}>
+                        <div style={{
+                          height: "100%", borderRadius: "var(--r-pill)", background: b.color,
+                          width: `${(b.val / maxBar) * 100}%`, transition: "width 0.6s ease",
+                        }} />
                       </div>
                     </div>
                   ))}
                 </div>
 
                 {/* Summary stats */}
-                <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-100 dark:border-gray-700">
-                  <div className="text-center">
-                    <div className="text-xs font-black text-amber-600 dark:text-amber-400" style={{ fontFamily: "Outfit,sans-serif" }}>{item.available}</div>
-                    <div className="text-[9px] text-gray-400 font-medium">Available</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-xs font-black text-red-600 dark:text-red-400" style={{ fontFamily: "Outfit,sans-serif" }}>{item.pending}</div>
-                    <div className="text-[9px] text-gray-400 font-medium">Pending</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-xs font-black text-gray-600 dark:text-gray-300" style={{ fontFamily: "Outfit,sans-serif" }}>{item.activeRequests}</div>
-                    <div className="text-[9px] text-gray-400 font-medium">Requests</div>
-                  </div>
+                <div style={{
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                  marginTop: "12px", paddingTop: "10px", borderTop: "1px solid var(--c-border)",
+                }}>
+                  {[
+                    { label: "Available", val: item.available, color: "#D97706" },
+                    { label: "Pending", val: item.pending, color: "#DC2626" },
+                    { label: "Active", val: item.activeRequests, color: "var(--c-text-3)" },
+                  ].map(s => (
+                    <div key={s.label} style={{ textAlign: "center" }}>
+                      <div style={{ fontFamily: "var(--f-display)", fontSize: "0.9rem", fontWeight: 800, color: s.color, lineHeight: 1 }}>
+                        {s.val}
+                      </div>
+                      <div style={{ fontSize: "0.57rem", color: "var(--c-text-4)", marginTop: "3px" }}>{s.label}</div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -201,23 +225,30 @@ export function InventoryView({ requests }: InventoryViewProps) {
       </div>
 
       {/* Component breakdown table */}
-      <div className="hd-card overflow-hidden hd-enter hd-s3">
-        <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex items-center gap-2">
-          <Package className="w-4 h-4 text-[#8B0000]" />
+      <div className="hd-card" style={{ overflow: "hidden" }}>
+        <div style={{
+          padding: "16px 18px", borderBottom: "1px solid var(--c-border)",
+          display: "flex", alignItems: "center", gap: "8px",
+        }}>
+          <Package size={15} style={{ color: "var(--c-brand)" }} />
           <span className="hd-sec-title">Component Breakdown</span>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.78rem" }}>
             <thead>
-              <tr className="bg-gray-50 dark:bg-gray-800/50">
-                <th className="text-left px-4 py-2.5 font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wide text-[10px]">Component</th>
-                <th className="text-center px-3 py-2.5 font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wide text-[10px]">Requests</th>
-                <th className="text-center px-3 py-2.5 font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wide text-[10px]">Required</th>
-                <th className="text-center px-3 py-2.5 font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wide text-[10px]">Fulfilled</th>
-                <th className="text-center px-3 py-2.5 font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wide text-[10px]">Administered</th>
+              <tr style={{ background: "var(--c-surface-2)" }}>
+                {["Component", "Requests", "Required", "Fulfilled", "Administered"].map(h => (
+                  <th key={h} style={{
+                    padding: "10px 14px",
+                    textAlign: h === "Component" ? "left" : "center",
+                    fontWeight: 700, color: "var(--c-text-4)",
+                    fontSize: "0.62rem", textTransform: "uppercase",
+                    letterSpacing: "0.07em", borderBottom: "1px solid var(--c-border)",
+                  }}>{h}</th>
+                ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
+            <tbody>
               {BLOOD_COMPONENT_TYPES.map((ct: string) => {
                 const ctReqs = activeRequests.filter(r => (r.componentType || "Whole Blood") === ct);
                 if (ctReqs.length === 0) return null;
@@ -225,12 +256,17 @@ export function InventoryView({ requests }: InventoryViewProps) {
                 const ful = ctReqs.reduce((s, r) => s + (r.unitsFulfilled || 0), 0);
                 const adm = ctReqs.reduce((s, r) => s + (r.unitsAdministered || 0), 0);
                 return (
-                  <tr key={ct} className="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
-                    <td className="px-4 py-2.5 font-semibold text-gray-800 dark:text-gray-200">{ct}</td>
-                    <td className="text-center px-3 py-2.5 text-gray-500 dark:text-gray-400">{ctReqs.length}</td>
-                    <td className="text-center px-3 py-2.5 font-bold text-red-700 dark:text-red-400">{req}u</td>
-                    <td className="text-center px-3 py-2.5 font-bold text-green-700 dark:text-green-400">{ful}u</td>
-                    <td className="text-center px-3 py-2.5 font-bold text-blue-700 dark:text-blue-400">{adm}u</td>
+                  <tr
+                    key={ct}
+                    style={{ borderBottom: "1px solid var(--c-border)", transition: "background var(--t-fast)" }}
+                    onMouseEnter={e => (e.currentTarget.style.background = "var(--c-surface-2)")}
+                    onMouseLeave={e => (e.currentTarget.style.background = "")}
+                  >
+                    <td style={{ padding: "10px 14px", fontWeight: 600, color: "var(--c-text)" }}>{ct}</td>
+                    <td style={{ padding: "10px 14px", textAlign: "center", color: "var(--c-text-3)" }}>{ctReqs.length}</td>
+                    <td style={{ padding: "10px 14px", textAlign: "center", fontWeight: 700, color: "var(--c-brand)", fontFamily: "var(--f-display)" }}>{req}u</td>
+                    <td style={{ padding: "10px 14px", textAlign: "center", fontWeight: 700, color: "#059669", fontFamily: "var(--f-display)" }}>{ful}u</td>
+                    <td style={{ padding: "10px 14px", textAlign: "center", fontWeight: 700, color: "#2563EB", fontFamily: "var(--f-display)" }}>{adm}u</td>
                   </tr>
                 );
               })}
