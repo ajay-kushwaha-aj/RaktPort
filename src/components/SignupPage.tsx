@@ -10,6 +10,7 @@ import {
   registerUserWithPhone,
   signInWithGoogle,
 } from '../lib/auth';
+import { sendVerificationEmail } from '../lib/emailService';
 import {
   isValidUsername,
   checkUsernameAvailable,
@@ -457,6 +458,7 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
   const [recaptchaV,      setRecaptchaV]      = useState<RecaptchaVerifier | null>(null);
   const [confirmation,    setConfirmation]    = useState<ConfirmationResult | null>(null);
   const [phoneUid,        setPhoneUid]        = useState('');
+  const [generatedEmailOtp, setGeneratedEmailOtp] = useState('');
 
   /* Form data */
   const [form, setForm] = useState({
@@ -521,16 +523,22 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
 
   /* OTP helpers */
   const sendOTP = async () => {
-    if (!form.mobile || form.mobile.length !== 10) { toast.error('Enter a valid 10-digit mobile number'); return; }
-    if (!recaptchaV) { toast.error('reCAPTCHA not ready — please refresh'); return; }
+    if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) { toast.error('Enter a valid email address first'); return; }
+    // if (!recaptchaV) { toast.error('reCAPTCHA not ready — please refresh'); return; } // Dormant reCAPTCHA logic
     setOtpLoading(true);
     try {
-      const res = await sendRegistrationOTP(form.mobile, recaptchaV);
+      const gCode = Math.floor(100000 + Math.random() * 900000).toString();
+      setGeneratedEmailOtp(gCode);
+      const res = await sendVerificationEmail(form.email, gCode, form.fullName || 'User');
+      
+      // Dormant firebase code:
+      // const res = await sendRegistrationOTP(form.mobile, recaptchaV);
+      
       if (res.success) {
         setOtpSent(true); setResendTimer(60);
-        setConfirmation(res.confirmationResult!);
-        toast.success('OTP sent!', { description: `Code sent to +91 ****${form.mobile.slice(-4)}` });
-      } else { toast.error('Failed to send OTP', { description: res.error }); }
+        // setConfirmation(res.confirmationResult!); // Dormant
+        toast.success('Verification Email sent!', { description: `Code sent to ${form.email}` });
+      } else { toast.error('Failed to send verification email', { description: res.error }); }
     } catch (e: any) { toast.error('OTP error', { description: e.message }); }
     finally { setOtpLoading(false); }
   };
@@ -548,9 +556,23 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
 
   const verifyOTP = async () => {
     const code = otp.join('');
-    if (code.length !== 6) { toast.error('Enter the complete 6-digit OTP'); return; }
+    if (code.length !== 6) { toast.error('Enter the complete 6-digit verification code'); return; }
     setOtpLoading(true);
     try {
+      // Local email verification check
+      if (code === generatedEmailOtp) {
+        setOtpVerified(true);
+        setPhoneUid('dummy-phone-uid-for-email-verify'); // Dummy UI for backward compat
+        toast.success('Email verified!');
+        setTimeout(() => goNext(), 500);
+      } else {
+        toast.error('Verification failed', { description: 'Incorrect verification code.' });
+        setOtp(['','','','','','']);
+        (document.getElementById(`otp-${uid}-0`) as HTMLInputElement)?.focus();
+      }
+      
+      // Dormant Firebase verify code
+      /*
       const res = await verifyRegistrationOTP(code, confirmation);
       if (res.success && res.phoneAuthUser) {
         setOtpVerified(true); setPhoneUid(res.phoneAuthUser.uid);
@@ -561,6 +583,7 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
         setOtp(['','','','','','']);
         (document.getElementById(`otp-${uid}-0`) as HTMLInputElement)?.focus();
       }
+      */
     } catch (e: any) { toast.error('Verification error', { description: e.message }); }
     finally { setOtpLoading(false); }
   };
@@ -572,7 +595,7 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
       if (form.mobile.length !== 10) { toast.error('Mobile must be 10 digits'); return false; }
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) { toast.error('Invalid email address'); return false; }
     }
-    if (step === 2 && !otpVerified) { toast.error('Verify your phone number first'); return false; }
+    if (step === 2 && !otpVerified) { toast.error('Verify your email address first'); return false; }
     if (step === 3) {
       if (role === 'donor') {
         if (!form.aadhar || form.aadhar.length !== 12) { toast.error('Aadhar must be 12 digits'); return false; }
@@ -869,14 +892,14 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                   <div className="space-y-5 animate-fadein">
                     <div className="flex flex-col items-center text-center gap-3">
                       <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-r ${cfg.gradient} flex items-center justify-center shadow-lg`}>
-                        <Smartphone className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                        <Mail className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-base sm:text-xl font-bold text-gray-800 mb-1">Verify Phone Number</h2>
+                        <h2 className="text-base sm:text-xl font-bold text-gray-800 mb-1">Verify Email Address</h2>
                         <p className="text-xs sm:text-sm text-gray-500">
                           {otpSent
-                            ? `Enter the 6-digit code sent to +91 ****${form.mobile.slice(-4)}`
-                            : `Click below to receive OTP on +91 ${form.mobile}`}
+                            ? `Enter the 6-digit code sent to ${form.email}`
+                            : `Click below to receive code on ${form.email}`}
                         </p>
                       </div>
                     </div>
@@ -917,7 +940,7 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
 
                         {otpVerified ? (
                           <div className="flex items-center justify-center gap-2 text-green-600 font-semibold text-sm sm:text-base">
-                            <CheckCircle2 className="w-5 h-5" /> Phone verified successfully!
+                            <CheckCircle2 className="w-5 h-5" /> Email verified successfully!
                           </div>
                         ) : (
                           <>
