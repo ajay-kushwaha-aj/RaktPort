@@ -507,7 +507,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
                   style={{ flex: 1, borderRadius: 8, padding: '8px 10px' }}
                   placeholder="e.g. D-RTID-100326-A4F7K"
                   value={rtidInput}
-                  onChange={e => { setRtidInput(e.target.value.toUpperCase()); setRtidResult(null); setRtidError(''); }}
+                  onChange={e => { setRtidInput(e.target.value); setRtidResult(null); setRtidError(''); }}
                   onKeyDown={e => e.key === 'Enter' && handleTrack()}
                 />
                 <button onClick={handleTrack} className="btn-p" style={{ padding: '8px 12px', fontSize: '12px', borderRadius: 8 }}>Track</button>
@@ -617,7 +617,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
                   style={{ flex: 1, borderRadius: 10 }}
                   placeholder="Enter RTID  e.g. D-RTID-100326-A4F7K"
                   value={rtidInput}
-                  onChange={e => { setRtidInput(e.target.value.toUpperCase()); setRtidResult(null); setRtidError(''); }}
+                  onChange={e => { setRtidInput(e.target.value); setRtidResult(null); setRtidError(''); }}
                   onKeyDown={e => e.key === 'Enter' && handleTrack()}
                 />
                 <button onClick={handleTrack} className="btn-p" style={{ whiteSpace: 'nowrap' }}>Track Donation</button>
