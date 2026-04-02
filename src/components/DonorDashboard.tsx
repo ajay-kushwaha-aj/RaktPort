@@ -206,7 +206,7 @@ const COOLDOWN_DAYS: Record<DonationComponent,{male:number;female:number}> = {
 const QRCodeCanvas = ({data,size=256,className=''}:{data:string;size?:number;className?:string}) => {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(()=>{
-    if(ref.current && data) try{new QRious({element:ref.current,value:data,size,foreground:'var(--clr-brand)',level:'H'});}catch(_){}
+    if(ref.current && data) try{new QRious({element:ref.current,value:data,size,foreground: '#C41E3A',level:'H'});}catch(_){}
   },[data,size]);
   return <canvas ref={ref} width={size} height={size} className={className}/>;
 };
@@ -397,7 +397,7 @@ const CertificateModal = ({isOpen,onClose,donorData,donationHistory}:CertModalPr
   // Render preview QR
   useEffect(()=>{
     if(!isOpen) return;
-    const t=setTimeout(()=>{if(previewQrRef.current)try{new QRious({element:previewQrRef.current,value:qrValue,size:64,foreground:'var(--clr-brand)',level:'H'});}catch(_){}},150);
+    const t=setTimeout(()=>{if(previewQrRef.current)try{new QRious({element:previewQrRef.current,value:qrValue,size:64,foreground: '#C41E3A',level:'H'});}catch(_){}},150);
     return()=>clearTimeout(t);
   },[isOpen,qrValue]);
 
@@ -406,7 +406,7 @@ const CertificateModal = ({isOpen,onClose,donorData,donationHistory}:CertModalPr
     // QR as data-URL
     const qrCanvas = document.createElement('canvas');
     let qrDataUrl = '';
-    try{ new QRious({element:qrCanvas,value:qrValue,size:96,foreground:'var(--clr-brand)',level:'H'}); qrDataUrl=qrCanvas.toDataURL('image/png'); }catch(_){}
+    try{ new QRious({element:qrCanvas,value:qrValue,size:96,foreground: '#C41E3A',level:'H'}); qrDataUrl=qrCanvas.toDataURL('image/png'); }catch(_){}
 
     // Logo as absolute URL (Vite hashed path)
     const logoUrl = new URL(logo as string, window.location.href).href;
@@ -816,7 +816,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
   // QR for booking confirm dialog — ref callback ensures canvas is mounted
   const confirmQrRef = useCallback((canvas: HTMLCanvasElement | null) => {
     if (canvas && bookingDetails.qrPayload) {
-      try { new QRious({ element: canvas, value: bookingDetails.qrPayload, size: 200, foreground: 'var(--clr-brand)' }); } catch (_) {}
+      try { new QRious({ element: canvas, value: bookingDetails.qrPayload, size: 200, foreground: '#C41E3A' }); } catch (_) {}
     }
   }, [bookingDetails.qrPayload]);
 

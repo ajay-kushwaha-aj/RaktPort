@@ -6,7 +6,7 @@ export const QRCanvas = ({ data, size = 200 }: { data: string; size?: number }) 
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     if (ref.current && data) {
-      try { new QRious({ element: ref.current, value: data, size, foreground: "var(--clr-brand)", level: "H" }); }
+      try { new QRious({ element: ref.current, value: data, size, foreground: '#C41E3A', level: "H" }); }
       catch (_) { /* QR generation failed silently */ }
     }
   }, [data, size]);
