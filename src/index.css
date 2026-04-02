@@ -43,13 +43,13 @@ All colors MUST be HSL.
     --clr-border: var(--border-color);
     --txt-heading: var(--text-primary);
     --txt-body: var(--text-secondary);
-    --txt-inverse: var(--bg-surface);
+    --txt-inverse: #FFFFFF;
     --clr-brand: var(--brand-primary);
     --clr-brand-tint: var(--brand-tint);
     --clr-emergency: var(--clr-danger);
     --header-bg: var(--brand-primary);
     --header-accent: var(--brand-hover);
-    --header-cta: var(--bg-surface);
+    --header-cta: var(--brand-primary);
     --stats-bg: var(--clr-dark-bg);
     --stats-divider: var(--border-color);
     --rtid-bg: var(--bg-surface);
@@ -127,6 +127,8 @@ All colors MUST be HSL.
     --brand-primary: #E8294A;
     --brand-tint: #2D0F16;
     --brand-hover: #C41E3A;
+    --txt-inverse: #F5F0F1;
+    --header-cta: var(--brand-primary);
 
     --background: 0 0% 7%;
     --foreground: 0 0% 98%;
