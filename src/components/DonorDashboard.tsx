@@ -313,17 +313,17 @@ const PrintableDonation = ({donation,donorData}:{donation:Donation|null;donorDat
         {/* Consent Section - NACO Guidelines */}
         <div style={{flex:1,border:'1px solid var(--clr-brand)',padding:'4mm',borderRadius:'2mm',backgroundColor:'#fffdfd',marginBottom:'4mm'}}>
           <div style={{fontSize:'9pt',fontWeight:'bold',color:'var(--clr-brand)',borderBottom:'1px solid var(--clr-brand)',paddingBottom:'1.5mm',marginBottom:'3mm',textAlign:'center'}}>DONOR CONSENT DECLARATION (As per NACO Guidelines)</div>
-          <div style={{fontSize:'7.5pt',lineHeight:'1.6',textAlign:'justify',marginBottom:'2mm',color:'#333'}}>
+          <div style={{fontSize:'7.5pt',lineHeight:'1.6',textAlign:'justify',marginBottom:'2mm',color: 'var(--rp-text)'}}>
             I declare that I have truthfully answered all questions to the best of my knowledge and fully understood the information provided to me about blood donation. I consent to donate blood/components voluntarily and without any expectation of remuneration.<br/><br/>
             I have been explained about the risks and benefits of blood donation, including the remote risk of adverse reactions. I authorize the <b>{donation.hospitalName}</b> blood bank to test my blood for TTI markers (HIV, Hepatitis B/C, Syphilis, Malaria). I understand my blood may be used for patient treatment, research, or quality control.
           </div>
           
-          <div style={{fontSize:'7.5pt', marginBottom:'3mm',color:'#333'}}>
+          <div style={{fontSize:'7.5pt', marginBottom:'3mm',color: 'var(--rp-text)'}}>
             <div style={{fontWeight:'bold', marginBottom:'1mm'}}>Pre-donation Confirmation:</div>
             <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1mm'}}>
               {['No high-risk behavior', 'No recent illness/surgery', 'No medication conflicts', 'No recent vaccination/pregnancy etc.'].map(lbl => (
                 <div key={lbl} style={{display:'flex', alignItems:'center', gap:'1.5mm'}}>
-                  <div style={{width:'2.5mm',height:'2.5mm',border:'1px solid #333',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'6pt'}}>✓</div>
+                  <div style={{width:'2.5mm',height:'2.5mm',border:'1px solid var(--rp-text)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'6pt'}}>✓</div>
                   <span>{lbl}</span>
                 </div>
               ))}
@@ -331,18 +331,18 @@ const PrintableDonation = ({donation,donorData}:{donation:Donation|null;donorDat
           </div>
 
           <div style={{fontSize:'8pt',fontWeight:'bold',marginBottom:'4mm',display:'flex',alignItems:'center',gap:'2mm'}}>
-            <div style={{width:'3mm',height:'3mm',border:'1px solid #333',display:'flex',alignItems:'center',justifyContent:'center'}}>✓</div>
+            <div style={{width:'3mm',height:'3mm',border:'1px solid var(--rp-text)',display:'flex',alignItems:'center',justifyContent:'center'}}>✓</div>
             <span>I confirm my voluntary consent digitally.</span>
           </div>
           
           <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-end',marginTop:'auto'}}>
             <div>
               <div style={{fontSize:'7pt',color:'#555',marginBottom:'1mm'}}>Digital Consent ID</div>
-              <div style={{fontFamily:'monospace',fontSize:'9pt',fontWeight:'bold',color:'#333'}}>{consentId}</div>
+              <div style={{fontFamily:'monospace',fontSize:'9pt',fontWeight:'bold',color: 'var(--rp-text)'}}>{consentId}</div>
             </div>
             <div style={{textAlign:'center'}}>
               <div style={{fontSize:'7pt',color:'#555',marginBottom:'1mm'}}>Donor Signature</div>
-              <div style={{width:'40mm',borderBottom:'1px dashed #333',height:'6mm',marginBottom:'1mm'}}/>
+              <div style={{width:'40mm',borderBottom:'1px dashed var(--rp-text)',height:'6mm',marginBottom:'1mm'}}/>
               <div style={{fontSize:'7.5pt',fontWeight:'bold'}}>{donorData.fullName?.toUpperCase()}</div>
             </div>
           </div>
@@ -352,7 +352,7 @@ const PrintableDonation = ({donation,donorData}:{donation:Donation|null;donorDat
         <div style={{display:'flex',gap:'4mm',marginBottom:'auto'}}>
           <div style={{flex:1,border:'1px solid #ccc',padding:'4mm',borderRadius:'2mm',display:'flex',flexDirection:'column',justifyContent:'space-between'}}>
             <div>
-              <div style={{fontSize:'8pt',fontWeight:'bold',color:'#333',marginBottom:'3mm'}}>AUTHORIZATION</div>
+              <div style={{fontSize:'8pt',fontWeight:'bold',color: 'var(--rp-text)',marginBottom:'3mm'}}>AUTHORIZATION</div>
               <div style={{fontSize:'7pt',color:'#555'}}>Medical Officer In-charge</div>
               <div style={{width:'100%',borderBottom:'1px dashed #999',height:'6mm',marginBottom:'2mm'}}/>
               <div style={{fontSize:'7pt'}}>Name: _______________________</div>
@@ -435,7 +435,7 @@ const CertificateModal = ({isOpen,onClose,donorData,donationHistory}:CertModalPr
 body{font-family:Georgia,'Times New Roman',serif;background:#fff}
 </style>
 </head><body>
-<div style="width:297mm;height:210mm;position:relative;overflow:hidden;background:linear-gradient(135deg,#fff8f5 0%,#ffffff 50%,#fff5f5 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12mm">
+<div style="width:297mm;height:210mm;position:relative;overflow:hidden;background:linear-gradient(135deg,#fff8f5 0%,var(--rp-surface) 50%,#fff5f5 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12mm">
   ${mkCorner('6mm',null,'6mm',null)}
   ${mkCorner('6mm',null,null,'6mm')}
   ${mkCorner(null,'6mm','6mm',null)}
@@ -446,7 +446,7 @@ body{font-family:Georgia,'Times New Roman',serif;background:#fff}
     <img src="${logoUrl}" style="width:18mm;height:18mm;object-fit:contain" onerror="this.style.display='none'"/>
     <div style="text-align:center">
       <div style="font-size:20pt;font-weight:bold;color:var(--clr-brand);letter-spacing:0.05em">RaktPort</div>
-      <div style="font-size:8pt;color:#666;letter-spacing:0.15em;text-transform:uppercase">National Blood Management System</div>
+      <div style="font-size:8pt;color: var(--rp-text-muted);letter-spacing:0.15em;text-transform:uppercase">National Blood Management System</div>
     </div>
     <img src="${logoUrl}" style="width:18mm;height:18mm;object-fit:contain;opacity:0.2" onerror="this.style.display='none'"/>
   </div>
@@ -454,7 +454,7 @@ body{font-family:Georgia,'Times New Roman',serif;background:#fff}
   <div style="width:180mm;height:1px;background:linear-gradient(to right,transparent,var(--clr-brand) 30%,var(--clr-brand) 70%,transparent);margin-bottom:5mm"></div>
 
   <div style="font-size:24pt;font-weight:bold;color:var(--clr-brand);letter-spacing:0.08em;margin-bottom:2mm;text-align:center">CERTIFICATE OF APPRECIATION</div>
-  <div style="font-size:9pt;color:#666;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:5mm;text-align:center">This is to certify that</div>
+  <div style="font-size:9pt;color: var(--rp-text-muted);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:5mm;text-align:center">This is to certify that</div>
 
   <div style="font-size:26pt;font-weight:bold;color:#1a0505;letter-spacing:-0.01em;margin-bottom:1mm;text-align:center">${(donorData.fullName||'Donor Name').toUpperCase()}</div>
   <div style="font-size:10pt;color:var(--clr-brand);font-style:italic;margin-bottom:5mm;text-align:center">ID: ${donorData.internalId || donorData.donorId || 'N/A'} &nbsp;·&nbsp; Blood Group: ${donorData.bloodGroup||'N/A'}</div>
@@ -475,12 +475,12 @@ body{font-family:Georgia,'Times New Roman',serif;background:#fff}
       <div style="font-size:6pt;color:#999;margin-top:1mm;font-family:monospace">${certNo}</div>
     </div>
     <div style="text-align:center">
-      <div style="font-size:8pt;color:#888">Issue Date</div>
-      <div style="font-size:10pt;font-weight:bold;color:#333">${formatDateDMY(new Date())}</div>
+      <div style="font-size:8pt;color: var(--rp-text-muted)">Issue Date</div>
+      <div style="font-size:10pt;font-weight:bold;color: var(--rp-text)">${formatDateDMY(new Date())}</div>
     </div>
     <div style="text-align:center">
-      <div style="width:50mm;border-bottom:1px solid #333;margin-bottom:1mm"></div>
-      <div style="font-size:7.5pt;color:#666">Authorised by RaktPort</div>
+      <div style="width:50mm;border-bottom:1px solid var(--rp-text);margin-bottom:1mm"></div>
+      <div style="font-size:7.5pt;color: var(--rp-text-muted)">Authorised by RaktPort</div>
       <div style="font-size:7pt;color:#999">National Blood Authority</div>
     </div>
   </div>
@@ -513,7 +513,7 @@ else{imgs.forEach(function(img){if(img.complete)tryPrint();else{img.onload=tryPr
         </DialogHeader>
 
         {/* Preview card */}
-        <div className="relative overflow-hidden rounded-2xl border-2 border-red-200" style={{background:'linear-gradient(135deg,#fff8f5 0%,#ffffff 50%,#fff5f5 100%)',fontFamily:'Georgia,serif'}}>
+        <div className="relative overflow-hidden rounded-2xl border-2 border-red-200" style={{background:'linear-gradient(135deg,#fff8f5 0%,var(--rp-surface) 50%,#fff5f5 100%)',fontFamily:'Georgia,serif'}}>
           {(['tl','tr','bl','br'] as const).map(pos=>(
             <div key={pos} className="absolute w-8 h-8 pointer-events-none" style={{[pos.includes('t')?'top':'bottom']:10,[pos.includes('l')?'left':'right']:10,borderTop:pos.includes('t')?'2px solid var(--clr-brand)':'none',borderBottom:pos.includes('b')?'2px solid var(--clr-brand)':'none',borderLeft:pos.includes('l')?'2px solid var(--clr-brand)':'none',borderRight:pos.includes('r')?'2px solid var(--clr-brand)':'none'}}/>
           ))}

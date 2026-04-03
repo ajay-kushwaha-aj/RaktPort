@@ -59,6 +59,17 @@ All colors MUST be HSL.
     --footer-accent: var(--brand-primary);
     --footer-txt: var(--text-secondary);
 
+    /* RaktPort V3 Mapped Tokens */
+    --rp-primary: var(--brand-primary);
+    --rp-primary-dark: var(--brand-hover);
+    --rp-primary-soft: var(--brand-tint);
+    --rp-emergency: var(--clr-danger);
+    --rp-surface: var(--bg-surface);
+    --rp-bg: var(--bg-page);
+    --rp-bg-dark: var(--clr-dark-bg);
+    --rp-text: var(--text-primary);
+    --rp-text-muted: var(--text-secondary);
+    --rp-info: var(--clr-info);
 
     /* RaktPort Theme Colors */
     --maroon: 0 100% 27%;         /* Primary Brand - var(--clr-brand) */

@@ -114,7 +114,7 @@ export function PatientHistoryModal({ isOpen, onClose, requests }: Props) {
               {/* Patient summary card */}
               <div className="bg-red-50 dark:bg-red-950/30 rounded-xl p-4 border border-red-100 dark:border-red-900/40">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-12 h-12 rounded-xl bg-[var(--clr-brand)] flex items-center justify-center text-[var(--txt-inverse)] text-xl font-black" style={{ fontFamily: "Outfit,sans-serif" }}>
+                  <div className="w-12 h-12 rounded-xl bg-rp-primary flex items-center justify-center text-[var(--txt-inverse)] text-xl font-black" style={{ fontFamily: "Outfit,sans-serif" }}>
                     {activePatient.name[0]?.toUpperCase()}
                   </div>
                   <div>

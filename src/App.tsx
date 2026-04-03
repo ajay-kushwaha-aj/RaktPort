@@ -181,7 +181,7 @@ function AppContent() {
               <p className="text-[var(--text-secondary)] mb-6">Could not find dashboard for role: {selectedRole}</p>
               <Button
                 onClick={handleLogout}
-                className="px-6 py-2 bg-[var(--clr-brand)] text-[var(--txt-inverse)] rounded hover:bg-[#6B0000]"
+                className="px-6 py-2 bg-rp-primary text-[var(--txt-inverse)] rounded hover:bg-[var(--rp-primary-dark)]"
               >
                 Logout
               </Button>

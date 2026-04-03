@@ -34,7 +34,7 @@ function buildReportHTML(requests: BloodRequest[], hospitalName: string, hospita
   .page{padding:40px;max-width:800px;margin:0 auto}
   .hdr{text-align:center;border-bottom:3px solid var(--clr-brand);padding-bottom:16px;margin-bottom:20px}
   .hdr h1{font-size:22px;color:var(--clr-brand);margin:4px 0}
-  .hdr .sub{font-size:10px;color:#666}
+  .hdr .sub{font-size:10px;color: var(--rp-text-muted)}
   .section{margin:16px 0}
   .section h2{font-size:13px;color:var(--clr-brand);border-bottom:1px solid #ddd;padding-bottom:4px;margin-bottom:8px}
   table{width:100%;border-collapse:collapse;font-size:10px}
@@ -44,7 +44,7 @@ function buildReportHTML(requests: BloodRequest[], hospitalName: string, hospita
   .kpi-row{display:flex;gap:16px;margin:12px 0}
   .kpi{flex:1;text-align:center;padding:12px;background:#fef2f2;border-radius:8px;border:1px solid #fecaca}
   .kpi .val{font-size:24px;font-weight:900;color:var(--clr-brand)}
-  .kpi .lbl{font-size:9px;color:#888;text-transform:uppercase;letter-spacing:0.5px}
+  .kpi .lbl{font-size:9px;color: var(--rp-text-muted);text-transform:uppercase;letter-spacing:0.5px}
   .foot{text-align:center;margin-top:24px;padding-top:12px;border-top:2px solid var(--clr-brand);font-size:9px;color:#999}
   .stamp{display:inline-block;padding:4px 12px;border:2px solid var(--clr-brand);border-radius:4px;color:var(--clr-brand);font-weight:700;font-size:10px;margin-top:8px}
   @media print{.no-print{display:none!important} body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}

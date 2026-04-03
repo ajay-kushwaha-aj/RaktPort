@@ -55,6 +55,18 @@ export default {
         success: "hsl(var(--success))",
         warn: "hsl(var(--warn))",
         info: "hsl(var(--info))",
+        rp: {
+          primary: "var(--rp-primary)",
+          "primary-dark": "var(--rp-primary-dark)",
+          "primary-soft": "var(--rp-primary-soft)",
+          emergency: "var(--rp-emergency)",
+          surface: "var(--rp-surface)",
+          bg: "var(--rp-bg)",
+          "bg-dark": "var(--rp-bg-dark)",
+          text: "var(--rp-text)",
+          "text-muted": "var(--rp-text-muted)",
+          info: "var(--rp-info)",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

@@ -78,7 +78,7 @@ export function Footer() {
               </div>
             </div>
             <a href="tel:1800-180-1104"
-              style={{ color:'white', fontWeight:800, fontSize:'1rem', textDecoration:'none', background:'linear-gradient(135deg,var(--footer-accent),#c0392b)', padding:'9px 20px', borderRadius:999, boxShadow:'0 3px 12px rgba(139,0,0,0.45)', whiteSpace:'nowrap', fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
+              style={{ color:'white', fontWeight:800, fontSize:'1rem', textDecoration:'none', background:'linear-gradient(135deg,var(--footer-accent),var(--rp-primary))', padding:'9px 20px', borderRadius:999, boxShadow:'0 3px 12px rgba(139,0,0,0.45)', whiteSpace:'nowrap', fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
               1800-180-1104
             </a>
           </div>
@@ -89,7 +89,7 @@ export function Footer() {
             {/* Brand */}
             <div>
               <div className="rp-footer-brand" style={{ fontSize:'2rem', color:'white', marginBottom:10 }}>
-                Rakt<span style={{ color:'#c0392b' }}>Port</span>
+                Rakt<span style={{ color:'var(--rp-primary)' }}>Port</span>
               </div>
               <p style={{ fontSize:'12.5px', color:'rgba(255,255,255,0.4)', lineHeight:1.75, maxWidth:280, marginBottom:20 }}>
                 India's National Digital Blood Donation & Management System — connecting donors, blood banks, and hospitals to save lives.
@@ -178,7 +178,7 @@ export function Footer() {
               Website Content Managed by RaktPort Team
             </p>
             <p style={{ fontSize:'11.5px', color:'rgba(255,255,255,0.28)', margin:0, display:'flex', alignItems:'center', gap:5 }}>
-              Made with <span style={{ color:'#c0392b', fontSize:'1rem' }}>♥</span> for India
+              Made with <span style={{ color:'var(--rp-primary)', fontSize:'1rem' }}>♥</span> for India
             </p>
           </div>
         </div>

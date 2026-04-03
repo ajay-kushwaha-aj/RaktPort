@@ -201,7 +201,7 @@ export function PWAInstallPrompt() {
                 { icon: <Plus className="w-5 h-5" />, step: '3', text: 'Tap', bold: '"Add"', after: 'in the top-right corner' },
               ].map((s) => (
                 <div key={s.step} className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[var(--clr-brand)]/10 flex items-center justify-center flex-shrink-0 text-[var(--clr-brand)]">
+                  <div className="w-8 h-8 rounded-full bg-rp-primary/10 flex items-center justify-center flex-shrink-0 text-[var(--clr-brand)]">
                     {s.icon}
                   </div>
                   <div className="pt-1">

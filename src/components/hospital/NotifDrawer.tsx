@@ -18,7 +18,7 @@ export const NotifDrawer = ({
         <div className="p-4 border-b dark:border-gray-700 flex items-center justify-between flex-shrink-0">
           <h3 className="font-bold text-[var(--text-primary)] dark:text-gray-100 flex items-center gap-2 text-sm">
             <Bell className="w-4 h-4 text-[var(--clr-brand)]" /> Notifications
-            {unread > 0 && <span className="bg-[var(--clr-brand)] text-[var(--txt-inverse)] text-[10px] font-bold px-1.5 py-0.5 rounded-full">{unread}</span>}
+            {unread > 0 && <span className="bg-rp-primary text-[var(--txt-inverse)] text-[10px] font-bold px-1.5 py-0.5 rounded-full">{unread}</span>}
           </h3>
           <div className="flex items-center gap-1">
             {unread > 0 && (
@@ -51,7 +51,7 @@ export const NotifDrawer = ({
                 <p className="text-sm text-gray-700 dark:text-gray-300 leading-snug">{n.message}</p>
                 <p className="text-[10px] text-gray-400 dark:text-[var(--text-secondary)] mt-0.5">{n.time}</p>
               </div>
-              {!n.read && <div className="w-1.5 h-1.5 rounded-full bg-[var(--clr-brand)] mt-2 flex-shrink-0" />}
+              {!n.read && <div className="w-1.5 h-1.5 rounded-full bg-rp-primary mt-2 flex-shrink-0" />}
             </div>
           ))}
         </div>

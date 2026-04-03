@@ -135,7 +135,7 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
         .dark .rph-mwrap { background:#1c1a14 !important; border-color:#3a3520 !important; }
         .dark .rph-mtrack { color:#b89a30 !important; }
         .dark .rph-logo-wrap { border-color:#2a2a2a !important; background:#1a1a1a !important; }
-        .dark .rph-hamburger { border-color:#3a3a3a !important; color:#c0392b !important; background:#1e1e1e !important; }
+        .dark .rph-hamburger { border-color:#3a3a3a !important; color:var(--rp-primary) !important; background:#1e1e1e !important; }
       `}</style>
 
       <header className="rph" style={{ position:'sticky', top:0, zIndex:50, boxShadow:'0 2px 12px rgba(0,0,0,0.1)' }}>

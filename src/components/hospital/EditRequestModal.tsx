@@ -167,7 +167,7 @@ export const EditRequestModal = ({ isOpen, onClose, onSave, request }: Props) =>
                 <div className="grid grid-cols-4 gap-2 mt-1">
                   {BLOOD_GROUPS.map((bg: string) => (
                     <button key={bg} type="button" onClick={() => setBloodGroup(bg as BloodGroup)}
-                      className={`py-2 rounded-xl text-sm font-black border-2 transition-all ${bloodGroup === bg ? "bg-[var(--clr-brand)] text-[var(--txt-inverse)] border-[var(--clr-brand)] scale-105 shadow-md" : "bg-[var(--bg-page)] dark:bg-gray-800 text-[var(--text-secondary)] dark:text-gray-400 border-[var(--border-color)] dark:border-gray-700"}`}>
+                      className={`py-2 rounded-xl text-sm font-black border-2 transition-all ${bloodGroup === bg ? "bg-rp-primary text-[var(--txt-inverse)] border-[var(--clr-brand)] scale-105 shadow-md" : "bg-[var(--bg-page)] dark:bg-gray-800 text-[var(--text-secondary)] dark:text-gray-400 border-[var(--border-color)] dark:border-gray-700"}`}>
                       {bg}
                     </button>
                   ))}

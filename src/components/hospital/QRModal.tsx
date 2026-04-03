@@ -48,7 +48,7 @@ export const QRModal = ({ isOpen, onClose, request }: { isOpen: boolean; onClose
             </div>
           </div>
         </div>
-        <Button onClick={onClose} className="w-full bg-[var(--clr-brand)] hover:bg-[#6b0000]">Close</Button>
+        <Button onClick={onClose} className="w-full bg-rp-primary hover:bg-rp-primary-dark">Close</Button>
       </DialogContent>
     </Dialog>
   );

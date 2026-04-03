@@ -338,7 +338,7 @@ export const HD_STYLES = `
 .hd-welcome {
   border-radius: var(--r-2xl); padding: 28px 32px;
   position: relative; overflow: hidden;
-  background: linear-gradient(135deg, #6B0000 0%, #C41C38 60%, #A31628 100%);
+  background: linear-gradient(135deg, var(--rp-primary-dark) 0%, #C41C38 60%, #A31628 100%);
 }
 .hd-welcome::before {
   content:''; position:absolute; inset:0;

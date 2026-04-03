@@ -122,7 +122,7 @@ export const NewRequestModal = ({
           <div className="flex items-center gap-1.5 mt-4">
             {["Patient Info", "Blood Details", "Doctor & Location"].map((s, i) => (
               <React.Fragment key={s}>
-                <div className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[11px] font-semibold transition-all ${step === i + 1 ? "bg-[var(--clr-brand)] text-[var(--txt-inverse)] shadow" : step > i + 1 ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-[var(--clr-success)]" : "bg-[var(--bg-page)] dark:bg-gray-800 text-gray-400"}`}>
+                <div className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[11px] font-semibold transition-all ${step === i + 1 ? "bg-rp-primary text-[var(--txt-inverse)] shadow" : step > i + 1 ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-[var(--clr-success)]" : "bg-[var(--bg-page)] dark:bg-gray-800 text-gray-400"}`}>
                   {step > i + 1 ? <CheckCircle2 className="w-3 h-3" /> : <span className="w-3.5 h-3.5 rounded-full border-2 border-current flex items-center justify-center text-[9px]">{i + 1}</span>}
                   <span className="hidden sm:inline">{s}</span>
                 </div>
@@ -175,7 +175,7 @@ export const NewRequestModal = ({
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div><label className="hd-label">Aadhaar No. <span className="hd-required">*</span></label><input className="hd-input" value={aadhaar} onChange={numOnly(setAadhaar, 12)} maxLength={12} placeholder="12-digit" />
-                  {aadhaar.length > 0 && (<div className="flex gap-0.5 mt-1.5">{Array.from({ length: 12 }).map((_, i) => (<div key={i} className={`flex-1 h-1 rounded-full transition-all ${i < aadhaar.length ? "bg-[var(--clr-brand)]" : "bg-gray-200 dark:bg-gray-700"}`} />))}</div>)}
+                  {aadhaar.length > 0 && (<div className="flex gap-0.5 mt-1.5">{Array.from({ length: 12 }).map((_, i) => (<div key={i} className={`flex-1 h-1 rounded-full transition-all ${i < aadhaar.length ? "bg-rp-primary" : "bg-gray-200 dark:bg-gray-700"}`} />))}</div>)}
                 </div>
                 <div><label className="hd-label">Bed Number</label><input className="hd-input" value={bedNumber} onChange={e => setBedNumber(e.target.value)} placeholder="e.g. ICU-12" /></div>
               </div>
@@ -190,7 +190,7 @@ export const NewRequestModal = ({
                 <div className="grid grid-cols-4 gap-2 mt-1">
                   {BLOOD_GROUPS.map((bg: string) => (
                     <button key={bg} type="button" onClick={() => setBloodGroup(bg as BloodGroup)}
-                      className={`py-2.5 rounded-xl text-sm font-black border-2 transition-all ${bloodGroup === bg ? "bg-[var(--clr-brand)] text-[var(--txt-inverse)] border-[var(--clr-brand)] scale-105 shadow-md" : "bg-[var(--bg-page)] dark:bg-gray-800 text-[var(--text-secondary)] dark:text-gray-400 border-[var(--border-color)] dark:border-gray-700 hover:border-[var(--clr-brand)]/40"}`}>
+                      className={`py-2.5 rounded-xl text-sm font-black border-2 transition-all ${bloodGroup === bg ? "bg-rp-primary text-[var(--txt-inverse)] border-[var(--clr-brand)] scale-105 shadow-md" : "bg-[var(--bg-page)] dark:bg-gray-800 text-[var(--text-secondary)] dark:text-gray-400 border-[var(--border-color)] dark:border-gray-700 hover:border-[var(--clr-brand)]/40"}`}>
                       {bg}
                     </button>
                   ))}

@@ -23,7 +23,7 @@ export const BloodBankHeader = ({
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap');
-        .bbh-wrap { font-family:'DM Sans',sans-serif; background:linear-gradient(135deg,#6b0000 0%,var(--header-cta) 55%,#9e0000 100%); position:relative; overflow:hidden; }
+        .bbh-wrap { font-family:'DM Sans',sans-serif; background:linear-gradient(135deg,var(--rp-primary-dark) 0%,var(--header-cta) 55%,#9e0000 100%); position:relative; overflow:hidden; }
         .bbh-wrap::before { content:''; position:absolute; inset:0; background-image:radial-gradient(circle at 20% 50%, rgba(255,255,255,0.05) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.04) 0%, transparent 40%); pointer-events:none; }
         .bbh-wrap::after  { content:''; position:absolute; bottom:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent); }
         .bbh-brand { font-family:'Outfit',sans-serif; font-weight:800; font-size:1.3rem; color:#fff; letter-spacing:-0.025em; line-height:1; }
