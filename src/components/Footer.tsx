@@ -2,10 +2,15 @@
 import { useState } from 'react';
 
 const FAQS = [
-  { q: "How often can I donate blood?", a: "To ensure your health, male donors can donate every 3 months, and female donors can safely donate every 4 months." },
-  { q: "Is blood donation safe?", a: "Yes, it is completely safe. We strictly use new, sterile, and disposable equipment for each donor, ensuring zero chance of contracting infections." },
-  { q: "Do I need to fast before donating?", a: "No, you should never donate on an empty stomach. Make sure to eat a light, healthy meal and drink plenty of fluids before donating." },
-  { q: "How much time does the process take?", a: "The actual blood withdrawal takes about 8-10 minutes. However, registration, health screening, and resting afterward take about 30-45 minutes in total." }
+  { q: "🩸 1. What is RaktPort?", a: <><strong>RaktPort</strong> is a digital infrastructure that enables <strong>location-independent blood donation and utilization</strong> through a unique <strong>RTID</strong> (RaktPort Transfusion ID) system.<br/><br/>It allows a donor to donate at one place while the benefit can be utilized for a patient elsewhere.</> },
+  { q: "⚔️ 2. How is RaktPort different from e-RaktKosh?", a: <><strong>e-RaktKosh</strong> → Manages blood inventory locally<br/><strong>RaktPort</strong> → Enables interoperable donation value transfer<br/><br/>👉 <strong>Key difference:</strong><br/>e-RaktKosh = <strong>Storage system</strong><br/>RaktPort = <strong>Transfer system</strong></> },
+  { q: "🔁 3. What is the RTID system?", a: <><strong>RTID</strong> (RaktPort Transfusion ID) is a unique, trackable digital ID assigned to each donation.<br/><br/>It enables:<br/>• Linking <strong>donor → donation → patient</strong><br/>• Tracking usage across locations<br/>• Creating a portable <strong>donation credit</strong></> },
+  { q: "🌍 4. What does “eliminating geographical separation” mean?", a: <>It means: A donor <strong>does not need to be physically near</strong> the patient to help them.<br/><br/>Example:<br/>Donor donates in <strong>Delhi</strong><br/>Patient needs blood in <strong>Lucknow</strong><br/>👉 Through the RTID system, the contribution is <strong>digitally mapped and utilized</strong>.</> },
+  { q: "🏥 5. Does RaktPort replace blood banks?", a: <><strong>No.</strong><br/>Blood banks still <strong>collect, test, store, and transfuse</strong>.<br/><br/>RaktPort only adds a <strong>coordination and tracking layer</strong> across locations.</> },
+  { q: "⚖️ 6. Is this legally compliant?", a: <><strong>Yes</strong>, because:<br/>• <strong>No physical transfer</strong> without hospital control<br/>• <strong>No commercialization</strong><br/>• Works within the <strong>voluntary donation framework</strong><br/><br/>RaktPort manages tracking and allocation logic, <strong>not</strong> medical procedures.</> },
+  { q: "🔐 7. How is transparency ensured?", a: <>Through RTID:<br/>• Every donation is <strong>traceable</strong><br/>• Every usage is <strong>recorded</strong><br/>• There is <strong>no ambiguity</strong> in donor contribution.</> },
+  { q: "🌟 8. What impact can this create?", a: <>• Removes dependency on <strong>donor location</strong><br/>• Improves <strong>fairness in access</strong><br/>• Enables <strong>national-level coordination</strong></> },
+  { q: "🧠 9. What is the long-term vision?", a: <>To build a nationwide <strong>interoperable blood network</strong> where donations are <strong>not restricted by geography</strong>, but enabled through a <strong>unified digital tracking system</strong>.</> }
 ];
 
 export function Footer() {
