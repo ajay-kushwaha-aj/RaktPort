@@ -16,6 +16,9 @@ interface HeaderProps {
 }
 
 export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
+  const [language, setLanguage] = useState<'EN' | 'HI'>('EN');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   const toggleLanguage = useCallback(() => setLanguage(p => (p === 'EN' ? 'HI' : 'EN')), []);
 
   const t = {
