@@ -41,7 +41,8 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
     donor:       language === 'EN' ? 'Become a Donor'    : 'दाता बनें',
     eligibility: language === 'EN' ? 'Eligibility Rules' : 'पात्रता नियम',
     camp:        language === 'EN' ? 'Find Donation Camp': 'शिविर खोजें',
-    login:       language === 'EN' ? 'Login / Register'  : 'लॉगिन / रजिस्टर',
+    login:       language === 'EN' ? 'Login'             : 'लॉगिन',
+    register:    language === 'EN' ? 'Register'          : 'रजिस्टर',
   };
 
   const marqueeItems = (
@@ -115,6 +116,13 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
           box-shadow:0 2px 8px rgba(0,0,0,0.14); font-family:'Plus Jakarta Sans',sans-serif;
         }
         .rph-login:hover { background:#fff0ee; box-shadow:0 4px 14px rgba(0,0,0,0.18); }
+        .rph-login-outline {
+          background:transparent; color:white; font-size:0.75rem; font-weight:700;
+          padding:6px 18px; border-radius:999px; letter-spacing:0.03em;
+          transition:all 0.2s; white-space:nowrap; border:1.5px solid rgba(255,255,255,0.7); cursor:pointer;
+          font-family:'Plus Jakarta Sans',sans-serif;
+        }
+        .rph-login-outline:hover { background:rgba(255,255,255,0.15); border-color:white; }
 
         /* ── Mobile nav items ── */
         .rph-mob {
@@ -217,9 +225,14 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
                     </NavigationMenuItem>
                   </NavigationMenuList>
                 </NavigationMenu>
-                {onLoginClick && (
-                  <button onClick={onLoginClick} className="rph-login" style={{ margin:'8px 0' }}>{t.login}</button>
-                )}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '8px 0' }}>
+                  {onLoginClick && (
+                    <button onClick={onLoginClick} className="rph-login-outline">{t.login}</button>
+                  )}
+                  {onSignupClick && (
+                    <button onClick={onSignupClick} className="rph-login">{t.register}</button>
+                  )}
+                </div>
               </div>
             )}
 
@@ -231,14 +244,24 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
                 <button onClick={() => { onSignupClick?.(); setMobileMenuOpen(false); }} className="rph-mob">{t.donor}</button>
                 <a href="/Donation-eligibility-rules.html" className="rph-mob">{t.eligibility}</a>
                 <a href="/bloodcenter.html" className="rph-mob">{t.camp}</a>
-                {onLoginClick && (
-                  <button
-                    onClick={() => { onLoginClick(); setMobileMenuOpen(false); }}
-                    style={{ width:'100%', marginTop:8, background:'white', color:'var(--header-cta)', fontSize:'0.85rem', fontWeight:700, padding:'11px 16px', borderRadius:10, border:'none', cursor:'pointer', fontFamily:"'Plus Jakarta Sans',sans-serif" }}
-                  >
-                    {t.login}
-                  </button>
-                )}
+                <div style={{ display: 'flex', gap: '8px', marginTop: 12 }}>
+                  {onLoginClick && (
+                    <button
+                      onClick={() => { onLoginClick(); setMobileMenuOpen(false); }}
+                      style={{ flex: 1, background:'transparent', color:'white', fontSize:'0.85rem', fontWeight:700, padding:'11px 16px', borderRadius:10, border:'1.5px solid rgba(255,255,255,0.4)', cursor:'pointer', fontFamily:"'Plus Jakarta Sans',sans-serif" }}
+                    >
+                      {t.login}
+                    </button>
+                  )}
+                  {onSignupClick && (
+                    <button
+                      onClick={() => { onSignupClick?.(); setMobileMenuOpen(false); }}
+                      style={{ flex: 1, background:'white', color:'var(--header-cta)', fontSize:'0.85rem', fontWeight:700, padding:'11px 16px', borderRadius:10, border:'none', cursor:'pointer', fontFamily:"'Plus Jakarta Sans',sans-serif" }}
+                    >
+                      {t.register}
+                    </button>
+                  )}
+                </div>
               </div>
             )}
           </div>

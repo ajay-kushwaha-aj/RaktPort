@@ -293,7 +293,10 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
         }
         @media (max-width:1100px) { .hero-right-panel { width:272px; padding:18px 14px; } }
         @media (max-width:860px)  { .hero-right-panel { width:240px; padding:16px 12px; } }
-        @media (max-width:768px)  { .hero-right-panel { display:none; } }
+        @media (max-width:768px)  { 
+          .hero-wrap { flex-direction: column; }
+          .hero-right-panel { width:100%; border-left: none; padding:32px 20px; } 
+        }
 
         /* Mobile CTA strip */
         .hero-mob-cta {
@@ -494,57 +497,14 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
           </div>
 
           {/* Right: Panel (desktop only — NOT overlapping carousel) */}
-          <aside className="hero-right-panel" aria-label="Quick Actions">
-
-            {/* RTID Tracker widget */}
-            <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: 14, padding: '14px', border: '1px solid rgba(255,255,255,0.14)' }}>
-              <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '10px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 4 }}>
-                <Hash size={10} /> Track Donation
-              </p>
-              <div style={{ display: 'flex', gap: 6, marginBottom: rtidError ? 6 : 0 }}>
-                <input
-                  className="fi fi-dark"
-                  style={{ flex: 1, borderRadius: 8, padding: '8px 10px' }}
-                  placeholder="e.g. D-RTID-100326-A4F7K"
-                  value={rtidInput}
-                  onChange={e => { setRtidInput(e.target.value); setRtidResult(null); setRtidError(''); }}
-                  onKeyDown={e => e.key === 'Enter' && handleTrack()}
-                />
-                <button onClick={handleTrack} className="btn-p" style={{ padding: '8px 12px', fontSize: '12px', borderRadius: 8 }}>Track</button>
-              </div>
-              {rtidError && <p style={{ color: '#fca5a5', fontSize: '10px', marginTop: 4 }}>{rtidError}</p>}
-
-              {/* Inline progress dots */}
-              {rtidResult && (
-                <div style={{ marginTop: 10, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                  {RTID_STEPS.map((step, i) => {
-                    const done = i < rtidResult.current;
-                    return (
-                      <div key={step} style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                        <div style={{ width: 18, height: 18, borderRadius: '50%', background: done ? '#4ade80' : 'rgba(255,255,255,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '8px', fontWeight: 700, color: done ? '#014012' : 'rgba(255,255,255,0.45)', flexShrink: 0 }}>
-                          {done ? '✓' : i + 1}
-                        </div>
-                        <span style={{ fontSize: '9px', color: done ? 'rgba(255,255,255,0.88)' : 'rgba(255,255,255,0.38)', whiteSpace: 'nowrap' }}>{step.split(' ')[0]}</span>
-                        {i < RTID_STEPS.length - 1 && <span style={{ color: 'rgba(255,255,255,0.22)', fontSize: '9px', marginLeft: 1 }}>›</span>}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Emergency button */}
-            <button
-              onClick={() => setEmergencyOpen(true)}
-              style={{ width: '100%', background: 'linear-gradient(135deg,var(--rp-primary),#e74c3c)', color: 'white', border: 'none', borderRadius: 12, padding: '13px 16px', fontWeight: 700, fontSize: '13.5px', cursor: 'pointer', fontFamily: "'Plus Jakarta Sans',sans-serif", display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, boxShadow: '0 4px 16px rgba(192,57,43,0.55)' }}
-            >
-              <AlertCircle size={16} /> 🔴 Need Blood Now? Emergency
-            </button>
-
-            {/* Donor button */}
-            <button onClick={onDonorSignupClick} className="btn-ow" style={{ width: '100%', textAlign: 'center' }}>
-              🩸 Register as Donor
-            </button>
+          <aside className="hero-right-panel" style={{ background: 'var(--rp-bg, #fdf8f6)', borderLeft: '1px solid rgba(0,0,0,0.05)', padding: '0 24px', justifyContent: 'center', textAlign: 'center' }} aria-label="Hero Text">
+            <h1 className="lp-d" style={{ fontSize: '2.3rem', lineHeight: 1.15, color: 'var(--rp-text, #1a0505)', marginBottom: '18px' }}>
+              Donate Blood <span style={{ color: 'var(--rp-primary)', fontStyle: 'italic' }}>Anywhere.</span><br />
+              Save Lives Everywhere.
+            </h1>
+            <p style={{ color: 'var(--rp-text, #666)', opacity: 0.75, fontSize: '13px', lineHeight: 1.6, fontWeight: 500 }}>
+              A nationwide real-time blood access network connecting donors, hospitals, and blood banks across India — powered by RTID technology.
+            </p>
           </aside>
         </div>
 
@@ -860,11 +820,10 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
                 <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '13px', marginTop: 5 }}>Select your role to access your personalised dashboard</p>
               </div>
               <div style={{ padding: '28px 24px' }}>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-5xl mx-auto">
                   <RoleCard title="For Donors" desc="Donate blood and track your life-saving impact" icon={<UserPlus className="w-11 h-11" />} onClick={() => onRoleSelect('donor')} badge="Most Common" />
                   <RoleCard title="For Blood Banks" desc="Manage inventory, requests, and donor networks" icon={<Building2 className="w-11 h-11" />} onClick={() => onRoleSelect('bloodbank')} />
                   <RoleCard title="For Hospitals" desc="Manage inventory and coordinate transfusions" icon={<ClipboardList className="w-11 h-11" />} onClick={() => onRoleSelect('hospital')} />
-                  <RoleCard title="Admin Login" desc="System administration and platform monitoring" icon={<Settings className="w-11 h-11" />} onClick={() => onRoleSelect('admin')} />
                 </div>
               </div>
             </div>
