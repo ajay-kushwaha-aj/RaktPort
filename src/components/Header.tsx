@@ -16,22 +16,6 @@ interface HeaderProps {
 }
 
 export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
-  const [language, setLanguage]           = useState<'EN' | 'HI'>('EN');
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isMobile, setIsMobile]           = useState(false);
-
-  /* Responsive breakpoint via JS (avoids Tailwind purge issues) */
-  useEffect(() => {
-    const check = () => {
-      const m = window.innerWidth < 768;
-      setIsMobile(m);
-      if (!m) setMobileMenuOpen(false);
-    };
-    check();
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
-  }, []);
-
   const toggleLanguage = useCallback(() => setLanguage(p => (p === 'EN' ? 'HI' : 'EN')), []);
 
   const t = {
@@ -179,7 +163,7 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
                 <Globe size={12}/>{language === 'EN' ? 'हिंदी' : 'EN'}
               </button>
               <ModeToggle />
-              {isMobile && (
+              <div className="md:hidden flex items-center">
                 <button
                   className="rph-hamburger"
                   onClick={() => setMobileMenuOpen(v => !v)}
@@ -189,7 +173,7 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
                 >
                   {mobileMenuOpen ? <X size={20}/> : <Menu size={20}/>}
                 </button>
-              )}
+              </div>
             </div>
           </div>
         </div>
@@ -199,56 +183,54 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
           <div className="container mx-auto" style={{ padding:'0 16px' }}>
 
             {/* Desktop */}
-            {!isMobile && (
-              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-                {/* NavigationMenu for desktop links */}
-                <NavigationMenu className="rph-nav-root">
-                  <NavigationMenuList style={{ gap:0, padding:0, margin:0 }}>
-                    <NavigationMenuItem>
-                      <NavigationMenuLink asChild>
-                        <button onClick={() => window.location.href='/'} className="rph-pill">{t.home}</button>
-                      </NavigationMenuLink>
-                    </NavigationMenuItem>
-                    <NavigationMenuItem>
-                      <NavigationMenuLink href="/about.html" className="rph-pill">{t.about}</NavigationMenuLink>
-                    </NavigationMenuItem>
-                    <NavigationMenuItem>
-                      <NavigationMenuLink asChild>
-                        <button onClick={onSignupClick} className="rph-pill">{t.donor}</button>
-                      </NavigationMenuLink>
-                    </NavigationMenuItem>
-                    <NavigationMenuItem>
-                      <NavigationMenuLink href="/Donation-eligibility-rules.html" className="rph-pill">{t.eligibility}</NavigationMenuLink>
-                    </NavigationMenuItem>
-                    <NavigationMenuItem>
-                      <NavigationMenuLink href="/bloodcenter.html" className="rph-pill">{t.camp}</NavigationMenuLink>
-                    </NavigationMenuItem>
-                  </NavigationMenuList>
-                </NavigationMenu>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '8px 0' }}>
-                  {onLoginClick && (
-                    <button onClick={onLoginClick} className="rph-login-outline">{t.login}</button>
-                  )}
-                  {onSignupClick && (
-                    <button onClick={onSignupClick} className="rph-login">{t.register}</button>
-                  )}
-                </div>
+            <div className="hidden md:flex items-center justify-between">
+              {/* NavigationMenu for desktop links */}
+              <NavigationMenu className="rph-nav-root">
+                <NavigationMenuList style={{ gap:0, padding:0, margin:0 }}>
+                  <NavigationMenuItem>
+                    <NavigationMenuLink asChild>
+                      <button onClick={() => window.location.href='/'} className="rph-pill">{t.home}</button>
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <NavigationMenuLink href="/about.html" className="rph-pill">{t.about}</NavigationMenuLink>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <NavigationMenuLink asChild>
+                      <button onClick={onSignupClick} className="rph-pill">{t.donor}</button>
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <NavigationMenuLink href="/Donation-eligibility-rules.html" className="rph-pill">{t.eligibility}</NavigationMenuLink>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <NavigationMenuLink href="/bloodcenter.html" className="rph-pill">{t.camp}</NavigationMenuLink>
+                  </NavigationMenuItem>
+                </NavigationMenuList>
+              </NavigationMenu>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '8px 0' }}>
+                {onLoginClick && (
+                  <button onClick={onLoginClick} className="rph-login-outline">{t.login}</button>
+                )}
+                {onSignupClick && (
+                  <button onClick={onSignupClick} className="rph-login">{t.register}</button>
+                )}
               </div>
-            )}
+            </div>
 
             {/* Mobile drawer */}
-            {isMobile && mobileMenuOpen && (
-              <div style={{ borderTop:'1px solid rgba(255,255,255,0.15)', padding:'8px 0' }}>
+            <div className={`md:hidden ${mobileMenuOpen ? 'block' : 'hidden'}`}>
+              <div style={{ borderTop:'1px solid rgba(255,255,255,0.15)', padding:'12px 0 16px 0' }}>
                 <button onClick={() => { window.location.href='/'; setMobileMenuOpen(false); }} className="rph-mob">{t.home}</button>
                 <a href="/about.html" className="rph-mob">{t.about}</a>
                 <button onClick={() => { onSignupClick?.(); setMobileMenuOpen(false); }} className="rph-mob">{t.donor}</button>
                 <a href="/Donation-eligibility-rules.html" className="rph-mob">{t.eligibility}</a>
                 <a href="/bloodcenter.html" className="rph-mob">{t.camp}</a>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '16px', paddingBottom: '8px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '16px' }}>
                   {onLoginClick && (
                     <button
                       onClick={() => { onLoginClick(); setMobileMenuOpen(false); }}
-                      style={{ width: '100%', background:'transparent', color:'white', fontSize:'0.88rem', fontWeight:700, padding:'12px 16px', borderRadius:10, border:'1.5px solid rgba(255,255,255,0.5)', cursor:'pointer', fontFamily:"'Plus Jakarta Sans',sans-serif" }}
+                      style={{ width: '100%', background:'transparent', color:'white', fontSize:'0.88rem', fontWeight:700, padding:'12px 16px', borderRadius:10, border:'1.5px solid rgba(255,255,255,0.5)', cursor:'pointer', fontFamily:"'Plus Jakarta Sans',sans-serif", textAlign: 'center' }}
                     >
                       {t.login}
                     </button>
@@ -256,14 +238,14 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
                   {onSignupClick && (
                     <button
                       onClick={() => { onSignupClick?.(); setMobileMenuOpen(false); }}
-                      style={{ width: '100%', background:'white', color:'var(--header-cta)', fontSize:'0.88rem', fontWeight:800, padding:'12px 16px', borderRadius:10, border:'none', cursor:'pointer', fontFamily:"'Plus Jakarta Sans',sans-serif", boxShadow: '0 4px 14px rgba(0,0,0,0.1)' }}
+                      style={{ width: '100%', background:'white', color:'var(--header-cta)', fontSize:'0.88rem', fontWeight:800, padding:'12px 16px', borderRadius:10, border:'none', cursor:'pointer', fontFamily:"'Plus Jakarta Sans',sans-serif", boxShadow: '0 4px 14px rgba(0,0,0,0.1)', textAlign: 'center' }}
                     >
                       {t.register}
                     </button>
                   )}
                 </div>
               </div>
-            )}
+            </div>
           </div>
         </nav>
       </header>
