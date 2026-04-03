@@ -244,11 +244,11 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
                 <button onClick={() => { onSignupClick?.(); setMobileMenuOpen(false); }} className="rph-mob">{t.donor}</button>
                 <a href="/Donation-eligibility-rules.html" className="rph-mob">{t.eligibility}</a>
                 <a href="/bloodcenter.html" className="rph-mob">{t.camp}</a>
-                <div style={{ display: 'flex', gap: '8px', marginTop: 12 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '16px', paddingBottom: '8px' }}>
                   {onLoginClick && (
                     <button
                       onClick={() => { onLoginClick(); setMobileMenuOpen(false); }}
-                      style={{ flex: 1, background:'transparent', color:'white', fontSize:'0.85rem', fontWeight:700, padding:'11px 16px', borderRadius:10, border:'1.5px solid rgba(255,255,255,0.4)', cursor:'pointer', fontFamily:"'Plus Jakarta Sans',sans-serif" }}
+                      style={{ width: '100%', background:'transparent', color:'white', fontSize:'0.88rem', fontWeight:700, padding:'12px 16px', borderRadius:10, border:'1.5px solid rgba(255,255,255,0.5)', cursor:'pointer', fontFamily:"'Plus Jakarta Sans',sans-serif" }}
                     >
                       {t.login}
                     </button>
@@ -256,7 +256,7 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
                   {onSignupClick && (
                     <button
                       onClick={() => { onSignupClick?.(); setMobileMenuOpen(false); }}
-                      style={{ flex: 1, background:'white', color:'var(--header-cta)', fontSize:'0.85rem', fontWeight:700, padding:'11px 16px', borderRadius:10, border:'none', cursor:'pointer', fontFamily:"'Plus Jakarta Sans',sans-serif" }}
+                      style={{ width: '100%', background:'white', color:'var(--header-cta)', fontSize:'0.88rem', fontWeight:800, padding:'12px 16px', borderRadius:10, border:'none', cursor:'pointer', fontFamily:"'Plus Jakarta Sans',sans-serif", boxShadow: '0 4px 14px rgba(0,0,0,0.1)' }}
                     >
                       {t.register}
                     </button>
