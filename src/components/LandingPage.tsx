@@ -686,7 +686,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
               {[
                 { n: '1', icon: <UserPlus size={18} />, t: 'Register', d: 'Create your donor profile in under 2 minutes.' },
                 { n: '2', icon: <ShieldCheck size={18} />, t: 'Check Eligibility', d: 'Answer quick health questions to confirm readiness.' },
-                { n: '3', icon: <Search size={18} />, t: 'Find a Camp', d: 'Locate the nearest donation camp or blood bank.' },
+                { n: '3', icon: <Search size={18} />, t: 'Book Donation Appointment', d: 'Find a blood bank and book a convenient time.' },
                 { n: '4', icon: <Heart size={18} />, t: 'Donate & Save', d: 'Donate and receive your digital certificate.' },
               ].map(s => (
                 <div key={s.n} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>

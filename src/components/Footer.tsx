@@ -1,5 +1,16 @@
 // src/components/Footer.tsx
+import { useState } from 'react';
+
+const FAQS = [
+  { q: "How often can I donate blood?", a: "To ensure your health, male donors can donate every 3 months, and female donors can safely donate every 4 months." },
+  { q: "Is blood donation safe?", a: "Yes, it is completely safe. We strictly use new, sterile, and disposable equipment for each donor, ensuring zero chance of contracting infections." },
+  { q: "Do I need to fast before donating?", a: "No, you should never donate on an empty stomach. Make sure to eat a light, healthy meal and drink plenty of fluids before donating." },
+  { q: "How much time does the process take?", a: "The actual blood withdrawal takes about 8-10 minutes. However, registration, health screening, and resting afterward take about 30-45 minutes in total." }
+];
+
 export function Footer() {
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+
   return (
     <>
       <style>{`
@@ -65,6 +76,31 @@ export function Footer() {
       <footer className="rp-footer" style={{ borderTop: '3px solid var(--footer-accent)', background: 'var(--footer-bg)' }}>
 
         <div className="container mx-auto px-4" style={{ paddingTop:50, paddingBottom:32 }}>
+
+          {/* FAQ Section */}
+          <div style={{ marginBottom: '40px', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', padding: '24px 28px', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <h3 style={{ color: 'white', fontSize: '1.25rem', fontFamily: "'Sora', sans-serif", fontWeight: 800, marginBottom: '20px', letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ color: 'var(--rp-primary)' }}>?</span> Frequently Asked Questions
+            </h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
+              {FAQS.map((faq, i) => (
+                <div key={i} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', padding: '16px', transition: 'all 0.2s' }}>
+                  <button 
+                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                    style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.9)', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', sans-serif", textAlign: 'left', padding: 0 }}
+                  >
+                    {faq.q}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ transform: openFaq === i ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s', color: openFaq === i ? 'var(--rp-primary)' : 'rgba(255,255,255,0.4)', flexShrink: 0, marginLeft: '12px' }}>
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                  </button>
+                  <div style={{ height: openFaq === i ? 'auto' : 0, overflow: 'hidden', opacity: openFaq === i ? 1 : 0, transition: 'all 0.3s' }}>
+                    <p style={{ margin: 0, paddingTop: '12px', color: 'rgba(255,255,255,0.5)', fontSize: '13px', lineHeight: 1.6 }}>{faq.a}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
 
           {/* Emergency helpline strip */}
           <div className="rp-helpline">
