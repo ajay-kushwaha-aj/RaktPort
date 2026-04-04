@@ -32,7 +32,7 @@ interface HeaderProps {
 /* ─── i18n copy ─────────────────────────────────────────── */
 const COPY = {
   EN: {
-    tagline: 'Donate Blood Anywhere · Save Lives Everywhere',
+    tagline: 'Donate Blood Anywhere. Save Lives Everywhere.',
     home: 'Home',
     about: 'About',
     donor: 'Become a Donor',
@@ -58,7 +58,7 @@ const COPY = {
     ddRoleLabel: 'Choose your role',
   },
   HI: {
-    tagline: 'कहीं भी रक्तदान करें · जीवन बचाएं',
+    tagline: 'कहीं भी रक्तदान करें. जीवन बचाएं.',
     home: 'होम',
     about: 'हमारे बारे में',
     donor: 'दाता बनें',
@@ -189,7 +189,7 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
               </div>
               <div>
                 <div className="rph-logo-name">RaktPort</div>
-                <div className="rph-logo-tag">{t.tagline.split('·')[0].trim()}</div>
+                <div className="rph-logo-tag">{t.tagline}</div>
               </div>
             </a>
 
@@ -657,11 +657,9 @@ function RphStyles() {
   letter-spacing:.05em;
   color:var(--rph-tm);
   margin-top:3px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  max-width:min(340px,42vw);
+  white-space:normal;
   display:block;
+  line-height:1.2;
 }
 
 /* Brand controls */
