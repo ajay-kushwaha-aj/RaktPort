@@ -1046,10 +1046,10 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
     <div className="min-h-screen bg-background pb-10">
 
       {/* ═══ HEADER ════════════════════════════════════════════ */}
-      <header className="bg-[var(--stats-bg)] dark:bg-[#3a0000] text-[var(--txt-inverse)] py-3 shadow-lg no-print sticky top-0 z-40">
+      <header className="bg-rp-primary dark:bg-rp-primary-dark text-white py-3 shadow-lg no-print sticky top-0 z-40">
         <div className="container mx-auto px-4 max-w-6xl flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <img src={logo} alt="RaktPort" className="w-10 h-10 rounded-full border-2 border-white/40 shadow flex-shrink-0"/>
+            <img src={logo} alt="RaktPort" className="w-10 h-10 rounded-full border-2 border-white shadow flex-shrink-0 bg-white p-0.5 object-contain"/>
             <div className="min-w-0">
               <h1 className="text-base sm:text-lg font-bold leading-tight flex flex-wrap items-center gap-1.5">
                 <span className="truncate max-w-[150px] sm:max-w-[300px]">Hello, {(donorData.fullName||'Donor').split(' ')[0]}! 👋</span>

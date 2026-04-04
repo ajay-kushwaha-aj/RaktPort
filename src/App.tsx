@@ -16,6 +16,7 @@ import AdminDashboard from './components/AdminDashboard';
 import { Button } from './components/ui/button';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { CookieConsent } from './components/CookieConsent';
+import { FeedbackWidget } from './components/FeedbackWidget';
 
 // --- Error Boundary to prevent blank page on runtime errors ---
 class ErrorBoundary extends React.Component<
@@ -258,7 +259,12 @@ function AppContent() {
                   />
                 )}
 
-                {currentView === 'dashboard' && renderDashboard()}
+                {currentView === 'dashboard' && (
+                  <>
+                    {renderDashboard()}
+                    <FeedbackWidget />
+                  </>
+                )}
               </div>
             }
           />

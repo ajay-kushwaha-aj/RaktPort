@@ -1,3 +1,22 @@
+// In-memory rate limiting store (persists for the lifetime of the serverless function instance)
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
+const MAX_REQUESTS_PER_IP = 5;
+const MAX_REQUESTS_PER_EMAIL = 3;
+
+const ipRequests = new Map();
+const emailRequests = new Map();
+
+// Helper to clean up old rate limit entries
+const cleanupRateLimits = () => {
+  const now = Date.now();
+  for (const [key, val] of ipRequests.entries()) {
+    if (now - val.startTime > RATE_LIMIT_WINDOW_MS) ipRequests.delete(key);
+  }
+  for (const [key, val] of emailRequests.entries()) {
+    if (now - val.startTime > RATE_LIMIT_WINDOW_MS) emailRequests.delete(key);
+  }
+};
+
 export default async function handler(req, res) {
   // Add CORS headers so local frontend can talk to it if needed during local testing
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -20,6 +39,40 @@ export default async function handler(req, res) {
   if (!toEmail || !otpCode) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
+
+  // --- Rate Limiting Logic ---
+  cleanupRateLimits();
+
+  const ip = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown';
+  
+  // 1. IP Rate Limiting
+  let ipRecord = ipRequests.get(ip);
+  if (!ipRecord || (Date.now() - ipRecord.startTime > RATE_LIMIT_WINDOW_MS)) {
+    ipRecord = { count: 1, startTime: Date.now() };
+  } else {
+    ipRecord.count += 1;
+  }
+  ipRequests.set(ip, ipRecord);
+
+  if (ip !== 'unknown' && ipRecord.count > MAX_REQUESTS_PER_IP) {
+    console.warn(`[Rate Limit] Blocked IP ${ip}. Requests: ${ipRecord.count}`);
+    return res.status(429).json({ error: 'Too many requests from this IP. Please try again later.' });
+  }
+
+  // 2. Email Rate Limiting
+  let emailRecord = emailRequests.get(toEmail);
+  if (!emailRecord || (Date.now() - emailRecord.startTime > RATE_LIMIT_WINDOW_MS)) {
+    emailRecord = { count: 1, startTime: Date.now() };
+  } else {
+    emailRecord.count += 1;
+  }
+  emailRequests.set(toEmail, emailRecord);
+
+  if (emailRecord.count > MAX_REQUESTS_PER_EMAIL) {
+    console.warn(`[Rate Limit] Blocked Email ${toEmail}. Requests: ${emailRecord.count}`);
+    return res.status(429).json({ error: 'Too many requests for this email. Please try again later.' });
+  }
+  // ---------------------------
 
   const RESEND_API_KEY = process.env.RESEND_API_KEY;
   if (!RESEND_API_KEY) {
