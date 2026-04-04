@@ -1,20 +1,99 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Core pages -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
+  <!-- ── Homepage ── -->
   <url>
-    <loc>https://raktport.in/</loc>
-    <lastmod>2024-04-05</lastmod>
-    <changefreq>weekly</changefreq>
+    <loc>https://www.raktport.in/</loc>
+    <lastmod>2025-04-05</lastmod>
+    <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://www.raktport.in/og-image.png</image:loc>
+      <image:title>RaktPort – Donate Blood Anywhere, Save Life Everywhere</image:title>
+      <image:caption>India's National Blood Donation and Management Platform</image:caption>
+    </image:image>
   </url>
+
+  <!-- ── About ── -->
   <url>
-    <loc>https://raktport.in/login</loc>
+    <loc>https://www.raktport.in/about.html</loc>
+    <lastmod>2025-04-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+
+  <!-- ── Our Mission ── -->
   <url>
-    <loc>https://raktport.in/signup</loc>
+    <loc>https://www.raktport.in/our-mission.html</loc>
+    <lastmod>2025-04-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- ── Blood Centers / Find Donation Camp ── -->
+  <url>
+    <loc>https://www.raktport.in/bloodcenter.html</loc>
+    <lastmod>2025-04-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- ── Blood Compatibility Chart ── -->
+  <url>
+    <loc>https://www.raktport.in/compatibility.html</loc>
+    <lastmod>2025-04-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+
+  <!-- ── Donation Eligibility Rules ── -->
+  <url>
+    <loc>https://www.raktport.in/Donation-eligibility-rules.html</loc>
+    <lastmod>2025-04-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- ── Donation Preparation & Aftercare ── -->
+  <url>
+    <loc>https://www.raktport.in/Donation-Preparation&amp;Aftercare.html</loc>
+    <lastmod>2025-04-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- ── Blood Donation Guidelines ── -->
+  <url>
+    <loc>https://www.raktport.in/blood-guidelines.html</loc>
+    <lastmod>2025-04-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- ── Contact ── -->
+  <url>
+    <loc>https://www.raktport.in/contact.html</loc>
+    <lastmod>2025-04-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- ── Terms & Conditions ── -->
+  <url>
+    <loc>https://www.raktport.in/terms.html</loc>
+    <lastmod>2025-04-05</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <!-- ── Privacy Policy ── -->
+  <url>
+    <loc>https://www.raktport.in/privacy.html</loc>
+    <lastmod>2025-04-05</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
 </urlset>

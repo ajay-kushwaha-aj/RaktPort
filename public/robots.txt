@@ -1,3 +1,38 @@
 User-agent: *
 Allow: /
-Sitemap: https://raktport.in/sitemap.xml
+
+# Block private/auth routes from indexing
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /hospital-dashboard
+Disallow: /bloodbank-dashboard
+Disallow: /donor-dashboard
+
+# Allow all public pages
+Allow: /about.html
+Allow: /our-mission.html
+Allow: /contact.html
+Allow: /bloodcenter.html
+Allow: /compatibility.html
+Allow: /Donation-eligibility-rules.html
+Allow: /Donation-Preparation&Aftercare.html
+Allow: /blood-guidelines.html
+Allow: /terms.html
+Allow: /privacy.html
+
+# Sitemaps
+Sitemap: https://www.raktport.in/sitemap.xml
+Sitemap: https://www.raktport.in/sitemap-index.xml
+
+# Crawl delay for polite crawling
+Crawl-delay: 1
+
+# Google-specific
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+# Bing
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
