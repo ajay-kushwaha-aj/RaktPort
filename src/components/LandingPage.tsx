@@ -15,6 +15,8 @@ import bannerImage1 from '../assets/one.png';
 import bannerImage2 from '../assets/two.png';
 import bannerImage3 from '../assets/three.png';
 import bannerImage4 from '../assets/four.png';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../firebase';
 
 /* ─── Types ─── */
 interface LandingPageProps { onRoleSelect: (role: string) => void; onDonorSignupClick: () => void; }
@@ -89,14 +91,7 @@ async function submitDB(data: Omit<EmergencyRecord, 'rtid' | 'timestamp' | 'stat
   try { const ex: EmergencyRecord[] = JSON.parse(localStorage.getItem(DB_KEY) || '[]'); ex.push(record); localStorage.setItem(DB_KEY, JSON.stringify(ex)); } catch { }
   return rtid;
 }
-function lookupRTID(rtid: string): { current: number; record?: EmergencyRecord } {
-  try {
-    const rs: EmergencyRecord[] = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
-    const f = rs.find(r => r.rtid.toUpperCase() === rtid.trim().toUpperCase());
-    if (f) { const m = (Date.now() - new Date(f.timestamp).getTime()) / 60000; return { current: Math.max(Math.min(Math.floor(m / 5) + 1, 6), 1), record: f }; }
-  } catch { }
-  return { current: Math.min(((rtid.trim().toUpperCase().slice(-1).charCodeAt(0) || 65) % 6) + 1, 6) };
-}
+
 function addDays(d: Date, days: number) { const r = new Date(d); r.setDate(r.getDate() + days); return r; }
 function fmtDate(d: Date) { return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }); }
 
@@ -236,9 +231,84 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
   const closeEmerg = () => { setEmergOpen(false); setEDone(false); setERTID(''); setEForm({ patientName: '', bloodGroup: '', units: '', hospital: '', city: '', contact: '', urgency: 'Critical' }); };
 
   const [rtidIn, setRtidIn] = React.useState('');
-  const [rtidRes, setRtidRes] = React.useState<{ current: number; record?: EmergencyRecord } | null>(null);
+  const [rtidRes, setRtidRes] = React.useState<{ current: number; record?: EmergencyRecord | any } | null>(null);
   const [rtidErr, setRtidErr] = React.useState('');
-  const track = () => { const v = rtidIn.trim().toUpperCase(); if (!v) { setRtidErr('Please enter an RTID.'); return; } if (!isValidRTID(v)) { setRtidErr('Format: D-RTID-DDMMYY-AXXXX  e.g. D-RTID-060426-A4F7K'); return; } setRtidErr(''); setRtidRes(lookupRTID(v)); };
+  
+  const track = async () => { 
+    const v = rtidIn.trim().toUpperCase(); 
+    if (!v) { setRtidErr('Please enter an RTID.'); return; } 
+    if (!isValidRTID(v)) { setRtidErr('Format: D-RTID-DDMMYY-AXXXX  e.g. D-RTID-060426-A4F7K'); return; } 
+    setRtidErr(''); 
+    setRtidRes(null); 
+    
+    try {
+      let current = 0;
+      let foundRef: any = null;
+      let details: any = null;
+
+      if (v.startsWith('D-RTID')) {
+        let snap = await getDocs(query(collection(db, 'donations'), where('rtidCode', '==', v)));
+        if (!snap.empty) foundRef = snap.docs[0].data();
+        else {
+          snap = await getDocs(query(collection(db, 'donations'), where('dRtid', '==', v)));
+          if (!snap.empty) foundRef = snap.docs[0].data();
+        }
+
+        if (foundRef) {
+          const st = (foundRef.rtidStatus || foundRef.status || '').toUpperCase();
+          if (['SCHEDULED', 'PENDING'].includes(st)) current = 0;
+          else if (st === 'DONATED') current = 1;
+          else if (['VERIFIED', 'CREDITED'].includes(st)) current = 2;
+          else if (['REDEEMED', 'COMPLETED', 'REDEEMED-CREDIT'].includes(st)) current = 4;
+          else if (['ADMINISTERED', 'PARTIALLY ADMINISTERED'].includes(st)) current = 6;
+          else current = 1;
+
+          if (foundRef.linkedHrtid && foundRef.linkedHrtid !== 'N/A') {
+            const hSnap = await getDocs(query(collection(db, 'bloodRequests'), where('rtid', '==', foundRef.linkedHrtid)));
+            if (!hSnap.empty) {
+              const hData = hSnap.docs[0].data();
+              details = { patientName: hData.patientName, bloodGroup: hData.bloodGroup };
+              const hst = (hData.status || '').toUpperCase();
+              if (hst === 'CLOSED' || hst === 'ADMINISTERED') current = 6;
+              else if (hst === 'PARTIALLY ADMINISTERED') current = 5;
+            } else {
+              details = { patientName: 'Processing at Blood Bank', bloodGroup: foundRef.bloodGroup || foundRef.component || 'Unknown' };
+            }
+          } else {
+            details = { patientName: 'Awaiting Hospital Assignment', bloodGroup: foundRef.bloodGroup || foundRef.component || 'Unknown' };
+          }
+        }
+      } else {
+        let snap = await getDocs(query(collection(db, 'bloodRequests'), where('rtid', '==', v)));
+        if (!snap.empty) foundRef = snap.docs[0].data();
+        else {
+          snap = await getDocs(query(collection(db, 'bloodRequests'), where('linkedRTID', '==', v)));
+          if (!snap.empty) foundRef = snap.docs[0].data();
+        }
+
+        if (foundRef) {
+          const st = (foundRef.status || '').toUpperCase();
+          if (['CREATED', 'PENDING'].includes(st)) current = 1;
+          else if (st === 'PARTIAL' || st === 'PLEDGED' || st === 'PROCESSING') current = 3;
+          else if (['REDEEMED', 'HOSPITAL VERIFIED'].includes(st)) current = 4;
+          else if (st === 'PARTIALLY ADMINISTERED') current = 5;
+          else if (st === 'CLOSED' || st === 'ADMINISTERED') current = 6;
+          else current = 1;
+
+          details = { patientName: foundRef.patientName, bloodGroup: foundRef.bloodGroup };
+        }
+      }
+
+      if (foundRef) {
+        setRtidRes({ current: Math.max(1, Math.min(current, 6)), record: details });
+      } else {
+        setRtidErr('No real-time record found for this RTID.');
+      }
+    } catch (err) {
+      console.error(err);
+      setRtidErr('Failed to fetch tracking data. Please try again.');
+    }
+  };
 
   const [eliF, setEliF] = React.useState({ lastDate: '', gender: 'Male', component: 'Whole Blood' });
   const [eliRes, setEliRes] = React.useState<string | null>(null);
