@@ -18,15 +18,15 @@
 //   • Staggered entrance animation
 // ─────────────────────────────────────────────────────────────
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { Globe, X, ChevronDown, Zap } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef, ReactNode } from 'react';
+import { Globe, X, ChevronDown, Zap, Home, Info, Lightbulb, Droplets, CheckSquare, CalendarRange, ClipboardList, Microscope, Hospital, TestTubes } from 'lucide-react';
 import raktportLogo from '../assets/raktport-logo.png';
 import { ModeToggle } from './mode-toggle';
 
 /* ─── Props ─────────────────────────────────────────────── */
 interface HeaderProps {
-  onLoginClick?: () => void;
-  onSignupClick?: () => void;
+  onLoginClick?: (role?: string) => void;
+  onSignupClick?: (role: string) => void;
 }
 
 /* ─── i18n copy ─────────────────────────────────────────── */
@@ -270,7 +270,7 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
                   onMouseLeave={closeDD_}
                 >
                   <DDRow icon="" title={t.ddDonor} desc={t.ddDonorDesc}
-                    onClick={() => { onSignupClick?.(); closeAll(); }} />
+                    onClick={() => { onSignupClick?.('donor'); closeAll(); }} />
                   <DDRow icon="" title={t.ddEli} desc={t.ddEliDesc}
                     href="/Donation-eligibility-rules.html" onClick={closeAll} />
                   <DDRow icon="" title={t.ddCamp} desc={t.ddCampDesc}
@@ -293,14 +293,14 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
             {/* Right: SOS + auth */}
             <div className="rph-nav-right">
 
-              <button className="rph-sos" onClick={onSignupClick} aria-label="Request emergency blood">
+              <button className="rph-sos" onClick={() => onSignupClick?.('donor')} aria-label="Request emergency blood">
                 <span className="rph-sos-ring" aria-hidden="true" />
                 <Zap size={12} aria-hidden="true" style={{ position: 'relative', zIndex: 1, flexShrink: 0 }} />
                 <span style={{ position: 'relative', zIndex: 1, whiteSpace: 'nowrap' }}>{t.sos}</span>
               </button>
 
               {onLoginClick && (
-                <button onClick={onLoginClick} className="rph-btn-outline">{t.login}</button>
+                <button onClick={() => onLoginClick?.('donor')} className="rph-btn-outline">{t.login}</button>
               )}
 
               {onSignupClick && (
@@ -331,15 +331,12 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
                     onMouseLeave={closeDD_}
                   >
                     <p className="rph-dd-label">{t.ddRoleLabel}</p>
-                    <RoleRow emoji="🩸" title={t.ddDonor} desc={t.ddDonorDesc}
-                      onClick={() => { onSignupClick(); closeAll(); }} />
-                    <RoleRow emoji="🏥" title={t.ddHospital} desc={t.ddHospDesc}
-                      onClick={() => { onSignupClick(); closeAll(); }} />
-                    <RoleRow emoji="🧪" title={t.ddBloodBank} desc={t.ddBBDesc}
-                      onClick={() => { onSignupClick(); closeAll(); }} />
-                    <div className="rph-dd-sep" />
-                    <RoleRow emoji="🔒" title={t.ddAdmin} desc={t.ddAdminDesc} muted
-                      onClick={() => { onLoginClick?.(); closeAll(); }} />
+                    <RoleRow icon={<Droplets size={16} />} title={t.ddDonor} desc={t.ddDonorDesc}
+                      onClick={() => { onSignupClick?.('donor'); closeAll(); }} />
+                    <RoleRow icon={<Hospital size={16} />} title={t.ddHospital} desc={t.ddHospDesc}
+                      onClick={() => { onSignupClick?.('hospital'); closeAll(); }} />
+                    <RoleRow icon={<TestTubes size={16} />} title={t.ddBloodBank} desc={t.ddBBDesc}
+                      onClick={() => { onSignupClick?.('bloodbank'); closeAll(); }} />
                   </Dropdown>
                 </div>
               )}
@@ -383,7 +380,7 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
         {/* Emergency CTA */}
         <button
           className="rph-d-sos"
-          onClick={() => { onSignupClick?.(); setDrawer(false); }}
+          onClick={() => { onSignupClick?.('donor'); setDrawer(false); }}
         >
           <Zap size={16} aria-hidden="true" />{t.sos}
         </button>
@@ -391,32 +388,31 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
         {/* Auth row */}
         <div className="rph-d-auth">
           <button className="rph-d-login" onClick={() => { onLoginClick?.(); setDrawer(false); }}>{t.login}</button>
-          <button className="rph-d-register" onClick={() => { onSignupClick?.(); setDrawer(false); }}>{t.register}</button>
+          <button className="rph-d-register" onClick={() => { onSignupClick?.('donor'); setDrawer(false); }}>{t.register}</button>
         </div>
 
         <div className="rph-d-sep" />
 
         <nav className="rph-d-nav" aria-label="Mobile navigation links">
           <span className="rph-d-section">Navigate</span>
-          <DLink href="/" icon="🏠" label={t.home} active onClick={() => setDrawer(false)} />
-          <DLink href="/about.html" icon="ℹ️" label={t.about} onClick={() => setDrawer(false)} />
-          <DLink icon="💡" label={t.impact}
-            onClick={() => { setDrawer(false); setTimeout(() => { const el = document.getElementById('impact'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }, 300); }} />
-          <DLink icon="🩸" label={t.donor}
-            onClick={() => { onSignupClick?.(); setDrawer(false); }} />
-          <DLink href="/Donation-eligibility-rules.html" icon="✅" label={t.eligibility} onClick={() => setDrawer(false)} />
-          <DLink href="/bloodcenter.html" icon="📅" label={t.camp} onClick={() => setDrawer(false)} />
-          <DLink href="/Donation-Preparation&Aftercare.html" icon="📋" label="Preparation & Aftercare" onClick={() => setDrawer(false)} />
-          <DLink href="/compatibility.html" icon="🔬" label="Blood Compatibility Chart" onClick={() => setDrawer(false)} />
+          <DLink href="/" icon={<Home size={16} />} label={t.home} active onClick={() => setDrawer(false)} />
+          <DLink href="/about.html" icon={<Info size={16} />} label={t.about} onClick={() => setDrawer(false)} />
+          <DLink href="/impact" icon={<Lightbulb size={16} />} label={t.impact} onClick={() => setDrawer(false)} />
+          <DLink icon={<Droplets size={16} />} label={t.donor}
+            onClick={() => { onSignupClick?.('donor'); setDrawer(false); }} />
+          <DLink href="/Donation-eligibility-rules.html" icon={<CheckSquare size={16} />} label={t.eligibility} onClick={() => setDrawer(false)} />
+          <DLink href="/bloodcenter.html" icon={<CalendarRange size={16} />} label={t.camp} onClick={() => setDrawer(false)} />
+          <DLink href="/Donation-Preparation&Aftercare.html" icon={<ClipboardList size={16} />} label="Preparation & Aftercare" onClick={() => setDrawer(false)} />
+          <DLink href="/compatibility.html" icon={<Microscope size={16} />} label="Blood Compatibility Chart" onClick={() => setDrawer(false)} />
         </nav>
 
         <div className="rph-d-sep" />
 
         <nav className="rph-d-nav" aria-label="Partner and admin links">
           <span className="rph-d-section">Partners &amp; Access</span>
-          <DLink icon="🏥" label="For Hospitals" onClick={() => { onSignupClick?.(); setDrawer(false); }} />
-          <DLink icon="🧪" label="For Blood Banks" onClick={() => { onSignupClick?.(); setDrawer(false); }} />
-          <DLink icon="🔒" label="Admin Access" onClick={() => { onLoginClick?.(); setDrawer(false); }} />
+          <DLink icon={<Hospital size={16} />} label="For Hospitals" onClick={() => { onSignupClick?.('hospital'); setDrawer(false); }} />
+          <DLink icon={<TestTubes size={16} />} label="For Blood Banks" onClick={() => { onSignupClick?.('bloodbank'); setDrawer(false); }} />
+          <DLink icon={<Microscope size={16} />} label="Admin Access" href="/admin" onClick={() => setDrawer(false)} />
         </nav>
 
         <div className="rph-d-sep" />
@@ -480,8 +476,8 @@ function DDRow({ icon, title, desc, href, onClick }:
 }
 
 /** Role item (register dropdown) */
-function RoleRow({ emoji, title, desc, onClick, muted }:
-  { emoji: string; title: string; desc: string; onClick: () => void; muted?: boolean }) {
+function RoleRow({ icon, title, desc, onClick, muted }:
+  { icon: ReactNode; title: string; desc: string; onClick: () => void; muted?: boolean }) {
   return (
     <button
       className="rph-ddi rph-role"
@@ -489,7 +485,7 @@ function RoleRow({ emoji, title, desc, onClick, muted }:
       role="menuitem"
       onClick={onClick}
     >
-      <span className="rph-role-em" aria-hidden="true">{emoji}</span>
+      <span className="rph-role-em" aria-hidden="true" style={{ fontSize: 0, display: 'flex', alignItems: 'center' }}>{icon}</span>
       <span className="rph-dd-text">
         <span className="rph-dd-title">{title}</span>
         <span className="rph-dd-desc">{desc}</span>
@@ -500,7 +496,7 @@ function RoleRow({ emoji, title, desc, onClick, muted }:
 
 /** Drawer nav link */
 function DLink({ icon, label, href, onClick, active }:
-  { icon: string; label: string; href?: string; onClick?: () => void; active?: boolean }) {
+  { icon: React.ReactNode; label: string; href?: string; onClick?: () => void; active?: boolean }) {
   const cls = `rph-dlink${active ? ' rph-dlink-active' : ''}`;
   if (href) return <a href={href} className={cls} onClick={onClick}><span className="rph-di" aria-hidden="true">{icon}</span>{label}</a>;
   return <button className={cls} onClick={onClick}><span className="rph-di" aria-hidden="true">{icon}</span>{label}</button>;
@@ -1009,34 +1005,35 @@ function RphStyles() {
   margin:14px 16px 0;
   display:flex; align-items:center; justify-content:center;
   gap:8px;
-  padding:13px;
-  border-radius:11px;
-  background:rgba(220,38,38,.09);
-  color:var(--rph-em);
-  font-size:13.5px; font-weight:700;
+  padding:12px;
+  border-radius:12px;
+  background:linear-gradient(135deg, #EF4444, #DC2626);
+  color:#fff;
+  font-size:14px; font-weight:700;
   font-family:'Plus Jakarta Sans',sans-serif;
-  border:1.5px solid rgba(220,38,38,.22);
+  border:none;
+  box-shadow: 0 4px 14px rgba(220,38,38,0.25);
   cursor:pointer;
   width:calc(100% - 32px);
-  transition:background .2s, color .2s;
+  transition:transform .2s, box-shadow .2s;
 }
-.rph-d-sos:hover { background:var(--rph-em); color:#fff; }
+.rph-d-sos:hover { transform:translateY(-1px); box-shadow: 0 6px 20px rgba(220,38,38,0.35); }
 
-.rph-d-auth { display:flex; gap:8px; padding:10px 16px 0; }
+.rph-d-auth { display:flex; gap:10px; padding:12px 16px 0; }
 .rph-d-auth button {
-  flex:1; padding:10px; border-radius:9px;
-  font-size:13px; font-weight:600;
+  flex:1; padding:11px; border-radius:12px;
+  font-size:14px; font-weight:600;
   font-family:'Plus Jakarta Sans',sans-serif;
-  cursor:pointer; transition:all .18s;
+  cursor:pointer; transition:all .2s;
 }
 .rph-d-login {
   background:transparent;
-  border:1px solid var(--rph-b);
+  border:1.5px solid var(--rph-b);
   color:var(--rph-t);
 }
-.rph-d-login:hover { border-color:var(--rph-p); color:var(--rph-p); background:var(--rph-pl); }
-.rph-d-register { background:var(--rph-p); border:1px solid transparent; color:#fff; }
-.rph-d-register:hover { background:var(--rph-ph); }
+.rph-d-login:hover { border-color:var(--rph-tm); }
+.rph-d-register { background:var(--rph-t); border:1.5px solid transparent; color:var(--rph-surf); }
+.rph-d-register:hover { opacity:0.9; }
 
 .rph-d-sep { height:1px; background:var(--rph-b); margin:12px 16px; }
 .rph-d-nav { padding:0 12px; }
@@ -1065,7 +1062,8 @@ function RphStyles() {
   background:var(--rph-pl) !important;
   color:var(--rph-p) !important;
 }
-.rph-di { font-size:15px; flex-shrink:0; width:22px; text-align:center; line-height:1; }
+.rph-di { display:flex; align-items:center; justify-content:center; color:var(--rph-tm); flex-shrink:0; width:24px; text-align:center; }
+.rph-dlink:hover .rph-di, .rph-dlink-active .rph-di { color:var(--rph-p); }
 
 .rph-d-util {
   display:flex; align-items:center; justify-content:space-between;

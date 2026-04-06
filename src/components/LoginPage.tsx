@@ -7,7 +7,7 @@
 // Also:  Google Sign-In
 // ═══════════════════════════════════════════════════════════════
 
-import { useState, useEffect, useCallback, useId, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useId, useMemo } from 'react';
 import {
   loginUser, signInWithGoogle, initRecaptcha,
   lookupUserByInternalId, lookupUserByUsername, lookupUserByPhone,
@@ -22,7 +22,7 @@ import { toast } from 'sonner';
 import {
   Eye, EyeOff, Mail, Lock, UserCircle,
   Building2, Droplet, ShieldCheck, ArrowLeft,
-  Phone, Search, Loader2, CheckCircle2,
+  Phone, Search, Loader2, CheckCircle2, ChevronDown,
   KeyRound, Smartphone, AtSign, Hash, Fingerprint,
 } from 'lucide-react';
 import logo from '../assets/raktport-logo.png';
@@ -85,6 +85,7 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
   const [role, setRole] = useState(initialRole || 'donor');
   const [tab, setTab] = useState<LoginTab>('smart');
   const [flowStep, setFlowStep] = useState<FlowStep>('input');
+  const [instMenuOpen, setInstMenuOpen] = useState(false);
 
   // Smart input
   const [smartInput, setSmartInput] = useState('');
@@ -313,12 +314,45 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
         <div className="absolute -bottom-40 -left-40 w-72 sm:w-96 h-72 sm:h-96 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
       </div>
 
-      {/* Back button */}
-      <div className="sticky top-0 z-30 flex items-center px-3 pt-3 pb-2 sm:px-6 sm:pt-5 pointer-events-none">
-        <button onClick={onBack} className="pointer-events-auto inline-flex items-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 bg-[var(--bg-surface)]/85 backdrop-blur-md rounded-full shadow-md hover:shadow-lg hover:bg-[var(--bg-surface)] active:scale-95 transition-all group">
+      {/* Back button & Institutional Dropdown */}
+      <div className="sticky top-0 z-30 flex items-center px-3 pt-3 pb-2 sm:px-6 sm:pt-5 justify-between">
+        <button onClick={onBack} className="inline-flex items-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 bg-[var(--bg-surface)]/85 backdrop-blur-md rounded-full shadow-md hover:shadow-lg hover:bg-[var(--bg-surface)] active:scale-95 transition-all group">
           <ArrowLeft className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]" />
           <span className="text-xs sm:text-sm font-medium text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]">Back to Home</span>
         </button>
+
+        {role !== 'admin' && (
+          <div className="relative pointer-events-auto">
+            <button 
+              onClick={() => setInstMenuOpen(o => !o)} 
+              className="inline-flex items-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2 bg-[var(--bg-surface)]/85 backdrop-blur-md rounded-full shadow-md hover:shadow-lg hover:bg-[var(--bg-surface)] border border-gray-200 active:scale-95 transition-all text-xs sm:text-sm font-semibold text-gray-700"
+            >
+              <Building2 className="w-4 h-4 text-blue-500" />
+              Institutional Login
+              <ChevronDown className={`w-3.5 h-3.5 transition-transform ${instMenuOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {instMenuOpen && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setInstMenuOpen(false)} aria-hidden="true" />
+                <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden animate-fadein origin-top-right">
+                  <div className="p-1.5 space-y-0.5">
+                    <button onClick={() => { setRole('hospital'); setInstMenuOpen(false); }} className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all ${role === 'hospital' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'}`}>
+                      <Building2 className="w-4 h-4" /> Hospital
+                    </button>
+                    <button onClick={() => { setRole('bloodbank'); setInstMenuOpen(false); }} className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all ${role === 'bloodbank' ? 'bg-purple-50 text-purple-700' : 'text-gray-700 hover:bg-gray-50'}`}>
+                      <UserCircle className="w-4 h-4" /> Blood Bank
+                    </button>
+                    <div className="h-px bg-gray-100 my-1 mx-2" />
+                    <button onClick={() => { setRole('donor'); setInstMenuOpen(false); }} className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-all ${role === 'donor' ? 'bg-red-50 text-red-700' : 'text-gray-500 hover:bg-gray-50'}`}>
+                      <Droplet className="w-4 h-4" /> Switch back to Donor
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Card */}
@@ -327,32 +361,12 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
           <div className="bg-[var(--bg-surface)]/80 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-2xl border border-white/30 overflow-hidden">
 
             {/* Header */}
-            <div className="pt-5 pb-4 px-4 sm:pt-8 sm:pb-6 sm:px-8 bg-gradient-to-br from-white/50 to-white/20 flex flex-col items-center text-center">
+            <div className={`pt-5 pb-4 px-4 sm:pt-8 sm:pb-6 sm:px-8 flex flex-col items-center text-center border-b-4 transition-colors duration-300 ${role === 'hospital' ? 'border-blue-500' : role === 'bloodbank' ? 'border-purple-500' : role === 'admin' ? 'border-teal-500' : 'border-[#e11d48]'}`}>
               <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl overflow-hidden shadow-lg mb-3 ring-4 ring-white/60">
                 <img src={logo} alt="RaktPort" className="w-full h-full object-cover" />
               </div>
-              <h1 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] mb-0.5">Welcome Back</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] mb-0.5">{current.label} Login</h1>
               <p className="text-xs sm:text-sm text-[var(--text-secondary)]">Sign in to continue to RaktPort</p>
-            </div>
-
-            {/* Role selector */}
-            <div className="px-3 sm:px-8 pt-4 sm:pt-6 pb-2">
-              <div className="relative bg-[var(--bg-page)]/70 backdrop-blur-sm rounded-xl sm:rounded-2xl p-1.5 shadow-inner">
-                <div className={`absolute top-1.5 bottom-1.5 bg-gradient-to-r ${current.color} rounded-lg shadow-md transition-all duration-300 ease-out`}
-                  style={{ left: `calc(${roleIdx * 25}% + 6px)`, width: 'calc(25% - 12px)' }} aria-hidden="true" />
-                <div className="relative grid grid-cols-4">
-                  {ROLES.map(r => {
-                    const active = r.id === role;
-                    return (
-                      <button key={r.id} type="button" onClick={() => setRole(r.id)} disabled={anyBusy} aria-pressed={active}
-                        className={`flex flex-col items-center gap-0.5 py-2.5 sm:py-3 rounded-lg transition-all duration-200 min-h-[52px] touch-manipulation ${active ? 'text-[var(--txt-inverse)]' : 'text-[var(--text-secondary)] hover:text-gray-700'} disabled:opacity-50`}>
-                        <r.Icon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${active ? 'scale-110' : ''}`} />
-                        <span className="text-[9px] sm:text-[11px] font-semibold leading-tight">{r.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
             </div>
 
             {/* Login method tabs */}

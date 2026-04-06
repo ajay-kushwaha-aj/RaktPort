@@ -109,6 +109,10 @@ function AppContent() {
     if (location.pathname === '/register/admin') {
       setCurrentView('signup');
       setSelectedRole('admin');
+    } else if (location.pathname.startsWith('/register/')) {
+      const roleFromPath = location.pathname.split('/register/')[1];
+      if (roleFromPath) setSelectedRole(roleFromPath);
+      setCurrentView('signup');
     } else if (location.pathname.startsWith('/login')) {
       const roleParam = new URLSearchParams(location.search).get('role');
       if (roleParam) {
@@ -131,17 +135,19 @@ function AppContent() {
     setCurrentView('home');
   };
 
-  const handleLoginClick = () => {
-    navigate('/login');
+  const handleLoginClick = (role: string = 'donor') => {
+    setSelectedRole(role);
+    navigate(`/login?role=${role}`);
     setCurrentView('login');
   };
 
-  const handleSignupClick = (role: string) => {
+  const handleSignupClick = (role: string = 'donor') => {
     setSelectedRole(role);
     if (role === 'admin') {
       navigate('/register/admin');
     } else {
       setCurrentView('signup');
+      navigate(`/register/${role}`);
     }
   };
 
@@ -216,6 +222,19 @@ function AppContent() {
             }
           />
 
+          <Route
+            path="/admin"
+            element={
+              <div className="min-h-screen flex flex-col">
+                <LoginPage
+                  initialRole="admin"
+                  onBack={() => navigate('/')}
+                  onSignupClick={(_role: string) => navigate('/register/admin')}
+                />
+              </div>
+            }
+          />
+
           {/* Default Routes */}
           <Route
             path="*"
@@ -225,7 +244,7 @@ function AppContent() {
                   <>
                     <Header
                       onLoginClick={handleLoginClick}
-                      onSignupClick={handleDonorSignupClick}
+                      onSignupClick={handleSignupClick}
                     />
                     <main className="flex-1">
                       <LandingPage
@@ -273,7 +292,7 @@ function AppContent() {
               <div className="min-h-screen flex flex-col">
                 <Header
                   onLoginClick={handleLoginClick}
-                  onSignupClick={handleDonorSignupClick}
+                  onSignupClick={handleSignupClick}
                 />
                 <main className="flex-1">
                   <ImpactPage />

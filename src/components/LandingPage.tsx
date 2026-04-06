@@ -681,7 +681,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
                     </div>
                   ))}
                 </div>
-                <a href="/ImpactPage.tsx" className="lp-btn lp-imp-btn">See How It Works <ArrowRight size={14} /></a>
+                <a href="/impact" className="lp-btn lp-imp-btn">See How It Works <ArrowRight size={14} /></a>
               </div>
             </div>
           </div>
