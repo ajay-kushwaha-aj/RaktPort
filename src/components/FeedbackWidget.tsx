@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 import { submitFeedback } from '../lib/feedback';
 import { useLocation } from 'react-router-dom';
 
-export function FeedbackWidget() {
+export function FeedbackWidget({ customTrigger }: { customTrigger?: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [type, setType] = useState<'feedback' | 'bug'>('feedback');
   const [message, setMessage] = useState('');
@@ -65,12 +65,14 @@ export function FeedbackWidget() {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <button
-          className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-[0_4px_15px_rgba(139,0,0,0.3)] hover:shadow-xl bg-rp-primary text-white z-[9999] transition-all hover:scale-105 flex items-center justify-center cursor-pointer border-none"
-          title="Feedback & Bug Report"
-        >
-          <MessageSquarePlus className="h-6 w-6" />
-        </button>
+        {customTrigger ? customTrigger : (
+          <button
+            className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-[0_4px_15px_rgba(139,0,0,0.3)] hover:shadow-xl bg-rp-primary text-white z-[9999] transition-all hover:scale-105 flex items-center justify-center cursor-pointer border-none"
+            title="Feedback & Bug Report"
+          >
+            <MessageSquarePlus className="h-6 w-6" />
+          </button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] bg-[var(--bg-surface)] dark:bg-gray-900 border-[var(--border-color)] dark:border-gray-800">
         <DialogHeader>

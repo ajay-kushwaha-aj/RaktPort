@@ -10,8 +10,9 @@ import {
   Calendar, Clock, Award, Target, Zap, UserCheck, UserX, AlertOctagon,
   CheckSquare, LogOut, User, ChevronDown, ChevronUp, Layers, Globe,
   ArrowRight, Phone, Mail, Hash, Settings, Flag, Trash2, Edit3,
-  ShieldCheck, AlarmClock, LayoutDashboard, Hospital, Heart
+  ShieldCheck, AlarmClock, LayoutDashboard, Hospital, Heart, MessageSquarePlus
 } from 'lucide-react';
+import { FeedbackWidget } from './FeedbackWidget';
 import { toast } from 'sonner';
 import Swal from 'sweetalert2';
 import { Button } from './ui/button';
@@ -877,6 +878,14 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   {adminName.charAt(0).toUpperCase()}
                 </div>
               </div>
+
+              <FeedbackWidget customTrigger={
+                <button title="Bug Report / Feedback"
+                  className="p-2.5 hover:bg-[var(--bg-page)] rounded-xl transition-all group">
+                  <MessageSquarePlus className="w-5 h-5 text-[var(--text-secondary)] group-hover:text-[var(--rtid-badge)] group-hover:rotate-12" />
+                </button>
+              } />
+
               <button onClick={onLogout}
                 className="px-4 py-2.5 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-[var(--txt-inverse)] rounded-xl font-semibold transition-all shadow-lg flex items-center gap-2">
                 <LogOut className="w-4 h-4" />

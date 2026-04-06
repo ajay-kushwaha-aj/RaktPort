@@ -14,8 +14,9 @@ import logo from '../../assets/raktport-logo.png';
 import { db } from '../../firebase';
 import {
   collection, query, where, getDocs, addDoc, deleteDoc,
-  doc, getDoc, updateDoc, onSnapshot
+  doc, getDoc, updateDoc, onSnapshot, Timestamp
 } from 'firebase/firestore';
+import { calculateDistance } from '../../lib/geo-utils';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 // @ts-ignore
 import { BLOOD_GROUPS, generateRtid } from "@/lib/bloodbank-utils";
@@ -140,6 +141,27 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, []);
+
+  // ── Geolocation Tracking ───────────────────────────────────
+  useEffect(() => {
+    if (!hospitalId) return;
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            await updateDoc(doc(db, 'users', hospitalId), {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              lastLocationUpdate: Timestamp.now()
+            });
+          } catch (e) {
+            console.error("Failed to map location.", e);
+          }
+        },
+        () => {}
+      );
+    }
+  }, [hospitalId]);
 
   // ── Real-time Firestore listener (original logic preserved) ──
   useEffect(() => {
@@ -278,6 +300,40 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
     addNotif(`New ${data.urgency} request for ${data.patientName} (${data.bloodGroup})`, "new");
     openPrintWindow(newReq, hospitalData, logo);
     logAuditAction(hospitalId, hospitalData?.fullName || "Hospital", "REQUEST_CREATED", `Created ${data.urgency} request for ${data.patientName} (${data.bloodGroup}, ${data.unitsRequired}u)`, newHrtid);
+
+    // 10KM Radius Notification matching
+    if (data.urgency === "Emergency" || data.urgency === "Critical" || data.urgency === "Urgent") {
+      try {
+        const hospitalQuery = await getDoc(doc(db, 'users', hospitalId));
+        const hospitalCoords = hospitalQuery.data();
+        if (hospitalCoords?.latitude && hospitalCoords?.longitude) {
+           const donorsSnap = await getDocs(query(collection(db, 'users'), where('role', '==', 'donor')));
+           const hLat = hospitalCoords.latitude;
+           const hLon = hospitalCoords.longitude;
+           
+           const alertsPromises: Promise<any>[] = [];
+           donorsSnap.forEach(snap => {
+             const donor = snap.data();
+             // Check availability explicitly
+             if (donor.availabilityMode === 'unavailable') return;
+             if (donor.latitude && donor.longitude) {
+                const dist = calculateDistance(hLat, hLon, donor.latitude, donor.longitude);
+                if (dist <= 10) {
+                   alertsPromises.push(addDoc(collection(db, 'notifications'), {
+                      userId: snap.id,
+                      message: `Humble request for Donation: ${data.bloodGroup} needed at ${hospitalData?.fullName || 'a nearby hospital'} (approx ${dist.toFixed(1)}km away).`,
+                      relatedHrtid: newHrtid,
+                      read: false,
+                      timestamp: Timestamp.now(),
+                      type: 'warning'
+                   }));
+                }
+             }
+           });
+           await Promise.all(alertsPromises);
+        }
+      } catch (e) { console.error("Radius alert error:", e); }
+    }
   };
 
   const handleMarkComplete = async (reqId: string, unitsNow: number, notes: string) => {

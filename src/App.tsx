@@ -8,7 +8,7 @@ import { LoginPage } from './components/LoginPage';
 import { SignupPage } from './components/SignupPage';
 import { AdminSignupPage } from './components/AdminSignupPage';
 import { DonorDashboard } from './components/DonorDashboard';
-
+import { ImpactPage } from './components/ImpactPage';
 // --- Import the dashboards with CONSISTENT DEFAULT IMPORTS ---
 import HospitalDashboard from './components/hospital/HospitalDashboard';
 import BloodBankDashboard from './components/BloodBankDashboard';
@@ -262,9 +262,23 @@ function AppContent() {
                 {currentView === 'dashboard' && (
                   <>
                     {renderDashboard()}
-                    <FeedbackWidget />
                   </>
                 )}
+              </div>
+            }
+          />
+          <Route
+            path="/impact"
+            element={
+              <div className="min-h-screen flex flex-col">
+                <Header
+                  onLoginClick={handleLoginClick}
+                  onSignupClick={handleDonorSignupClick}
+                />
+                <main className="flex-1">
+                  <ImpactPage />
+                </main>
+                <Footer />
               </div>
             }
           />

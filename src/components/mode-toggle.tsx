@@ -14,23 +14,50 @@ export function ModeToggle() {
     return (
         <button
             onClick={toggle}
-            aria-label="Toggle dark mode"
-            className="relative inline-flex h-8 w-14 items-center rounded-full transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            style={{ background: isDark ? '#4a1a1a' : '#f3e8e8' }}
+            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+            style={{
+                width: 36,
+                height: 36,
+                borderRadius: '50%',
+                border: '1.5px solid',
+                borderColor: isDark ? '#3a2a2e' : '#e0d6d8',
+                background: isDark ? '#1e1014' : '#fff',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: 0,
+                transition: 'all 0.22s cubic-bezier(.22,1,.36,1)',
+                flexShrink: 0,
+            }}
+            onMouseEnter={e => {
+                (e.currentTarget as HTMLButtonElement).style.borderColor = '#C41E3A';
+                (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.08)';
+            }}
+            onMouseLeave={e => {
+                (e.currentTarget as HTMLButtonElement).style.borderColor = isDark ? '#3a2a2e' : '#e0d6d8';
+                (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)';
+            }}
         >
-            {/* Sliding knob */}
-            <span
-                className="inline-flex h-6 w-6 items-center justify-center rounded-full shadow-md transition-transform duration-300"
-                style={{
-                    transform: isDark ? 'translateX(26px)' : 'translateX(4px)',
-                    background: isDark ? '#1a1a2e' : '#fff',
-                }}
-            >
-                {isDark
-                    ? <Moon className="h-3.5 w-3.5 text-yellow-300" />
-                    : <Sun className="h-3.5 w-3.5 text-[var(--clr-danger)]" />
-                }
-            </span>
+            {isDark ? (
+                <Moon
+                    size={16}
+                    style={{
+                        color: '#fbbf24',
+                        transition: 'transform 0.3s ease',
+                        transform: 'rotate(-20deg)',
+                    }}
+                />
+            ) : (
+                <Sun
+                    size={16}
+                    style={{
+                        color: '#C41E3A',
+                        transition: 'transform 0.3s ease',
+                        transform: 'rotate(0deg)',
+                    }}
+                />
+            )}
         </button>
     )
 }

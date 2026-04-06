@@ -33,10 +33,9 @@ import { useBloodBankData } from '@/hooks/useBloodBankData';
 
 /* ─── Styles ─────────────────────────────────────────── */
 const dashStyles = `
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap');
 
 .bbd-root {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   min-height: 100vh;
   background: #fafaf8;
 }

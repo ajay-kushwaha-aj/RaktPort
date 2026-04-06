@@ -1,74 +1,5 @@
 // src/types/bloodbank.ts
 
-// (Other types... BloodGroup, Inventory, etc. are here)
-
-export type Appointment = {
-  appointmentRtid: string;
-  donorName: string;
-  bloodGroup: BloodGroup;
-  date: Date;
-  time: string;
-  status: 'Upcoming' | 'Completed' | 'Cancelled' | 'Pledged'; // <-- FIX: 'Pledged' is added
-};
-
-// (Other types... Donation, Redemption, etc. are here)
-
-export type Donation = {
-  dRtid: string;
-  otp: string;
-  bloodGroup: BloodGroup;
-  donorName: string;
-  donationType: string;
-  hRtid: string | null;
-  status: 'AVAILABLE' | 'REDEEMED' | 'EXPIRED';
-  donationLocation: string;
-  date: Date;
-};
-
-export type Redemption = {
-  dRtid: string;
-  bloodGroup: BloodGroup;
-  donationLocation: string;
-  redemptionLocation: string;
-  linkedHRTID: string | null;
-  date: Date;
-  bloodBankId: string;
-};
-
-export type BloodRequest = {
-  rtid: string;
-  patientName: string;
-  bloodGroup: BloodGroup;
-  units: number;
-  city: string;
-  hospitalName: string;
-  status: string;
-  createdAt: Date;
-};
-
-export type Notification = {
-  id: string;
-  message: string;
-  type: 'success' | 'error' | 'info';
-  timestamp: Date;
-  read: boolean;
-};
-
-export type KPIData = {
-  totalInventory: number;
-  availableUnits: number;
-  todayAppointments: number;
-  totalDonations: number;
-  totalRedemptions: number;
-  totalBloodRequests: number;
-};
-
-export type BloodGroup = 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
-
-export type Inventory = {
-  [key in BloodGroup]: { total: number; available: number };
-};
-
 // PART 7: Update your types/bloodbank.ts file
 // Add these fields to existing types:
 
@@ -158,10 +89,12 @@ export interface BloodRequest {
 
 export interface Notification {
   id: string;
+  userId?: string;
   message: string;
   read: boolean;
   timestamp: any;
   type?: 'info' | 'warning' | 'success' | 'error';
+  relatedHrtid?: string;
 }
 
 export interface KPI {

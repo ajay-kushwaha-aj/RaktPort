@@ -78,12 +78,7 @@ const PARTNER_LINKS = [
   { label: 'MyGov Pledge', href: 'https://pledge.mygov.in/voluntary-blood-donation/' },
 ];
 
-const STATS = [
-  { icon: '🩸', value: '2,542+', label: 'Lives Saved' },
-  { icon: '👥', value: '18,000+', label: 'Active Donors' },
-  { icon: '🏥', value: '851', label: 'Blood Banks' },
-  { icon: '📍', value: '24', label: 'Cities' },
-];
+// Stats removed per user request
 
 const SOCIALS = [
   {
@@ -166,25 +161,7 @@ export function Footer() {
           </svg>
         </div>
 
-        {/* ═ LIVE STATS STRIP ══════════════════════════════ */}
-        <div className="rpf-stats-strip" ref={statsRef}>
-          <div className="rpf-container">
-            <div className="rpf-stats-inner">
-              {STATS.map((s, i) => (
-                <div key={s.label} className="rpf-stat" style={{ animationDelay: `${i * 0.1}s` }}>
-                  <div className="rpf-stat-icon" aria-hidden="true">{s.icon}</div>
-                  <div className="rpf-stat-val">{s.value}</div>
-                  <div className="rpf-stat-label">{s.label}</div>
-                </div>
-              ))}
-              {/* Live pulse indicator */}
-              <div className="rpf-live-badge" aria-label="Live data">
-                <span className="rpf-live-dot" aria-hidden="true" />
-                <span>Live</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Live stats strip removed */}
 
         {/* ═ MAIN CONTENT ══════════════════════════════════ */}
         <div className="rpf-container rpf-main">

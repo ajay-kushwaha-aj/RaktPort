@@ -9,18 +9,19 @@
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { ModeToggle } from './mode-toggle';
+import { FeedbackWidget } from './FeedbackWidget';
 import { createPortal } from 'react-dom';
 import { Button }  from './ui/button';
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from './ui/card';
 import { Badge }   from './ui/badge';
 import {
-  Calendar, Heart, Printer, QrCode, Loader2, User, List, KeyRound,
-  Share2, Award, Droplet, Clock, Star, MapPin,
-  Phone, Mail, CalendarCheck, AlertCircle,
-  TrendingUp, Activity, Check, X, Timer, Zap,
-  Gift, XCircle, Download,
-  BookOpen, Flame, ChevronRight,
-  Navigation, HeartHandshake, BadgeCheck, Building2,
+  Bell, CheckCircle2, ChevronRight, Clock, MapPin, Search, Star, MessageSquarePlus,
+  ArrowRight, ShieldCheck, Download, Trash2, Calendar, Map, Phone, AlertCircle, Heart, User, PowerOff, Droplet, Zap, Target, Loader2, Navigation, Award, CheckCircle, Info, X,
+  Mail, CalendarCheck,
+  TrendingUp, Activity, Check, Timer,
+  Gift, XCircle,
+  BookOpen, Flame, HeartHandshake, BadgeCheck, Building2, List,
+  Share2, QrCode, Printer, KeyRound,
 } from 'lucide-react';
 import {
   Table, TableBody, TableCell, TableHead,
@@ -639,6 +640,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
   const [motivationQuote,  setMotivationQuote]  = useState('');
   const [currentHealthTip, setCurrentHealthTip] = useState(0);
   const [emergencyAlerts,  setEmergencyAlerts]  = useState<EmergencyAlert[]>([]);
+  const [personalNotifs,   setPersonalNotifs]   = useState<any[]>([]);
   const [centers,          setCenters]          = useState<BloodCenter[]>([]);
   const [selectedCenter,   setSelectedCenter]   = useState<BloodCenter | null>(null);
   const [apiLoading,       setApiLoading]       = useState(false);
@@ -683,6 +685,29 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
     const id = setInterval(() => setCurrentHealthTip(c => (c + 1) % HEALTH_TIPS.length), 8000);
     return () => clearInterval(id);
   }, []);
+
+  // ── Geolocation Tracking ───────────────────────────────────
+  useEffect(() => {
+    if (!userId) return;
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            await updateDoc(doc(db, 'users', userId), {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              lastLocationUpdate: Timestamp.now()
+            });
+          } catch (e) {
+            console.error("Failed to map location.", e);
+          }
+        },
+        (error) => {
+          console.error("Error getting location: ", error);
+        }
+      );
+    }
+  }, [userId]);
 
   // ── Sorting helper ─────────────────────────────────────────
   const sortHistory = (arr: Donation[]): Donation[] => {
@@ -790,6 +815,17 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
             setEmergencyAlerts(alerts.slice(0,3));
           } catch(_){}
         }
+
+        // 4. Personal Notifications (Targeted Emergency Requests)
+        try {
+          const notifSnap = await getDocs(query(collection(db, 'notifications'), where('userId', '==', userId), where('read', '==', false)));
+          const personal: any[] = [];
+          notifSnap.forEach(d => personal.push({ id: d.id, ...d.data() }));
+          // Sort by timestamp desc
+          personal.sort((a,b) => (b.timestamp?.toMillis?.() || 0) - (a.timestamp?.toMillis?.() || 0));
+          setPersonalNotifs(personal);
+        } catch (_) {}
+
       } catch(e:any) {
         console.error(e); setError('Failed to load data. Please check your connection.');
       } finally { setLoading(false); }
@@ -1080,6 +1116,26 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
       </div>
 
       {/* ═══ EMERGENCY ALERTS ══════════════════════════════════ */}
+      {personalNotifs.length>0 && (
+        <div className="no-print space-y-2 mb-4">
+          {personalNotifs.map(notif=>(
+            <div key={notif.id} className="px-4 py-3 flex items-center gap-3 flex-wrap bg-red-600 text-white rounded-lg shadow-sm border border-red-800">
+              <Zap className="w-4 h-4 flex-shrink-0 animate-pulse"/>
+              <span className="text-sm font-semibold flex-1">💌 Alert: {notif.message}</span>
+              <Button size="sm" className="bg-white text-red-700 hover:bg-gray-100 text-xs py-1 h-7" onClick={async () => {
+                try { await updateDoc(doc(db,'notifications',notif.id), { read: true }); } catch(_) {}
+                setPersonalNotifs(prev=>prev.filter(a=>a.id!==notif.id));
+                setScheduleOpen(true);
+              }}>I Can Help</Button>
+              <button onClick={async ()=>{
+                try { await updateDoc(doc(db,'notifications',notif.id), { read: true }); } catch(_) {}
+                setPersonalNotifs(prev=>prev.filter(a=>a.id!==notif.id));
+              }} className="opacity-70 hover:opacity-100"><X className="w-4 h-4"/></button>
+            </div>
+          ))}
+        </div>
+      )}
+
       {emergencyAlerts.length>0 && (
         <div className="no-print">
           {emergencyAlerts.map(alert=>(
@@ -1431,6 +1487,13 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                   <div className="flex gap-2 pt-2">
                     <Button size="sm" variant="outline" className="flex-1 text-xs" onClick={()=>{setCompatOpen(true);setProfileOpen(false);}}><HeartHandshake className="w-3.5 h-3.5 mr-1"/> Compatibility</Button>
                     <Button size="sm" variant="outline" className="flex-1 text-xs" onClick={()=>{setCertOpen(true);setProfileOpen(false);}}><Download className="w-3.5 h-3.5 mr-1"/> Certificate</Button>
+                  </div>
+                  <div className="pt-2">
+                    <FeedbackWidget customTrigger={
+                      <button className="w-full py-2.5 flex items-center justify-center gap-2 border-2 border-gray-200 dark:border-gray-700 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer">
+                        <MessageSquarePlus className="w-4 h-4" /> Bug Report / Feedback
+                      </button>
+                    } />
                   </div>
                 </TabsContent>
                 <TabsContent value="badges">

@@ -35,6 +35,7 @@ const COPY = {
     tagline: 'Donate Blood Anywhere. Save Lives Everywhere.',
     home: 'Home',
     about: 'About',
+    impact: 'Impact',
     donor: 'Become a Donor',
     eligibility: 'Eligibility Rules',
     camp: 'Find Donation Camp',
@@ -61,6 +62,7 @@ const COPY = {
     tagline: 'कहीं भी रक्तदान करें. जीवन बचाएं.',
     home: 'होम',
     about: 'हमारे बारे में',
+    impact: 'प्रभाव',
     donor: 'दाता बनें',
     eligibility: 'पात्रता नियम',
     camp: 'शिविर खोजें',
@@ -239,6 +241,10 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
                 <a href="/about.html" className="rph-pill">{t.about}</a>
               </li>
 
+              <li>
+                <a href="/impact" className="rph-pill" onClick={(e) => { e.preventDefault(); window.location.href = '/impact'; }}>{t.impact}</a>
+              </li>
+
               {/* Become a Donor dropdown */}
               <li
                 className="rph-ddp"
@@ -394,6 +400,8 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
           <span className="rph-d-section">Navigate</span>
           <DLink href="/" icon="🏠" label={t.home} active onClick={() => setDrawer(false)} />
           <DLink href="/about.html" icon="ℹ️" label={t.about} onClick={() => setDrawer(false)} />
+          <DLink icon="💡" label={t.impact}
+            onClick={() => { setDrawer(false); setTimeout(() => { const el = document.getElementById('impact'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }, 300); }} />
           <DLink icon="🩸" label={t.donor}
             onClick={() => { onSignupClick?.(); setDrawer(false); }} />
           <DLink href="/Donation-eligibility-rules.html" icon="✅" label={t.eligibility} onClick={() => setDrawer(false)} />
@@ -1076,12 +1084,14 @@ function RphStyles() {
 @media (max-width:767px) {
   .rph-nav      { display:none; }
   .rph-ham      { display:flex; }
-  .rph-logo-tag { display:none; }
+  .rph-logo-name { font-size: 1.15rem; }
+  .rph-logo-tag { font-size: 7px; white-space: nowrap; }
 }
 @media (max-width:400px) {
-  .rph-logo-tag { display:none; }
   .rph-mbar     { height:26px; }
   .rph-mitem    { font-size:10.5px; padding:0 20px; }
+  .rph-logo-name { font-size: 1.05rem; }
+  .rph-logo-tag { font-size: 6.5px; white-space: normal; line-height: 1.1; margin-top:2px; max-width: 140px; }
 }
 @media (min-width:768px) { .rph-ham { display:none !important; } }
 

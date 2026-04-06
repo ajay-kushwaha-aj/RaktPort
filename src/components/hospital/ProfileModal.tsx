@@ -1,6 +1,8 @@
 // hospital/ProfileModal.tsx
+import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Building2, MapPin, Phone, Hash, Mail } from "lucide-react";
+import { Building2, MapPin, Phone, Hash, Mail, MessageSquarePlus } from "lucide-react";
+import { FeedbackWidget } from "../FeedbackWidget";
 
 export const ProfileModal = ({ isOpen, onClose, hospital }: { isOpen: boolean; onClose: () => void; hospital: any }) => (
   <Dialog open={isOpen} onOpenChange={onClose}>
@@ -34,6 +36,14 @@ export const ProfileModal = ({ isOpen, onClose, hospital }: { isOpen: boolean; o
             </div>
           </div>
         ))}
+        
+        <div className="pt-2">
+          <FeedbackWidget customTrigger={
+            <button className="w-full py-2.5 flex items-center justify-center gap-2 border-2 border-[var(--border-color)] dark:border-gray-800 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer">
+              <MessageSquarePlus className="w-4 h-4" /> Bug Report / Feedback
+            </button>
+          } />
+        </div>
       </div>
     </DialogContent>
   </Dialog>

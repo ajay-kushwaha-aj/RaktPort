@@ -1,5 +1,6 @@
-import { Bell, LogOut, Droplet, MapPin } from 'lucide-react';
+import { Bell, LogOut, Droplet, MapPin, MessageSquarePlus } from 'lucide-react';
 import { ModeToggle } from '@/components/mode-toggle';
+import { FeedbackWidget } from './FeedbackWidget';
 import logo from '../assets/raktport-logo.png';
 
 interface BloodBankHeaderProps {
@@ -85,6 +86,13 @@ export const BloodBankHeader = ({
             {/* Actions */}
             <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 ml-auto">
               <div className="hidden sm:block"><ModeToggle /></div>
+
+              <FeedbackWidget customTrigger={
+                <button className="bbh-icon-btn group" title="Bug Report / Feedback" aria-label="Feedback">
+                  <MessageSquarePlus className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+                </button>
+              } />
+
               <button onClick={onNotificationClick} className="bbh-icon-btn" aria-label="Notifications">
                 <Bell className="w-4 h-4" />
                 {notificationCount > 0 && (
