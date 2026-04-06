@@ -269,13 +269,13 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
                   onMouseEnter={keepDD_}
                   onMouseLeave={closeDD_}
                 >
-                  <DDRow icon="🩸" title={t.ddDonor} desc={t.ddDonorDesc}
+                  <DDRow icon="" title={t.ddDonor} desc={t.ddDonorDesc}
                     onClick={() => { onSignupClick?.(); closeAll(); }} />
-                  <DDRow icon="✅" title={t.ddEli} desc={t.ddEliDesc}
+                  <DDRow icon="" title={t.ddEli} desc={t.ddEliDesc}
                     href="/Donation-eligibility-rules.html" onClick={closeAll} />
-                  <DDRow icon="📅" title={t.ddCamp} desc={t.ddCampDesc}
+                  <DDRow icon="" title={t.ddCamp} desc={t.ddCampDesc}
                     href="/bloodcenter.html" onClick={closeAll} />
-                  <DDRow icon="📋" title={t.ddPrep} desc={t.ddPrepDesc}
+                  <DDRow icon="" title={t.ddPrep} desc={t.ddPrepDesc}
                     href="/Donation-Preparation&Aftercare.html" onClick={closeAll} />
                 </Dropdown>
               </li>

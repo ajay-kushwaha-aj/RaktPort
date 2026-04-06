@@ -233,14 +233,14 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
   const [rtidIn, setRtidIn] = React.useState('');
   const [rtidRes, setRtidRes] = React.useState<{ current: number; record?: EmergencyRecord | any } | null>(null);
   const [rtidErr, setRtidErr] = React.useState('');
-  
-  const track = async () => { 
-    const v = rtidIn.trim().toUpperCase(); 
-    if (!v) { setRtidErr('Please enter an RTID.'); return; } 
-    if (!isValidRTID(v)) { setRtidErr('Format: D-RTID-DDMMYY-AXXXX  e.g. D-RTID-060426-A4F7K'); return; } 
-    setRtidErr(''); 
-    setRtidRes(null); 
-    
+
+  const track = async () => {
+    const v = rtidIn.trim().toUpperCase();
+    if (!v) { setRtidErr('Please enter an RTID.'); return; }
+    if (!isValidRTID(v)) { setRtidErr('Format: D-RTID-DDMMYY-AXXXX  e.g. D-RTID-060426-A4F7K'); return; }
+    setRtidErr('');
+    setRtidRes(null);
+
     try {
       let current = 0;
       let foundRef: any = null;
@@ -457,7 +457,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
               <div className="lp-rtl-left"><NetworkSVG /></div>
               <div className="lp-rtbox">
                 <p className="lp-rthdr"><Activity size={13} /> Live RTID Tracker</p>
-                <p className="lp-rtfmt">Format: <code>D-RTID-DDMMYY-AXXXX</code></p>
+                <p className="lp-rtfmt">Format: <code>D/H-RTID-DDMMYY-AXXXX</code></p>
                 <div className="lp-rtrow">
                   <input className="lp-rtin" placeholder="e.g. D-RTID-060426-A4F7K" value={rtidIn}
                     onChange={e => { setRtidIn(e.target.value); setRtidRes(null); setRtidErr(''); }} onKeyDown={e => e.key === 'Enter' && track()} />
@@ -618,7 +618,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
           <div className="lp-c">
             <div className="lp-sh"><p className="lp-ey lp-eyr">Making A Difference</p>
               <h2 className="lp-h2 lp-h2d">Your Impact <span className="lp-red">Matters</span></h2>
-              <p className="lp-sub lp-subd">Every donation goes through rigorous testing and quality checks before reaching hospitals</p></div>
+              <p className="lp-sub lp-subd">RaktPort connects donors, hospitals, and blood banks into a unified network—ensuring blood reaches patients faster, smarter, and without geographical limits.</p></div>
             <div className="lp-imp-grid">
               {/* Left: Donation Journey Diagram */}
               <div className="lp-imp-dia">
@@ -626,32 +626,32 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
                   {/* Donation */}
                   <circle cx="80" cy="70" r="48" fill="rgba(196,30,58,0.07)" stroke="rgba(196,30,58,0.18)" strokeWidth="1.5" />
                   <text x="80" y="60" textAnchor="middle" fontSize="24">🩸</text>
-                  <text x="80" y="80" textAnchor="middle" fontSize="10" fontWeight="700" fill="var(--rp-text, #1A0505)">Donation</text>
+                  <text x="80" y="80" textAnchor="middle" fontSize="10" fontWeight="700" fill="var(--rp-text, #1A0505)">Donor</text>
                   {/* Arrow 1 */}
                   <path d="M128 55 L170 55" stroke="rgba(196,30,58,0.3)" strokeWidth="2" strokeDasharray="4 3" markerEnd="url(#impArr)" />
                   {/* Testing */}
                   <circle cx="220" cy="50" r="42" fill="rgba(196,30,58,0.07)" stroke="rgba(196,30,58,0.18)" strokeWidth="1.5" />
                   <text x="220" y="42" textAnchor="middle" fontSize="22">🔬</text>
-                  <text x="220" y="60" textAnchor="middle" fontSize="10" fontWeight="700" fill="var(--rp-text, #1A0505)">Testing</text>
+                  <text x="220" y="60" textAnchor="middle" fontSize="10" fontWeight="700" fill="var(--rp-text, #1A0505)">RTID Generation</text>
                   {/* Arrow 2 */}
                   <path d="M262 55 L300 80" stroke="rgba(196,30,58,0.3)" strokeWidth="2" strokeDasharray="4 3" markerEnd="url(#impArr)" />
                   {/* Storage */}
                   <circle cx="330" cy="120" r="44" fill="rgba(196,30,58,0.07)" stroke="rgba(196,30,58,0.18)" strokeWidth="1.5" />
                   <text x="330" y="112" textAnchor="middle" fontSize="22">🏦</text>
-                  <text x="330" y="130" textAnchor="middle" fontSize="10" fontWeight="700" fill="var(--rp-text, #1A0505)">Storage</text>
+                  <text x="330" y="130" textAnchor="middle" fontSize="10" fontWeight="700" fill="var(--rp-text, #1A0505)">Nearest Certified Center</text>
                   {/* Arrow 3 */}
                   <path d="M316 162 L280 210" stroke="rgba(196,30,58,0.3)" strokeWidth="2" strokeDasharray="4 3" markerEnd="url(#impArr)" />
                   {/* Hospital */}
                   <circle cx="240" cy="250" r="46" fill="rgba(196,30,58,0.07)" stroke="rgba(196,30,58,0.18)" strokeWidth="1.5" />
                   <text x="240" y="242" textAnchor="middle" fontSize="24">🏥</text>
-                  <text x="240" y="262" textAnchor="middle" fontSize="10" fontWeight="700" fill="var(--rp-text, #1A0505)">Hospital</text>
+                  <text x="240" y="262" textAnchor="middle" fontSize="10" fontWeight="700" fill="var(--rp-text, #1A0505)">Patient Allocation</text>
                   {/* Arrow 4 */}
                   <path d="M194 260 L140 280" stroke="rgba(196,30,58,0.3)" strokeWidth="2" strokeDasharray="4 3" markerEnd="url(#impArr)" />
                   {/* Recovery */}
                   <circle cx="100" cy="295" r="46" fill="rgba(16,185,129,0.08)" stroke="rgba(16,185,129,0.22)" strokeWidth="1.5" />
                   <text x="100" y="284" textAnchor="middle" fontSize="22">💚</text>
                   <text x="100" y="302" textAnchor="middle" fontSize="9" fontWeight="700" fill="var(--rp-text, #1A0505)">Recovery</text>
-                  <text x="100" y="316" textAnchor="middle" fontSize="8" fill="rgba(122,96,96,0.7)">& Follow-up</text>
+                  <text x="100" y="316" textAnchor="middle" fontSize="8" fill="rgba(122,96,96,0.7)">Tracking</text>
                   {/* Arrow marker */}
                   <defs>
                     <marker id="impArr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
@@ -666,14 +666,14 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
               </div>
               {/* Right: Content */}
               <div className="lp-imp-content">
-                <p className="lp-imp-desc">Our transparent process ensures safety and efficacy at every step. From the moment you donate to the patient's recovery, your blood is handled with the highest standards.</p>
+                <p className="lp-imp-desc">Our RTID-based tracking system ensures every donation is digitally linked, traceable, and efficiently routed. From donor to patient, RaktPort eliminates delays and enables real-time coordination across healthcare systems.</p>
                 <div className="lp-imp-checks">
                   {[
-                    'Collected from verified donors',
-                    'Rigorous lab testing and screening',
-                    'Secure storage in certified banks',
-                    'Delivered to hospitals in need',
-                    'Patient recovery and follow-up',
+                    'RTID-based transparent tracking system',
+                    'Real-time donation tracking',
+                    'Cross-location blood access (no regional limitation)',
+                    'Verified hospitals & blood bank integration',
+                    'Emergency alert system for urgent needs',
                   ].map(item => (
                     <div key={item} className="lp-imp-chk">
                       <span className="lp-imp-ico"><CheckCircle2 size={18} /></span>
@@ -681,7 +681,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
                     </div>
                   ))}
                 </div>
-                <a href="/about.html" className="lp-btn lp-imp-btn">Learn More <ArrowRight size={14} /></a>
+                <a href="/ImpactPage" className="lp-btn lp-imp-btn">See How It Works <ArrowRight size={14} /></a>
               </div>
             </div>
           </div>
@@ -762,7 +762,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
               <p className="text-[var(--clr-brand)] font-bold tracking-widest text-sm uppercase mb-2">Making a Difference</p>
               <h2 className="text-4xl md:text-5xl font-bold text-[var(--txt-main)]">Our <span className="text-[var(--clr-brand)]">Impact</span></h2>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-0">
               <div className="space-y-6">
                 <p className="text-[var(--text-secondary)] text-lg leading-relaxed text-left">
