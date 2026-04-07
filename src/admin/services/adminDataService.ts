@@ -120,6 +120,7 @@ export async function fetchAllAdminData(): Promise<void> {
       address: u.address || `${u.district || u.city || ''}${u.state ? ', ' + u.state : ''}`,
       pincode: u.pincode || '',
       district: u.district || '',
+      documentUrls: u.documentUrls || (u.registrationFileUrl ? [u.registrationFileUrl] : undefined),
     });
 
     const allOrgs: Organization[] = [
@@ -137,6 +138,12 @@ export async function fetchAllAdminData(): Promise<void> {
       const bg: BloodGroup = BLOOD_GROUPS.includes(u.bloodGroup as BloodGroup)
         ? (u.bloodGroup as BloodGroup)
         : 'O+';
+        
+      const actualDonations = allDonations.filter((d: any) => 
+        (d.donorId === u.id || d.userId === u.id) && 
+        ['Completed', 'Donated', 'AVAILABLE', 'Available'].includes(d.status)
+      ).length;
+
       return {
         id: u.id,
         name: u.fullName || u.name || 'Anonymous',
@@ -145,7 +152,7 @@ export async function fetchAllAdminData(): Promise<void> {
         city: u.district || u.city || 'Unknown',
         state: u.state || '',
         lastDonationDate: lastDon?.toISOString(),
-        totalDonations: Number(u.totalDonations) || 0,
+        totalDonations: actualDonations || Number(u.totalDonations) || 0,
         isEligible,
       };
     });

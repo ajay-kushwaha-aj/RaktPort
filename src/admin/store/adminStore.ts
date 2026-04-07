@@ -30,6 +30,7 @@ export interface Organization {
   address?: string;
   pincode?: string;
   district?: string;
+  documentUrls?: string[];
 }
 
 export interface LedgerEntry {

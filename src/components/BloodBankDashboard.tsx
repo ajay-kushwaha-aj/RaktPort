@@ -4,7 +4,8 @@ import {
   Loader2, PlusCircle, AlertTriangle, Activity, Droplet, Package,
   Clock, TrendingUp, TrendingDown, Users, CalendarCheck, Shield,
   CheckCircle2, Zap, ArrowRight, Heart, BarChart2, RefreshCw,
-  Bell, Search, ChevronRight, Sparkles, Flame, LayoutDashboard
+  Bell, Search, ChevronRight, Sparkles, Flame, LayoutDashboard,
+  Archive, BadgeCheck, FileBarChart2, Siren, Lock
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Appointment, BloodGroup } from '@/types/bloodbank';
@@ -35,11 +36,11 @@ import { useBloodBankData } from '@/hooks/useBloodBankData';
 const dashStyles = `
 
 .bbd-root {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Sora', system-ui, sans-serif;
   min-height: 100vh;
   background: #fafaf8;
 }
-.dark .bbd-root { background: #120202; }
+.dark .bbd-root { background: #080e1a; }
 
 /* ── Page-level fade-in ── */
 @keyframes bbd-fadein  { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
@@ -80,7 +81,7 @@ const dashStyles = `
   transform: translateY(-3px);
   box-shadow: 0 8px 24px rgba(0,0,0,0.09), 0 2px 6px rgba(0,0,0,0.06);
 }
-.dark .bbd-kpi-card { background:#1e0505; border-color:rgba(255,255,255,0.07); }
+.dark .bbd-kpi-card { background:#111827; border-color:rgba(255,255,255,0.07); }
 
 .bbd-kpi-card.c-crimson::before { background:linear-gradient(90deg,var(--clr-brand),var(--brand-primary)); }
 .bbd-kpi-card.c-emerald::before { background:linear-gradient(90deg,var(--clr-success),var(--clr-success)); }
@@ -187,7 +188,7 @@ const dashStyles = `
 }
 .bbd-action-card:hover { transform:translateY(-3px); box-shadow:0 8px 20px rgba(139,0,0,0.12); border-color:rgba(139,0,0,0.2); }
 .bbd-action-card:hover::before { opacity:0.12; transform:scale(1.3); }
-.dark .bbd-action-card { background:#1e0505; border-color:rgba(255,255,255,0.07); }
+.dark .bbd-action-card { background:#111827; border-color:rgba(255,255,255,0.07); }
 .bbd-action-icon { width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center; }
 .bbd-action-title { font-size:0.82rem; font-weight:700; color:#1a0a0a; }
 .dark .bbd-action-title { color:#fff5f5; }
@@ -218,7 +219,7 @@ const dashStyles = `
   box-shadow:0 1px 4px rgba(0,0,0,0.04);
 }
 .bbd-appt-card:hover { transform:translateX(3px); box-shadow:0 4px 14px rgba(139,0,0,0.1); border-color:rgba(139,0,0,0.2); }
-.dark .bbd-appt-card { background:#1e0505; border-color:rgba(255,255,255,0.07); }
+.dark .bbd-appt-card { background:#111827; border-color:rgba(255,255,255,0.07); }
 .bbd-appt-date { width:44px; height:44px; border-radius:10px; background:linear-gradient(135deg,var(--clr-brand),#b30000); color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; flex-shrink:0; font-family:'Outfit',sans-serif; }
 .bbd-appt-dd { font-size:1rem; font-weight:800; line-height:1; }
 .bbd-appt-mo { font-size:0.52rem; font-weight:600; opacity:0.75; letter-spacing:0.05em; text-transform:uppercase; }
@@ -251,7 +252,7 @@ const dashStyles = `
   border:1px solid rgba(139,0,0,0.07);
   box-shadow:0 2px 10px rgba(0,0,0,0.04);
 }
-.dark .bbd-card { background:#1e0505; border-color:rgba(255,255,255,0.07); }
+.dark .bbd-card { background:#111827; border-color:rgba(255,255,255,0.07); }
 
 /* ── Stat Sparkline Placeholder ── */
 .bbd-sparkline { width:60px; height:24px; }
@@ -260,7 +261,7 @@ const dashStyles = `
 .bbd-search { 
   background:#f8f5f5; border:1.5px solid rgba(139,0,0,0.1); border-radius:10px;
   padding:8px 12px 8px 36px; font-size:0.8rem; color:#374151; 
-  transition:all 0.2s; outline:none; width:100%; font-family:'DM Sans',sans-serif;
+  transition:all 0.2s; outline:none; width:100%; font-family:'Sora',sans-serif;
 }
 .bbd-search:focus { border-color:rgba(139,0,0,0.35); background:#fff; box-shadow:0 0 0 3px rgba(139,0,0,0.08); }
 `;
@@ -325,19 +326,19 @@ function PremiumOverview({
   const maxInv = Math.max(...BLOOD_GROUPS.map(bg => inventory?.[bg]?.available || 0), 1);
 
   const kpiCards = [
-    { label:'Total Inventory', val: kpi.totalInventory,     icon:'🗃️', cls:'c-crimson', trend:null,    subtext:'units stored'  },
-    { label:'Available Units',  val: kpi.availableUnits,     icon:'✅', cls:'c-emerald', trend:'up',    subtext:'ready to use'  },
-    { label:'Today\'s Appts',   val: kpi.todayAppointments,  icon:'📅', cls:'c-blue',    trend:null,    subtext:'scheduled'     },
-    { label:'Donations',        val: kpi.totalDonations,     icon:'🩸', cls:'c-amber',   trend:'up',    subtext:'all time'      },
-    { label:'Redemptions',      val: kpi.totalRedemptions,   icon:'🔄', cls:'c-purple',  trend:null,    subtext:'fulfilled'     },
-    { label:'Blood Requests',   val: kpi.totalBloodRequests, icon:'🏥', cls:'c-rose',    trend: kpi.totalBloodRequests > 0 ? 'up' : null, subtext:'pending'     },
+    { label:'Total Inventory', val: kpi.totalInventory,     icon: <Archive size={18} />,      cls:'c-crimson', trend:null,    subtext:'units stored',  iconBg:'#fff0f0', iconColor:'var(--clr-brand)'   },
+    { label:'Available Units',  val: kpi.availableUnits,     icon: <CheckCircle2 size={18} />, cls:'c-emerald', trend:'up',    subtext:'ready to use',  iconBg:'#f0fdf4', iconColor:'#16a34a'            },
+    { label:"Today's Appts",   val: kpi.todayAppointments,  icon: <CalendarCheck size={18} />,cls:'c-blue',    trend:null,    subtext:'scheduled',     iconBg:'#eff6ff', iconColor:'#1d4ed8'            },
+    { label:'Donations',        val: kpi.totalDonations,     icon: <Droplet size={18} />,      cls:'c-amber',   trend:'up',    subtext:'all time',      iconBg:'#fffbeb', iconColor:'#d97706'            },
+    { label:'Redemptions',      val: kpi.totalRedemptions,   icon: <RefreshCw size={18} />,    cls:'c-purple',  trend:null,    subtext:'fulfilled',     iconBg:'#faf5ff', iconColor:'#7c3aed'            },
+    { label:'Blood Requests',   val: kpi.totalBloodRequests, icon: <Activity size={18} />,     cls:'c-rose',    trend: kpi.totalBloodRequests > 0 ? 'up' : null, subtext:'pending', iconBg:'#fff0f4', iconColor:'#e11d48' },
   ];
 
   const quickActions = [
-    { icon:'📅', label:'New Appointment',   sub:'Schedule a donor',  color:'var(--clr-brand)', bg:'#fff5f5',  action: onAppointmentOpen },
-    { icon:'🩸', label:'Record Donation',   sub:'Walk-in / Check-in',color:'var(--clr-emergency)', bg:'#fff0f0',  action: onDonationOpen    },
-    { icon:'✅', label:'Verify & Redeem',   sub:'RTID verification', color:'var(--clr-success)', bg:'#f0fdf4',  action: () => onNavigate('verify')     },
-    { icon:'📊', label:'View Reports',      sub:'Analytics & export',color:'#0284c7', bg:'#f0f9ff',  action: () => onNavigate('reports')    },
+    { icon: <CalendarCheck size={18} />, iconColor:'var(--clr-brand)',     label:'New Appointment',  sub:'Schedule a donor',   color:'var(--clr-brand)',      bg:'#fff5f5', action: onAppointmentOpen },
+    { icon: <Droplet size={18} />,       iconColor:'var(--clr-emergency)', label:'Record Donation',  sub:'Walk-in / Check-in', color:'var(--clr-emergency)',  bg:'#fff0f0', action: onDonationOpen    },
+    { icon: <BadgeCheck size={18} />,    iconColor:'var(--clr-success)',   label:'Verify & Redeem',  sub:'RTID verification',  color:'var(--clr-success)',    bg:'#f0fdf4', action: () => onNavigate('verify')  },
+    { icon: <FileBarChart2 size={18} />, iconColor:'#0284c7',              label:'View Reports',     sub:'Analytics & export', color:'#0284c7',               bg:'#f0f9ff', action: () => onNavigate('reports') },
   ];
 
   return (
@@ -346,7 +347,9 @@ function PremiumOverview({
       {/* Critical Alert */}
       {criticalGroups.length > 0 && (
         <div className="bbd-alert critical">
-          <div className="w-9 h-9 rounded-xl bg-[var(--stats-divider)] flex items-center justify-center flex-shrink-0 text-lg">🚨</div>
+          <div className="w-9 h-9 rounded-xl bg-[var(--stats-divider)] flex items-center justify-center flex-shrink-0" style={{ color: 'var(--clr-emergency)' }}>
+            <Siren size={18} />
+          </div>
           <div className="flex-1">
             <p className="text-sm font-bold text-red-800">Critical Blood Shortage</p>
             <p className="text-xs text-[var(--clr-danger)] mt-0.5">
@@ -411,8 +414,8 @@ function PremiumOverview({
               className={`bbd-kpi-card ${m.cls}`}
               style={{ animationDelay: `${i * 0.07}s` }}
             >
-              <div className="bbd-kpi-icon" style={{ background: m.cls === 'c-crimson' ? '#fff0f0' : m.cls === 'c-emerald' ? '#f0fdf4' : m.cls === 'c-blue' ? '#eff6ff' : m.cls === 'c-amber' ? '#fffbeb' : m.cls === 'c-purple' ? '#faf5ff' : '#fff0f4' }}>
-                <span className="text-lg">{m.icon}</span>
+              <div className="bbd-kpi-icon" style={{ background: m.iconBg, color: m.iconColor }}>
+                {m.icon}
               </div>
               <div className="bbd-kpi-val">{m.val.toLocaleString()}</div>
               <div className="bbd-kpi-label">{m.label}</div>
@@ -496,8 +499,8 @@ function PremiumOverview({
                   style={{'--action-color': a.color} as any}
                 >
                   <style>{`.bbd-action-card:nth-child(${i+1})::before { background:${a.color}; }`}</style>
-                  <div className="bbd-action-icon" style={{background:a.bg}}>
-                    <span className="text-lg">{a.icon}</span>
+                  <div className="bbd-action-icon" style={{ background: a.bg, color: a.iconColor }}>
+                    {a.icon}
                   </div>
                   <div>
                     <div className="bbd-action-title">{a.label}</div>
@@ -519,7 +522,7 @@ function PremiumOverview({
             </div>
             {recentDonations.length === 0 ? (
               <div className="text-center py-8">
-                <div className="text-4xl mb-2 opacity-30">🩸</div>
+                <div className="mb-2 opacity-30 flex justify-center"><Droplet size={40} className="text-red-400" /></div>
                 <p className="text-sm text-gray-400 font-medium">No donations yet</p>
                 <button onClick={onDonationOpen} className="mt-3 text-xs text-[var(--clr-danger)] font-semibold hover:underline">Record first donation →</button>
               </div>
@@ -573,10 +576,10 @@ function PremiumOverview({
             </div>
             <div className="space-y-3">
               {[
-                { label:'Total Units',     val: kpi.totalInventory,   color:'var(--clr-brand)', icon:'📦' },
-                { label:'Available',       val: kpi.availableUnits,   color:'var(--clr-success)', icon:'✅' },
-                { label:'Reserved',        val: Math.max(0, kpi.totalInventory - kpi.availableUnits), color:'#d97706', icon:'🔒' },
-                { label:'Critical Groups', val: criticalGroups.length, color: criticalGroups.length > 0 ? 'var(--clr-emergency)' : '#6b7280', icon:'🚨' },
+                { label:'Total Units',     val: kpi.totalInventory,   color:'var(--clr-brand)',     icon: <Archive size={13} /> },
+                { label:'Available',       val: kpi.availableUnits,   color:'var(--clr-success)',   icon: <CheckCircle2 size={13} /> },
+                { label:'Reserved',        val: Math.max(0, kpi.totalInventory - kpi.availableUnits), color:'#d97706', icon: <Lock size={13} /> },
+                { label:'Critical Groups', val: criticalGroups.length, color: criticalGroups.length > 0 ? 'var(--clr-emergency)' : '#6b7280', icon: <AlertTriangle size={13} /> },
               ].map(s => (
                 <div key={s.label} className="flex items-center justify-between py-1.5 border-b border-gray-50 last:border-0">
                   <span className="text-xs text-[var(--text-secondary)] flex items-center gap-2">
@@ -604,7 +607,7 @@ function PremiumOverview({
             </div>
             {upcomingToday.length === 0 ? (
               <div className="text-center py-6">
-                <div className="text-3xl opacity-25 mb-2">📅</div>
+                <div className="opacity-25 mb-2 flex justify-center"><CalendarCheck size={32} className="text-blue-400" /></div>
                 <p className="text-xs text-gray-400">No appointments today</p>
                 <button onClick={onAppointmentOpen} className="mt-2 text-xs text-[var(--rtid-badge)] font-semibold hover:underline">Schedule one →</button>
               </div>

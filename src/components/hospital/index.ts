@@ -19,6 +19,7 @@ export { ErrorBoundary } from "./ErrorBoundary";
 export { InventoryView } from "./InventoryView";
 export { StatusTimeline } from "./StatusTimeline";
 export { PatientHistoryModal } from "./PatientHistoryModal";
+export { PatientHistoryView } from "./PatientHistoryView";
 export { GlobalSearch } from "./GlobalSearch";
 export { EditRequestModal } from "./EditRequestModal";
 export { AuditTrailView } from "./AuditTrailView";

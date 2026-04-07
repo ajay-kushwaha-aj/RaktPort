@@ -1,4 +1,9 @@
+import React from 'react';
 import { cn } from '@/lib/utils';
+import {
+  LayoutDashboard, Droplet, CalendarCheck, ClipboardList,
+  RefreshCw, BadgeCheck, QrCode, MapPin, BarChart2
+} from 'lucide-react';
 
 export type TabType =
   | 'overview'
@@ -18,16 +23,16 @@ interface BloodBankNavigationProps {
   requestCount?: number;
 }
 
-const tabs: { id: TabType; label: string; icon: string; shortLabel?: string }[] = [
-  { id: 'overview',     label: 'Overview',      icon: '📊' },
-  { id: 'inventory',    label: 'Inventory',     icon: '🩸' },
-  { id: 'appointments', label: 'Appointments',  icon: '📅', shortLabel: 'Appts' },
-  { id: 'donations',    label: 'Donations',     icon: '📋' },
-  { id: 'redemptions',  label: 'Redemptions',   icon: '🔄', shortLabel: 'Redeem' },
-  { id: 'verify',       label: 'Verify',        icon: '✅' },
-  { id: 'rtidVerify',   label: 'RTID',          icon: '🔍' },
-  { id: 'camps',        label: 'Camps',         icon: '⛺' },
-  { id: 'reports',      label: 'Reports',       icon: '📈' },
+const tabs: { id: TabType; label: string; icon: React.ReactNode; shortLabel?: string }[] = [
+  { id: 'overview',     label: 'Overview',         icon: <LayoutDashboard size={15} /> },
+  { id: 'inventory',    label: 'Inventory',        icon: <Droplet size={15} /> },
+  { id: 'appointments', label: 'Appointments',     icon: <CalendarCheck size={15} />, shortLabel: 'Appts' },
+  { id: 'donations',    label: 'Donations',        icon: <ClipboardList size={15} /> },
+  { id: 'redemptions',  label: 'Redemptions',      icon: <RefreshCw size={15} />, shortLabel: 'Redeem' },
+  { id: 'verify',       label: 'Verify & Redeem',  icon: <BadgeCheck size={15} />, shortLabel: 'Verify' },
+  { id: 'rtidVerify',   label: 'RTID',             icon: <QrCode size={15} /> },
+  { id: 'camps',        label: 'Camps',            icon: <MapPin size={15} /> },
+  { id: 'reports',      label: 'Reports',          icon: <BarChart2 size={15} /> },
 ];
 
 export const BloodBankNavigation = ({
@@ -39,15 +44,15 @@ export const BloodBankNavigation = ({
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap');
         .bbn-root {
-          font-family:'DM Sans',sans-serif;
+          font-family:'Sora',sans-serif;
           background:#fff;
           border-bottom:1px solid rgba(139,0,0,0.08);
           box-shadow:0 2px 8px rgba(139,0,0,0.06);
           position:sticky; top:0; z-index:40;
         }
-        .dark .bbn-root { background:#1a0505; border-bottom-color:rgba(255,255,255,0.08); }
+        .dark .bbn-root { background:#0d1220; border-bottom-color:rgba(255,255,255,0.08); }
 
         .bbn-scroll { display:flex; gap:2px; overflow-x:auto; padding:8px 12px; scrollbar-width:none; -ms-overflow-style:none; align-items:center; }
         .bbn-scroll::-webkit-scrollbar { display:none; }
@@ -63,7 +68,7 @@ export const BloodBankNavigation = ({
           position:relative;
           background:transparent;
           color:#6b7280;
-          font-family:'DM Sans',sans-serif;
+          font-family:'Sora',sans-serif;
           flex-shrink:0;
         }
         .bbn-tab:hover:not(.bbn-active) {
@@ -79,7 +84,7 @@ export const BloodBankNavigation = ({
           transform:translateY(-1px);
         }
         .bbn-active .bbn-icon { filter:none; opacity:1; }
-        .bbn-icon { font-size:0.9rem; line-height:1; opacity:0.7; transition:opacity 0.2s; }
+        .bbn-icon { display:flex; align-items:center; line-height:1; opacity:0.7; transition:opacity 0.2s; }
         .bbn-tab:hover .bbn-icon { opacity:1; }
 
         .bbn-badge {

@@ -1,6 +1,6 @@
 // hospital/AnalyticsView.tsx — v5.0 (all original chart logic preserved, UI upgraded)
 import { useMemo } from "react";
-import { TrendingUp, BarChart3, PieChart, Activity } from "lucide-react";
+import { TrendingUp, BarChart3, PieChart, Activity, Syringe, Users, Stethoscope, Droplet, LineChart as LineChartIcon } from "lucide-react";
 import { URGENCY_CONFIG } from "./constants";
 import type { BloodRequest, UrgencyLevel, BloodComponentType } from "./types";
 // @ts-ignore
@@ -172,7 +172,7 @@ export function AnalyticsView({ requests }: AnalyticsViewProps) {
     return { totalUnits, fulfilledUnits, administeredUnits, fulfillRate, adminRate, avgAge: Math.round(avgAge), uniquePatients, uniqueDoctors };
   }, [activeReqs]);
 
-  const maxBG = useMemo(() => Math.max(...bgData.map(d => d.value), 1), [bgData]);
+  const maxBG = useMemo(() => Math.max(...bgData.map((d: { value: number }) => d.value), 1), [bgData]);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }} className="hd-enter">
@@ -182,10 +182,10 @@ export function AnalyticsView({ requests }: AnalyticsViewProps) {
         <style>{`@media(min-width:640px){.an-kpi-grid{grid-template-columns:repeat(4,1fr)!important}}`}</style>
         <div className="an-kpi-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "12px", gridColumn: "1/-1" }}>
           {[
-            { icon: "📊", label: "Fulfillment Rate", val: `${stats.fulfillRate}%`, cls: "k-green" },
-            { icon: "💉", label: "Admin Rate", val: `${stats.adminRate}%`, cls: "k-blue" },
-            { icon: "👤", label: "Unique Patients", val: stats.uniquePatients, cls: "k-amber" },
-            { icon: "🩺", label: "Doctors Involved", val: stats.uniqueDoctors, cls: "k-purple" },
+            { icon: <BarChart3 size={20} />, label: "Fulfillment Rate", val: `${stats.fulfillRate}%`, cls: "k-green" },
+            { icon: <Syringe size={20} />, label: "Admin Rate", val: `${stats.adminRate}%`, cls: "k-blue" },
+            { icon: <Users size={20} />, label: "Unique Patients", val: stats.uniquePatients, cls: "k-amber" },
+            { icon: <Stethoscope size={20} />, label: "Doctors Involved", val: stats.uniqueDoctors, cls: "k-purple" },
           ].map((k, i) => (
             <div key={k.label} className={`hd-kpi ${k.cls} hd-enter hd-s${i + 1}`}>
               <span style={{ fontSize: "1.35rem", display: "block", marginBottom: "8px" }}>{k.icon}</span>
@@ -222,9 +222,9 @@ export function AnalyticsView({ requests }: AnalyticsViewProps) {
 
       {/* Blood group + Monthly trend */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: "14px" }}>
-        <ChartCard title="Blood Group Demand" icon={<span style={{ fontSize: "1rem" }}>🩸</span>}>
+        <ChartCard title="Blood Group Demand" icon={<Droplet size={15} style={{ color: "var(--c-brand)" }} />}>
           <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-            {bgData.map(d => <HBar key={d.label} label={d.label} value={d.value} max={maxBG} color={d.color} />)}
+            {bgData.map((d: { label: string; value: number; color: string; max: number }) => <HBar key={d.label} label={d.label} value={d.value} max={maxBG} color={d.color} />)}
           </div>
         </ChartCard>
 
@@ -281,7 +281,7 @@ export function AnalyticsView({ requests }: AnalyticsViewProps) {
       {/* Units summary */}
       <div className="hd-card" style={{ padding: "24px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "20px" }}>
-          <span style={{ fontSize: "1rem" }}>📈</span>
+          <LineChartIcon size={18} style={{ color: "var(--c-brand)" }} />
           <span className="hd-sec-title">Unit Flow Summary</span>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "20px", textAlign: "center" }}>

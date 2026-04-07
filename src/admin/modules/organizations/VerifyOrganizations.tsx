@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Building2, CheckCircle, XCircle, Search, Mail, MapPin, FileText, Phone, Filter, Droplet } from 'lucide-react';
+import { Building2, CheckCircle, XCircle, Search, Mail, MapPin, FileText, Phone, Filter, Droplet, ExternalLink } from 'lucide-react';
 import { useAdminStore } from '../../store/adminStore';
 import { verifyOrganization } from '../../services/adminDataService';
 import { formatDate } from '../../services/exportService';
@@ -232,6 +232,21 @@ export const VerifyOrganizations: React.FC = () => {
                 >
                   <XCircle size={16} /> Reject
                 </button>
+                {org.documentUrls && org.documentUrls.length > 0 && (
+                  <button 
+                    onClick={() => window.open(org.documentUrls![0], '_blank')}
+                    style={{
+                      background: 'transparent', color: '#60a5fa',
+                      border: '1px solid rgba(96,165,250,0.3)', borderRadius: 8, padding: '8px 16px',
+                      fontSize: 13, fontWeight: 600, fontFamily: 'Inter, sans-serif',
+                      cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                      minWidth: 100, marginTop: 8
+                    }}
+                  >
+                    <ExternalLink size={16} /> View Doc
+                  </button>
+                )}
               </div>
             </div>
           ))}

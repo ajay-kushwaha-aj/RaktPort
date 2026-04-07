@@ -7,9 +7,10 @@ import Swal from "sweetalert2";
 import {
   Bell, LogOut, Plus, QrCode, Siren, FileDown, MapPin,
   Building2, RefreshCw, Droplet, UserCircle, Search, Users, Shield,
-  Moon, Sun, Keyboard, FileText, Activity
+  Moon, Sun, Keyboard, FileText, Activity, Home, ClipboardList, BarChart3, ShieldCheck, History
 } from "lucide-react";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "../ui/sonner";
+// @ts-ignore
 import logo from '../../assets/raktport-logo.png';
 import { db } from '../../firebase';
 import {
@@ -28,7 +29,7 @@ import {
   ErrorBoundary, QRModal, ProfileModal, NotifDrawer, CompleteModal, NewRequestModal,
   PremiumDashboard, RequestsView, TransfusionHistoryView,
   openPrintWindow,
-  InventoryView, PatientHistoryModal, GlobalSearch, EditRequestModal, AuditTrailView,
+  InventoryView, PatientHistoryModal, PatientHistoryView, GlobalSearch, EditRequestModal, AuditTrailView,
   logAuditAction,
   AnalyticsView, KeyboardShortcuts, ReportGenerator,
 } from "./index";
@@ -37,15 +38,16 @@ import type {
   DonorInfo, TransfusionRecord, Notification, BloodComponentType,
 } from "./types";
 
-type TabId = "overview" | "requests" | "history" | "inventory" | "audit" | "analytics";
+type TabId = "overview" | "requests" | "history" | "inventory" | "audit" | "analytics" | "patient-history";
 
-const TABS: { id: TabId; label: string; icon: string }[] = [
-  { id: "overview", label: "Dashboard", icon: "🏥" },
-  { id: "requests", label: "All Requests", icon: "📋" },
-  { id: "inventory", label: "Blood Inventory", icon: "🩸" },
-  { id: "analytics", label: "Analytics", icon: "📊" },
-  { id: "history", label: "Transfusion History", icon: "💉" },
-  { id: "audit", label: "Audit Trail", icon: "🛡️" },
+const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
+  { id: "overview", label: "Dashboard", icon: <Home size={18} /> },
+  { id: "requests", label: "All Requests", icon: <ClipboardList size={18} /> },
+  { id: "patient-history", label: "Patient History", icon: <UserCircle size={18} /> },
+  { id: "inventory", label: "Blood Inventory", icon: <Droplet size={18} /> },
+  { id: "history", label: "Transfusion History", icon: <History size={18} /> },
+  { id: "analytics", label: "Analytics", icon: <BarChart3 size={18} /> },
+  { id: "audit", label: "Audit Trail", icon: <ShieldCheck size={18} /> },
 ];
 
 /* ═══════════════════════════════════════════
@@ -523,12 +525,6 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
               </button>
               <style>{`@media(min-width:640px){#profile-btn-desktop{display:flex!important}} @media(min-width:768px){#profile-label-md{display:inline!important}}`}</style>
 
-              {/* Patient history (desktop) */}
-              <button onClick={() => setIsPatientHistoryOpen(true)} className="hd-hdr-btn" title="Patient History" style={{ display: "none" }} id="hist-btn-desktop">
-                <Users size={15} />
-              </button>
-              <style>{`@media(min-width:640px){#hist-btn-desktop{display:flex!important}}`}</style>
-
               {/* Dark mode */}
               <button onClick={toggleDark} className="hd-hdr-btn" title={isDark ? "Light Mode" : "Dark Mode"}>
                 {isDark ? <Sun size={15} /> : <Moon size={15} />}
@@ -719,6 +715,7 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
                 )}
                 {activeTab === "inventory" && <InventoryView requests={requests} />}
                 {activeTab === "analytics" && <AnalyticsView requests={requests} />}
+                {activeTab === "patient-history" && <PatientHistoryView requests={requests} />}
                 {activeTab === "history" && <TransfusionHistoryView requests={requests} />}
                 {activeTab === "audit" && hospitalId && <AuditTrailView hospitalId={hospitalId} />}
               </div>
@@ -735,11 +732,11 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
         {/* ── MOBILE BOTTOM NAV ── */}
         <nav className="hd-bottom-nav no-print">
           {[
-            { id: "overview", icon: "🏥", label: "Home" },
-            { id: "requests", icon: "📋", label: "Requests", badge: requests.length },
-            { id: "_emg", icon: "🚨", label: "Emergency", emergency: true },
-            { id: "analytics", icon: "📊", label: "Analytics" },
-            { id: "_profile", icon: "👤", label: "Profile" },
+            { id: "overview", icon: <Home size={18} />, label: "Home" },
+            { id: "requests", icon: <ClipboardList size={18} />, label: "Requests", badge: requests.length },
+            { id: "_emg", icon: <Siren size={18} />, label: "Emergency", emergency: true },
+            { id: "patient-history", icon: <UserCircle size={18} />, label: "Patients" },
+            { id: "_profile", icon: <UserCircle size={18} />, label: "Profile" },
           ].map(item => {
             if (item.emergency) return (
               <button key="emg" className="hd-bnav-btn" onClick={() => openNewRequest("Emergency")} style={{ color: "var(--clr-emergency)" }}>

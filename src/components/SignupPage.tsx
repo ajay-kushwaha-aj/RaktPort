@@ -3,6 +3,8 @@
 // Updated: @rakt username system + internal ID generation
 
 import { useState, useEffect, useCallback, useId, useRef } from 'react';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { storage } from '../firebase';
 import {
   initRecaptcha,
   sendRegistrationOTP,
@@ -785,16 +787,33 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
       }, phoneUid);
 
       if (res.success) {
-        // For bloodbank, also initialise inventory document
-        if (role === 'bloodbank' && inventoryForFirestore && res.userId) {
+        // Handle post-registration stuff
+        if (role === 'hospital' || role === 'bloodbank') {
           try {
-            const { doc, setDoc } = await import('firebase/firestore');
+            const { doc, updateDoc, setDoc } = await import('firebase/firestore');
             const { db } = await import('../firebase');
-            await setDoc(doc(db, 'inventory', res.userId), inventoryForFirestore);
+            
+            // Upload documents if any
+            let documentUrls: string[] = [];
+            if (docs.length > 0 && res.userId) {
+              for (const file of docs) {
+                const docRef = ref(storage, `verification_docs/${res.userId}_${file.name}`);
+                await uploadBytes(docRef, file);
+                const url = await getDownloadURL(docRef);
+                documentUrls.push(url);
+              }
+              await updateDoc(doc(db, 'users', res.userId), { documentUrls });
+            }
+
+            // For bloodbank, also initialise inventory document
+            if (role === 'bloodbank' && inventoryForFirestore && res.userId) {
+               await setDoc(doc(db, 'inventory', res.userId), inventoryForFirestore);
+            }
           } catch (e) {
-            console.warn('Inventory init failed:', e);
+            console.warn('Post-registration initialization failed:', e);
           }
         }
+        
         toast.success('Your Account Is successfully Created.', { description: role === 'donor' ? 'You can now log in.' : 'Account pending admin verification.' });
         confetti({
           particleCount: 150,

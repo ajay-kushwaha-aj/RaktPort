@@ -87,7 +87,7 @@ export function PWAInstallPrompt() {
       if (outcome === 'accepted') {
         setShow(false);
       }
-    } catch (_) {}
+    } catch (_) { }
     setInstalling(false);
     setDeferredPrompt(null);
   }, [deferredPrompt, platform]);
@@ -137,7 +137,7 @@ export function PWAInstallPrompt() {
               <p className="text-[11px] text-red-100/80 mt-0.5 leading-snug">
                 {platform === 'ios'
                   ? 'Add to Home Screen for the best experience'
-                  : 'Get instant access, offline support & faster loading'}
+                  : 'Get instant access & faster loading'}
               </p>
             </div>
 
@@ -163,7 +163,7 @@ export function PWAInstallPrompt() {
 
           {/* Feature chips */}
           <div className="px-4 pb-3 flex gap-2 flex-wrap">
-            {['⚡ Fast', '📴 Offline', '🔔 Notifications'].map((f) => (
+            {['⚡ Fast', 'Notifications'].map((f) => (
               <span key={f} className="text-[10px] bg-[var(--bg-surface)]/10 px-2 py-0.5 rounded-full border border-white/5">
                 {f}
               </span>

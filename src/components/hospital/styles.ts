@@ -2,43 +2,41 @@
 // Aesthetic: Clinical Precision — airy, minimal, trustworthy, medical-grade
 
 export const HD_STYLES = `
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
-
 /* ════════════════════════════════════════
    DESIGN TOKENS
 ════════════════════════════════════════ */
 :root {
-  --c-brand:         var(--clr-brand);
-  --c-brand-dark:    var(--clr-brand);
-  --c-brand-mid:     var(--clr-brand-dark);
-  --c-brand-soft:    #FFF0F2;
+  --c-brand:         var(--rp-primary);
+  --c-brand-dark:    var(--rp-primary-dark);
+  --c-brand-mid:     var(--rp-primary-dark);
+  --c-brand-soft:    var(--rp-primary-soft);
   --c-brand-glow:    rgba(196,28,56,0.12);
 
-  --c-bg:            var(--clr-bg-page);
-  --c-surface:       var(--clr-bg-card);
-  --c-surface-2:     #F8F9FD;
-  --c-surface-3:     #EEF1F8;
+  --c-bg:            var(--rp-bg);
+  --c-surface:       var(--rp-surface);
+  --c-surface-2:     var(--rp-surface);
+  --c-surface-3:     var(--rp-bg);
 
-  --c-border:        var(--clr-border);
+  --c-border:        var(--border-color);
   --c-border-med:    rgba(15,23,42,0.12);
   --c-border-strong: rgba(15,23,42,0.2);
 
-  --c-text:          var(--txt-heading);
-  --c-text-2:        var(--txt-heading);
-  --c-text-3:        var(--txt-body);
+  --c-text:          var(--rp-text);
+  --c-text-2:        var(--rp-text);
+  --c-text-3:        var(--rp-text-muted);
   --c-text-4:        #94A3B8;
   --c-text-inv:      var(--txt-inverse);
 
   --c-success:       var(--clr-success);
   --c-success-bg:    #ECFDF5;
   --c-success-bdr:   #A7F3D0;
-  --c-warn:          #D97706;
+  --c-warn:          var(--clr-warning);
   --c-warn-bg:       #FFFBEB;
   --c-warn-bdr:      #FDE68A;
-  --c-info:          var(--clr-info);
+  --c-info:          var(--rp-info);
   --c-info-bg:       #EFF6FF;
   --c-info-bdr:      #BFDBFE;
-  --c-danger:        var(--clr-emergency);
+  --c-danger:        var(--rp-emergency);
   --c-danger-bg:     #FEF2F2;
   --c-danger-bdr:    #FECACA;
 
@@ -56,8 +54,8 @@ export const HD_STYLES = `
   --r-2xl:  24px;
   --r-pill: 999px;
 
-  --f-display: 'Syne', sans-serif;
-  --f-body:    'Plus Jakarta Sans', sans-serif;
+  --f-display: 'Inter', sans-serif;
+  --f-body:    'Inter', sans-serif;
   --f-mono:    'JetBrains Mono', monospace;
 
   --t-fast:   140ms cubic-bezier(0.4,0,0.2,1);
@@ -68,16 +66,16 @@ export const HD_STYLES = `
 
 /* ── Dark Mode ── */
 .dark {
-  --c-bg:            #07090F;
-  --c-surface:       #0E1118;
-  --c-surface-2:     #131720;
-  --c-surface-3:     #1A2030;
-  --c-border:        rgba(255,255,255,0.06);
+  --c-bg:            var(--rp-bg);
+  --c-surface:       var(--rp-surface);
+  --c-surface-2:     var(--rp-surface);
+  --c-surface-3:     var(--rp-surface);
+  --c-border:        var(--border-color);
   --c-border-med:    rgba(255,255,255,0.1);
   --c-border-strong: rgba(255,255,255,0.18);
-  --c-text:          #F1F5F9;
-  --c-text-2:        #CBD5E1;
-  --c-text-3:        #94A3B8;
+  --c-text:          var(--rp-text);
+  --c-text-2:        var(--rp-text);
+  --c-text-3:        var(--rp-text-muted);
   --c-text-4:        #475569;
   --c-brand-soft:    rgba(196,28,56,0.14);
   --c-success-bg:    rgba(5,150,105,0.1);

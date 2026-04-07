@@ -1,6 +1,6 @@
 // hospital/InventoryView.tsx — Blood Inventory tab v5.0 (all original logic preserved)
 import { useState, useMemo } from "react";
-import { Droplet, Package, Filter } from "lucide-react";
+import { Droplet, Package, Filter, AlertTriangle, CheckCircle2, Syringe, Archive, Clock, Zap } from "lucide-react";
 // @ts-ignore
 import { BLOOD_GROUPS } from "@/lib/bloodbank-utils";
 import { BLOOD_COMPONENT_TYPES } from "./constants";
@@ -74,8 +74,8 @@ export function InventoryView({ requests }: InventoryViewProps) {
           <div style={{
             width: "40px", height: "40px", borderRadius: "var(--r-lg)",
             background: "rgba(220,38,38,0.1)", display: "flex",
-            alignItems: "center", justifyContent: "center", fontSize: "1.3rem", flexShrink: 0,
-          }}>⚠️</div>
+            alignItems: "center", justifyContent: "center", color: "var(--clr-emergency)", flexShrink: 0,
+          }}><AlertTriangle size={20} /></div>
           <div style={{ flex: 1 }}>
             <p style={{ fontWeight: 700, color: "var(--c-danger)", fontSize: "0.85rem", fontFamily: "var(--f-display)" }}>Critical Blood Shortage</p>
             <p style={{ fontSize: "0.72rem", color: "var(--clr-emergency)", marginTop: "2px", opacity: 0.8 }}>
@@ -95,11 +95,11 @@ export function InventoryView({ requests }: InventoryViewProps) {
       {/* KPI row */}
       <div className="hd-kpi-grid">
         {[
-          { icon: "🩸", label: "Total Required", val: totals.required, cls: "k-red" },
-          { icon: "✅", label: "Fulfilled", val: totals.fulfilled, cls: "k-green" },
-          { icon: "💉", label: "Administered", val: totals.administered, cls: "k-blue" },
-          { icon: "📦", label: "Available Stock", val: totals.available, cls: "k-amber" },
-          { icon: "⏳", label: "Pending Demand", val: totals.pending, cls: "k-purple" },
+          { icon: <Droplet size={20} />, label: "Total Required", val: totals.required, cls: "k-red" },
+          { icon: <CheckCircle2 size={20} />, label: "Fulfilled", val: totals.fulfilled, cls: "k-green" },
+          { icon: <Syringe size={20} />, label: "Administered", val: totals.administered, cls: "k-blue" },
+          { icon: <Archive size={20} />, label: "Available Stock", val: totals.available, cls: "k-amber" },
+          { icon: <Clock size={20} />, label: "Pending Demand", val: totals.pending, cls: "k-purple" },
         ].map((k, i) => (
           <div key={k.label} className={`hd-kpi ${k.cls} hd-enter hd-s${i + 1}`}>
             <span style={{ fontSize: "1.35rem", display: "block", marginBottom: "8px" }}>{k.icon}</span>
@@ -138,8 +138,9 @@ export function InventoryView({ requests }: InventoryViewProps) {
               marginLeft: "auto", fontSize: "0.7rem", fontWeight: 700,
               color: "var(--c-warn)", background: "var(--c-warn-bg)",
               padding: "4px 10px", borderRadius: "var(--r-pill)", border: "1px solid var(--c-warn-bdr)",
+              display: "flex", alignItems: "center", gap: "4px"
             }}>
-              ⚡ {lowCount} Low Stock
+              <Zap size={12} style={{ fill: "currentColor" }} /> {lowCount} Low Stock
             </span>
           )}
         </div>

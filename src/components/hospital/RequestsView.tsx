@@ -1,9 +1,9 @@
 // hospital/RequestsView.tsx — All Requests tab v5.0
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Search, QrCode, Copy, Trash2, Printer, ChevronDown,
   HeartHandshake, Pencil, CopyPlus, ChevronLeft, ChevronRight,
-  Calendar, SlidersHorizontal, X
+  Calendar, SlidersHorizontal, X, Siren, Zap, ClipboardList, MessageSquare
 } from "lucide-react";
 // @ts-ignore
 import { BLOOD_GROUPS } from "@/lib/bloodbank-utils";
@@ -280,7 +280,7 @@ export function RequestsView({
       {filtered.length === 0 ? (
         <div className="hd-card">
           <div className="hd-empty">
-            <div className="hd-empty-icon">🔍</div>
+            <div className="hd-empty-icon"><Search size={40} style={{ color: "var(--c-text-4)" }} /></div>
             <p className="hd-empty-title">No requests found</p>
             <p className="hd-empty-sub">Try adjusting your filters or search term</p>
             <button
@@ -336,9 +336,9 @@ export function RequestsView({
                       width: "38px", height: "38px", borderRadius: "10px",
                       background: uc2.bg, border: `1.5px solid ${uc2.border}`,
                       display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: "1.1rem", flexShrink: 0,
+                      color: uc2.color, flexShrink: 0,
                     }}>
-                      {isEM ? "🚨" : r.urgency === "Urgent" ? "⚡" : "📋"}
+                      {isEM ? <Siren size={18} /> : r.urgency === "Urgent" ? <Zap size={18} /> : <ClipboardList size={18} />}
                     </div>
 
                     {/* Info */}
@@ -468,7 +468,7 @@ export function RequestsView({
                       <ActionBtn icon={<Printer size={12} />} label="Print Slip" onClick={e => { e.stopPropagation(); onPrint(r); }} />
                       <ActionBtn icon={<QrCode size={12} />} label="View QR" onClick={e => { e.stopPropagation(); onViewQR(r); }} />
                       <ActionBtn icon={<Copy size={12} />} label="Copy RTID" onClick={e => { e.stopPropagation(); onCopyRTID(r.rtid); }} />
-                      <button onClick={e => { e.stopPropagation(); onWhatsAppShare(r); }} className="hd-share-wa">💬 WhatsApp</button>
+                      <button onClick={e => { e.stopPropagation(); onWhatsAppShare(r); }} className="hd-share-wa" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><MessageSquare size={12} /> WhatsApp</button>
 
                       {["CREATED", "PENDING"].includes(r.status) && onEditRequest && (
                         <ActionBtn icon={<Pencil size={12} />} label="Edit" variant="warn"
