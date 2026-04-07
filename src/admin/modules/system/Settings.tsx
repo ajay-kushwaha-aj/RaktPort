@@ -5,7 +5,7 @@ import { useAdminStore } from '../../store/adminStore';
 export const Settings: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const adminName = localStorage.getItem('adminName') || 'Super Admin';
-  const adminEmail = localStorage.getItem('adminEmail') || 'admin@raktport.dev';
+  const adminEmail = localStorage.getItem('adminEmail') || 'admin@raktport.in';
 
   const handleSave = () => {
     setLoading(true);
@@ -65,9 +65,9 @@ export const Settings: React.FC = () => {
                 Enabled by Default
               </button>
             </div>
-            
+
             <hr style={{ border: 'none', borderTop: '1px solid #1e1214', margin: '20px 0' }} />
-            
+
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
                 <p style={{ margin: 0, fontSize: 14, color: '#e0d0d4', fontWeight: 500 }}>Global Read-Only Role</p>
@@ -84,14 +84,14 @@ export const Settings: React.FC = () => {
             <Info size={16} /> About Platform
           </h3>
           <div style={{ background: '#0f0a0b', border: '1px solid #1e1214', borderRadius: 12, padding: 24, fontSize: 13, color: '#a09094' }}>
-            <p style={{ margin: '0 0 8px 0' }}><strong>RaktPort Admin Control Center</strong> version 2.0.0 (Phase 3)</p>
+            <p style={{ margin: '0 0 8px 0' }}><strong>RaktPort Admin Control Center</strong> version 1.0.0 (Phase 1)</p>
             <p style={{ margin: '0 0 8px 0' }}>Built for the Indian National Blood Network System.</p>
-            <p style={{ margin: 0 }}>© 2026 RaktPort Foundation. All rights reserved.</p>
+            <p style={{ margin: 0 }}>© 2026 RaktPort. All rights reserved.</p>
           </div>
         </section>
 
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
-          <button 
+          <button
             onClick={handleSave}
             style={{
               background: '#f87171', color: '#0f0a0b', border: 'none', borderRadius: 8, padding: '10px 24px',
