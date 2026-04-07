@@ -248,7 +248,9 @@ export async function loginUser(
         await auth.signOut();
         return { success: false, error: `This account is registered as "${data.role}".` };
       }
-      const status = data.status ?? (data.isVerified ? 'active' : 'inactive');
+      const status = (data.status === 'pending' && data.isVerified) 
+        ? 'active' 
+        : (data.status ?? (data.isVerified ? 'active' : 'inactive'));
       if (status !== 'active') {
         await auth.signOut();
         return { success: false, error: 'Your account is not active. Contact an administrator.' };
@@ -289,7 +291,9 @@ export async function signInWithGoogle(role: string): Promise<AuthResult> {
         await auth.signOut();
         return { success: false, error: `This Google account is registered as "${data.role}".` };
       }
-      const status = data.status ?? (data.isVerified ? 'active' : 'inactive');
+      const status = (data.status === 'pending' && data.isVerified) 
+        ? 'active' 
+        : (data.status ?? (data.isVerified ? 'active' : 'inactive'));
       if (status !== 'active') {
         await auth.signOut();
         return { success: false, error: 'Your account is not active. Contact an administrator.' };
@@ -340,7 +344,9 @@ export async function signInWithGoogle(role: string): Promise<AuthResult> {
 
 /** Helper: extract common lookup fields from a user doc. */
 function toLookupResult(docId: string, data: any): UserLookupResult {
-  const status = data.status ?? (data.isVerified ? 'active' : 'inactive');
+  const status = (data.status === 'pending' && data.isVerified) 
+    ? 'active' 
+    : (data.status ?? (data.isVerified ? 'active' : 'inactive'));
   return {
     found: true,
     uid: docId,
@@ -485,7 +491,9 @@ export async function verifyLoginOTP(
     }
 
     // Active status
-    const status = data.status ?? (data.isVerified ? 'active' : 'inactive');
+    const status = (data.status === 'pending' && data.isVerified) 
+      ? 'active' 
+      : (data.status ?? (data.isVerified ? 'active' : 'inactive'));
     if (status !== 'active') {
       try { await auth.signOut(); } catch (_) {}
       return { success: false, error: 'Access denied. Account not active.' };

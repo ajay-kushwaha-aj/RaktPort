@@ -398,6 +398,7 @@ export async function verifyOrganization(
   await updateDoc(doc(db, 'users', orgId), {
     isVerified: action === 'verified',
     verificationStatus: action,
+    status: action === 'verified' ? 'active' : 'rejected',
     verifiedAt: new Date().toISOString(),
     verifiedBy: adminId,
   });
