@@ -13,7 +13,7 @@ import { LocateDonationSite } from './components/LocateDonationSite';
 // --- Import the dashboards with CONSISTENT DEFAULT IMPORTS ---
 import HospitalDashboard from './components/hospital/HospitalDashboard';
 import BloodBankDashboard from './components/BloodBankDashboard';
-import AdminDashboard from './components/AdminDashboard';
+import AdminLayout from './admin/AdminLayout';
 import { Button } from './components/ui/button';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { CookieConsent } from './components/CookieConsent';
@@ -179,7 +179,7 @@ function AppContent() {
         return <BloodBankDashboard onLogout={handleLogout} />;
 
       case 'admin':
-        return <AdminDashboard onLogout={handleLogout} />;
+        return <AdminLayout onLogout={handleLogout} />;
 
       default:
         return (
