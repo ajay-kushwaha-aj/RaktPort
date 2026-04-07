@@ -622,46 +622,81 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
             <div className="lp-imp-grid">
               {/* Left: Donation Journey Diagram */}
               <div className="lp-imp-dia">
-                <svg viewBox="0 0 400 360" fill="none" className="lp-imp-svg">
-                  {/* Donation */}
-                  <circle cx="80" cy="70" r="48" fill="rgba(196,30,58,0.07)" stroke="rgba(196,30,58,0.18)" strokeWidth="1.5" />
-                  <text x="80" y="60" textAnchor="middle" fontSize="24">🩸</text>
-                  <text x="80" y="80" textAnchor="middle" fontSize="10" fontWeight="700" fill="var(--rp-text, #1A0505)">Donor</text>
-                  {/* Arrow 1 */}
-                  <path d="M128 55 L170 55" stroke="rgba(196,30,58,0.3)" strokeWidth="2" strokeDasharray="4 3" markerEnd="url(#impArr)" />
-                  {/* Testing */}
-                  <circle cx="220" cy="50" r="42" fill="rgba(196,30,58,0.07)" stroke="rgba(196,30,58,0.18)" strokeWidth="1.5" />
-                  <text x="220" y="42" textAnchor="middle" fontSize="22">🔬</text>
-                  <text x="220" y="60" textAnchor="middle" fontSize="10" fontWeight="700" fill="var(--rp-text, #1A0505)">RTID Generation</text>
-                  {/* Arrow 2 */}
-                  <path d="M262 55 L300 80" stroke="rgba(196,30,58,0.3)" strokeWidth="2" strokeDasharray="4 3" markerEnd="url(#impArr)" />
-                  {/* Storage */}
-                  <circle cx="330" cy="120" r="44" fill="rgba(196,30,58,0.07)" stroke="rgba(196,30,58,0.18)" strokeWidth="1.5" />
-                  <text x="330" y="112" textAnchor="middle" fontSize="22">🏦</text>
-                  <text x="330" y="130" textAnchor="middle" fontSize="10" fontWeight="700" fill="var(--rp-text, #1A0505)">Nearest Certified Center</text>
-                  {/* Arrow 3 */}
-                  <path d="M316 162 L280 210" stroke="rgba(196,30,58,0.3)" strokeWidth="2" strokeDasharray="4 3" markerEnd="url(#impArr)" />
-                  {/* Hospital */}
-                  <circle cx="240" cy="250" r="46" fill="rgba(196,30,58,0.07)" stroke="rgba(196,30,58,0.18)" strokeWidth="1.5" />
-                  <text x="240" y="242" textAnchor="middle" fontSize="24">🏥</text>
-                  <text x="240" y="262" textAnchor="middle" fontSize="10" fontWeight="700" fill="var(--rp-text, #1A0505)">Patient Allocation</text>
-                  {/* Arrow 4 */}
-                  <path d="M194 260 L140 280" stroke="rgba(196,30,58,0.3)" strokeWidth="2" strokeDasharray="4 3" markerEnd="url(#impArr)" />
-                  {/* Recovery */}
-                  <circle cx="100" cy="295" r="46" fill="rgba(16,185,129,0.08)" stroke="rgba(16,185,129,0.22)" strokeWidth="1.5" />
-                  <text x="100" y="284" textAnchor="middle" fontSize="22">💚</text>
-                  <text x="100" y="302" textAnchor="middle" fontSize="9" fontWeight="700" fill="var(--rp-text, #1A0505)">Recovery</text>
-                  <text x="100" y="316" textAnchor="middle" fontSize="8" fill="rgba(122,96,96,0.7)">Tracking</text>
-                  {/* Arrow marker */}
+                <svg viewBox="0 0 420 390" fill="none" className="lp-imp-svg">
                   <defs>
-                    <marker id="impArr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-                      <path d="M0,0 L8,3 L0,6" fill="rgba(196,30,58,0.4)" />
+                    {/* Arrow marker */}
+                    <marker id="impArr" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                      <path d="M0,0 L10,3.5 L0,7 Z" fill="rgba(196,30,58,0.65)" />
                     </marker>
+                    {/* Node radial gradient – red */}
+                    <radialGradient id="ng1" cx="40%" cy="35%" r="65%">
+                      <stop offset="0%" stopColor="rgba(196,30,58,0.22)" />
+                      <stop offset="100%" stopColor="rgba(196,30,58,0.07)" />
+                    </radialGradient>
+                    {/* Node radial gradient – green */}
+                    <radialGradient id="ng2" cx="40%" cy="35%" r="65%">
+                      <stop offset="0%" stopColor="rgba(16,185,129,0.22)" />
+                      <stop offset="100%" stopColor="rgba(16,185,129,0.07)" />
+                    </radialGradient>
                   </defs>
-                  {/* Decorative elements */}
-                  <circle cx="170" cy="170" r="4" fill="rgba(196,30,58,0.15)" />
-                  <circle cx="350" cy="230" r="3" fill="rgba(196,30,58,0.12)" />
-                  <circle cx="50" cy="180" r="3.5" fill="rgba(16,185,129,0.15)" />
+
+                  {/* ── CONNECTING ARROWS ── */}
+                  {/* 1→2  Donor → RTID Gen  (horizontal right) */}
+                  <line x1="121" y1="105" x2="159" y2="105" stroke="rgba(196,30,58,0.5)" strokeWidth="2" strokeDasharray="5,3" markerEnd="url(#impArr)" />
+                  {/* 2→3  RTID Gen → Blood Bank  (horizontal right) */}
+                  <line x1="256" y1="105" x2="294" y2="105" stroke="rgba(196,30,58,0.5)" strokeWidth="2" strokeDasharray="5,3" markerEnd="url(#impArr)" />
+                  {/* 3→4  Blood Bank → Patient Allocation  (curved diagonal down-left) */}
+                  <path d="M315,143 Q308,207 241,248" stroke="rgba(196,30,58,0.5)" strokeWidth="2" strokeDasharray="5,3" fill="none" markerEnd="url(#impArr)" />
+                  {/* 4→5  Patient Allocation → Recovery  (horizontal left) */}
+                  <line x1="164" y1="285" x2="122" y2="285" stroke="rgba(196,30,58,0.5)" strokeWidth="2" strokeDasharray="5,3" markerEnd="url(#impArr)" />
+
+                  {/* ── NODE 1 : DONOR ── */}
+                  <circle cx="75" cy="105" r="52" fill="rgba(196,30,58,0.05)" />
+                  <circle cx="75" cy="105" r="44" fill="url(#ng1)" stroke="rgba(196,30,58,0.3)" strokeWidth="1.5" />
+                  <text x="75" y="95" textAnchor="middle" fontSize="24">🩸</text>
+                  <text x="75" y="116" textAnchor="middle" fontSize="11" fontWeight="700" fill="#C41E3A">Donor</text>
+                  <circle cx="107" cy="70" r="13" fill="#C41E3A" />
+                  <text x="107" y="75" textAnchor="middle" fontSize="11" fontWeight="800" fill="white">1</text>
+
+                  {/* ── NODE 2 : RTID GENERATION ── */}
+                  <circle cx="207" cy="105" r="52" fill="rgba(196,30,58,0.05)" />
+                  <circle cx="207" cy="105" r="44" fill="url(#ng1)" stroke="rgba(196,30,58,0.3)" strokeWidth="1.5" />
+                  <text x="207" y="93" textAnchor="middle" fontSize="22">🔬</text>
+                  <text x="207" y="112" textAnchor="middle" fontSize="10" fontWeight="700" fill="#C41E3A">RTID</text>
+                  <text x="207" y="124" textAnchor="middle" fontSize="10" fontWeight="700" fill="#C41E3A">Generation</text>
+                  <circle cx="239" cy="70" r="13" fill="#C41E3A" />
+                  <text x="239" y="75" textAnchor="middle" fontSize="11" fontWeight="800" fill="white">2</text>
+
+                  {/* ── NODE 3 : CERTIFIED BLOOD BANK ── */}
+                  <circle cx="339" cy="105" r="52" fill="rgba(196,30,58,0.05)" />
+                  <circle cx="339" cy="105" r="44" fill="url(#ng1)" stroke="rgba(196,30,58,0.3)" strokeWidth="1.5" />
+                  <text x="339" y="93" textAnchor="middle" fontSize="22">🏦</text>
+                  <text x="339" y="112" textAnchor="middle" fontSize="10" fontWeight="700" fill="#C41E3A">Certified</text>
+                  <text x="339" y="124" textAnchor="middle" fontSize="10" fontWeight="700" fill="#C41E3A">Blood Bank</text>
+                  <circle cx="371" cy="70" r="13" fill="#C41E3A" />
+                  <text x="371" y="75" textAnchor="middle" fontSize="11" fontWeight="800" fill="white">3</text>
+
+                  {/* ── NODE 4 : PATIENT ALLOCATION ── */}
+                  <circle cx="207" cy="285" r="52" fill="rgba(196,30,58,0.05)" />
+                  <circle cx="207" cy="285" r="44" fill="url(#ng1)" stroke="rgba(196,30,58,0.3)" strokeWidth="1.5" />
+                  <text x="207" y="273" textAnchor="middle" fontSize="24">🏥</text>
+                  <text x="207" y="293" textAnchor="middle" fontSize="10" fontWeight="700" fill="#C41E3A">Patient</text>
+                  <text x="207" y="305" textAnchor="middle" fontSize="10" fontWeight="700" fill="#C41E3A">Allocation</text>
+                  <circle cx="239" cy="250" r="13" fill="#C41E3A" />
+                  <text x="239" y="255" textAnchor="middle" fontSize="11" fontWeight="800" fill="white">4</text>
+
+                  {/* ── NODE 5 : RECOVERY ── */}
+                  <circle cx="75" cy="285" r="52" fill="rgba(16,185,129,0.05)" />
+                  <circle cx="75" cy="285" r="44" fill="url(#ng2)" stroke="rgba(16,185,129,0.32)" strokeWidth="1.5" />
+                  <text x="75" y="273" textAnchor="middle" fontSize="24">💚</text>
+                  <text x="75" y="293" textAnchor="middle" fontSize="11" fontWeight="700" fill="rgba(5,150,105,1)">Recovery</text>
+                  <text x="75" y="305" textAnchor="middle" fontSize="9.5" fill="rgba(5,150,105,0.75)">&amp; Tracking</text>
+                  <circle cx="107" cy="250" r="13" fill="rgba(5,150,105,0.9)" />
+                  <text x="107" y="255" textAnchor="middle" fontSize="11" fontWeight="800" fill="white">5</text>
+
+                  {/* ── DECORATIVE CENTRE DOT ── */}
+                  <circle cx="207" cy="195" r="5" fill="rgba(196,30,58,0.12)" />
+                  <circle cx="207" cy="195" r="2.5" fill="rgba(196,30,58,0.3)" />
                 </svg>
               </div>
               {/* Right: Content */}
@@ -751,49 +786,6 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
                   <span className="lp-rcta">Get Started <ArrowRight size={12} /></span>
                 </button>
               ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ══ IMPACT SECTION ══ */}
-        <section className="lp-sec bg-white dark:bg-[#130408] relative">
-          <div className="lp-c relative z-10 px-4 md:px-8 max-w-6xl mx-auto">
-            <div className="text-center md:text-left mb-12">
-              <p className="text-[var(--clr-brand)] font-bold tracking-widest text-sm uppercase mb-2">Making a Difference</p>
-              <h2 className="text-4xl md:text-5xl font-bold text-[var(--txt-main)]">Our <span className="text-[var(--clr-brand)]">Impact</span></h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-0">
-              <div className="space-y-6">
-                <p className="text-[var(--text-secondary)] text-lg leading-relaxed text-left">
-                  RaktPort has streamlined emergency blood requests, ensuring that hospitals and patients connect with nearby donors in record time. Our network stands strong with over 18,000 active donors ready to respond.
-                </p>
-                <ul className="space-y-4 text-left">
-                  <li className="flex items-center gap-3 text-[var(--txt-main)] font-semibold text-lg">
-                    <CheckCircle2 size={24} className="text-[var(--clr-brand)] flex-shrink-0" /> Over 2,542+ lives saved
-                  </li>
-                  <li className="flex items-center gap-3 text-[var(--txt-main)] font-semibold text-lg">
-                    <CheckCircle2 size={24} className="text-[var(--clr-brand)] flex-shrink-0" /> Response time reduced for rare phenotypes
-                  </li>
-                  <li className="flex items-center gap-3 text-[var(--txt-main)] font-semibold text-lg">
-                    <CheckCircle2 size={24} className="text-[var(--clr-brand)] flex-shrink-0" /> 24 active cities connected directly
-                  </li>
-                </ul>
-                <div className="pt-6 text-left">
-                  <a href="/impact" onClick={(e) => { e.preventDefault(); window.location.href = '/impact'; }} className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-[var(--clr-brand)] text-white font-bold rounded-xl shadow-lg shadow-[var(--clr-brand)]/20 hover:scale-[1.03] transition-all">
-                    See Full Impact & Stories <ArrowRight size={18} />
-                  </a>
-                </div>
-              </div>
-              <div className="relative group rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white dark:border-[#2A1015]">
-                <img src={bannerImage2} alt="Donation impact" className="w-full h-[400px] md:h-[450px] object-cover transition-transform duration-700 group-hover:scale-105" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex items-end p-8">
-                  <div className="text-white text-left">
-                    <h3 className="text-2xl font-bold mb-2">Real Stories, Real Lives</h3>
-                    <p className="text-white/85 text-base">Every drop counts towards building a sustainable and self-reliant healthcare ecosystem.</p>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </section>

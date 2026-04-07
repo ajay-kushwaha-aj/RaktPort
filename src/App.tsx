@@ -9,6 +9,7 @@ import { SignupPage } from './components/SignupPage';
 import { AdminSignupPage } from './components/AdminSignupPage';
 import { DonorDashboard } from './components/DonorDashboard';
 import { ImpactPage } from './components/ImpactPage';
+import { LocateDonationSite } from './components/LocateDonationSite';
 // --- Import the dashboards with CONSISTENT DEFAULT IMPORTS ---
 import HospitalDashboard from './components/hospital/HospitalDashboard';
 import BloodBankDashboard from './components/BloodBankDashboard';
@@ -296,6 +297,22 @@ function AppContent() {
                 />
                 <main className="flex-1">
                   <ImpactPage />
+                </main>
+                <Footer />
+              </div>
+            }
+          />
+
+          <Route
+            path="/locate-site"
+            element={
+              <div className="min-h-screen flex flex-col">
+                <Header
+                  onLoginClick={handleLoginClick}
+                  onSignupClick={handleSignupClick}
+                />
+                <main className="flex-1">
+                  <LocateDonationSite />
                 </main>
                 <Footer />
               </div>

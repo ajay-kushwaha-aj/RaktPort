@@ -19,7 +19,7 @@
 // ─────────────────────────────────────────────────────────────
 
 import { useState, useEffect, useCallback, useRef, ReactNode } from 'react';
-import { Globe, X, ChevronDown, Zap, Home, Info, Lightbulb, Droplets, CheckSquare, CalendarRange, ClipboardList, Microscope, Hospital, TestTubes } from 'lucide-react';
+import { Globe, X, ChevronDown, Zap, Home, Info, Lightbulb, Droplets, CheckSquare, MapPin, ClipboardList, Microscope, Hospital, TestTubes } from 'lucide-react';
 import raktportLogo from '../assets/raktport-logo.png';
 import { ModeToggle } from './mode-toggle';
 
@@ -38,7 +38,7 @@ const COPY = {
     impact: 'Impact',
     donor: 'Become a Donor',
     eligibility: 'Eligibility Rules',
-    camp: 'Find Donation Camp',
+    camp: 'Locate Donation Site',
     login: 'Login',
     register: 'Register',
     sos: 'Need Blood Now',
@@ -46,8 +46,8 @@ const COPY = {
     ddDonorDesc: 'Create your donor profile',
     ddEli: 'Check Eligibility',
     ddEliDesc: 'Donation health criteria & rules',
-    ddCamp: 'Find Donation Camp',
-    ddCampDesc: 'Blood camps near you',
+    ddCamp: 'Locate Donation Site',
+    ddCampDesc: 'Find blood banks & camps near you',
     ddPrep: 'Preparation & Aftercare',
     ddPrepDesc: 'What to do before & after donation',
     ddHospital: 'For Hospitals',
@@ -65,7 +65,7 @@ const COPY = {
     impact: 'प्रभाव',
     donor: 'दाता बनें',
     eligibility: 'पात्रता नियम',
-    camp: 'शिविर खोजें',
+    camp: 'डोनेशन साइट खोजें',
     login: 'लॉगिन',
     register: 'रजिस्टर',
     sos: 'तुरंत रक्त चाहिए',
@@ -73,8 +73,8 @@ const COPY = {
     ddDonorDesc: 'अपनी प्रोफाइल बनाएं',
     ddEli: 'पात्रता जांचें',
     ddEliDesc: 'स्वास्थ्य मानदंड और नियम',
-    ddCamp: 'शिविर खोजें',
-    ddCampDesc: 'आपके पास शिविर',
+    ddCamp: 'डोनेशन साइट खोजें',
+    ddCampDesc: 'नजदीकी ब्लड बैंक और शिविर',
     ddPrep: 'तैयारी और देखभाल',
     ddPrepDesc: 'दान से पहले और बाद में',
     ddHospital: 'अस्पतालों के लिए',
@@ -274,7 +274,7 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
                   <DDRow icon="" title={t.ddEli} desc={t.ddEliDesc}
                     href="/Donation-eligibility-rules.html" onClick={closeAll} />
                   <DDRow icon="" title={t.ddCamp} desc={t.ddCampDesc}
-                    href="/bloodcenter.html" onClick={closeAll} />
+                    href="/locate-site" onClick={closeAll} />
                   <DDRow icon="" title={t.ddPrep} desc={t.ddPrepDesc}
                     href="/Donation-Preparation&Aftercare.html" onClick={closeAll} />
                 </Dropdown>
@@ -285,7 +285,7 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
               </li>
 
               <li>
-                <a href="/bloodcenter.html" className="rph-pill">{t.camp}</a>
+                <a href="/locate-site" className="rph-pill" onClick={(e) => { e.preventDefault(); window.location.href = '/locate-site'; }}>{t.camp}</a>
               </li>
 
             </ul>
@@ -401,7 +401,7 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
           <DLink icon={<Droplets size={16} />} label={t.donor}
             onClick={() => { onSignupClick?.('donor'); setDrawer(false); }} />
           <DLink href="/Donation-eligibility-rules.html" icon={<CheckSquare size={16} />} label={t.eligibility} onClick={() => setDrawer(false)} />
-          <DLink href="/bloodcenter.html" icon={<CalendarRange size={16} />} label={t.camp} onClick={() => setDrawer(false)} />
+          <DLink href="/locate-site" icon={<MapPin size={16} />} label={t.camp} onClick={() => setDrawer(false)} />
           <DLink href="/Donation-Preparation&Aftercare.html" icon={<ClipboardList size={16} />} label="Preparation & Aftercare" onClick={() => setDrawer(false)} />
           <DLink href="/compatibility.html" icon={<Microscope size={16} />} label="Blood Compatibility Chart" onClick={() => setDrawer(false)} />
         </nav>

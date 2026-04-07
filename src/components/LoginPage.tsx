@@ -40,18 +40,18 @@ type LoginTab = 'smart' | 'email';
 type FlowStep = 'input' | 'found' | 'otp';
 
 const ROLES = [
-  { id: 'donor',     label: 'Donor',      Icon: Droplet,     color: 'from-red-500    to-pink-500'    },
-  { id: 'hospital',  label: 'Hospital',   Icon: Building2,   color: 'from-blue-500   to-cyan-500'    },
-  { id: 'bloodbank', label: 'Blood Bank', Icon: UserCircle,  color: 'from-purple-500 to-violet-500'  },
-  { id: 'admin',     label: 'Admin',      Icon: ShieldCheck, color: 'from-emerald-500 to-teal-500'   },
+  { id: 'donor', label: 'Donor', Icon: Droplet, color: 'from-red-500    to-pink-500' },
+  { id: 'hospital', label: 'Hospital', Icon: Building2, color: 'from-blue-500   to-cyan-500' },
+  { id: 'bloodbank', label: 'Blood Bank', Icon: UserCircle, color: 'from-purple-500 to-violet-500' },
+  { id: 'admin', label: 'Admin', Icon: ShieldCheck, color: 'from-emerald-500 to-teal-500' },
 ] as const;
 
 const TYPE_BADGE: Record<InputType, { label: string; Icon: any; color: string } | null> = {
-  internalId: { label: 'User ID',   Icon: Fingerprint, color: 'bg-blue-100 text-blue-700'   },
-  username:   { label: '@rakt',     Icon: AtSign,      color: 'bg-purple-100 text-purple-700'},
-  phone:      { label: 'Phone',     Icon: Phone,       color: 'bg-green-100 text-green-700'  },
-  email:      { label: 'Email',     Icon: Mail,        color: 'bg-amber-100 text-amber-700'  },
-  unknown:    null,
+  internalId: { label: 'User ID', Icon: Fingerprint, color: 'bg-blue-100 text-blue-700' },
+  username: { label: '@rakt', Icon: AtSign, color: 'bg-purple-100 text-purple-700' },
+  phone: { label: 'Phone', Icon: Phone, color: 'bg-green-100 text-green-700' },
+  email: { label: 'Email', Icon: Mail, color: 'bg-amber-100 text-amber-700' },
+  unknown: null,
 };
 
 /* ─── Sub-components ─── */
@@ -59,10 +59,10 @@ const TYPE_BADGE: Record<InputType, { label: string; Icon: any; color: string } 
 function GoogleIcon({ size = 18 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden="true">
-      <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-      <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-      <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-      <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+      <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+      <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+      <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+      <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
     </svg>
   );
 }
@@ -96,7 +96,7 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  
+
   // Forgot Password
   const [showForgotPwd, setShowForgotPwd] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
@@ -136,7 +136,7 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
   useEffect(() => {
     const v = initRecaptcha('lp-recaptcha');
     setRecaptchaV(v);
-    return () => { try { v?.clear(); } catch (_) {} };
+    return () => { try { v?.clear(); } catch (_) { } };
   }, []);
 
   useEffect(() => {
@@ -153,8 +153,8 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
     localStorage.setItem('userEmail', emailAddr);
     localStorage.setItem('userUid', userId);
     if (ids?.internalId) localStorage.setItem('internalId', ids.internalId);
-    if (ids?.donorId)    localStorage.setItem('donorId', ids.donorId);
-    if (ids?.username)   localStorage.setItem('username', ids.username);
+    if (ids?.donorId) localStorage.setItem('donorId', ids.donorId);
+    if (ids?.username) localStorage.setItem('username', ids.username);
   };
 
   // ═══ HANDLER: Smart Lookup ═══
@@ -169,15 +169,15 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
     setLookupLoading(true);
     try {
       let result: UserLookupResult;
-      if (type === 'internalId')     result = await lookupUserByInternalId(v);
-      else if (type === 'username')  result = await lookupUserByUsername(v);
-      else                           result = await lookupUserByPhone(v);
+      if (type === 'internalId') result = await lookupUserByInternalId(v);
+      else if (type === 'username') result = await lookupUserByUsername(v);
+      else result = await lookupUserByPhone(v);
 
       if (!result.found) {
         toast.error('User not registered', {
           description: type === 'internalId' ? 'No account found with this ID.'
             : type === 'username' ? 'No account with this username.'
-            : 'This phone number is not registered.',
+              : 'This phone number is not registered.',
         });
         return;
       }
@@ -323,8 +323,8 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
 
         {role !== 'admin' && (
           <div className="relative pointer-events-auto">
-            <button 
-              onClick={() => setInstMenuOpen(o => !o)} 
+            <button
+              onClick={() => setInstMenuOpen(o => !o)}
               className="inline-flex items-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2 bg-[var(--bg-surface)]/85 backdrop-blur-md rounded-full shadow-md hover:shadow-lg hover:bg-[var(--bg-surface)] border border-gray-200 active:scale-95 transition-all text-xs sm:text-sm font-semibold text-gray-700"
             >
               <Building2 className="w-4 h-4 text-blue-500" />
@@ -377,9 +377,8 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
                   { id: 'email' as LoginTab, label: 'Email', Icon: Mail },
                 ] as const).map(t => (
                   <button key={t.id} type="button" onClick={() => setTab(t.id)} disabled={anyBusy}
-                    className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all touch-manipulation ${
-                      tab === t.id ? 'bg-[var(--bg-surface)] shadow-sm text-[var(--text-primary)]' : 'text-[var(--text-secondary)] hover:text-gray-700 hover:bg-[var(--bg-surface)]/50'
-                    } disabled:opacity-50`}>
+                    className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all touch-manipulation ${tab === t.id ? 'bg-[var(--bg-surface)] shadow-sm text-[var(--text-primary)]' : 'text-[var(--text-secondary)] hover:text-gray-700 hover:bg-[var(--bg-surface)]/50'
+                      } disabled:opacity-50`}>
                     <t.Icon className="w-3.5 h-3.5" />
                     {t.label}
                   </button>
@@ -426,9 +425,8 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
                       </div>
 
                       <button type="button" onClick={handleSmartLookup} disabled={anyBusy || !smartInput.trim()}
-                        className={`w-full min-h-[50px] py-3 sm:py-3.5 rounded-xl font-bold text-[var(--txt-inverse)] text-sm sm:text-base shadow-lg transition-all touch-manipulation ${
-                          anyBusy || !smartInput.trim() ? 'bg-gray-300 cursor-not-allowed' : `bg-gradient-to-r ${current.color} hover:shadow-xl hover:scale-[1.01] active:scale-[0.99]`
-                        }`}>
+                        className={`w-full min-h-[50px] py-3 sm:py-3.5 rounded-xl font-bold text-[var(--txt-inverse)] text-sm sm:text-base shadow-lg transition-all touch-manipulation ${anyBusy || !smartInput.trim() ? 'bg-gray-300 cursor-not-allowed' : `bg-gradient-to-r ${current.color} hover:shadow-xl hover:scale-[1.01] active:scale-[0.99]`
+                          }`}>
                         {lookupLoading
                           ? <span className="flex items-center justify-center gap-2"><Spinner white />Finding account…</span>
                           : <span className="flex items-center justify-center gap-2"><Search className="w-4 h-4" />Find My Account</span>}
@@ -484,9 +482,8 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
                         <button type="button" onClick={resetFlow} disabled={anyBusy}
                           className="px-4 py-3 border-2 border-[var(--border-color)] rounded-xl text-sm font-semibold text-gray-700 hover:bg-[var(--bg-page)] active:scale-95 transition-all disabled:opacity-50">← Back</button>
                         <button type="button" onClick={handleSendOTP} disabled={anyBusy}
-                          className={`flex-1 min-h-[50px] py-3 rounded-xl font-bold text-[var(--txt-inverse)] text-sm shadow-lg transition-all touch-manipulation ${
-                            anyBusy ? 'bg-gray-300 cursor-not-allowed' : `bg-gradient-to-r ${current.color} hover:shadow-xl active:scale-[0.99]`
-                          }`}>
+                          className={`flex-1 min-h-[50px] py-3 rounded-xl font-bold text-[var(--txt-inverse)] text-sm shadow-lg transition-all touch-manipulation ${anyBusy ? 'bg-gray-300 cursor-not-allowed' : `bg-gradient-to-r ${current.color} hover:shadow-xl active:scale-[0.99]`
+                            }`}>
                           {otpSending
                             ? <span className="flex items-center justify-center gap-2"><Spinner white />Sending…</span>
                             : <span className="flex items-center justify-center gap-2"><KeyRound className="w-4 h-4" />Send OTP</span>}
@@ -511,18 +508,16 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
                           <input key={idx} id={`lp-otp-${uid}-${idx}`} type="text" inputMode="numeric" maxLength={1}
                             value={digit} onChange={e => changeOtpDigit(idx, e.target.value)} onKeyDown={e => otpKeyDown(idx, e)}
                             disabled={verifyLoading} aria-label={`OTP digit ${idx + 1}`}
-                            className={`text-center text-xl sm:text-2xl font-bold border-2 rounded-xl outline-none transition-all touch-manipulation text-[var(--text-primary)] ${
-                              digit ? 'bg-[var(--bg-surface)] border-gray-500' : 'bg-[var(--bg-surface)]/60 border-[var(--border-color)] focus:border-gray-500 focus:ring-4 focus:ring-gray-200/50'
-                            } disabled:opacity-50`} style={{ width: 44, height: 52 }} />
+                            className={`text-center text-xl sm:text-2xl font-bold border-2 rounded-xl outline-none transition-all touch-manipulation text-[var(--text-primary)] ${digit ? 'bg-[var(--bg-surface)] border-gray-500' : 'bg-[var(--bg-surface)]/60 border-[var(--border-color)] focus:border-gray-500 focus:ring-4 focus:ring-gray-200/50'
+                              } disabled:opacity-50`} style={{ width: 44, height: 52 }} />
                         ))}
                       </div>
 
                       <button type="button" onClick={handleVerifyOTP} disabled={anyBusy || otp.join('').length !== 6}
-                        className={`w-full min-h-[50px] py-3 sm:py-3.5 rounded-xl font-bold text-[var(--txt-inverse)] text-sm sm:text-base shadow-lg transition-all touch-manipulation ${
-                          otp.join('').length === 6 && !anyBusy
+                        className={`w-full min-h-[50px] py-3 sm:py-3.5 rounded-xl font-bold text-[var(--txt-inverse)] text-sm sm:text-base shadow-lg transition-all touch-manipulation ${otp.join('').length === 6 && !anyBusy
                             ? `bg-gradient-to-r ${current.color} hover:shadow-xl active:scale-[0.99]`
                             : 'bg-gray-300 cursor-not-allowed'
-                        }`}>
+                          }`}>
                         {verifyLoading
                           ? <span className="flex items-center justify-center gap-2"><Spinner white />Verifying…</span>
                           : <span className="flex items-center justify-center gap-2"><ShieldCheck className="w-4 h-4" />Verify & Login</span>}
@@ -573,9 +568,8 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
                     </div>
                   </div>
                   <button type="submit" disabled={anyBusy}
-                    className={`w-full min-h-[50px] py-3 sm:py-4 rounded-xl font-bold text-[var(--txt-inverse)] text-sm sm:text-base shadow-lg transition-all duration-200 touch-manipulation ${
-                      anyBusy ? 'bg-gray-300 cursor-not-allowed' : `bg-gradient-to-r ${current.color} hover:shadow-xl hover:scale-[1.01] active:scale-[0.99]`
-                    }`}>
+                    className={`w-full min-h-[50px] py-3 sm:py-4 rounded-xl font-bold text-[var(--txt-inverse)] text-sm sm:text-base shadow-lg transition-all duration-200 touch-manipulation ${anyBusy ? 'bg-gray-300 cursor-not-allowed' : `bg-gradient-to-r ${current.color} hover:shadow-xl hover:scale-[1.01] active:scale-[0.99]`
+                      }`}>
                     {loginLoading ? <span className="flex items-center justify-center gap-2"><Spinner white />Signing in…</span> : 'Sign In'}
                   </button>
                 </form>

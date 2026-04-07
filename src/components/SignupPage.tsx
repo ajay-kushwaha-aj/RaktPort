@@ -24,7 +24,7 @@ import {
   User, Mail, Phone, Lock, MapPin, Calendar, Droplet,
   FileText, Building2, Heart, Shield, AlertCircle, Loader2,
   ChevronRight, ChevronLeft, Home, Smartphone, KeyRound,
-  Package, Clock, Zap, Check, Info, AtSign,
+  Package, Clock, Zap, Check, Info, AtSign, Navigation,
 } from 'lucide-react';
 import logo from '../assets/raktport-logo.png';
 import type { ConfirmationResult, RecaptchaVerifier } from 'firebase/auth';
@@ -72,7 +72,44 @@ const getSteps = (role: string) =>
     ? ['Basic','OTP','Details','Inventory','Address','Finish']
     : ['Basic','OTP','Details','Address','Finish'];
 
-/* ─────────────────── Helpers ─────────────────── */
+/* ─────────────────── GPS helper ─────────────────── */
+
+async function useNominatimGps(): Promise<{
+  lat: number; lng: number;
+  address?: string; district?: string; state?: string; pincode?: string; city?: string;
+}> {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) { reject(new Error('Geolocation not supported')); return; }
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&addressdetails=1`,
+            { headers: { 'Accept-Language': 'en' } }
+          );
+          const data = await res.json();
+          const a = data?.address || {};
+          resolve({
+            lat, lng,
+            city:     a.city || a.town || a.village || a.county || '',
+            district: a.county || a.city_district || a.suburb || '',
+            state:    a.state || '',
+            pincode:  a.postcode || '',
+            address:  data.display_name || '',
+          });
+        } catch {
+          resolve({ lat, lng });
+        }
+      },
+      (err) => reject(err),
+      { timeout: 12000, enableHighAccuracy: true }
+    );
+  });
+}
+
+
 
 function getPasswordStrength(pwd: string): { score: number; label: string; color: string } {
   let score = 0;
@@ -247,9 +284,33 @@ function GoogleProfileCompletion({
   const [state, setState] = useState('');
   const [pincode, setPincode] = useState('');
   const [mobile, setMobile] = useState('');
+  const [lat, setLat] = useState<number | null>(null);
+  const [lng, setLng] = useState<number | null>(null);
+  const [gpsDetecting, setGpsDetecting] = useState(false);
+  const [gpsStatus, setGpsStatus] = useState<'idle' | 'ok' | 'error'>('idle');
   const [inventory, setInventory] = useState<Record<string, number>>(
     Object.fromEntries(BLOOD_GROUPS.map(bg => [bg, 0]))
   );
+
+  /* GPS handler for modal */
+  const handleModalGps = async () => {
+    setGpsDetecting(true);
+    setGpsStatus('idle');
+    try {
+      const geo = await useNominatimGps();
+      setLat(geo.lat);
+      setLng(geo.lng);
+      if (geo.address) setAddress(geo.address);
+      if (geo.district) setDistrict(geo.district);
+      if (geo.state) setState(INDIAN_STATES.find(s => s.toLowerCase().includes(geo.state!.toLowerCase())) || geo.state || '');
+      if (geo.pincode) setPincode(geo.pincode.replace(/\D/g,'').slice(0,6));
+      setGpsStatus('ok');
+    } catch {
+      setGpsStatus('error');
+    } finally {
+      setGpsDetecting(false);
+    }
+  };
 
   const totalSteps = role === 'bloodbank' ? 3 : 2;
 
@@ -263,6 +324,9 @@ function GoogleProfileCompletion({
       const { db } = await import('../firebase');
       await updateDoc(doc(db, 'users', googleUid), {
         address, district, state, pincode,
+        ...(lat !== null && lng !== null && { lat, lng }),
+        cityLower: district.toLowerCase() || '',
+        city: district,
         mobile: mobile ? `+91${mobile}` : '',
         ...(role === 'hospital' && { registrationNo }),
         ...(role === 'bloodbank' && { licenseNo }),
@@ -365,6 +429,30 @@ function GoogleProfileCompletion({
           {((step === 2 && role !== 'bloodbank') || (step === 3 && role === 'bloodbank')) && (
             <div className="space-y-4 animate-fadein">
               <h3 className="font-bold text-[var(--text-primary)]">Address Details</h3>
+
+              {/* GPS Auto-detect button */}
+              <button
+                type="button"
+                onClick={handleModalGps}
+                disabled={gpsDetecting}
+                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border-2 border-dashed border-blue-300 bg-blue-50 text-blue-700 font-semibold text-sm hover:bg-blue-100 active:scale-[0.98] transition-all disabled:opacity-60"
+              >
+                {gpsDetecting
+                  ? <><Loader2 className="w-4 h-4 animate-spin" /> Detecting location…</>
+                  : <><Navigation className="w-4 h-4" /> Auto-detect My Location</>
+                }
+              </button>
+              {gpsStatus === 'ok' && (
+                <p className="flex items-center gap-1.5 text-xs text-green-700 font-medium">
+                  <CheckCircle2 className="w-3.5 h-3.5" /> Location detected and fields pre-filled. Edit if needed.
+                </p>
+              )}
+              {gpsStatus === 'error' && (
+                <p className="flex items-center gap-1.5 text-xs text-red-600 font-medium">
+                  <AlertCircle className="w-3.5 h-3.5" /> Could not detect location. Please fill in manually.
+                </p>
+              )}
+
               <Field label="Complete Address" required>
                 <div className="relative">
                   <Home className="absolute left-3 top-3 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -391,6 +479,11 @@ function GoogleProfileCompletion({
                   onChange={v => setPincode(v.replace(/\D/g,'').slice(0,6))} placeholder="110001"
                   iconLeft={<MapPin className="w-4 h-4" />} />
               </Field>
+              {lat !== null && lng !== null && (
+                <p className="text-[10px] text-gray-400 flex items-center gap-1">
+                  <MapPin className="w-3 h-3" /> GPS: {lat.toFixed(5)}, {lng.toFixed(5)} — coordinates saved for locator
+                </p>
+              )}
             </div>
           )}
 
@@ -470,9 +563,40 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
     bloodGroup: '', gender: '', dob: '', lastDonationDate: '',
     dontRemember: false, licenseNo: '', registrationNo: '',
     totalBeds: '', operatingHours: '',
+    lat: null as number | null,
+    lng: null as number | null,
     inventory: Object.fromEntries(BLOOD_GROUPS.map(bg => [bg, 0])) as Record<string, number>,
     acceptTerms: false,
   });
+
+  /* GPS state for address step */
+  const [gpsDetecting, setGpsDetecting] = useState(false);
+  const [gpsStatus, setGpsStatus] = useState<'idle' | 'ok' | 'error'>('idle');
+
+  /* GPS handler for main form */
+  const handleFormGps = useCallback(async () => {
+    setGpsDetecting(true);
+    setGpsStatus('idle');
+    try {
+      const geo = await useNominatimGps();
+      setForm(prev => ({
+        ...prev,
+        lat: geo.lat,
+        lng: geo.lng,
+        ...(geo.address  && { address:  geo.address }),
+        ...(geo.district && { district: geo.district }),
+        ...(geo.pincode  && { pincode:  geo.pincode.replace(/\D/g,'').slice(0,6) }),
+        ...(geo.state    && {
+          state: INDIAN_STATES.find(s => s.toLowerCase().includes(geo.state!.toLowerCase())) || geo.state || ''
+        }),
+      }));
+      setGpsStatus('ok');
+    } catch {
+      setGpsStatus('error');
+    } finally {
+      setGpsDetecting(false);
+    }
+  }, []);
 
   const [docs, setDocs] = useState<File[]>([]);
 
@@ -651,6 +775,9 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
         role, fullName: form.fullName, mobile: `+91${form.mobile}`,
         ...(form.username && { username: form.username }),
         address: form.address, district: form.district, state: form.state, pincode: form.pincode,
+        cityLower: form.district.toLowerCase() || form.pincode,
+        city: form.district,
+        ...(form.lat !== null && form.lng !== null && { lat: form.lat, lng: form.lng }),
         isVerified: role === 'donor',
         ...(role === 'donor'     && { aadhar: form.aadhar, bloodGroup: form.bloodGroup, gender: form.gender, dob: form.dob, lastDonationDate: form.dontRemember ? null : form.lastDonationDate, credits: 0 }),
         ...(role === 'hospital'  && { registrationNo: form.registrationNo, totalBeds: form.totalBeds }),
@@ -1147,6 +1274,43 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                 {((step === 4 && role !== 'bloodbank') || (step === 5 && role === 'bloodbank')) && (
                   <div className="space-y-4 animate-fadein">
                     <h2 className="text-base sm:text-xl font-bold text-[var(--text-primary)]">Address Details</h2>
+
+                    {/* GPS auto-detect button — only for hospitals and blood banks */}
+                    {(role === 'hospital' || role === 'bloodbank') && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={handleFormGps}
+                          disabled={gpsDetecting}
+                          className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 border-blue-300 bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-700 font-semibold text-sm hover:from-blue-100 hover:to-cyan-100 active:scale-[0.98] transition-all disabled:opacity-60 shadow-sm"
+                        >
+                          {gpsDetecting
+                            ? <><Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" /> Detecting your location…</>
+                            : <><Navigation className="w-4 h-4 sm:w-5 sm:h-5" /> Auto-detect My Institution's Location</>
+                          }
+                        </button>
+                        {gpsStatus === 'ok' && (
+                          <div className="flex items-center gap-2 p-2.5 bg-green-50 border border-green-200 rounded-xl">
+                            <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
+                            <span className="text-xs text-green-700 font-medium">Location detected! Fields pre-filled — edit if needed.</span>
+                            {form.lat !== null && (
+                              <span className="ml-auto text-[10px] text-green-500 font-mono tabular-nums">{form.lat.toFixed(4)}, {form.lng?.toFixed(4)}</span>
+                            )}
+                          </div>
+                        )}
+                        {gpsStatus === 'error' && (
+                          <div className="flex items-center gap-2 p-2.5 bg-red-50 border border-red-200 rounded-xl">
+                            <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
+                            <span className="text-xs text-red-600">Could not detect location. Please fill in the address manually.</span>
+                          </div>
+                        )}
+                        <div className="flex items-center gap-2" aria-hidden="true">
+                          <div className="flex-1 h-px bg-gray-200" />
+                          <span className="text-[10px] text-gray-400 font-medium whitespace-nowrap">or enter manually below</span>
+                          <div className="flex-1 h-px bg-gray-200" />
+                        </div>
+                      </>
+                    )}
 
                     <Field label="Complete Address" required>
                       <div className="relative group">

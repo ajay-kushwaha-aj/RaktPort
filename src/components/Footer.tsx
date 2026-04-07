@@ -48,7 +48,7 @@ const NAV_LINKS = [
   { label: 'Our Mission', href: '/our-mission.html' },
   { label: 'Become a Donor', href: '#' },
   { label: 'Eligibility Rules', href: '/Donation-eligibility-rules.html' },
-  { label: 'Find Donation Camp', href: '/bloodcenter.html' },
+  { label: 'Locate Donation Site', href: '/locate-site' },
   { label: 'Preparation & Aftercare', href: '/Donation-Preparation&Aftercare.html' },
   { label: 'Blood Compatibility', href: '/compatibility.html' },
 ];
@@ -74,7 +74,7 @@ const PARTNER_LINKS = [
   { label: 'For Hospitals', href: '#' },
   { label: 'For Blood Banks', href: '#' },
   { label: 'Admin Access', href: '#' },
-  { label: 'Find Blood Bank', href: '/bloodcenter.html' },
+  { label: 'Locate Donation Site', href: '/locate-site' },
   { label: 'MyGov Pledge', href: 'https://pledge.mygov.in/voluntary-blood-donation/' },
 ];
 
