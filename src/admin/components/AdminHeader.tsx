@@ -310,8 +310,8 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             }}
           >
             {[
-              { icon: User, label: 'Profile', action: () => {} },
-              { icon: Settings, label: 'Settings', action: () => {} },
+              { icon: User, label: 'Profile', action: () => { useAdminStore.getState().setActiveModule('settings'); } },
+              { icon: Settings, label: 'Settings', action: () => { useAdminStore.getState().setActiveModule('settings'); } },
             ].map(({ icon: Icon, label, action }) => (
               <button
                 key={label}

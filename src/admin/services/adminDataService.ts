@@ -13,6 +13,7 @@ import {
   query,
   orderBy,
   limit,
+  type Unsubscribe,
 } from 'firebase/firestore';
 
 import { useAdminStore } from '../store/adminStore';
@@ -284,7 +285,7 @@ export async function fetchAllAdminData(): Promise<void> {
         id: r.id,
         rtid: r.rtid || r.id,
         reason: r.fraudReason || 'Suspicious activity detected',
-        riskScore: r.riskScore || Math.floor(Math.random() * 40 + 60),
+        riskScore: r.riskScore || 75,
         createdAt: toDate(r.createdAt) || new Date(),
         status: 'open',
         requestedBy: r.patientName || r.hospitalName || 'Unknown',
@@ -340,7 +341,10 @@ export async function fetchAllAdminData(): Promise<void> {
     );
     store.setAuditLog(log);
 
-    // ── 11. Auto-notifications ────────────────────────────────────────────────
+    // ── 11. Auto-notifications (clear old auto-notifs first, only add real ones) ─
+    // Clear all existing notifications to avoid duplicate stacking on every fetch
+    notifStore.clearAll();
+
     if (pendingOrgs.length > 0) {
       notifStore.addNotification({
         title: 'Pending Verifications',
@@ -427,13 +431,17 @@ export async function verifyOrganization(
   ]);
 }
 
-// ─── Real-time Notification Listener ─────────────────────────────────────────
+// ─── Real-time Listeners ─────────────────────────────────────────────────────
+
+// Internal flag to skip the initial snapshot (which fires for all existing docs)
+let _initialSnapshotDone = false;
 
 /**
  * Subscribe to the top recent blood requests via onSnapshot for real-time notifications.
  * Returns the unsubscribe function.
  */
-export function subscribeToRealtimeAlerts(): () => void {
+export function subscribeToRealtimeAlerts(): Unsubscribe {
+  _initialSnapshotDone = false;
   try {
     const q = query(
       collection(db, 'bloodRequests'),
@@ -441,6 +449,10 @@ export function subscribeToRealtimeAlerts(): () => void {
       limit(1)
     );
     return onSnapshot(q, (snap) => {
+      if (!_initialSnapshotDone) {
+        _initialSnapshotDone = true;
+        return; // Skip the initial snapshot to avoid false notification
+      }
       snap.docChanges().forEach((change) => {
         if (change.type === 'added') {
           const data = change.doc.data() as Record<string, unknown>;
@@ -459,4 +471,48 @@ export function subscribeToRealtimeAlerts(): () => void {
   } catch (_) {
     return () => {};
   }
+}
+
+/**
+ * Subscribe to all major Firestore collections for real-time dashboard updates.
+ * When any document in users / bloodRequests / donations changes, re-fetches all data.
+ * Returns a single cleanup function that unsubscribes all listeners.
+ */
+export function subscribeToRealtimeData(): Unsubscribe {
+  // Debounce: avoid rapid re-fetches when multiple docs change at once
+  let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+  let initialUsersSnap = true;
+  let initialRequestsSnap = true;
+  let initialDonationsSnap = true;
+
+  const debouncedRefresh = () => {
+    if (debounceTimer) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      fetchAllAdminData().catch((e) =>
+        console.error('[adminDataService] realtime refresh failed:', e)
+      );
+    }, 1500); // 1.5s debounce
+  };
+
+  const unsubUsers = onSnapshot(collection(db, 'users'), () => {
+    if (initialUsersSnap) { initialUsersSnap = false; return; }
+    debouncedRefresh();
+  });
+
+  const unsubRequests = onSnapshot(collection(db, 'bloodRequests'), () => {
+    if (initialRequestsSnap) { initialRequestsSnap = false; return; }
+    debouncedRefresh();
+  });
+
+  const unsubDonations = onSnapshot(collection(db, 'donations'), () => {
+    if (initialDonationsSnap) { initialDonationsSnap = false; return; }
+    debouncedRefresh();
+  });
+
+  return () => {
+    if (debounceTimer) clearTimeout(debounceTimer);
+    unsubUsers();
+    unsubRequests();
+    unsubDonations();
+  };
 }

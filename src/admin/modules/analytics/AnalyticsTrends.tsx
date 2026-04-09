@@ -1,32 +1,53 @@
 import React, { useMemo } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import { AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Activity, TrendingUp } from 'lucide-react';
 import { useAdminStore } from '../../store/adminStore';
 
 /**
- * Helper to generate 6 months of placeholder/mock trend data 
- * because real timestamps might not span 6 months in a dev DB.
+ * Aggregate real data from the national ledger into monthly buckets
+ * for the last 6 months, using actual Firestore records.
  */
-const generateTrendData = () => {
-  const data = [];
-  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const today = new Date();
-  
-  for (let i = 5; i >= 0; i--) {
-    const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
-    data.push({
-      name: monthNames[d.getMonth()],
-      requests: Math.floor(Math.random() * 50) + 20,
-      donations: Math.floor(Math.random() * 60) + 30,
-      shortages: Math.floor(Math.random() * 15) + 2,
-    });
-  }
-  return data;
+const useTrendData = () => {
+  const { nationalLedger, nationalInventory } = useAdminStore();
+
+  return useMemo(() => {
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const today = new Date();
+    const buckets: { name: string; requests: number; donations: number; shortages: number }[] = [];
+
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      const monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+
+      const monthEntries = nationalLedger.filter((e) => {
+        const entryDate = new Date(e.createdAt || 0);
+        const entryKey = `${entryDate.getFullYear()}-${String(entryDate.getMonth() + 1).padStart(2, '0')}`;
+        return entryKey === monthKey;
+      });
+
+      const requests = monthEntries.filter((e) => e.type === 'request').length;
+      const donations = monthEntries.filter((e) => e.type === 'donation').length;
+      // Shortages: requests that are still pending (unfulfilled)
+      const shortages = monthEntries.filter(
+        (e) => e.type === 'request' && e.status.toLowerCase() === 'pending'
+      ).length;
+
+      buckets.push({
+        name: monthNames[d.getMonth()],
+        requests,
+        donations,
+        shortages,
+      });
+    }
+    return buckets;
+  }, [nationalLedger]);
 };
 
 export const AnalyticsTrends: React.FC = () => {
   const { loading } = useAdminStore();
-  const trendData = useMemo(() => generateTrendData(), []);
+  const trendData = useTrendData();
+
+  const hasData = trendData.some(d => d.requests > 0 || d.donations > 0);
 
   return (
     <div style={{ padding: '32px 36px', maxWidth: 1200, fontFamily: 'Inter, sans-serif' }}>
@@ -36,12 +57,20 @@ export const AnalyticsTrends: React.FC = () => {
           <Activity size={22} color="#a78bfa" /> Platform Trends
         </h2>
         <p style={{ fontSize: 13, color: '#6a5a5d', marginTop: 4 }}>
-          6-month historical analysis of national blood requests versus completed donations.
+          6-month historical analysis of national blood requests versus completed donations based on real data.
         </p>
       </div>
 
       {loading ? (
         <p style={{ color: '#6a5a5d' }}>Loading trends data...</p>
+      ) : !hasData ? (
+        <div style={{ background: '#0f0a0b', border: '1px solid #1e1214', borderRadius: 16, padding: '60px 32px', textAlign: 'center' }}>
+          <Activity size={36} color="#2a1a1d" style={{ margin: '0 auto 12px' }} />
+          <h3 style={{ fontSize: 16, color: '#e0d0d4', margin: 0 }}>No Trend Data Yet</h3>
+          <p style={{ color: '#6a5a5d', fontSize: 13, marginTop: 4 }}>
+            Trend charts will populate automatically as blood requests and donations accumulate over time.
+          </p>
+        </div>
       ) : (
         <div style={{ display: 'grid', gap: 24 }}>
           
@@ -74,7 +103,7 @@ export const AnalyticsTrends: React.FC = () => {
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#2e1a1e" vertical={false} />
                   <XAxis dataKey="name" stroke="#6a5a5d" tick={{ fill: '#6a5a5d', fontSize: 12 }} axisLine={false} tickLine={false} />
-                  <YAxis stroke="#6a5a5d" tick={{ fill: '#6a5a5d', fontSize: 12 }} axisLine={false} tickLine={false} />
+                  <YAxis stroke="#6a5a5d" tick={{ fill: '#6a5a5d', fontSize: 12 }} axisLine={false} tickLine={false} allowDecimals={false} />
                   <Tooltip 
                     contentStyle={{ background: '#1a1012', border: '1px solid #2e1a1e', borderRadius: 8, color: '#f0e0e4' }}
                     itemStyle={{ fontSize: 13, fontWeight: 500 }}
@@ -91,7 +120,7 @@ export const AnalyticsTrends: React.FC = () => {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
               <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: '#e0d0d4', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <TrendingUp size={18} color="#f87171" /> 
-                Critical Shortage Index
+                Unfulfilled Requests Index
               </h3>
             </div>
 
@@ -100,11 +129,11 @@ export const AnalyticsTrends: React.FC = () => {
                 <LineChart data={trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#2e1a1e" vertical={false} />
                   <XAxis dataKey="name" stroke="#6a5a5d" tick={{ fill: '#6a5a5d', fontSize: 12 }} axisLine={false} tickLine={false} />
-                  <YAxis stroke="#6a5a5d" tick={{ fill: '#6a5a5d', fontSize: 12 }} axisLine={false} tickLine={false} />
+                  <YAxis stroke="#6a5a5d" tick={{ fill: '#6a5a5d', fontSize: 12 }} axisLine={false} tickLine={false} allowDecimals={false} />
                   <Tooltip 
                     contentStyle={{ background: '#1a1012', border: '1px solid #2e1a1e', borderRadius: 8, color: '#f0e0e4' }}
                   />
-                  <Line type="monotone" dataKey="shortages" name="Unfulfilled Shortages" stroke="#f87171" strokeWidth={3} dot={{ r: 4, fill: '#140c0e' }} activeDot={{ r: 6 }} />
+                  <Line type="monotone" dataKey="shortages" name="Unfulfilled Requests" stroke="#f87171" strokeWidth={3} dot={{ r: 4, fill: '#140c0e' }} activeDot={{ r: 6 }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>

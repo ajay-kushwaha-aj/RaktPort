@@ -11,6 +11,7 @@ import {
   fetchAllAdminData,
   fetchAdminDetails,
   subscribeToRealtimeAlerts,
+  subscribeToRealtimeData,
 } from './services/adminDataService';
 import { toast } from 'sonner';
 
@@ -36,8 +37,15 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onLogout }) => {
     );
 
     // Real-time emergency alert subscription
-    const unsubscribe = subscribeToRealtimeAlerts();
-    return () => unsubscribe();
+    const unsubAlerts = subscribeToRealtimeAlerts();
+
+    // Real-time data listener — auto-refreshes dashboard when Firestore data changes
+    const unsubData = subscribeToRealtimeData();
+
+    return () => {
+      unsubAlerts();
+      unsubData();
+    };
   }, []);
 
   const adminEmail =

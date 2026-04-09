@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Activity, Clock } from 'lucide-react';
 import { useAdminStore } from '../../store/adminStore';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
@@ -12,12 +12,30 @@ export const LiveMetrics: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Generate some live mock data for the chart to show activity in the last 15 minutes
-  const chartData = Array.from({ length: 15 }).map((_, i) => ({
-    time: `-${15 - i}m`,
-    requests: Math.floor(Math.random() * 5 + (metrics.activeRTIDs / 50)),
-    donations: Math.floor(Math.random() * 8 + (metrics.totalDonations / 100))
-  }));
+  // Build real chart data from the national ledger: group by day for the last 15 days
+  const chartData = useMemo(() => {
+    const days: { time: string; requests: number; donations: number }[] = [];
+    const now = new Date();
+
+    for (let i = 14; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().split('T')[0]; // YYYY-MM-DD
+      const label = d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+
+      const dayEntries = nationalLedger.filter((e) => {
+        const entryDate = new Date(e.createdAt || 0);
+        return entryDate.toISOString().split('T')[0] === key;
+      });
+
+      days.push({
+        time: label,
+        requests: dayEntries.filter((e) => e.type === 'request').length,
+        donations: dayEntries.filter((e) => e.type === 'donation').length,
+      });
+    }
+    return days;
+  }, [nationalLedger]);
 
   return (
     <div style={{ padding: '32px 36px', maxWidth: 1200, fontFamily: 'Inter, sans-serif' }}>
@@ -27,7 +45,7 @@ export const LiveMetrics: React.FC = () => {
             <Activity size={22} color="#f472b6" /> Real-Time Live Metrics
           </h2>
           <p style={{ fontSize: 13, color: '#6a5a5d', marginTop: 4 }}>
-            Continuous stream of network activity and system load.
+            Live network activity based on actual Firestore data.
           </p>
         </div>
         <div style={{ background: '#0f0a0b', border: '1px solid #1e1214', borderRadius: 8, padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -53,18 +71,18 @@ export const LiveMetrics: React.FC = () => {
       </div>
 
       <div style={{ background: '#0f0a0b', border: '1px solid #1e1214', borderRadius: 16, padding: '24px' }}>
-        <h3 style={{ fontSize: 14, fontWeight: 600, color: '#c0b0b3', marginBottom: 24 }}>Network Activity (Last 15 Minutes)</h3>
+        <h3 style={{ fontSize: 14, fontWeight: 600, color: '#c0b0b3', marginBottom: 24 }}>Network Activity (Last 15 Days)</h3>
         <div style={{ height: 300, width: '100%' }}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
               <XAxis dataKey="time" stroke="#2e1a1e" tick={{ fill: '#6a5a5d', fontSize: 12 }} axisLine={false} tickLine={false} />
-              <YAxis stroke="#2e1a1e" tick={{ fill: '#6a5a5d', fontSize: 12 }} axisLine={false} tickLine={false} />
+              <YAxis stroke="#2e1a1e" tick={{ fill: '#6a5a5d', fontSize: 12 }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip
                 contentStyle={{ background: '#1a1012', border: '1px solid #2e1a1e', borderRadius: 8, color: '#f0e0e4' }}
                 itemStyle={{ color: '#f0e0e4' }}
               />
-              <Line type="monotone" dataKey="requests" stroke="#f472b6" strokeWidth={3} dot={false} />
-              <Line type="monotone" dataKey="donations" stroke="#60a5fa" strokeWidth={3} dot={false} />
+              <Line type="monotone" dataKey="requests" name="Requests" stroke="#f472b6" strokeWidth={3} dot={false} />
+              <Line type="monotone" dataKey="donations" name="Donations" stroke="#60a5fa" strokeWidth={3} dot={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>
