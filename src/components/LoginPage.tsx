@@ -252,7 +252,7 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
           internalId: result.internalId, donorId: result.donorId, username: result.username,
         });
         toast.success('Login successful!');
-        setTimeout(() => { window.location.href = '/'; }, 500);
+        setTimeout(() => { window.location.href = '/dashboard'; }, 500);
       } else {
         toast.error('Access denied', { description: result.error });
         setOtp(['', '', '', '', '', '']);
@@ -280,7 +280,7 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
       if (res.success) {
         persistSession(res.userId!, res.email ?? emailInput, role);
         toast.success('Login successful!');
-        setTimeout(() => { window.location.href = '/'; }, 500);
+        setTimeout(() => { window.location.href = '/dashboard'; }, 500);
       } else { toast.error('Login failed', { description: res.error }); }
     } catch (err: any) { toast.error('Login error', { description: err.message }); }
     finally { setLoginLoading(false); }
@@ -295,7 +295,7 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
         persistSession(res.userId!, res.email ?? '', role);
         if (res.displayName) localStorage.setItem('userName', res.displayName);
         toast.success('Signed in with Google!');
-        setTimeout(() => { window.location.href = '/'; }, 500);
+        setTimeout(() => { window.location.href = '/dashboard'; }, 500);
       } else if (res.error !== 'Sign-in cancelled.') {
         toast.error('Google sign-in failed', { description: res.error });
       }

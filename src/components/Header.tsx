@@ -19,9 +19,10 @@
 // ─────────────────────────────────────────────────────────────
 
 import { useState, useEffect, useCallback, useRef, ReactNode } from 'react';
-import { Globe, X, ChevronDown, Zap, Home, Info, Lightbulb, Droplets, CheckSquare, MapPin, ClipboardList, Microscope, Hospital, TestTubes } from 'lucide-react';
+import { Globe, X, ChevronDown, Zap, Home, Info, Lightbulb, Droplets, CheckSquare, MapPin, ClipboardList, Microscope, Hospital, TestTubes, UserCircle } from 'lucide-react';
 import raktportLogo from '../assets/raktport-logo.png';
 import { ModeToggle } from './mode-toggle';
+import { useNavigate } from 'react-router-dom';
 
 /* ─── Props ─────────────────────────────────────────────── */
 interface HeaderProps {
@@ -36,12 +37,13 @@ const COPY = {
     home: 'Home',
     about: 'About',
     impact: 'Impact',
-    donor: 'Become a Donor',
+    donor: 'Donate',
+    needBlood: 'Need Blood',
     eligibility: 'Eligibility Rules',
     camp: 'Locate Donation Site',
     login: 'Login',
     register: 'Register',
-    sos: 'Need Blood Now',
+    sos: 'Want to Donate',
     ddDonor: 'Register as Donor',
     ddDonorDesc: 'Create your donor profile',
     ddEli: 'Check Eligibility',
@@ -63,12 +65,13 @@ const COPY = {
     home: 'होम',
     about: 'हमारे बारे में',
     impact: 'प्रभाव',
-    donor: 'दाता बनें',
+    donor: 'रक्तदान',
+    needBlood: 'रक्त चाहिए',
     eligibility: 'पात्रता नियम',
     camp: 'डोनेशन साइट खोजें',
     login: 'लॉगिन',
     register: 'रजिस्टर',
-    sos: 'तुरंत रक्त चाहिए',
+    sos: 'रक्तदान करें',
     ddDonor: 'दाता के रूप में पंजीकरण',
     ddDonorDesc: 'अपनी प्रोफाइल बनाएं',
     ddEli: 'पात्रता जांचें',
@@ -105,6 +108,9 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
   const [drawer, setDrawer] = useState(false);
   const [openDD, setOpenDD] = useState<string | null>(null);
   const ddTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const navigate = useNavigate();
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
   const t = COPY[lang];
 
@@ -224,28 +230,20 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
         <nav className="rph-nav" aria-label="Main navigation">
           <div className="rph-nav-row">
 
-            {/* Nav links */}
+            {/* Nav links — simplified: Home, Donate (dropdown), Need Blood, Impact */}
             <ul className="rph-links" role="list">
 
               <li>
                 <a
                   href="/"
-                  className="rph-pill rph-active"
-                  onClick={e => { e.preventDefault(); window.location.href = '/'; }}
+                  className="rph-pill"
+                  onClick={e => { e.preventDefault(); navigate('/'); }}
                 >
                   {t.home}
                 </a>
               </li>
 
-              <li>
-                <a href="/about.html" className="rph-pill">{t.about}</a>
-              </li>
-
-              <li>
-                <a href="/impact" className="rph-pill" onClick={(e) => { e.preventDefault(); window.location.href = '/impact'; }}>{t.impact}</a>
-              </li>
-
-              {/* Become a Donor dropdown */}
+              {/* Donate dropdown — includes eligibility & locate center */}
               <li
                 className="rph-ddp"
                 onMouseEnter={() => openDD_('donor')}
@@ -281,11 +279,13 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
               </li>
 
               <li>
-                <a href="/Donation-eligibility-rules.html" className="rph-pill">{t.eligibility}</a>
+                <button className="rph-pill" onClick={() => { onSignupClick?.('donor'); }}>
+                  {t.needBlood}
+                </button>
               </li>
 
               <li>
-                <a href="/locate-site" className="rph-pill" onClick={(e) => { e.preventDefault(); window.location.href = '/locate-site'; }}>{t.camp}</a>
+                <a href="/impact" className="rph-pill" onClick={(e) => { e.preventDefault(); window.location.href = '/impact'; }}>{t.impact}</a>
               </li>
 
             </ul>
@@ -293,52 +293,60 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
             {/* Right: SOS + auth */}
             <div className="rph-nav-right">
 
-              <button className="rph-sos" onClick={() => onSignupClick?.('donor')} aria-label="Request emergency blood">
+              <button className="rph-sos" onClick={() => isLoggedIn ? navigate('/dashboard') : onLoginClick?.('donor')} aria-label="Want to donate blood">
                 <span className="rph-sos-ring" aria-hidden="true" />
-                <Zap size={12} aria-hidden="true" style={{ position: 'relative', zIndex: 1, flexShrink: 0 }} />
-                <span style={{ position: 'relative', zIndex: 1, whiteSpace: 'nowrap' }}>{t.sos}</span>
+                <Droplets size={12} aria-hidden="true" style={{ position: 'relative', zIndex: 1, flexShrink: 0 }} />
+                <span style={{ position: 'relative', zIndex: 1, whiteSpace: 'nowrap' }}>{isLoggedIn ? 'Donate Now' : t.sos}</span>
               </button>
 
-              {onLoginClick && (
-                <button onClick={() => onLoginClick?.('donor')} className="rph-btn-outline">{t.login}</button>
-              )}
+              {isLoggedIn ? (
+                <button onClick={() => navigate('/dashboard')} className="rph-btn-solid shadow-[0_4px_16px_rgba(196,30,58,0.25)] hover:-translate-y-0.5 active:translate-y-0 transition-all ml-1 flex items-center pr-4 pl-3.5">
+                  <UserCircle size={15} style={{ marginRight: 6 }}/> Dashboard
+                </button>
+              ) : (
+                <>
+                  {onLoginClick && (
+                    <button onClick={() => onLoginClick?.('donor')} className="rph-btn-outline">{t.login}</button>
+                  )}
 
-              {onSignupClick && (
-                <div
-                  className="rph-ddp"
-                  style={{ position: 'relative' }}
-                  onMouseEnter={() => openDD_('reg')}
-                  onMouseLeave={closeDD_}
-                >
-                  <button
-                    className="rph-btn-solid"
-                    aria-haspopup="true"
-                    aria-expanded={openDD === 'reg'}
-                    onClick={() => setOpenDD(p => p === 'reg' ? null : 'reg')}
-                  >
-                    {t.register}&nbsp;
-                    <ChevronDown
-                      size={11}
-                      aria-hidden="true"
-                      style={{ transition: 'transform .2s', transform: openDD === 'reg' ? 'rotate(180deg)' : 'none' }}
-                    />
-                  </button>
-                  <Dropdown
-                    open={openDD === 'reg'}
-                    align="right"
-                    minWidth={248}
-                    onMouseEnter={keepDD_}
-                    onMouseLeave={closeDD_}
-                  >
-                    <p className="rph-dd-label">{t.ddRoleLabel}</p>
-                    <RoleRow icon={<Droplets size={16} />} title={t.ddDonor} desc={t.ddDonorDesc}
-                      onClick={() => { onSignupClick?.('donor'); closeAll(); }} />
-                    <RoleRow icon={<Hospital size={16} />} title={t.ddHospital} desc={t.ddHospDesc}
-                      onClick={() => { onSignupClick?.('hospital'); closeAll(); }} />
-                    <RoleRow icon={<TestTubes size={16} />} title={t.ddBloodBank} desc={t.ddBBDesc}
-                      onClick={() => { onSignupClick?.('bloodbank'); closeAll(); }} />
-                  </Dropdown>
-                </div>
+                  {onSignupClick && (
+                    <div
+                      className="rph-ddp"
+                      style={{ position: 'relative' }}
+                      onMouseEnter={() => openDD_('reg')}
+                      onMouseLeave={closeDD_}
+                    >
+                      <button
+                        className="rph-btn-solid"
+                        aria-haspopup="true"
+                        aria-expanded={openDD === 'reg'}
+                        onClick={() => setOpenDD(p => p === 'reg' ? null : 'reg')}
+                      >
+                        {t.register}&nbsp;
+                        <ChevronDown
+                          size={11}
+                          aria-hidden="true"
+                          style={{ transition: 'transform .2s', transform: openDD === 'reg' ? 'rotate(180deg)' : 'none' }}
+                        />
+                      </button>
+                      <Dropdown
+                        open={openDD === 'reg'}
+                        align="right"
+                        minWidth={248}
+                        onMouseEnter={keepDD_}
+                        onMouseLeave={closeDD_}
+                      >
+                        <p className="rph-dd-label">{t.ddRoleLabel}</p>
+                        <RoleRow icon={<Droplets size={16} />} title={t.ddDonor} desc={t.ddDonorDesc}
+                          onClick={() => { onSignupClick?.('donor'); closeAll(); }} />
+                        <RoleRow icon={<Hospital size={16} />} title={t.ddHospital} desc={t.ddHospDesc}
+                          onClick={() => { onSignupClick?.('hospital'); closeAll(); }} />
+                        <RoleRow icon={<TestTubes size={16} />} title={t.ddBloodBank} desc={t.ddBBDesc}
+                          onClick={() => { onSignupClick?.('bloodbank'); closeAll(); }} />
+                      </Dropdown>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>

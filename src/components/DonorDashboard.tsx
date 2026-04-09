@@ -11,12 +11,13 @@ import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { ModeToggle } from './mode-toggle';
 import { FeedbackWidget } from './FeedbackWidget';
 import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button }  from './ui/button';
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from './ui/card';
 import { Badge }   from './ui/badge';
 import {
   Bell, CheckCircle2, ChevronRight, Clock, MapPin, Search, Star, MessageSquarePlus,
-  ArrowRight, ShieldCheck, Download, Trash2, Calendar, Map, Phone, AlertCircle, Heart, User, PowerOff, Droplet, Zap, Target, Loader2, Navigation, Award, CheckCircle, Info, X,
+  ArrowRight, ShieldCheck, Download, Trash2, Calendar, Map, Phone, AlertCircle, Heart, User, PowerOff, Droplet, Zap, Target, Loader2, Navigation, Award, CheckCircle, Info, X, Home,
   Mail, CalendarCheck,
   TrendingUp, Activity, Check, Timer,
   Gift, XCircle,
@@ -629,6 +630,7 @@ const ShareCardModal = ({isOpen,onClose,donorData}:{isOpen:boolean;onClose:()=>v
 // ═══════════════════════════════════════════════════════════════
 
 export function DonorDashboard({ onLogout }: DonorDashboardProps) {
+  const navigate = useNavigate();
 
   // ── State ──────────────────────────────────────────────────
   const [donorData,        setDonorData]        = useState<DonorData>({});
@@ -1099,6 +1101,9 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             <ModeToggle />
+            <Button variant="secondary" size="sm" className="bg-[var(--bg-surface)] text-[var(--clr-brand)] hover:bg-[var(--bg-page)] dark:bg-[var(--bg-surface)]/10 dark:text-[var(--txt-inverse)] dark:hover:bg-[var(--bg-surface)]/20 text-xs px-3" onClick={() => navigate('/')}>
+              <Home className="w-3.5 h-3.5 mr-1"/> Home
+            </Button>
             <Button variant="secondary" size="sm" className="bg-[var(--bg-surface)] text-[var(--clr-brand)] hover:bg-[var(--bg-page)] dark:bg-[var(--bg-surface)]/10 dark:text-[var(--txt-inverse)] dark:hover:bg-[var(--bg-surface)]/20 text-xs px-3" onClick={()=>setProfileOpen(true)}>
               <User className="w-3.5 h-3.5 mr-1"/> Profile
             </Button>

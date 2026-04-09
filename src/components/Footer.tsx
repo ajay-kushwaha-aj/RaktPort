@@ -345,9 +345,9 @@ function FooterStyles() {
 
 /* ── Tokens (inherit from Header; redeclare only footer-specific) ── */
 :root {
-  --rpf-bg0:    #0A0204;
-  --rpf-bg1:    #0F0306;
-  --rpf-bg2:    #150508;
+  --rpf-bg0:    #020617;
+  --rpf-bg1:    #0f172a;
+  --rpf-bg2:    #1e293b;
   --rpf-accent: #C41E3A;
   --rpf-acl:    #E8294A;
   --rpf-acd:    #7A0E1E;
@@ -356,7 +356,7 @@ function FooterStyles() {
   --rpf-border: rgba(255,255,255,0.07);
   --rpf-sep:    rgba(255,255,255,0.06);
   /* compat */
-  --footer-bg:     #0A0204;
+  --footer-bg:     #020617;
   --footer-accent: #7A0E1E;
   --rp-primary:    #C41E3A;
 }

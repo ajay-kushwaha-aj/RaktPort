@@ -98,11 +98,18 @@ function AppContent() {
       setIsLoggedIn(false);
       // Let it fall through to default routing
     }
-    // If user is logged in AND has valid userId, always show dashboard (don't let URL override)
+    // If user is logged in AND has valid userId, always show dashboard UNLESS trying to view public pages explicitly
     else if (loggedIn) {
       setIsLoggedIn(true);
       setSelectedRole(role);
-      setCurrentView('dashboard');
+      
+      // Allow logged-in users to view these public pages
+      if (location.pathname === '/' || location.pathname === '/impact' || location.pathname === '/locate-site') {
+        const viewMap: Record<string, View> = { '/': 'home' };
+        setCurrentView(viewMap[location.pathname] || 'home');
+      } else {
+        setCurrentView('dashboard');
+      }
       return; // Exit early - don't process URL routing when logged in
     }
 

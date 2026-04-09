@@ -130,44 +130,44 @@ All colors MUST be HSL.
 
   .dark {
     /* Baseline Dark Mode */
-    --bg-page: #130A0C;
-    --bg-surface: #1E1014;
-    --border-color: #2D1218;
-    --text-primary: #F5F0F1;
-    --text-secondary: #A09090;
-    --brand-primary: #E8294A;
-    --brand-tint: #2D0F16;
-    --brand-hover: #C41E3A;
-    --txt-inverse: #F5F0F1;
+    --bg-page: #0f172a;
+    --bg-surface: #1e293b;
+    --border-color: #334155;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --brand-primary: #3b82f6;
+    --brand-tint: #1e3a8a;
+    --brand-hover: #2563eb;
+    --txt-inverse: #f8fafc;
     --header-cta: var(--brand-primary);
 
-    --background: 0 0% 7%;
-    --foreground: 0 0% 98%;
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
 
-    --card: 0 0% 10%;
-    --card-foreground: 0 0% 98%;
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 0 0% 10%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 0 100% 35%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 11%;
 
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 217 32% 17%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 65%;
+    --muted: 217 32% 17%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 0 100% 27%;
+    --accent: 217 91% 60%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 17%;
-    --input: 0 0% 17%;
-    --ring: 0 100% 35%;
+    --border: 217 32% 17%;
+    --input: 217 32% 17%;
+    --ring: 224 76% 48%;
     
     /* Status colors — dark mode */
     --status-pending-bg: 40 30% 14%;
