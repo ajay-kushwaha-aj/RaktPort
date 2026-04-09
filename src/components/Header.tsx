@@ -959,7 +959,7 @@ function RphStyles() {
 .rph-overlay {
   position:fixed; inset:0;
   background:rgba(19,10,12,.45);
-  z-index:48;
+  z-index:90;
   opacity:0; pointer-events:none;
   backdrop-filter:blur(3px);
   transition:opacity .3s;
@@ -972,7 +972,7 @@ function RphStyles() {
   width:min(320px,88vw);
   background:var(--rph-surf);
   border-left:1px solid var(--rph-b);
-  z-index:49;
+  z-index:100;
   transform:translateX(100%);
   transition:transform .34s cubic-bezier(.22,1,.36,1);
   overflow-y:auto;
