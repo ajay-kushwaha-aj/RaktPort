@@ -1,5 +1,5 @@
 // src/components/LandingPage.tsx
-// RaktPort — Landing Page v5 — Conversion-Focused Redesign
+// RaktPort — Landing Page v1
 // Decision-based hero, urgency-driven, RTID innovation, donor conversion optimised.
 
 import * as React from 'react';
@@ -9,8 +9,6 @@ import {
   Droplets, AlertCircle, CheckCircle2, MapPin,
   ArrowRight, Activity, Zap, Fingerprint,
   Globe, Award, Search, Star, Sparkles,
-  Hospital, Syringe, FlaskConical, User, Target,
-  CalendarCheck, CircleDot, HeartHandshake,
 } from 'lucide-react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -29,10 +27,10 @@ const BLOOD_TYPES = [
   { type: 'A−', donateTo: 'A+, A−, AB+, AB−', receiveFrom: 'A−, O−', tag: '' },
   { type: 'B+', donateTo: 'B+, AB+', receiveFrom: 'B+, B−, O+, O−', tag: '' },
   { type: 'B−', donateTo: 'B+, B−, AB+, AB−', receiveFrom: 'B−, O−', tag: '' },
-  { type: 'AB+', donateTo: 'AB+ only', receiveFrom: 'All blood types', tag: 'Universal Recipient' },
+  { type: 'AB+', donateTo: 'AB+ only', receiveFrom: 'All blood types', tag: '🌟 Universal Recipient' },
   { type: 'AB−', donateTo: 'AB+, AB−', receiveFrom: 'AB−, A−, B−, O−', tag: '' },
   { type: 'O+', donateTo: 'A+, B+, O+, AB+', receiveFrom: 'O+, O−', tag: '' },
-  { type: 'O−', donateTo: 'All blood types', receiveFrom: 'O− only', tag: 'Universal Donor' },
+  { type: 'O−', donateTo: 'All blood types', receiveFrom: 'O− only', tag: '🌟 Universal Donor' },
 ];
 
 const STORIES = [
@@ -136,9 +134,9 @@ function NetworkSVG() {
       ))}
       <circle cx="140" cy="96" r="28" fill="rgba(196,30,58,0.18)" stroke="#C41E3A" strokeWidth="2" />
       <path d="M 140,84 C 140,84 130,98 130,103 A 10,10 0 0,0 150,103 C 150,98 140,84 140,84 Z" fill="#E8294A" />
-      {[{ cx: 46, cy: 44, label: 'H' }, { cx: 234, cy: 44, label: 'B' }, { cx: 46, cy: 148, label: 'D' }, { cx: 234, cy: 148, label: 'D' }, { cx: 140, cy: 18, label: 'L' }].map((n, i) => (
+      {[{ cx: 46, cy: 44, icon: '🏥' }, { cx: 234, cy: 44, icon: '🏨' }, { cx: 46, cy: 148, icon: '👤' }, { cx: 234, cy: 148, icon: '👤' }, { cx: 140, cy: 18, icon: '🧪' }].map((n, i) => (
         <g key={i}><circle cx={n.cx} cy={n.cy} r="20" fill="rgba(196,30,58,0.1)" stroke="rgba(196,30,58,0.28)" strokeWidth="1.5" />
-          <text x={n.cx} y={n.cy + 5} textAnchor="middle" fontSize="10" fontWeight="700" fill="#C41E3A" fontFamily="DM Sans,sans-serif">{n.label}</text></g>
+          <text x={n.cx} y={n.cy + 6} textAnchor="middle" fontSize="14">{n.icon}</text></g>
       ))}
       <circle cx="140" cy="96" r="46" fill="none" stroke="rgba(196,30,58,0.09)" strokeWidth="1" strokeDasharray="5 4" />
     </svg>
@@ -347,17 +345,17 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
               </div>
               <div className="lp-stats-row">
                 <div className="lp-stat">
-                  <span className="lp-si"><Droplets size={20} /></span>
+                  <span className="lp-si">🩸</span>
                   <span className="lp-sn">{cnt1}+</span>
                   <span className="lp-sl">Donations Today</span>
                 </div>
                 <div className="lp-stat">
-                  <span className="lp-si"><Heart size={20} /></span>
+                  <span className="lp-si">❤️</span>
                   <span className="lp-sn">{cnt2.toLocaleString()}+</span>
                   <span className="lp-sl">Lives Saved This Month</span>
                 </div>
                 <div className="lp-stat">
-                  <span className="lp-si"><Hospital size={20} /></span>
+                  <span className="lp-si">🏥</span>
                   <span className="lp-sn">{cnt3}+</span>
                   <span className="lp-sl">Blood Banks Connected</span>
                 </div>
@@ -377,7 +375,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
             </div>
             <div className="lp-how">
               {[
-                { n: '01', I: Fingerprint, t: 'Generate Your RTID', d: 'Receive a unique Real-Time ID — your digital identity for every donation, fully traceable across the network.' },
+                { n: '01', I: Fingerprint, t: 'Generate Your RTID', d: 'Receive a unique RaktPort Transfusion ID — your digital identity for every donation, fully traceable across the network.' },
                 { n: '02', I: Activity, t: 'Get Matched Instantly', d: 'Our intelligent matching system connects you with the nearest hospital or urgent blood request in real time.' },
                 { n: '03', I: MapPin, t: 'Donate Anywhere', d: 'Walk into any verified partner blood bank or donation camp. Your RTID works across all locations nationwide.' },
                 { n: '04', I: Award, t: 'Track Your Impact', d: 'Follow your donation digitally — from collection to transfusion. Receive your Digital Impact Certificate.' },
@@ -411,7 +409,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
               <FeatureCard
                 icon={<Zap size={22} />}
                 title="Emergency Blood Matching in Minutes"
-                desc="Smart matching connects urgent requests with compatible donors nearby — average response time under 15 minutes."
+                desc="Smart matching connects urgent requests with compatible donors nearby."
               />
               <FeatureCard
                 icon={<Activity size={22} />}
@@ -443,7 +441,9 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
             <div className="lp-sh">
               <p className="lp-ey lp-eyr">Quick Reference</p>
               <h2 className="lp-h2 lp-h2d">Blood Group <span className="lp-red">Guide</span></h2>
-              <p className="lp-sub lp-subd">Tap any blood type to see full compatibility — O− is the universal donor, AB+ is the universal recipient</p>
+              <p className="lp-sub lp-subd">Tap any blood type to see full compatibility .</p>
+              <p className="lp-sub lp-subd"><b>O−</b> is the <b>  universal donor</b></p>
+              <p className="lp-sub lp-subd"><b>AB+</b> is the <b>universal recipient</b></p>
             </div>
             <div className="lp-bgl">
               <div className="lp-bgl-l">
@@ -452,7 +452,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
                     <button key={b.type} className={`lp-bc${selBlood === b.type ? ' on' : ''}${b.tag ? ' special' : ''}`}
                       onClick={() => setSelBlood(p => p === b.type ? null : b.type)} aria-pressed={selBlood === b.type}>
                       <span className="lp-btype">{b.type}</span>
-                      {b.tag && <span className="lp-btag"><Star size={8} style={{display:'inline',verticalAlign:'middle',marginRight:3}} />{b.tag.includes('Donor') ? 'Universal Donor' : 'Universal Recipient'}</span>}
+                      {b.tag && <span className="lp-btag">{b.tag.includes('Donor') ? 'Universal Donor' : 'Universal Recipient'}</span>}
                       <span className="lp-bhint">{selBlood === b.type ? '▲' : 'tap'}</span>
                     </button>
                   ))}
@@ -466,8 +466,8 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
                         <button className="lp-binfo-x" onClick={() => setSelBlood(null)}>✕ Close</button>
                       </div>
                       <div className="lp-bcompat">
-                        <div className="lp-bcd"><p className="lp-bcl"><Droplets size={11} style={{display:'inline',verticalAlign:'middle',marginRight:4}} />Can Donate To</p><p className="lp-bcv">{info.donateTo}</p></div>
-                        <div className="lp-bcr"><p className="lp-bcl"><Syringe size={11} style={{display:'inline',verticalAlign:'middle',marginRight:4}} />Can Receive From</p><p className="lp-bcv">{info.receiveFrom}</p></div>
+                        <div className="lp-bcd"><p className="lp-bcl">🩸 Can Donate To</p><p className="lp-bcv">{info.donateTo}</p></div>
+                        <div className="lp-bcr"><p className="lp-bcl">💉 Can Receive From</p><p className="lp-bcv">{info.receiveFrom}</p></div>
                       </div>
                     </div>
                   );
@@ -493,7 +493,6 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
               <div className="lp-rtbox">
                 <p className="lp-rthdr"><Activity size={13} /> Live RTID Tracker</p>
                 <p className="lp-rtfmt">Format: <code>D/H-RTID-DDMMYY-AXXXX</code></p>
-                <p className="lp-rtex">Example: <code>D-RTID-12042026-XXXX</code></p>
                 <div className="lp-rtrow">
                   <input className="lp-rtin" placeholder="e.g. D-RTID-060426-A4F7K" value={rtidIn}
                     onChange={e => { setRtidIn(e.target.value); setRtidRes(null); setRtidErr(''); }} onKeyDown={e => e.key === 'Enter' && track()} />
@@ -558,7 +557,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
                   {eliRes && (() => {
                     const [t, m] = eliRes.split(':'); const ok = t === 'ok'; return (
                       <div className={`lp-eres${ok ? ' lp-eok' : ' lp-ewait'}`}>
-                        <span className="lp-eico">{ok ? <CheckCircle2 size={26} color="#10B981" /> : <CalendarCheck size={26} color="#C41E3A" />}</span>
+                        <span className="lp-eico">{ok ? '✅' : '📅'}</span>
                         <div>
                           <p className="lp-etitle">{ok ? 'Eligible to donate!' : 'Not yet eligible'}</p>
                           <p className="lp-emsg">{m}</p>
@@ -585,7 +584,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
             {/* Dynamic impact personalisation */}
             <div className="lp-impact-personal">
               <div className="lp-impact-card lp-impact-zero">
-                <div className="lp-impact-ico"><Droplets size={32} color="#C41E3A" /></div>
+                <div className="lp-impact-ico">🩸</div>
                 <h3 className="lp-impact-stat">You have saved <span className="lp-red">0 lives</span> yet</h3>
                 <p className="lp-impact-msg">Your next donation can save <strong>3 lives</strong>. Join thousands of donors making a difference every day.</p>
                 <div className="lp-impact-bar">
@@ -597,7 +596,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
                 </button>
               </div>
               <div className="lp-impact-card lp-impact-next">
-                <div className="lp-impact-ico"><Target size={32} color="#C41E3A" /></div>
+                <div className="lp-impact-ico">🎯</div>
                 <h3 className="lp-impact-stat">Your next donation<br />can save <span className="lp-red">3 lives</span></h3>
                 <p className="lp-impact-msg">Every unit of blood separates into red cells, plasma, and platelets — reaching 3 different patients in need.</p>
                 <div className="lp-impact-checks-sm">
@@ -654,8 +653,8 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
                   </div>
                   <p className="lp-story-quote">"{s.quote}"</p>
                   <div className="lp-story-foot">
-                    {s.donations > 0 && <span className="lp-story-don"><Droplets size={13} style={{display:'inline',verticalAlign:'middle',marginRight:4}} />{s.donations} Donations</span>}
-                    {s.donations === 0 && <span className="lp-story-recipt"><HeartHandshake size={13} style={{display:'inline',verticalAlign:'middle',marginRight:4}} />Recipient Story</span>}
+                    {s.donations > 0 && <span className="lp-story-don">🩸 {s.donations} Donations</span>}
+                    {s.donations === 0 && <span className="lp-story-recipt">💝 Recipient Story</span>}
                   </div>
                 </div>
               ))}
@@ -686,7 +685,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
         <div className="lp-ov" onClick={e => e.target === e.currentTarget && closeEmerg()}>
           <div className="lp-modal" role="dialog" aria-modal="true" aria-label="Emergency Blood Request">
             <div className="lp-mhd">
-              <div><p className="lp-mkick"><CircleDot size={10} style={{display:'inline',verticalAlign:'middle',marginRight:5,color:'#ff4444'}} />Emergency Request</p><h3 className="lp-mttl">Request Emergency Blood</h3></div>
+              <div><p className="lp-mkick">🔴 Emergency Request</p><h3 className="lp-mttl">Request Emergency Blood</h3></div>
               <button className="lp-mx" onClick={closeEmerg} aria-label="Close"><X size={15} /></button>
             </div>
             <div className="lp-mbody">
@@ -711,7 +710,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
                     <div className="lp-ur">
                       {['Critical', 'Urgent', 'Moderate'].map(l => (
                         <button key={l} className={`lp-ub${eForm.urgency === l ? ' on' : ''}`} onClick={() => setEForm(p => ({ ...p, urgency: l }))}>
-                          <CircleDot size={12} style={{display:'inline',verticalAlign:'middle',marginRight:4,color: l === 'Critical' ? '#ef4444' : l === 'Urgent' ? '#f97316' : '#eab308'}} />{l}
+                          {l === 'Critical' ? '🔴' : l === 'Urgent' ? '🟠' : '🟡'} {l}
                         </button>
                       ))}
                     </div>
@@ -723,7 +722,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
                 </>
               ) : (
                 <div className="lp-mok">
-                  <span className="lp-okico"><CheckCircle2 size={42} color="#10B981" /></span>
+                  <span className="lp-okico">✅</span>
                   <h4 className="lp-okt">Request Submitted!</h4>
                   <p className="lp-okm">Donors in <strong>{eForm.city}</strong> notified for <strong>{eForm.bloodGroup || 'requested'}</strong> blood.</p>
                   <div className="lp-rtd2"><p className="lp-rtd2l">Your RaktPort RTID</p><p className="lp-rtd2v">{eRTID}</p><p className="lp-rtd2h">Use this in the RTID Tracker to follow your request</p></div>

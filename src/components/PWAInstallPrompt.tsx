@@ -2,7 +2,8 @@
 // PWA Install Prompt — Works on Android, iOS, Desktop
 // ═══════════════════════════════════════════════════════════
 import { useState, useEffect, useCallback } from 'react';
-import { X, Download, Share, Plus, Smartphone, Monitor, ChevronUp } from 'lucide-react';
+import { X, Download, Share, Plus, Smartphone, Monitor, ChevronUp, Bell } from 'lucide-react';
+import { toast } from 'sonner';
 
 // ── Types ──
 interface BeforeInstallPromptEvent extends Event {
@@ -35,8 +36,12 @@ export function PWAInstallPrompt() {
   const [platform, setPlatform] = useState<Platform>('unknown');
   const [showIOSGuide, setShowIOSGuide] = useState(false);
   const [installing, setInstalling] = useState(false);
+  const [notifPerm, setNotifPerm] = useState<NotificationPermission>('default');
 
   useEffect(() => {
+    if ('Notification' in window) {
+      setNotifPerm(Notification.permission);
+    }
     // Don't show if already installed or dismissed recently
     if (isStandalone()) return;
     const dismissed = localStorage.getItem('pwa-install-dismissed');
@@ -97,6 +102,19 @@ export function PWAInstallPrompt() {
     localStorage.setItem('pwa-install-dismissed', Date.now().toString());
   };
 
+  const handleEnableNotifications = async () => {
+    if (!('Notification' in window)) return;
+    try {
+      const perm = await Notification.requestPermission();
+      setNotifPerm(perm);
+      if (perm === 'granted') {
+        toast.success("Notifications enabled!");
+      }
+    } catch (e) {
+      console.error("Failed to request notification permission", e);
+    }
+  };
+
   if (!show) return null;
 
   const PlatformIcon = platform === 'ios' ? Smartphone : platform === 'android' ? Smartphone : Monitor;
@@ -130,11 +148,11 @@ export function PWAInstallPrompt() {
 
             {/* Text */}
             <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-sm leading-tight flex items-center gap-1.5">
+              <h3 className="font-bold text-sm leading-tight flex items-center gap-1.5 text-white">
                 Install RaktPort
-                <PlatformIcon className="w-3.5 h-3.5 opacity-60" />
+                <PlatformIcon className="w-3.5 h-3.5 opacity-90" />
               </h3>
-              <p className="text-[11px] text-red-100/80 mt-0.5 leading-snug">
+              <p className="text-[11px] text-white/90 mt-0.5 leading-snug font-medium">
                 {platform === 'ios'
                   ? 'Add to Home Screen for the best experience'
                   : 'Get instant access & faster loading'}
@@ -145,7 +163,7 @@ export function PWAInstallPrompt() {
             <button
               onClick={handleInstall}
               disabled={installing}
-              className="flex-shrink-0 bg-[var(--bg-surface)] text-[var(--clr-brand)] font-bold text-xs px-4 py-2 rounded-xl hover:bg-red-50 active:scale-95 transition-all shadow-md disabled:opacity-60"
+              className="flex-shrink-0 bg-white text-[var(--clr-brand)] font-bold text-xs px-4 py-2 rounded-xl hover:bg-gray-50 active:scale-95 transition-all shadow-md disabled:opacity-60"
             >
               {installing ? (
                 <span className="flex items-center gap-1.5">
@@ -162,12 +180,24 @@ export function PWAInstallPrompt() {
           </div>
 
           {/* Feature chips */}
-          <div className="px-4 pb-3 flex gap-2 flex-wrap">
-            {['⚡ Fast', 'Notifications'].map((f) => (
-              <span key={f} className="text-[10px] bg-[var(--bg-surface)]/10 px-2 py-0.5 rounded-full border border-white/5">
-                {f}
+          <div className="px-4 pb-3 flex gap-2 flex-wrap items-center">
+            <span className="text-[10px] bg-white/20 text-white font-medium px-2 py-0.5 rounded-full border border-white/20">
+              ⚡ Fast
+            </span>
+            {notifPerm !== 'granted' && 'Notification' in window ? (
+              <button
+                onClick={handleEnableNotifications}
+                className="text-[10px] bg-white text-[var(--clr-brand)] font-bold px-2.5 py-0.5 rounded-full shadow-sm hover:scale-105 active:scale-95 transition-transform flex items-center gap-1.5 border border-white/20"
+              >
+                <Bell className="w-3 h-3" />
+                Enable Notifications
+              </button>
+            ) : (
+              <span className="text-[10px] bg-white/20 text-white font-medium px-2.5 py-0.5 rounded-full border border-white/20 flex items-center gap-1">
+                <Bell className="w-3 h-3" />
+                Notifications On
               </span>
-            ))}
+            )}
           </div>
         </div>
       </div>
