@@ -51,10 +51,10 @@ export const VerifiedOrganizations: React.FC = () => {
       {/* ── Page header ── */}
       <div style={{ marginBottom: 28, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
         <div>
-          <h2 style={{ fontSize: 20, fontWeight: 700, color: '#f0e0e4', margin: 0 }}>
+          <h2 style={{ fontSize: 20, fontWeight: 700, color: '#ffffff', margin: 0 }}>
             Verified Organizations
           </h2>
-          <p style={{ fontSize: 13, color: '#6a5a5d', marginTop: 4 }}>
+          <p style={{ fontSize: 13, color: '#94a3b8', marginTop: 4 }}>
             Manage approved Hospitals and Blood Banks currently active in the RaktPort network.
           </p>
         </div>
@@ -63,8 +63,8 @@ export const VerifiedOrganizations: React.FC = () => {
             onClick={handleExportCSV}
             disabled={verifiedOrgs.length === 0}
             style={{
-              background: 'rgba(255,255,255,0.05)', color: '#c0b0b3',
-              border: '1px solid #2e1a1e', borderRadius: 8, padding: '8px 16px',
+              background: 'rgba(255,255,255,0.05)', color: '#f1f5f9',
+              border: '1px solid #475569', borderRadius: 8, padding: '8px 16px',
               fontSize: 13, fontWeight: 600, fontFamily: 'Inter, sans-serif',
               cursor: verifiedOrgs.length === 0 ? 'not-allowed' : 'pointer',
               display: 'flex', alignItems: 'center', gap: 8, opacity: verifiedOrgs.length === 0 ? 0.5 : 1
@@ -76,8 +76,8 @@ export const VerifiedOrganizations: React.FC = () => {
             onClick={handleExportPDF}
             disabled={verifiedOrgs.length === 0}
             style={{
-              background: 'rgba(196,30,58,0.1)', color: '#C41E3A',
-              border: '1px solid rgba(196,30,58,0.2)', borderRadius: 8, padding: '8px 16px',
+              background: 'rgba(37,99,235,0.1)', color: '#2563eb',
+              border: '1px solid rgba(37,99,235,0.2)', borderRadius: 8, padding: '8px 16px',
               fontSize: 13, fontWeight: 600, fontFamily: 'Inter, sans-serif',
               cursor: verifiedOrgs.length === 0 ? 'not-allowed' : 'pointer',
               display: 'flex', alignItems: 'center', gap: 8, opacity: verifiedOrgs.length === 0 ? 0.5 : 1
@@ -91,7 +91,7 @@ export const VerifiedOrganizations: React.FC = () => {
       {/* ── Filters ── */}
       <div style={{ display: 'flex', gap: 16, marginBottom: 24, flexWrap: 'wrap' }}>
         <div style={{ position: 'relative', flex: 1, minWidth: 280 }}>
-          <Search size={16} color="#6a5a5d" style={{ position: 'absolute', left: 16, top: 13 }} />
+          <Search size={16} color="#94a3b8" style={{ position: 'absolute', left: 16, top: 13 }} />
           <input 
             type="text" 
             placeholder="Search by name, email, city, or license..." 
@@ -100,10 +100,10 @@ export const VerifiedOrganizations: React.FC = () => {
             style={{
               width: '100%',
               padding: '11px 16px 11px 42px',
-              background: '#0f0a0b',
-              border: '1px solid #2e1a1e',
+              background: '#1e293b',
+              border: '1px solid #475569',
               borderRadius: 8,
-              color: '#f0e0e4',
+              color: '#ffffff',
               fontSize: 13,
               fontFamily: 'Inter, sans-serif',
               outline: 'none'
@@ -111,16 +111,16 @@ export const VerifiedOrganizations: React.FC = () => {
           />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Filter size={16} color="#6a5a5d" />
+          <Filter size={16} color="#94a3b8" />
           <select 
             value={filterType}
             onChange={e => setFilterType(e.target.value as any)}
             style={{
               padding: '11px 16px',
-              background: '#0f0a0b',
-              border: '1px solid #2e1a1e',
+              background: '#1e293b',
+              border: '1px solid #475569',
               borderRadius: 8,
-              color: '#f0e0e4',
+              color: '#ffffff',
               fontSize: 13,
               fontFamily: 'Inter, sans-serif',
               outline: 'none',
@@ -136,15 +136,15 @@ export const VerifiedOrganizations: React.FC = () => {
 
       {/* ── List ── */}
       {loading ? (
-        <p style={{ color: '#6a5a5d', fontSize: 14 }}>Loading verified organizations...</p>
+        <p style={{ color: '#94a3b8', fontSize: 14 }}>Loading verified organizations...</p>
       ) : verifiedOrgs.length === 0 ? (
         <div style={{ 
-          background: '#0f0a0b', border: '1px solid #1e1214', borderRadius: 12, 
+          background: '#1e293b', border: '1px solid #334155', borderRadius: 12, 
           padding: '60px 20px', textAlign: 'center' 
         }}>
-          <Building2 size={32} color="#6a5a5d" style={{ margin: '0 auto 12px', opacity: 0.5 }} />
-          <h3 style={{ fontSize: 16, color: '#f0e0e4', margin: 0 }}>No Organizations Found</h3>
-          <p style={{ color: '#6a5a5d', fontSize: 13, marginTop: 4 }}>
+          <Building2 size={32} color="#94a3b8" style={{ margin: '0 auto 12px', opacity: 0.5 }} />
+          <h3 style={{ fontSize: 16, color: '#ffffff', margin: 0 }}>No Organizations Found</h3>
+          <p style={{ color: '#94a3b8', fontSize: 13, marginTop: 4 }}>
             {searchTerm || filterType !== 'all' ? 'Try adjusting your search filters.' : 'There are no verified organizations yet.'}
           </p>
         </div>
@@ -152,8 +152,8 @@ export const VerifiedOrganizations: React.FC = () => {
         <div style={{ display: 'grid', gap: 16 }}>
           {verifiedOrgs.map(org => (
             <div key={org.id} style={{
-              background: '#0f0a0b', 
-              border: '1px solid #1e1214',
+              background: '#1e293b', 
+              border: '1px solid #334155',
               borderRadius: 12,
               padding: '20px 24px',
               display: 'flex',
@@ -171,12 +171,12 @@ export const VerifiedOrganizations: React.FC = () => {
                   {org.type === 'hospital' ? (
                     <Building2 size={24} color="#60a5fa" />
                   ) : (
-                    <Droplet size={24} color="#f472b6" />
+                    <Droplet size={24} color="#60a5fa" />
                   )}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                    <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#f0e0e4' }}>
+                    <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#ffffff' }}>
                       {org.name}
                     </h3>
                     <span style={{
@@ -189,17 +189,17 @@ export const VerifiedOrganizations: React.FC = () => {
                   </div>
                   
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 8 }}>
-                    <p style={{ margin: 0, fontSize: 13, color: '#a09094', display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <Mail size={13} color="#6a5a5d" /> {org.email}
+                    <p style={{ margin: 0, fontSize: 13, color: '#e2e8f0', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <Mail size={13} color="#94a3b8" /> {org.email}
                     </p>
-                    <p style={{ margin: 0, fontSize: 13, color: '#a09094', display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <Phone size={13} color="#6a5a5d" /> {org.phone || 'N/A'}
+                    <p style={{ margin: 0, fontSize: 13, color: '#e2e8f0', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <Phone size={13} color="#94a3b8" /> {org.phone || 'N/A'}
                     </p>
-                    <p style={{ margin: 0, fontSize: 13, color: '#a09094', display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <MapPin size={13} color="#6a5a5d" /> {org.address}
+                    <p style={{ margin: 0, fontSize: 13, color: '#e2e8f0', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <MapPin size={13} color="#94a3b8" /> {org.address}
                     </p>
-                    <p style={{ margin: 0, fontSize: 13, color: '#a09094', display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <FileText size={13} color="#6a5a5d" /> License: {org.registrationNumber}
+                    <p style={{ margin: 0, fontSize: 13, color: '#e2e8f0', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <FileText size={13} color="#94a3b8" /> License: {org.registrationNumber}
                     </p>
                   </div>
                   

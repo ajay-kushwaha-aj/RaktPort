@@ -36,23 +36,23 @@ export const SystemHealth: React.FC = () => {
   return (
     <div style={{ padding: '32px 36px', maxWidth: 1000, fontFamily: 'Inter, sans-serif' }}>
       <div style={{ marginBottom: 32 }}>
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#f0e0e4', margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#ffffff', margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
           <ActivitySquare size={22} color={statusColor} /> System Health
         </h2>
-        <p style={{ fontSize: 13, color: '#6a5a5d', marginTop: 4 }}>
+        <p style={{ fontSize: 13, color: '#94a3b8', marginTop: 4 }}>
           Live platform status and operational telemetry.
         </p>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
         {/* Firebase DB */}
-        <div style={{ background: '#0f0a0b', border: `1px solid ${borderColor}`, borderRadius: 12, padding: 24, display: 'flex', alignItems: 'center', gap: 20 }}>
+        <div style={{ background: '#1e293b', border: `1px solid ${borderColor}`, borderRadius: 12, padding: 24, display: 'flex', alignItems: 'center', gap: 20 }}>
           <div style={{ width: 48, height: 48, borderRadius: 12, background: `rgba(${isOperational ? '74,222,128' : '251,191,36'},0.1)`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <Database size={24} color={statusColor} />
           </div>
           <div>
-            <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#f0e0e4' }}>Firestore Database</h3>
-            <p style={{ margin: '4px 0 0 0', fontSize: 12, color: '#a09094' }}>
+            <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#ffffff' }}>Firestore Database</h3>
+            <p style={{ margin: '4px 0 0 0', fontSize: 12, color: '#e2e8f0' }}>
               {dbStatus === 'checking' ? 'Measuring latency…' :
                dbStatus === 'operational' ? `Latency: ${pingMs}ms • Status: Operational` :
                'Status: Degraded — connection issues'}
@@ -61,26 +61,26 @@ export const SystemHealth: React.FC = () => {
         </div>
 
         {/* Data Pipeline */}
-        <div style={{ background: '#0f0a0b', border: `1px solid ${borderColor}`, borderRadius: 12, padding: 24, display: 'flex', alignItems: 'center', gap: 20 }}>
+        <div style={{ background: '#1e293b', border: `1px solid ${borderColor}`, borderRadius: 12, padding: 24, display: 'flex', alignItems: 'center', gap: 20 }}>
           <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(74,222,128,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <Server size={24} color={statusColor} />
           </div>
           <div>
-            <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#f0e0e4' }}>Data Pipeline</h3>
-            <p style={{ margin: '4px 0 0 0', fontSize: 12, color: '#a09094' }}>
+            <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#ffffff' }}>Data Pipeline</h3>
+            <p style={{ margin: '4px 0 0 0', fontSize: 12, color: '#e2e8f0' }}>
               Records loaded: {nationalLedger.length.toLocaleString('en-IN')} • Donors: {metrics.totalDonors.toLocaleString('en-IN')}
             </p>
           </div>
         </div>
 
         {/* Real-time Subscriptions */}
-        <div style={{ background: '#0f0a0b', border: `1px solid ${borderColor}`, borderRadius: 12, padding: 24, display: 'flex', alignItems: 'center', gap: 20 }}>
+        <div style={{ background: '#1e293b', border: `1px solid ${borderColor}`, borderRadius: 12, padding: 24, display: 'flex', alignItems: 'center', gap: 20 }}>
           <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(74,222,128,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <Zap size={24} color={statusColor} />
           </div>
           <div>
-            <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#f0e0e4' }}>Real-Time Listeners</h3>
-            <p style={{ margin: '4px 0 0 0', fontSize: 12, color: '#a09094' }}>
+            <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#ffffff' }}>Real-Time Listeners</h3>
+            <p style={{ margin: '4px 0 0 0', fontSize: 12, color: '#e2e8f0' }}>
               {loading ? 'Syncing…' : 'Connected'} • Active Subscriptions: 3 (users, requests, donations)
             </p>
           </div>
@@ -91,15 +91,15 @@ export const SystemHealth: React.FC = () => {
       {lastRefreshed && (
         <div style={{
           marginTop: 24,
-          background: '#0f0a0b',
-          border: '1px solid #1e1214',
+          background: '#1e293b',
+          border: '1px solid #334155',
           borderRadius: 10,
           padding: '14px 20px',
           display: 'flex',
           alignItems: 'center',
           gap: 10,
           fontSize: 12,
-          color: '#6a5a5d',
+          color: '#94a3b8',
         }}>
           <Zap size={13} color="#4ade80" />
           Last data sync: {lastRefreshed.toLocaleString('en-IN', {

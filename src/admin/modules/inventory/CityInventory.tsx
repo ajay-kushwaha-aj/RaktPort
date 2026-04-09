@@ -25,17 +25,17 @@ export const CityInventory: React.FC = () => {
     <div style={{ padding: '32px 36px', maxWidth: 1200, fontFamily: 'Inter, sans-serif' }}>
       {/* ── Page header ── */}
       <div style={{ marginBottom: 32 }}>
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#f0e0e4', margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
-          <MapPin size={22} color="#f472b6" /> Regional Inventory
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#ffffff', margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
+          <MapPin size={22} color="#60a5fa" /> Regional Inventory
         </h2>
-        <p style={{ fontSize: 13, color: '#6a5a5d', marginTop: 4 }}>
+        <p style={{ fontSize: 13, color: '#94a3b8', marginTop: 4 }}>
           Breakdown of blood stock levels isolated by district and city geometry.
         </p>
       </div>
 
       {/* ── Search Bar ── */}
       <div style={{ position: 'relative', maxWidth: 400, marginBottom: 24 }}>
-        <Search size={16} color="#6a5a5d" style={{ position: 'absolute', left: 16, top: 13 }} />
+        <Search size={16} color="#94a3b8" style={{ position: 'absolute', left: 16, top: 13 }} />
         <input 
           type="text" 
           placeholder="Search for a city or region..." 
@@ -43,15 +43,15 @@ export const CityInventory: React.FC = () => {
           onChange={e => setSearchTerm(e.target.value)}
           style={{
             width: '100%', padding: '11px 16px 11px 42px',
-            background: '#0f0a0b', border: '1px solid #2e1a1e', borderRadius: 8,
-            color: '#f0e0e4', fontSize: 13, outline: 'none'
+            background: '#1e293b', border: '1px solid #475569', borderRadius: 8,
+            color: '#ffffff', fontSize: 13, outline: 'none'
           }}
         />
       </div>
 
       {/* ── City List ── */}
       {filteredCities.length === 0 ? (
-        <div style={{ padding: 40, textAlign: 'center', color: '#6a5a5d', background: '#0f0a0b', border: '1px solid #1e1214', borderRadius: 12 }}>
+        <div style={{ padding: 40, textAlign: 'center', color: '#94a3b8', background: '#1e293b', border: '1px solid #334155', borderRadius: 12 }}>
           No regions found matching your criteria.
         </div>
       ) : (
@@ -62,11 +62,11 @@ export const CityInventory: React.FC = () => {
             const criticals = data.filter(i => i.units < 5 && i.units > 0);
 
             return (
-              <div key={city} style={{ background: '#0f0a0b', border: '1px solid #1e1214', borderRadius: 12, padding: '20px 24px' }}>
+              <div key={city} style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: 12, padding: '20px 24px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <h3 style={{ fontSize: 18, fontWeight: 700, color: '#f0e0e4', margin: 0 }}>{city}</h3>
-                    <span style={{ background: '#1a1012', color: '#a09094', padding: '4px 8px', borderRadius: 6, fontSize: 11, fontWeight: 600 }}>
+                    <h3 style={{ fontSize: 18, fontWeight: 700, color: '#ffffff', margin: 0 }}>{city}</h3>
+                    <span style={{ background: '#1a1012', color: '#e2e8f0', padding: '4px 8px', borderRadius: 6, fontSize: 11, fontWeight: 600 }}>
                       Total Units: {cityTotal}
                     </span>
                     {criticals.length > 0 && (
@@ -81,13 +81,13 @@ export const CityInventory: React.FC = () => {
                   {data.map(item => (
                     <div key={item.bloodGroup} style={{ 
                       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                      background: '#140c0e', border: '1px solid #2e1a1e', borderRadius: 8, padding: '12px 16px' 
+                      background: '#1e293b', border: '1px solid #475569', borderRadius: 8, padding: '12px 16px' 
                     }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                         <Droplet size={14} color={getStockColor(item.units)} />
-                        <span style={{ color: '#c0b0b3', fontWeight: 600, fontSize: 14 }}>{item.bloodGroup}</span>
+                        <span style={{ color: '#f1f5f9', fontWeight: 600, fontSize: 14 }}>{item.bloodGroup}</span>
                       </div>
-                      <span style={{ color: item.units === 0 ? '#6a5a5d' : '#f0e0e4', fontWeight: 800, fontSize: 16 }}>
+                      <span style={{ color: item.units === 0 ? '#94a3b8' : '#ffffff', fontWeight: 800, fontSize: 16 }}>
                         {item.units}
                       </span>
                     </div>

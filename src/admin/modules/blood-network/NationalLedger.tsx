@@ -57,7 +57,7 @@ export const NationalLedger: React.FC = () => {
     if (s.includes('completed') || s.includes('available') || s.includes('donated')) return { bg: 'rgba(74,222,128,0.1)', text: '#4ade80', border: 'rgba(74,222,128,0.2)' };
     if (s.includes('redeem')) return { bg: 'rgba(96,165,250,0.1)', text: '#60a5fa', border: 'rgba(96,165,250,0.2)' };
     if (s.includes('flagged') || s.includes('reject') || s.includes('cancel')) return { bg: 'rgba(248,113,113,0.1)', text: '#f87171', border: 'rgba(248,113,113,0.2)' };
-    return { bg: 'rgba(255,255,255,0.05)', text: '#a09094', border: 'rgba(255,255,255,0.1)' };
+    return { bg: 'rgba(255,255,255,0.05)', text: '#e2e8f0', border: 'rgba(255,255,255,0.1)' };
   };
 
   return (
@@ -65,10 +65,10 @@ export const NationalLedger: React.FC = () => {
       {/* ── Page header ── */}
       <div style={{ marginBottom: 28, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
         <div>
-          <h2 style={{ fontSize: 20, fontWeight: 700, color: '#f0e0e4', margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
+          <h2 style={{ fontSize: 20, fontWeight: 700, color: '#ffffff', margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
             <Database size={22} color="#a78bfa" /> National Ledger
           </h2>
-          <p style={{ fontSize: 13, color: '#6a5a5d', marginTop: 4 }}>
+          <p style={{ fontSize: 13, color: '#94a3b8', marginTop: 4 }}>
             Immutable record of all blood requests and donations across the platform.
           </p>
         </div>
@@ -76,8 +76,8 @@ export const NationalLedger: React.FC = () => {
           onClick={handleExport}
           disabled={filteredLedger.length === 0}
           style={{
-            background: 'rgba(255,255,255,0.05)', color: '#c0b0b3',
-            border: '1px solid #2e1a1e', borderRadius: 8, padding: '8px 16px',
+            background: 'rgba(255,255,255,0.05)', color: '#f1f5f9',
+            border: '1px solid #475569', borderRadius: 8, padding: '8px 16px',
             fontSize: 13, fontWeight: 600, fontFamily: 'Inter, sans-serif',
             cursor: filteredLedger.length === 0 ? 'not-allowed' : 'pointer',
             display: 'flex', alignItems: 'center', gap: 8, opacity: filteredLedger.length === 0 ? 0.5 : 1
@@ -90,7 +90,7 @@ export const NationalLedger: React.FC = () => {
       {/* ── Filters ── */}
       <div style={{ display: 'flex', gap: 16, marginBottom: 24, flexWrap: 'wrap' }}>
         <div style={{ position: 'relative', flex: 1, minWidth: 280 }}>
-          <Search size={16} color="#6a5a5d" style={{ position: 'absolute', left: 16, top: 13 }} />
+          <Search size={16} color="#94a3b8" style={{ position: 'absolute', left: 16, top: 13 }} />
           <input 
             type="text" 
             placeholder="Search RTID, patient, hospital, group..." 
@@ -98,8 +98,8 @@ export const NationalLedger: React.FC = () => {
             onChange={e => setSearchTerm(e.target.value)}
             style={{
               width: '100%', padding: '11px 16px 11px 42px',
-              background: '#0f0a0b', border: '1px solid #2e1a1e', borderRadius: 8,
-              color: '#f0e0e4', fontSize: 13, fontFamily: 'Inter, sans-serif', outline: 'none'
+              background: '#1e293b', border: '1px solid #475569', borderRadius: 8,
+              color: '#ffffff', fontSize: 13, fontFamily: 'Inter, sans-serif', outline: 'none'
             }}
           />
         </div>
@@ -107,8 +107,8 @@ export const NationalLedger: React.FC = () => {
           value={filterType}
           onChange={e => setFilterType(e.target.value)}
           style={{
-            padding: '11px 16px', background: '#0f0a0b', border: '1px solid #2e1a1e',
-            borderRadius: 8, color: '#c0b0b3', fontSize: 13, outline: 'none', cursor: 'pointer'
+            padding: '11px 16px', background: '#1e293b', border: '1px solid #475569',
+            borderRadius: 8, color: '#f1f5f9', fontSize: 13, outline: 'none', cursor: 'pointer'
           }}
         >
           <option value="all">All Transactions</option>
@@ -119,8 +119,8 @@ export const NationalLedger: React.FC = () => {
           value={filterStatus}
           onChange={e => setFilterStatus(e.target.value)}
           style={{
-            padding: '11px 16px', background: '#0f0a0b', border: '1px solid #2e1a1e',
-            borderRadius: 8, color: '#c0b0b3', fontSize: 13, outline: 'none', cursor: 'pointer'
+            padding: '11px 16px', background: '#1e293b', border: '1px solid #475569',
+            borderRadius: 8, color: '#f1f5f9', fontSize: 13, outline: 'none', cursor: 'pointer'
           }}
         >
           <option value="all">All Statuses</option>
@@ -132,21 +132,21 @@ export const NationalLedger: React.FC = () => {
       </div>
 
       {/* ── Ledger Table ── */}
-      <div style={{ background: '#0f0a0b', border: '1px solid #1e1214', borderRadius: 12, overflowX: 'auto' }}>
+      <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: 12, overflowX: 'auto' }}>
         {loading ? (
-          <div style={{ padding: 40, textAlign: 'center', color: '#6a5a5d' }}>Loading ledger data...</div>
+          <div style={{ padding: 40, textAlign: 'center', color: '#94a3b8' }}>Loading ledger data...</div>
         ) : filteredLedger.length === 0 ? (
-          <div style={{ padding: 60, textAlign: 'center', color: '#6a5a5d' }}>No records found</div>
+          <div style={{ padding: 60, textAlign: 'center', color: '#94a3b8' }}>No records found</div>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
-              <tr style={{ background: '#140c0e', borderBottom: '1px solid #1e1214' }}>
-                <th style={{ padding: '14px 20px', fontSize: 11, fontWeight: 600, color: '#6a5a5d', textTransform: 'uppercase', letterSpacing: 0.5 }}>Type / RTID</th>
-                <th style={{ padding: '14px 20px', fontSize: 11, fontWeight: 600, color: '#6a5a5d', textTransform: 'uppercase', letterSpacing: 0.5 }}>Blood Group</th>
-                <th style={{ padding: '14px 20px', fontSize: 11, fontWeight: 600, color: '#6a5a5d', textTransform: 'uppercase', letterSpacing: 0.5 }}>Entity</th>
-                <th style={{ padding: '14px 20px', fontSize: 11, fontWeight: 600, color: '#6a5a5d', textTransform: 'uppercase', letterSpacing: 0.5 }}>Location</th>
-                <th style={{ padding: '14px 20px', fontSize: 11, fontWeight: 600, color: '#6a5a5d', textTransform: 'uppercase', letterSpacing: 0.5 }}>Date & Time</th>
-                <th style={{ padding: '14px 20px', fontSize: 11, fontWeight: 600, color: '#6a5a5d', textTransform: 'uppercase', letterSpacing: 0.5 }}>Status</th>
+              <tr style={{ background: '#1e293b', borderBottom: '1px solid #334155' }}>
+                <th style={{ padding: '14px 20px', fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5 }}>Type / RTID</th>
+                <th style={{ padding: '14px 20px', fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5 }}>Blood Group</th>
+                <th style={{ padding: '14px 20px', fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5 }}>Entity</th>
+                <th style={{ padding: '14px 20px', fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5 }}>Location</th>
+                <th style={{ padding: '14px 20px', fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5 }}>Date & Time</th>
+                <th style={{ padding: '14px 20px', fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5 }}>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -168,7 +168,7 @@ export const NationalLedger: React.FC = () => {
                           <p style={{ margin: 0, fontSize: 11, color: isReq ? '#60a5fa' : '#4ade80', fontWeight: 600 }}>
                             {isReq ? 'REQUEST' : 'DONATION'}
                           </p>
-                          <p style={{ margin: '2px 0 0 0', fontSize: 13, color: '#f0e0e4', fontWeight: 600, fontFamily: 'monospace' }}>
+                          <p style={{ margin: '2px 0 0 0', fontSize: 13, color: '#ffffff', fontWeight: 600, fontFamily: 'monospace' }}>
                             {item.rtid}
                           </p>
                         </div>
@@ -177,30 +177,30 @@ export const NationalLedger: React.FC = () => {
                     <td style={{ padding: '16px 20px' }}>
                       <span style={{ 
                         display: 'inline-block', padding: '4px 8px', borderRadius: 6,
-                        background: '#1a1012', border: '1px solid #2e1a1e',
-                        color: '#f0e0e4', fontSize: 12, fontWeight: 700 
+                        background: '#1a1012', border: '1px solid #475569',
+                        color: '#ffffff', fontSize: 12, fontWeight: 700 
                       }}>
-                        {item.bloodGroup} <span style={{ color: '#6a5a5d', fontWeight: 400 }}>× {item.units}</span>
+                        {item.bloodGroup} <span style={{ color: '#94a3b8', fontWeight: 400 }}>× {item.units}</span>
                       </span>
                     </td>
                     <td style={{ padding: '16px 20px' }}>
-                      <p style={{ margin: 0, fontSize: 13, color: '#e0d0d4', fontWeight: 500 }}>
+                      <p style={{ margin: 0, fontSize: 13, color: '#f8fafc', fontWeight: 500 }}>
                         {isReq ? item.hospitalName : item.donorName}
                       </p>
                       {item.patientName && (
-                        <p style={{ margin: '2px 0 0 0', fontSize: 11, color: '#7a6a6d' }}>
+                        <p style={{ margin: '2px 0 0 0', fontSize: 11, color: '#cbd5e1' }}>
                           For: {item.patientName}
                         </p>
                       )}
                     </td>
-                    <td style={{ padding: '16px 20px', fontSize: 13, color: '#a09094' }}>
+                    <td style={{ padding: '16px 20px', fontSize: 13, color: '#e2e8f0' }}>
                       {item.city}
                     </td>
                     <td style={{ padding: '16px 20px' }}>
-                      <p style={{ margin: 0, fontSize: 13, color: '#c0b0b3' }}>
+                      <p style={{ margin: 0, fontSize: 13, color: '#f1f5f9' }}>
                         {formatDate(item.createdAt)}
                       </p>
-                      <p style={{ margin: '2px 0 0 0', fontSize: 11, color: '#6a5a5d', display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <p style={{ margin: '2px 0 0 0', fontSize: 11, color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 4 }}>
                         <Clock size={10} />
                         {new Date(item.createdAt || 0).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
                       </p>

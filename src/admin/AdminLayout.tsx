@@ -62,7 +62,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onLogout }) => {
         height: '100vh',
         width: '100vw',
         overflow: 'hidden',
-        background: '#080508',
+        background: '#020617',
         fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
         // Force Inter font for the entire admin shell
       }}
@@ -90,7 +90,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onLogout }) => {
           background: transparent;
         }
         .admin-scroll::-webkit-scrollbar-thumb {
-          background: #2a1a1d;
+          background: #475569;
           border-radius: 2px;
         }
         .admin-scroll::-webkit-scrollbar-thumb:hover {
@@ -117,7 +117,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onLogout }) => {
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
-            background: '#080508',
+            background: '#020617',
           }}
         >
           <AdminHeader
@@ -133,7 +133,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onLogout }) => {
               flex: 1,
               overflowY: 'auto',
               overflowX: 'hidden',
-              background: '#0a0608',
+              background: '#0f172a',
             }}
           >
             <AdminRoutes />

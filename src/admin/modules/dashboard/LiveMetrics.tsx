@@ -41,14 +41,14 @@ export const LiveMetrics: React.FC = () => {
     <div style={{ padding: '32px 36px', maxWidth: 1200, fontFamily: 'Inter, sans-serif' }}>
       <div style={{ marginBottom: 32, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
         <div>
-          <h2 style={{ fontSize: 20, fontWeight: 700, color: '#f0e0e4', margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Activity size={22} color="#f472b6" /> Real-Time Live Metrics
+          <h2 style={{ fontSize: 20, fontWeight: 700, color: '#ffffff', margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <Activity size={22} color="#60a5fa" /> Real-Time Live Metrics
           </h2>
-          <p style={{ fontSize: 13, color: '#6a5a5d', marginTop: 4 }}>
+          <p style={{ fontSize: 13, color: '#94a3b8', marginTop: 4 }}>
             Live network activity based on actual Firestore data.
           </p>
         </div>
-        <div style={{ background: '#0f0a0b', border: '1px solid #1e1214', borderRadius: 8, padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: 8, padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
           <Clock size={16} color="#4ade80" />
           <span style={{ color: '#4ade80', fontWeight: 600, fontSize: 14, fontFamily: 'monospace' }}>
             {currentTime.toLocaleTimeString()}
@@ -58,30 +58,30 @@ export const LiveMetrics: React.FC = () => {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
         {[
-          { label: 'Active RTIDs', value: metrics.activeRTIDs, color: '#f472b6' },
+          { label: 'Active RTIDs', value: metrics.activeRTIDs, color: '#60a5fa' },
           { label: 'Total Operations', value: nationalLedger.length, color: '#60a5fa' },
           { label: 'Network Pending Orgs', value: metrics.pendingOrgsCount, color: '#fbbf24' },
           { label: 'System Anomalies', value: metrics.fraudAlertsCount, color: '#f87171' }
         ].map(m => (
-          <div key={m.label} style={{ background: '#0f0a0b', border: '1px solid #1e1214', borderRadius: 12, padding: '24px' }}>
-            <p style={{ margin: '0 0 8px 0', fontSize: 12, color: '#6a5a5d', fontWeight: 600, textTransform: 'uppercase' }}>{m.label}</p>
+          <div key={m.label} style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: 12, padding: '24px' }}>
+            <p style={{ margin: '0 0 8px 0', fontSize: 12, color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase' }}>{m.label}</p>
             <p style={{ margin: 0, fontSize: 32, fontWeight: 800, color: m.color }}>{m.value}</p>
           </div>
         ))}
       </div>
 
-      <div style={{ background: '#0f0a0b', border: '1px solid #1e1214', borderRadius: 16, padding: '24px' }}>
-        <h3 style={{ fontSize: 14, fontWeight: 600, color: '#c0b0b3', marginBottom: 24 }}>Network Activity (Last 15 Days)</h3>
+      <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: 16, padding: '24px' }}>
+        <h3 style={{ fontSize: 14, fontWeight: 600, color: '#f1f5f9', marginBottom: 24 }}>Network Activity (Last 15 Days)</h3>
         <div style={{ height: 300, width: '100%' }}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
-              <XAxis dataKey="time" stroke="#2e1a1e" tick={{ fill: '#6a5a5d', fontSize: 12 }} axisLine={false} tickLine={false} />
-              <YAxis stroke="#2e1a1e" tick={{ fill: '#6a5a5d', fontSize: 12 }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <XAxis dataKey="time" stroke="#475569" tick={{ fill: '#94a3b8', fontSize: 12 }} axisLine={false} tickLine={false} />
+              <YAxis stroke="#475569" tick={{ fill: '#94a3b8', fontSize: 12 }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip
-                contentStyle={{ background: '#1a1012', border: '1px solid #2e1a1e', borderRadius: 8, color: '#f0e0e4' }}
-                itemStyle={{ color: '#f0e0e4' }}
+                contentStyle={{ background: '#1a1012', border: '1px solid #475569', borderRadius: 8, color: '#ffffff' }}
+                itemStyle={{ color: '#ffffff' }}
               />
-              <Line type="monotone" dataKey="requests" name="Requests" stroke="#f472b6" strokeWidth={3} dot={false} />
+              <Line type="monotone" dataKey="requests" name="Requests" stroke="#60a5fa" strokeWidth={3} dot={false} />
               <Line type="monotone" dataKey="donations" name="Donations" stroke="#60a5fa" strokeWidth={3} dot={false} />
             </LineChart>
           </ResponsiveContainer>

@@ -29,10 +29,10 @@ export const EligibilityTracking: React.FC = () => {
     <div style={{ padding: '32px 36px', maxWidth: 1200, fontFamily: 'Inter, sans-serif' }}>
       {/* ── Page header ── */}
       <div style={{ marginBottom: 32 }}>
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#f0e0e4', margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
-          <Calendar size={22} color="#f472b6" /> Eligibility Tracking
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#ffffff', margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
+          <Calendar size={22} color="#60a5fa" /> Eligibility Tracking
         </h2>
-        <p style={{ fontSize: 13, color: '#6a5a5d', marginTop: 4 }}>
+        <p style={{ fontSize: 13, color: '#94a3b8', marginTop: 4 }}>
           Monitor the 90-day biological recovery window for recent donors to ensure safety compliance.
         </p>
       </div>
@@ -46,7 +46,7 @@ export const EligibilityTracking: React.FC = () => {
 
           return (
             <div key={donor.id} style={{ 
-              background: '#0f0a0b', border: `1px solid ${border}`, borderRadius: 12, padding: '20px',
+              background: '#1e293b', border: `1px solid ${border}`, borderRadius: 12, padding: '20px',
               position: 'relative', overflow: 'hidden'
             }}>
               {/* Progress bar background for ineligible */}
@@ -59,13 +59,13 @@ export const EligibilityTracking: React.FC = () => {
 
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#f0e0e4' }}>{donor.name}</h3>
-                  <p style={{ margin: '2px 0 0 0', fontSize: 12, color: '#a09094' }}>{donor.phone}</p>
+                  <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#ffffff' }}>{donor.name}</h3>
+                  <p style={{ margin: '2px 0 0 0', fontSize: 12, color: '#e2e8f0' }}>{donor.phone}</p>
                 </div>
                 <div style={{ 
-                  width: 32, height: 32, borderRadius: 8, background: '#1a1012', border: '1px solid #2e1a1e',
+                  width: 32, height: 32, borderRadius: 8, background: '#1a1012', border: '1px solid #475569',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: '#e0d0d4', fontSize: 12, fontWeight: 800
+                  color: '#f8fafc', fontSize: 12, fontWeight: 800
                 }}>
                   {donor.bloodGroup}
                 </div>
@@ -77,7 +77,7 @@ export const EligibilityTracking: React.FC = () => {
                     <CheckCircle2 size={24} color="#4ade80" />
                     <div>
                       <p style={{ margin: 0, color: '#4ade80', fontSize: 13, fontWeight: 700 }}>Eligible to Donate</p>
-                      <p style={{ margin: '2px 0 0 0', color: '#6a5a5d', fontSize: 11 }}>Recovered &gt; 90 days</p>
+                      <p style={{ margin: '2px 0 0 0', color: '#94a3b8', fontSize: 11 }}>Recovered &gt; 90 days</p>
                     </div>
                   </>
                 ) : (
@@ -85,7 +85,7 @@ export const EligibilityTracking: React.FC = () => {
                     <UserX size={24} color="#f87171" />
                     <div>
                       <p style={{ margin: 0, color: '#f87171', fontSize: 13, fontWeight: 700 }}>In Recovery Phase</p>
-                      <p style={{ margin: '2px 0 0 0', color: '#a09094', fontSize: 11 }}>
+                      <p style={{ margin: '2px 0 0 0', color: '#e2e8f0', fontSize: 11 }}>
                         {daysRemaining} day{daysRemaining !== 1 ? 's' : ''} remaining until eligible
                       </p>
                     </div>
@@ -97,7 +97,7 @@ export const EligibilityTracking: React.FC = () => {
         })}
 
         {donorsWithHistory.length === 0 && (
-          <div style={{ gridColumn: '1 / -1', padding: 40, textAlign: 'center', color: '#6a5a5d', background: '#0f0a0b', border: '1px solid #1e1214', borderRadius: 12 }}>
+          <div style={{ gridColumn: '1 / -1', padding: 40, textAlign: 'center', color: '#94a3b8', background: '#1e293b', border: '1px solid #334155', borderRadius: 12 }}>
             No donation history available to track eligibility.
           </div>
         )}

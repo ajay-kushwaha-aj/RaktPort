@@ -59,11 +59,11 @@ const ModuleFallback: React.FC<{ label?: string }> = ({ label }) => (
       width: 36,
       height: 36,
       borderRadius: '50%',
-      border: '3px solid #1e1214',
-      borderTopColor: '#C41E3A',
+      border: '3px solid #334155',
+      borderTopColor: '#2563eb',
       animation: 'spin 0.8s linear infinite',
     }} />
-    <p style={{ fontSize: 13, color: '#5a4a4d', margin: 0 }}>
+    <p style={{ fontSize: 13, color: '#94a3b8', margin: 0 }}>
       Loading {label ?? 'module'}…
     </p>
     <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
@@ -87,7 +87,7 @@ const ComingSoon: React.FC<{ title: string }> = ({ title }) => (
       width: 56,
       height: 56,
       borderRadius: 14,
-      background: 'rgba(196,30,58,0.08)',
+      background: 'rgba(37,99,235,0.08)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -95,15 +95,15 @@ const ComingSoon: React.FC<{ title: string }> = ({ title }) => (
     }}>
       🛠
     </div>
-    <h2 style={{ fontSize: 18, fontWeight: 600, color: '#d0c0c4', margin: 0 }}>
+    <h2 style={{ fontSize: 18, fontWeight: 600, color: '#f8fafc', margin: 0 }}>
       {title}
     </h2>
-    <p style={{ fontSize: 13, color: '#5a4a4d', margin: 0, textAlign: 'center', maxWidth: 320 }}>
+    <p style={{ fontSize: 13, color: '#94a3b8', margin: 0, textAlign: 'center', maxWidth: 320 }}>
       This module is being built as part of Phase 3. The routing and store are already wired.
     </p>
     <span style={{
-      background: 'rgba(196,30,58,0.12)',
-      color: '#E8294A',
+      background: 'rgba(37,99,235,0.12)',
+      color: '#3b82f6',
       fontSize: 11,
       fontWeight: 600,
       padding: '4px 12px',

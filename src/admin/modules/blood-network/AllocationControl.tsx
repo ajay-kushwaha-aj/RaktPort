@@ -16,10 +16,10 @@ export const AllocationControl: React.FC = () => {
     <div style={{ padding: '32px 36px', maxWidth: 1200, fontFamily: 'Inter, sans-serif' }}>
       {/* ── Page header ── */}
       <div style={{ marginBottom: 32 }}>
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#f0e0e4', margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#ffffff', margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
           <ArrowRightLeft size={22} color="#60a5fa" /> Allocation Control
         </h2>
-        <p style={{ fontSize: 13, color: '#6a5a5d', marginTop: 4 }}>
+        <p style={{ fontSize: 13, color: '#94a3b8', marginTop: 4 }}>
           Manually route available national blood inventory to pending critical or unmet hospital requests.
         </p>
       </div>
@@ -28,13 +28,13 @@ export const AllocationControl: React.FC = () => {
         
         {/* Pending Requests Column */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <h3 style={{ fontSize: 13, fontWeight: 600, color: '#c0b0b3', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+          <h3 style={{ fontSize: 13, fontWeight: 600, color: '#f1f5f9', textTransform: 'uppercase', letterSpacing: 0.5 }}>
             Pending Requests ({pendingRequests.length})
           </h3>
           
           {pendingRequests.length === 0 ? (
-            <div style={{ background: '#0f0a0b', border: '1px solid #1e1214', borderRadius: 12, padding: 40, textAlign: 'center' }}>
-              <p style={{ margin: 0, color: '#6a5a5d', fontSize: 14 }}>No pending requests require manual allocation.</p>
+            <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: 12, padding: 40, textAlign: 'center' }}>
+              <p style={{ margin: 0, color: '#94a3b8', fontSize: 14 }}>No pending requests require manual allocation.</p>
             </div>
           ) : (
             pendingRequests.map(req => {
@@ -44,16 +44,16 @@ export const AllocationControl: React.FC = () => {
               
               return (
                 <div key={req.id} style={{
-                  background: '#0f0a0b', border: '1px solid #1e1214', borderRadius: 12, padding: '20px 24px'
+                  background: '#1e293b', border: '1px solid #334155', borderRadius: 12, padding: '20px 24px'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
                     <div>
                       <p style={{ margin: 0, fontSize: 11, color: '#60a5fa', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
                         {req.rtid}
                       </p>
-                      <h4 style={{ margin: '4px 0 0 0', fontSize: 18, fontWeight: 700, color: '#f0e0e4', display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <h4 style={{ margin: '4px 0 0 0', fontSize: 18, fontWeight: 700, color: '#ffffff', display: 'flex', alignItems: 'center', gap: 8 }}>
                         <Droplet size={16} color="#f87171" fill="#f87171" />
-                        {req.bloodGroup} <span style={{ fontSize: 14, color: '#7a6a6d', fontWeight: 500 }}>× {req.units} units</span>
+                        {req.bloodGroup} <span style={{ fontSize: 14, color: '#cbd5e1', fontWeight: 500 }}>× {req.units} units</span>
                       </h4>
                     </div>
                     <span style={{ 
@@ -66,24 +66,24 @@ export const AllocationControl: React.FC = () => {
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#a09094', fontSize: 13 }}>
-                      <Building2 size={14} color="#6a5a5d" /> {req.hospitalName}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#e2e8f0', fontSize: 13 }}>
+                      <Building2 size={14} color="#94a3b8" /> {req.hospitalName}
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#a09094', fontSize: 13 }}>
-                      <User size={14} color="#6a5a5d" /> {req.patientName || 'Confidential'}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#e2e8f0', fontSize: 13 }}>
+                      <User size={14} color="#94a3b8" /> {req.patientName || 'Confidential'}
                     </div>
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <p style={{ margin: 0, fontSize: 12, color: '#6a5a5d' }}>
+                    <p style={{ margin: 0, fontSize: 12, color: '#94a3b8' }}>
                       Requested: {formatDate(req.createdAt)} • {req.city}
                     </p>
                     <button
                       disabled={!isFulfilled}
                       style={{
                         background: isFulfilled ? '#60a5fa' : 'transparent',
-                        color: isFulfilled ? '#0f172a' : '#c0b0b3',
-                        border: isFulfilled ? 'none' : '1px solid #2e1a1e',
+                        color: isFulfilled ? '#0f172a' : '#f1f5f9',
+                        border: isFulfilled ? 'none' : '1px solid #475569',
                         borderRadius: 8, padding: '8px 16px', fontSize: 12, fontWeight: 600,
                         cursor: isFulfilled ? 'pointer' : 'not-allowed',
                         display: 'flex', alignItems: 'center', gap: 6, opacity: isFulfilled ? 1 : 0.5
@@ -101,23 +101,23 @@ export const AllocationControl: React.FC = () => {
 
         {/* Global Stock Column */}
         <div>
-          <h3 style={{ fontSize: 13, fontWeight: 600, color: '#c0b0b3', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 16 }}>
+          <h3 style={{ fontSize: 13, fontWeight: 600, color: '#f1f5f9', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 16 }}>
             National Reserve
           </h3>
-          <div style={{ background: '#0f0a0b', border: '1px solid #1e1214', borderRadius: 12, padding: '20px 24px' }}>
+          <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: 12, padding: '20px 24px' }}>
             {nationalInventory.map(inv => (
               <div key={inv.bloodGroup} style={{ 
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
-                padding: '12px 0', borderBottom: '1px solid #160d0f' 
+                padding: '12px 0', borderBottom: '1px solid #334155' 
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(248,113,113,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Droplet size={16} color="#f87171" fill="#f87171" />
                   </div>
-                  <span style={{ fontSize: 16, fontWeight: 700, color: '#e0d0d4' }}>{inv.bloodGroup}</span>
+                  <span style={{ fontSize: 16, fontWeight: 700, color: '#f8fafc' }}>{inv.bloodGroup}</span>
                 </div>
-                <span style={{ fontSize: 16, fontWeight: 700, color: inv.units === 0 ? '#6a5a5d' : '#f0e0e4' }}>
-                  {inv.units} <span style={{ fontSize: 12, color: '#6a5a5d', fontWeight: 500 }}>units</span>
+                <span style={{ fontSize: 16, fontWeight: 700, color: inv.units === 0 ? '#94a3b8' : '#ffffff' }}>
+                  {inv.units} <span style={{ fontSize: 12, color: '#94a3b8', fontWeight: 500 }}>units</span>
                 </span>
               </div>
             ))}

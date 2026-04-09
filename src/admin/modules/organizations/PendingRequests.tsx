@@ -10,7 +10,7 @@ export const PendingRequests: React.FC = () => {
     setActiveModule('verify-organizations');
   }, [setActiveModule]);
 
-  return <div style={{ padding: 40, color: '#f0e0e4' }}>Redirecting to Verify Queue...</div>;
+  return <div style={{ padding: 40, color: '#ffffff' }}>Redirecting to Verify Queue...</div>;
 };
 
 export default PendingRequests;

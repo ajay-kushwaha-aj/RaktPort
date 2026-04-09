@@ -49,10 +49,10 @@ export const AllDonors: React.FC = () => {
       {/* ── Page header ── */}
       <div style={{ marginBottom: 28, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
         <div>
-          <h2 style={{ fontSize: 20, fontWeight: 700, color: '#f0e0e4', margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
+          <h2 style={{ fontSize: 20, fontWeight: 700, color: '#ffffff', margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
             <Users size={22} color="#fbbf24" /> Registered Donors
           </h2>
-          <p style={{ fontSize: 13, color: '#6a5a5d', marginTop: 4 }}>
+          <p style={{ fontSize: 13, color: '#94a3b8', marginTop: 4 }}>
             Manage the national donor database, export contacts, and track individual contributions.
           </p>
         </div>
@@ -60,8 +60,8 @@ export const AllDonors: React.FC = () => {
           onClick={handleExport}
           disabled={filteredDonors.length === 0}
           style={{
-            background: 'rgba(255,255,255,0.05)', color: '#c0b0b3',
-            border: '1px solid #2e1a1e', borderRadius: 8, padding: '8px 16px',
+            background: 'rgba(255,255,255,0.05)', color: '#f1f5f9',
+            border: '1px solid #475569', borderRadius: 8, padding: '8px 16px',
             fontSize: 13, fontWeight: 600, fontFamily: 'Inter, sans-serif',
             cursor: filteredDonors.length === 0 ? 'not-allowed' : 'pointer',
             display: 'flex', alignItems: 'center', gap: 8, opacity: filteredDonors.length === 0 ? 0.5 : 1
@@ -74,7 +74,7 @@ export const AllDonors: React.FC = () => {
       {/* ── Filters ── */}
       <div style={{ display: 'flex', gap: 16, marginBottom: 24, flexWrap: 'wrap' }}>
         <div style={{ position: 'relative', flex: 1, minWidth: 280 }}>
-          <Search size={16} color="#6a5a5d" style={{ position: 'absolute', left: 16, top: 13 }} />
+          <Search size={16} color="#94a3b8" style={{ position: 'absolute', left: 16, top: 13 }} />
           <input 
             type="text" 
             placeholder="Search donors by name, city, or phone..." 
@@ -82,8 +82,8 @@ export const AllDonors: React.FC = () => {
             onChange={e => setSearchTerm(e.target.value)}
             style={{
               width: '100%', padding: '11px 16px 11px 42px',
-              background: '#0f0a0b', border: '1px solid #2e1a1e', borderRadius: 8,
-              color: '#f0e0e4', fontSize: 13, outline: 'none'
+              background: '#1e293b', border: '1px solid #475569', borderRadius: 8,
+              color: '#ffffff', fontSize: 13, outline: 'none'
             }}
           />
         </div>
@@ -91,8 +91,8 @@ export const AllDonors: React.FC = () => {
           value={bgFilter}
           onChange={e => setBgFilter(e.target.value)}
           style={{
-            padding: '11px 16px', background: '#0f0a0b', border: '1px solid #2e1a1e',
-            borderRadius: 8, color: '#c0b0b3', fontSize: 13, outline: 'none', cursor: 'pointer'
+            padding: '11px 16px', background: '#1e293b', border: '1px solid #475569',
+            borderRadius: 8, color: '#f1f5f9', fontSize: 13, outline: 'none', cursor: 'pointer'
           }}
         >
           <option value="all">All Blood Groups</option>
@@ -103,20 +103,20 @@ export const AllDonors: React.FC = () => {
       </div>
 
       {/* ── Table ── */}
-      <div style={{ background: '#0f0a0b', border: '1px solid #1e1214', borderRadius: 12, overflowX: 'auto' }}>
+      <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: 12, overflowX: 'auto' }}>
         {loading ? (
-          <div style={{ padding: 40, textAlign: 'center', color: '#6a5a5d' }}>Loading donors...</div>
+          <div style={{ padding: 40, textAlign: 'center', color: '#94a3b8' }}>Loading donors...</div>
         ) : filteredDonors.length === 0 ? (
-          <div style={{ padding: 60, textAlign: 'center', color: '#6a5a5d' }}>No donors found matching criteria.</div>
+          <div style={{ padding: 60, textAlign: 'center', color: '#94a3b8' }}>No donors found matching criteria.</div>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
-              <tr style={{ background: '#140c0e', borderBottom: '1px solid #1e1214' }}>
-                <th style={{ padding: '14px 20px', fontSize: 11, fontWeight: 600, color: '#6a5a5d', textTransform: 'uppercase', letterSpacing: 0.5 }}>Donor / Blood Group</th>
-                <th style={{ padding: '14px 20px', fontSize: 11, fontWeight: 600, color: '#6a5a5d', textTransform: 'uppercase', letterSpacing: 0.5 }}>Location</th>
-                <th style={{ padding: '14px 20px', fontSize: 11, fontWeight: 600, color: '#6a5a5d', textTransform: 'uppercase', letterSpacing: 0.5 }}>Contact</th>
-                <th style={{ padding: '14px 20px', fontSize: 11, fontWeight: 600, color: '#6a5a5d', textTransform: 'uppercase', letterSpacing: 0.5 }}>Contributions</th>
-                <th style={{ padding: '14px 20px', fontSize: 11, fontWeight: 600, color: '#6a5a5d', textTransform: 'uppercase', letterSpacing: 0.5 }}>Eligibility</th>
+              <tr style={{ background: '#1e293b', borderBottom: '1px solid #334155' }}>
+                <th style={{ padding: '14px 20px', fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5 }}>Donor / Blood Group</th>
+                <th style={{ padding: '14px 20px', fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5 }}>Location</th>
+                <th style={{ padding: '14px 20px', fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5 }}>Contact</th>
+                <th style={{ padding: '14px 20px', fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5 }}>Contributions</th>
+                <th style={{ padding: '14px 20px', fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5 }}>Eligibility</th>
               </tr>
             </thead>
             <tbody>
@@ -131,19 +131,19 @@ export const AllDonors: React.FC = () => {
                       }}>
                         {donor.bloodGroup}
                       </div>
-                      <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#e0d0d4' }}>{donor.name}</p>
+                      <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#f8fafc' }}>{donor.name}</p>
                     </div>
                   </td>
-                  <td style={{ padding: '16px 20px', fontSize: 13, color: '#a09094' }}>
+                  <td style={{ padding: '16px 20px', fontSize: 13, color: '#e2e8f0' }}>
                     {donor.city}{donor.state ? `, ${donor.state}` : ''}
                   </td>
-                  <td style={{ padding: '16px 20px', fontSize: 13, color: '#a09094', fontFamily: 'monospace' }}>
+                  <td style={{ padding: '16px 20px', fontSize: 13, color: '#e2e8f0', fontFamily: 'monospace' }}>
                     {donor.phone || 'N/A'}
                   </td>
                   <td style={{ padding: '16px 20px' }}>
-                    <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#f0e0e4' }}>{donor.totalDonations}</p>
+                    <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#ffffff' }}>{donor.totalDonations}</p>
                     {donor.totalDonations > 0 && (
-                      <p style={{ margin: '2px 0 0 0', fontSize: 11, color: '#6a5a5d' }}>
+                      <p style={{ margin: '2px 0 0 0', fontSize: 11, color: '#94a3b8' }}>
                         Last: {formatDate(donor.lastDonationDate)}
                       </p>
                     )}

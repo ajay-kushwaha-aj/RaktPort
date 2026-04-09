@@ -6,7 +6,7 @@ import { useNotificationStore, type Notification, type NotificationSeverity } fr
 const severityConfig: Record<NotificationSeverity, { icon: React.ElementType; color: string; bg: string }> = {
   info: { icon: Info, color: '#60a5fa', bg: 'rgba(96,165,250,0.1)' },
   warning: { icon: AlertTriangle, color: '#fbbf24', bg: 'rgba(251,191,36,0.1)' },
-  critical: { icon: AlertOctagon, color: '#E8294A', bg: 'rgba(232,41,74,0.1)' },
+  critical: { icon: AlertOctagon, color: '#3b82f6', bg: 'rgba(59,130,246,0.1)' },
   success: { icon: CheckCircle2, color: '#4ade80', bg: 'rgba(74,222,128,0.1)' },
 };
 
@@ -31,7 +31,7 @@ const NotificationItem: React.FC<{ n: Notification }> = ({ n }) => {
         gap: 12,
         padding: '12px 16px',
         background: n.read ? 'transparent' : 'rgba(255,255,255,0.025)',
-        borderBottom: '1px solid #1a0e10',
+        borderBottom: '1px solid #334155',
         cursor: 'pointer',
         transition: 'background 0.12s',
         position: 'relative',
@@ -52,7 +52,7 @@ const NotificationItem: React.FC<{ n: Notification }> = ({ n }) => {
           width: 6,
           height: 6,
           borderRadius: '50%',
-          background: '#C41E3A',
+          background: '#2563eb',
         }} />
       )}
       <div
@@ -74,7 +74,7 @@ const NotificationItem: React.FC<{ n: Notification }> = ({ n }) => {
           fontFamily: 'Inter, sans-serif',
           fontSize: 13,
           fontWeight: n.read ? 400 : 600,
-          color: n.read ? '#8a7a7d' : '#d0c0c4',
+          color: n.read ? '#cbd5e1' : '#f8fafc',
           margin: '0 0 2px 0',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
@@ -85,7 +85,7 @@ const NotificationItem: React.FC<{ n: Notification }> = ({ n }) => {
         <p style={{
           fontFamily: 'Inter, sans-serif',
           fontSize: 12,
-          color: '#6a5a5d',
+          color: '#94a3b8',
           margin: '0 0 4px 0',
           display: '-webkit-box',
           WebkitLineClamp: 2,
@@ -94,7 +94,7 @@ const NotificationItem: React.FC<{ n: Notification }> = ({ n }) => {
         }}>
           {n.message}
         </p>
-        <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 10, color: '#4a3a3d' }}>
+        <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 10, color: '#64748b' }}>
           {formatTime(n.timestamp)}
         </span>
       </div>
@@ -128,8 +128,8 @@ export const NotificationPanel: React.FC = () => {
           right: 0,
           bottom: 0,
           width: 360,
-          background: '#0e0809',
-          borderLeft: '1px solid #1a0e10',
+          background: '#0f172a',
+          borderLeft: '1px solid #334155',
           zIndex: 60,
           display: 'flex',
           flexDirection: 'column',
@@ -145,11 +145,11 @@ export const NotificationPanel: React.FC = () => {
           alignItems: 'center',
           gap: 10,
           padding: '0 16px',
-          borderBottom: '1px solid #1a0e10',
+          borderBottom: '1px solid #334155',
           flexShrink: 0,
         }}>
-          <Bell size={16} color="#C41E3A" />
-          <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, fontWeight: 600, color: '#e0d0d4', flex: 1 }}>
+          <Bell size={16} color="#2563eb" />
+          <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, fontWeight: 600, color: '#f8fafc', flex: 1 }}>
             Notifications
           </span>
 
@@ -158,18 +158,18 @@ export const NotificationPanel: React.FC = () => {
               <button
                 onClick={markAllRead}
                 title="Mark all read"
-                style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 5, borderRadius: 5, color: '#5a4a4d', transition: 'color 0.15s' }}
+                style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 5, borderRadius: 5, color: '#94a3b8', transition: 'color 0.15s' }}
                 onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#60a5fa'; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#5a4a4d'; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#94a3b8'; }}
               >
                 <CheckCheck size={15} />
               </button>
               <button
                 onClick={clearAll}
                 title="Clear all"
-                style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 5, borderRadius: 5, color: '#5a4a4d', transition: 'color 0.15s' }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#E8294A'; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#5a4a4d'; }}
+                style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 5, borderRadius: 5, color: '#94a3b8', transition: 'color 0.15s' }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#3b82f6'; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#94a3b8'; }}
               >
                 <Trash2 size={15} />
               </button>
@@ -178,9 +178,9 @@ export const NotificationPanel: React.FC = () => {
 
           <button
             onClick={closePanel}
-            style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 5, borderRadius: 5, color: '#5a4a4d', transition: 'color 0.15s' }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#e0d0d4'; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#5a4a4d'; }}
+            style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 5, borderRadius: 5, color: '#94a3b8', transition: 'color 0.15s' }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#f8fafc'; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#94a3b8'; }}
           >
             <X size={16} />
           </button>
@@ -196,10 +196,10 @@ export const NotificationPanel: React.FC = () => {
               justifyContent: 'center',
               height: '100%',
               gap: 12,
-              color: '#4a3a3d',
+              color: '#64748b',
             }}>
               <Bell size={36} />
-              <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, color: '#5a4a4d', margin: 0 }}>
+              <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, color: '#94a3b8', margin: 0 }}>
                 No notifications yet
               </p>
             </div>
@@ -212,11 +212,11 @@ export const NotificationPanel: React.FC = () => {
         {notifications.length > 0 && (
           <div style={{
             padding: '10px 16px',
-            borderTop: '1px solid #1a0e10',
+            borderTop: '1px solid #334155',
             textAlign: 'center',
             flexShrink: 0,
           }}>
-            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 11, color: '#4a3a3d', margin: 0 }}>
+            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 11, color: '#64748b', margin: 0 }}>
               {notifications.length} notification{notifications.length !== 1 ? 's' : ''}
             </p>
           </div>

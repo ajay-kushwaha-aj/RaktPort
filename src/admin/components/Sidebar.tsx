@@ -184,7 +184,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ adminEmail, onLogout }) => {
         width: sidebarCollapsed ? 64 : 260,
         minWidth: sidebarCollapsed ? 64 : 260,
         height: '100vh',
-        background: 'linear-gradient(180deg, #0a0608 0%, #0d0709 100%)',
+        background: 'linear-gradient(180deg, #0f172a 0%, #0d0709 100%)',
         borderRight: '1px solid #1e1014',
         display: 'flex',
         flexDirection: 'column',
@@ -218,16 +218,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ adminEmail, onLogout }) => {
             objectFit: 'cover',
             objectPosition: 'center',
             flexShrink: 0,
-            border: '1px solid rgba(196,30,58,0.3)',
-            boxShadow: '0 0 10px rgba(196,30,58,0.25)',
+            border: '1px solid rgba(37,99,235,0.3)',
+            boxShadow: '0 0 10px rgba(37,99,235,0.25)',
           }}
         />
         {!sidebarCollapsed && (
           <div style={{ overflow: 'hidden' }}>
-            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 700, color: '#f0e8ea', letterSpacing: 0.5, margin: 0, lineHeight: 1.1 }}>
+            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 700, color: '#ffffff', letterSpacing: 0.5, margin: 0, lineHeight: 1.1 }}>
               RaktPort
             </p>
-            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 10, fontWeight: 500, color: '#C41E3A', letterSpacing: 1.5, textTransform: 'uppercase', margin: 0 }}>
+            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 10, fontWeight: 500, color: '#2563eb', letterSpacing: 1.5, textTransform: 'uppercase', margin: 0 }}>
               Control Center
             </p>
           </div>
@@ -253,7 +253,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ adminEmail, onLogout }) => {
                   alignItems: 'center',
                   gap: 10,
                   padding: sidebarCollapsed ? '9px 16px' : '9px 16px 9px 18px',
-                  background: hasActive && sidebarCollapsed ? 'rgba(196,30,58,0.12)' : 'transparent',
+                  background: hasActive && sidebarCollapsed ? 'rgba(37,99,235,0.12)' : 'transparent',
                   border: 'none',
                   cursor: 'pointer',
                   borderRadius: 6,
@@ -269,15 +269,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ adminEmail, onLogout }) => {
                 }}
                 onMouseLeave={(e) => {
                   (e.currentTarget as HTMLButtonElement).style.background =
-                    hasActive && sidebarCollapsed ? 'rgba(196,30,58,0.12)' : 'transparent';
+                    hasActive && sidebarCollapsed ? 'rgba(37,99,235,0.12)' : 'transparent';
                 }}
               >
                 {hasActive && sidebarCollapsed && (
-                  <div style={{ position: 'absolute', left: 0, top: '20%', bottom: '20%', width: 3, borderRadius: 2, background: '#C41E3A' }} />
+                  <div style={{ position: 'absolute', left: 0, top: '20%', bottom: '20%', width: 3, borderRadius: 2, background: '#2563eb' }} />
                 )}
                 <SectionIcon
                   size={16}
-                  color={hasActive ? '#E8294A' : '#8a7a7d'}
+                  color={hasActive ? '#3b82f6' : '#cbd5e1'}
                   style={{ flexShrink: 0 }}
                 />
                 {!sidebarCollapsed && (
@@ -288,7 +288,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ adminEmail, onLogout }) => {
                       fontFamily: 'Inter, sans-serif',
                       fontSize: 12,
                       fontWeight: 600,
-                      color: hasActive ? '#f0e8ea' : '#9a8a8d',
+                      color: hasActive ? '#ffffff' : '#e2e8f0',
                       letterSpacing: 0.3,
                       textTransform: 'uppercase',
                     }}>
@@ -296,7 +296,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ adminEmail, onLogout }) => {
                     </span>
                     <ChevronDown
                       size={13}
-                      color="#5a4a4d"
+                      color="#94a3b8"
                       style={{
                         transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)',
                         transition: 'transform 0.2s',
@@ -324,7 +324,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ adminEmail, onLogout }) => {
                           gap: 10,
                           padding: '7px 14px 7px 36px',
                           margin: '1px 6px',
-                          background: isActive ? 'rgba(196,30,58,0.15)' : 'transparent',
+                          background: isActive ? 'rgba(37,99,235,0.15)' : 'transparent',
                           border: 'none',
                           borderRadius: 6,
                           cursor: 'pointer',
@@ -338,7 +338,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ adminEmail, onLogout }) => {
                         }}
                         onMouseLeave={(e) => {
                           (e.currentTarget as HTMLButtonElement).style.background =
-                            isActive ? 'rgba(196,30,58,0.15)' : 'transparent';
+                            isActive ? 'rgba(37,99,235,0.15)' : 'transparent';
                         }}
                       >
                         {isActive && (
@@ -349,12 +349,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ adminEmail, onLogout }) => {
                             bottom: '15%',
                             width: 3,
                             borderRadius: 2,
-                            background: '#C41E3A',
+                            background: '#2563eb',
                           }} />
                         )}
                         <ChildIcon
                           size={14}
-                          color={isActive ? '#E8294A' : '#6a5a5d'}
+                          color={isActive ? '#3b82f6' : '#94a3b8'}
                           style={{ flexShrink: 0 }}
                         />
                         <span style={{
@@ -363,13 +363,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ adminEmail, onLogout }) => {
                           fontFamily: 'Inter, sans-serif',
                           fontSize: 13,
                           fontWeight: isActive ? 600 : 400,
-                          color: isActive ? '#f0e8ea' : '#8a7a7d',
+                          color: isActive ? '#ffffff' : '#cbd5e1',
                         }}>
                           {child.label}
                         </span>
                         {child.badge !== undefined && child.badge > 0 && (
                           <span style={{
-                            background: '#C41E3A',
+                            background: '#2563eb',
                             color: '#fff',
                             fontSize: 10,
                             fontWeight: 700,
@@ -417,11 +417,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ adminEmail, onLogout }) => {
             border: 'none',
             borderRadius: 6,
             cursor: 'pointer',
-            color: '#5a4a4d',
+            color: '#94a3b8',
             transition: 'color 0.15s',
           }}
-          onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#9a8a8d'; }}
-          onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#5a4a4d'; }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#e2e8f0'; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#94a3b8'; }}
         >
           {sidebarCollapsed ? (
             <ChevronRight size={15} />
@@ -456,7 +456,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ adminEmail, onLogout }) => {
             width: 28,
             height: 28,
             borderRadius: '50%',
-            background: 'linear-gradient(135deg, #C41E3A, #7B0D1E)',
+            background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -466,10 +466,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ adminEmail, onLogout }) => {
           </div>
           {!sidebarCollapsed && (
             <div style={{ overflow: 'hidden', flex: 1 }}>
-              <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, fontWeight: 600, color: '#c0b0b3', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, fontWeight: 600, color: '#f1f5f9', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 Super Admin
               </p>
-              <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 10, color: '#6a5a5d', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 10, color: '#94a3b8', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {adminEmail || 'admin@raktport.dev'}
               </p>
             </div>
@@ -486,12 +486,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ adminEmail, onLogout }) => {
                 borderRadius: 4,
                 display: 'flex',
                 alignItems: 'center',
-                color: '#6a5a5d',
+                color: '#94a3b8',
                 flexShrink: 0,
                 transition: 'color 0.15s',
               }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#E8294A'; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#6a5a5d'; }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#3b82f6'; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#94a3b8'; }}
             >
               <LogOut size={14} />
             </button>
@@ -513,11 +513,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ adminEmail, onLogout }) => {
               border: 'none',
               borderRadius: 6,
               cursor: 'pointer',
-              color: '#6a5a5d',
+              color: '#94a3b8',
               transition: 'color 0.15s',
             }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#E8294A'; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#6a5a5d'; }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#3b82f6'; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#94a3b8'; }}
           >
             <LogOut size={15} />
           </button>

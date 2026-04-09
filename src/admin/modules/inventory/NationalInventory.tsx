@@ -26,10 +26,10 @@ export const NationalInventory: React.FC = () => {
     <div style={{ padding: '32px 36px', maxWidth: 1200, fontFamily: 'Inter, sans-serif' }}>
       {/* ── Page header ── */}
       <div style={{ marginBottom: 32 }}>
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#f0e0e4', margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#ffffff', margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
           <Package size={22} color="#fbbf24" /> National Blood Inventory
         </h2>
-        <p style={{ fontSize: 13, color: '#6a5a5d', marginTop: 4 }}>
+        <p style={{ fontSize: 13, color: '#94a3b8', marginTop: 4 }}>
           Live stock levels aggregated from all verified blood banks and hospitals across the country.
         </p>
       </div>
@@ -44,13 +44,13 @@ export const NationalInventory: React.FC = () => {
             
             return (
               <div key={item.bloodGroup} style={{
-                background: '#0f0a0b', border: '1px solid #1e1214', borderRadius: 16, padding: '24px 28px',
+                background: '#1e293b', border: '1px solid #334155', borderRadius: 16, padding: '24px 28px',
                 transition: 'border-color 0.2s', position: 'relative'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <Droplet fill={level.color} color={level.color} size={20} />
-                    <span style={{ fontSize: 24, fontWeight: 800, color: '#f0e0e4' }}>{item.bloodGroup}</span>
+                    <span style={{ fontSize: 24, fontWeight: 800, color: '#ffffff' }}>{item.bloodGroup}</span>
                   </div>
                   <span style={{ 
                     background: level.bg, color: level.color, padding: '4px 10px', 
@@ -61,8 +61,8 @@ export const NationalInventory: React.FC = () => {
                 </div>
                 
                 <div style={{ textAlign: 'center', marginBottom: 16 }}>
-                  <p style={{ margin: 0, fontSize: 36, fontWeight: 800, color: '#e0d0d4' }}>{item.units}</p>
-                  <p style={{ margin: 0, fontSize: 12, color: '#6a5a5d', fontWeight: 600 }}>AVAILABLE UNITS</p>
+                  <p style={{ margin: 0, fontSize: 36, fontWeight: 800, color: '#f8fafc' }}>{item.units}</p>
+                  <p style={{ margin: 0, fontSize: 12, color: '#94a3b8', fontWeight: 600 }}>AVAILABLE UNITS</p>
                 </div>
                 
                 <div style={{ width: '100%', background: '#1a1012', height: 6, borderRadius: 3, overflow: 'hidden' }}>
@@ -78,11 +78,11 @@ export const NationalInventory: React.FC = () => {
         {/* Global Summary Column */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {/* Total */}
-          <div style={{ background: '#0f0a0b', border: '1px solid #1e1214', borderRadius: 12, padding: '24px 28px', textAlign: 'center' }}>
-            <p style={{ margin: 0, fontSize: 13, color: '#6a5a5d', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+          <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: 12, padding: '24px 28px', textAlign: 'center' }}>
+            <p style={{ margin: 0, fontSize: 13, color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
               Total National Stock
             </p>
-            <p style={{ margin: '12px 0 0 0', fontSize: 42, fontWeight: 800, color: '#f0e0e4' }}>
+            <p style={{ margin: '12px 0 0 0', fontSize: 42, fontWeight: 800, color: '#ffffff' }}>
               {totalUnits}
             </p>
           </div>
@@ -94,13 +94,13 @@ export const NationalInventory: React.FC = () => {
                 <AlertTriangle size={18} />
                 <h3 style={{ fontSize: 14, fontWeight: 700, margin: 0 }}>Critical Shortages</h3>
               </div>
-              <p style={{ margin: '0 0 16px 0', fontSize: 13, color: '#c0b0b3', lineHeight: 1.5 }}>
+              <p style={{ margin: '0 0 16px 0', fontSize: 13, color: '#f1f5f9', lineHeight: 1.5 }}>
                 The following blood groups have dropped below minimum safe thresholds:
               </p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                 {criticalGroups.map(c => (
                   <span key={c.bloodGroup} style={{ 
-                    background: '#f87171', color: '#0f0a0b', padding: '4px 12px', 
+                    background: '#f87171', color: '#1e293b', padding: '4px 12px', 
                     borderRadius: 6, fontSize: 13, fontWeight: 800 
                   }}>
                     {c.bloodGroup} ({c.units})
@@ -110,22 +110,22 @@ export const NationalInventory: React.FC = () => {
             </div>
           )}
 
-          <div style={{ background: '#0f0a0b', border: '1px solid #1e1214', borderRadius: 12, padding: 24 }}>
-            <h3 style={{ fontSize: 13, fontWeight: 600, color: '#6a5a5d', margin: '0 0 16px 0', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+          <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: 12, padding: 24 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 600, color: '#94a3b8', margin: '0 0 16px 0', textTransform: 'uppercase', letterSpacing: 0.5 }}>
               Stock Trends
             </h3>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
               <TrendingUp size={16} color="#4ade80" />
               <div style={{ flex: 1 }}>
-                <p style={{ margin: 0, fontSize: 13, color: '#e0d0d4' }}>Incoming donations</p>
-                <p style={{ margin: 0, fontSize: 11, color: '#a09094' }}>+5% this week</p>
+                <p style={{ margin: 0, fontSize: 13, color: '#f8fafc' }}>Incoming donations</p>
+                <p style={{ margin: 0, fontSize: 11, color: '#e2e8f0' }}>+5% this week</p>
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <TrendingDown size={16} color="#f87171" />
               <div style={{ flex: 1 }}>
-                <p style={{ margin: 0, fontSize: 13, color: '#e0d0d4' }}>Outgoing requests</p>
-                <p style={{ margin: 0, fontSize: 11, color: '#a09094' }}>-2% this week</p>
+                <p style={{ margin: 0, fontSize: 13, color: '#f8fafc' }}>Outgoing requests</p>
+                <p style={{ margin: 0, fontSize: 11, color: '#e2e8f0' }}>-2% this week</p>
               </div>
             </div>
           </div>

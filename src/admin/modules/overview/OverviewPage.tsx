@@ -32,8 +32,8 @@ const KPICard: React.FC<{
   <div
     onClick={onClick}
     style={{
-      background: '#0f0a0b',
-      border: '1px solid #1e1214',
+      background: '#1e293b',
+      border: '1px solid #334155',
       borderRadius: 12,
       padding: '20px 22px',
       display: 'flex',
@@ -44,22 +44,22 @@ const KPICard: React.FC<{
     }}
     onMouseEnter={(e) => {
       if (onClick) {
-        (e.currentTarget as HTMLDivElement).style.borderColor = '#3e1a20';
-        (e.currentTarget as HTMLDivElement).style.background = '#120a0c';
+        (e.currentTarget as HTMLDivElement).style.borderColor = '#64748b';
+        (e.currentTarget as HTMLDivElement).style.background = '#1e293b';
       } else {
-        (e.currentTarget as HTMLDivElement).style.borderColor = '#2e1a1e';
+        (e.currentTarget as HTMLDivElement).style.borderColor = '#475569';
       }
     }}
     onMouseLeave={(e) => {
-      (e.currentTarget as HTMLDivElement).style.borderColor = '#1e1214';
-      (e.currentTarget as HTMLDivElement).style.background = '#0f0a0b';
+      (e.currentTarget as HTMLDivElement).style.borderColor = '#334155';
+      (e.currentTarget as HTMLDivElement).style.background = '#1e293b';
     }}
   >
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
       <span style={{
         fontFamily: 'Inter, sans-serif',
         fontSize: 11,
-        color: '#7a6a6d',
+        color: '#cbd5e1',
         fontWeight: 600,
         textTransform: 'uppercase',
         letterSpacing: 0.6,
@@ -83,7 +83,7 @@ const KPICard: React.FC<{
         fontFamily: 'Inter, sans-serif',
         fontSize: 30,
         fontWeight: 700,
-        color: '#f0e0e4',
+        color: '#ffffff',
         margin: 0,
         letterSpacing: -0.5,
       }}>
@@ -115,8 +115,8 @@ const StatCard: React.FC<{
   <div
     onClick={onClick}
     style={{
-      background: '#0f0a0b',
-      border: '1px solid #1e1214',
+      background: '#1e293b',
+      border: '1px solid #334155',
       borderRadius: 10,
       padding: '16px 18px',
       display: 'flex',
@@ -126,21 +126,21 @@ const StatCard: React.FC<{
       transition: 'border-color 0.15s',
     }}
     onMouseEnter={(e) => {
-      (e.currentTarget as HTMLDivElement).style.borderColor = '#2e1a1e';
+      (e.currentTarget as HTMLDivElement).style.borderColor = '#475569';
     }}
     onMouseLeave={(e) => {
-      (e.currentTarget as HTMLDivElement).style.borderColor = '#1e1214';
+      (e.currentTarget as HTMLDivElement).style.borderColor = '#334155';
     }}
   >
     <div style={{ width: 4, height: 36, borderRadius: 2, background: color, flexShrink: 0 }} />
     <div>
-      <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 22, fontWeight: 700, color: '#e0d0d4', margin: 0 }}>
+      <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 22, fontWeight: 700, color: '#f8fafc', margin: 0 }}>
         {value.toLocaleString('en-IN')}
       </p>
-      <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, color: '#7a6a6d', margin: 0 }}>
+      <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, color: '#cbd5e1', margin: 0 }}>
         {label}
       </p>
-      <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 10, color: '#5a4a4d', margin: 0 }}>
+      <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 10, color: '#94a3b8', margin: 0 }}>
         {sublabel}
       </p>
     </div>
@@ -159,9 +159,9 @@ const ActivityRow: React.FC<{
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: '7px 0',
-    borderBottom: '1px solid #160d0f',
+    borderBottom: '1px solid #334155',
   }}>
-    <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, color: '#7a6a6d' }}>{label}</span>
+    <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, color: '#cbd5e1' }}>{label}</span>
     <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, fontWeight: 600, color }}>{value}</span>
   </div>
 );
@@ -207,13 +207,13 @@ export const OverviewPage: React.FC = () => {
       {/* ── Page header ──────────────────────────────────────────── */}
       <div style={{ marginBottom: 28, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
         <div>
-          <h2 style={{ fontSize: 20, fontWeight: 700, color: '#f0e0e4', margin: 0 }}>
+          <h2 style={{ fontSize: 20, fontWeight: 700, color: '#ffffff', margin: 0 }}>
             Control Center Overview
           </h2>
-          <p style={{ fontSize: 13, color: '#6a5a5d', marginTop: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <p style={{ fontSize: 13, color: '#94a3b8', marginTop: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
             Real-time national blood access network status
             {loading && (
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: '#C41E3A' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: '#2563eb' }}>
                 <RefreshCw size={11} style={{ animation: 'spin 1s linear infinite' }} />
                 Syncing…
               </span>
@@ -287,7 +287,7 @@ export const OverviewPage: React.FC = () => {
         <h3 style={{
           fontSize: 11,
           fontWeight: 600,
-          color: '#5a4a4d',
+          color: '#94a3b8',
           textTransform: 'uppercase',
           letterSpacing: 0.8,
           marginBottom: 12,
@@ -317,7 +317,7 @@ export const OverviewPage: React.FC = () => {
             label="Fraud Alerts"
             value={metrics.fraudAlertsCount}
             sublabel="Flagged requests"
-            color="#E8294A"
+            color="#3b82f6"
             onClick={() => setActiveModule('fraud-alerts')}
           />
           <StatCard
@@ -339,17 +339,17 @@ export const OverviewPage: React.FC = () => {
 
         {/* Today's Activity */}
         <div style={{
-          background: '#0f0a0b',
-          border: '1px solid #1e1214',
+          background: '#1e293b',
+          border: '1px solid #334155',
           borderRadius: 12,
           padding: '20px 22px',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-            <Clock size={13} color="#C41E3A" />
+            <Clock size={13} color="#2563eb" />
             <h3 style={{
               fontSize: 11,
               fontWeight: 600,
-              color: '#7a6a6d',
+              color: '#cbd5e1',
               margin: 0,
               textTransform: 'uppercase',
               letterSpacing: 0.7,
@@ -361,19 +361,19 @@ export const OverviewPage: React.FC = () => {
           <ActivityRow label="Donations processed" value={todayActivity.donations} color="#4ade80" />
           <ActivityRow label="Active RTIDs (pending)" value={metrics.activeRTIDs} color="#a78bfa" />
           <ActivityRow label="Orgs pending verification" value={metrics.pendingOrgsCount} color="#fbbf24" />
-          <ActivityRow label="Fraud flags" value={metrics.fraudAlertsCount} color="#E8294A" />
+          <ActivityRow label="Fraud flags" value={metrics.fraudAlertsCount} color="#3b82f6" />
 
           {lastRefreshed && (
             <p style={{
               fontFamily: 'Inter, sans-serif',
               fontSize: 10,
-              color: '#4a3a3d',
+              color: '#64748b',
               marginTop: 12,
               display: 'flex',
               alignItems: 'center',
               gap: 4,
             }}>
-              <Zap size={10} color="#C41E3A" />
+              <Zap size={10} color="#2563eb" />
               Live data — last synced {formatDateTime(lastRefreshed)}
             </p>
           )}
@@ -381,8 +381,8 @@ export const OverviewPage: React.FC = () => {
 
         {/* Recent Audit Activity */}
         <div style={{
-          background: '#0f0a0b',
-          border: '1px solid #1e1214',
+          background: '#1e293b',
+          border: '1px solid #334155',
           borderRadius: 12,
           padding: '20px 22px',
         }}>
@@ -392,7 +392,7 @@ export const OverviewPage: React.FC = () => {
               <h3 style={{
                 fontSize: 11,
                 fontWeight: 600,
-                color: '#7a6a6d',
+                color: '#cbd5e1',
                 margin: 0,
                 textTransform: 'uppercase',
                 letterSpacing: 0.7,
@@ -408,7 +408,7 @@ export const OverviewPage: React.FC = () => {
                 cursor: 'pointer',
                 fontFamily: 'Inter, sans-serif',
                 fontSize: 11,
-                color: '#C41E3A',
+                color: '#2563eb',
                 padding: 0,
               }}
             >
@@ -425,8 +425,8 @@ export const OverviewPage: React.FC = () => {
               minHeight: 120,
               gap: 8,
             }}>
-              <Building2 size={28} color="#2a1a1d" />
-              <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, color: '#4a3a4d', margin: 0 }}>
+              <Building2 size={28} color="#475569" />
+              <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, color: '#64748b', margin: 0 }}>
                 {loading ? 'Loading activity…' : 'No recent activity'}
               </p>
             </div>
@@ -435,7 +435,7 @@ export const OverviewPage: React.FC = () => {
               {recentActivity.map((entry) => {
                 const typeColor =
                   entry.action.toLowerCase().includes('verif') ? '#4ade80' :
-                  entry.action.toLowerCase().includes('fraud') ? '#E8294A' :
+                  entry.action.toLowerCase().includes('fraud') ? '#3b82f6' :
                   entry.action.toLowerCase().includes('request') ? '#60a5fa' :
                   '#a78bfa';
                 return (
@@ -444,7 +444,7 @@ export const OverviewPage: React.FC = () => {
                     alignItems: 'flex-start',
                     gap: 10,
                     padding: '8px 0',
-                    borderBottom: '1px solid #160d0f',
+                    borderBottom: '1px solid #334155',
                   }}>
                     <div style={{
                       width: 7,
@@ -459,7 +459,7 @@ export const OverviewPage: React.FC = () => {
                         fontFamily: 'Inter, sans-serif',
                         fontSize: 12,
                         fontWeight: 600,
-                        color: '#c0b0b3',
+                        color: '#f1f5f9',
                         margin: 0,
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
@@ -470,7 +470,7 @@ export const OverviewPage: React.FC = () => {
                       <p style={{
                         fontFamily: 'Inter, sans-serif',
                         fontSize: 11,
-                        color: '#5a4a5d',
+                        color: '#94a3b8',
                         margin: '1px 0 0 0',
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
@@ -482,7 +482,7 @@ export const OverviewPage: React.FC = () => {
                     <span style={{
                       fontFamily: 'Inter, sans-serif',
                       fontSize: 10,
-                      color: '#4a3a4d',
+                      color: '#64748b',
                       flexShrink: 0,
                       paddingTop: 2,
                     }}>

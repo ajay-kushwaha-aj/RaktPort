@@ -67,8 +67,8 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
     <header
       style={{
         height: 64,
-        background: '#0a0608',
-        borderBottom: '1px solid #1a0e10',
+        background: '#0f172a',
+        borderBottom: '1px solid #334155',
         display: 'flex',
         alignItems: 'center',
         gap: 16,
@@ -87,13 +87,13 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           cursor: 'pointer',
           padding: 6,
           borderRadius: 6,
-          color: '#6a5a5d',
+          color: '#94a3b8',
           display: 'flex',
           alignItems: 'center',
           transition: 'color 0.15s',
         }}
-        onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#f0e8ea'; }}
-        onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#6a5a5d'; }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#ffffff'; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#94a3b8'; }}
       >
         <Menu size={18} />
       </button>
@@ -105,7 +105,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             fontFamily: 'Inter, sans-serif',
             fontSize: 15,
             fontWeight: 600,
-            color: '#e0d0d4',
+            color: '#f8fafc',
             margin: 0,
             whiteSpace: 'nowrap',
             overflow: 'hidden',
@@ -114,7 +114,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
         >
           {moduleTitles[activeModule] ?? 'Control Center'}
         </h1>
-        <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 10, color: '#5a4a4d', margin: 0, display: 'flex', alignItems: 'center', gap: 4 }}>
+        <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 10, color: '#94a3b8', margin: 0, display: 'flex', alignItems: 'center', gap: 4 }}>
           <Dot size={14} color={lastRefreshed ? '#22c55e' : '#5a5a5a'} style={{ margin: -4 }} />
           Last refreshed: {formatLastRefreshed(lastRefreshed)}
         </p>
@@ -127,7 +127,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           display: 'flex',
           alignItems: 'center',
           background: searchFocused ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.04)',
-          border: `1px solid ${searchFocused ? '#3a1a20' : '#1a0e10'}`,
+          border: `1px solid ${searchFocused ? '#64748b' : '#334155'}`,
           borderRadius: 8,
           padding: '0 12px',
           gap: 8,
@@ -135,7 +135,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           transition: 'background 0.15s, border 0.15s',
         }}
       >
-        <Search size={13} color="#5a4a4d" style={{ flexShrink: 0 }} />
+        <Search size={13} color="#94a3b8" style={{ flexShrink: 0 }} />
         <input
           placeholder="Search modules, RTIDs…"
           onFocus={() => setSearchFocused(true)}
@@ -146,7 +146,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             outline: 'none',
             fontFamily: 'Inter, sans-serif',
             fontSize: 12,
-            color: '#c0b0b3',
+            color: '#f1f5f9',
             width: '100%',
             padding: '8px 0',
           }}
@@ -164,7 +164,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           cursor: loading ? 'not-allowed' : 'pointer',
           padding: 7,
           borderRadius: 7,
-          color: '#5a4a4d',
+          color: '#94a3b8',
           display: 'flex',
           alignItems: 'center',
           transition: 'color 0.15s, background 0.15s',
@@ -173,12 +173,12 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
         onMouseEnter={(e) => {
           if (!loading) {
             (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.06)';
-            (e.currentTarget as HTMLButtonElement).style.color = '#e0d0d4';
+            (e.currentTarget as HTMLButtonElement).style.color = '#f8fafc';
           }
         }}
         onMouseLeave={(e) => {
           (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
-          (e.currentTarget as HTMLButtonElement).style.color = '#5a4a4d';
+          (e.currentTarget as HTMLButtonElement).style.color = '#94a3b8';
         }}
       >
         <RefreshCw
@@ -197,7 +197,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           cursor: 'pointer',
           padding: 7,
           borderRadius: 7,
-          color: '#5a4a4d',
+          color: '#94a3b8',
           display: 'flex',
           alignItems: 'center',
           position: 'relative',
@@ -205,11 +205,11 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
         }}
         onMouseEnter={(e) => {
           (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.06)';
-          (e.currentTarget as HTMLButtonElement).style.color = '#e0d0d4';
+          (e.currentTarget as HTMLButtonElement).style.color = '#f8fafc';
         }}
         onMouseLeave={(e) => {
           (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
-          (e.currentTarget as HTMLButtonElement).style.color = '#5a4a4d';
+          (e.currentTarget as HTMLButtonElement).style.color = '#94a3b8';
         }}
       >
         <Bell size={16} />
@@ -221,7 +221,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
               right: 4,
               width: 16,
               height: 16,
-              background: '#C41E3A',
+              background: '#2563eb',
               borderRadius: '50%',
               fontFamily: 'Inter, sans-serif',
               fontSize: 9,
@@ -230,7 +230,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              border: '1.5px solid #0a0608',
+              border: '1.5px solid #0f172a',
             }}
           >
             {unreadCount > 9 ? '9+' : unreadCount}
@@ -269,7 +269,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
               width: 28,
               height: 28,
               borderRadius: '50%',
-              background: 'linear-gradient(135deg, #C41E3A, #7B0D1E)',
+              background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -279,16 +279,16 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             <User size={14} color="#fff" />
           </div>
           <div style={{ textAlign: 'left' }}>
-            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, fontWeight: 600, color: '#c0b0b3', margin: 0 }}>
+            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, fontWeight: 600, color: '#f1f5f9', margin: 0 }}>
               Super Admin
             </p>
-            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 10, color: '#6a5a5d', margin: 0, maxWidth: 130, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 10, color: '#94a3b8', margin: 0, maxWidth: 130, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {adminEmail || 'admin@raktport.dev'}
             </p>
           </div>
           <ChevronDown
             size={12}
-            color="#5a4a4d"
+            color="#94a3b8"
             style={{ transform: profileOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}
           />
         </button>
@@ -300,8 +300,8 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
               position: 'absolute',
               top: 'calc(100% + 8px)',
               right: 0,
-              background: '#120b0d',
-              border: '1px solid #2a1a1d',
+              background: '#1e293b',
+              border: '1px solid #475569',
               borderRadius: 10,
               padding: '6px',
               width: 180,
@@ -328,23 +328,23 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                   cursor: 'pointer',
                   fontFamily: 'Inter, sans-serif',
                   fontSize: 13,
-                  color: '#9a8a8d',
+                  color: '#e2e8f0',
                   transition: 'background 0.12s, color 0.12s',
                 }}
                 onMouseEnter={(e) => {
                   (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.05)';
-                  (e.currentTarget as HTMLButtonElement).style.color = '#e0d0d4';
+                  (e.currentTarget as HTMLButtonElement).style.color = '#f8fafc';
                 }}
                 onMouseLeave={(e) => {
                   (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
-                  (e.currentTarget as HTMLButtonElement).style.color = '#9a8a8d';
+                  (e.currentTarget as HTMLButtonElement).style.color = '#e2e8f0';
                 }}
               >
                 <Icon size={13} />
                 {label}
               </button>
             ))}
-            <div style={{ height: 1, background: '#2a1a1d', margin: '4px 0' }} />
+            <div style={{ height: 1, background: '#475569', margin: '4px 0' }} />
             <button
               onClick={() => { onLogout(); setProfileOpen(false); }}
               style={{
@@ -359,11 +359,11 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                 cursor: 'pointer',
                 fontFamily: 'Inter, sans-serif',
                 fontSize: 13,
-                color: '#E8294A',
+                color: '#3b82f6',
                 transition: 'background 0.12s',
               }}
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(196,30,58,0.12)';
+                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(37,99,235,0.12)';
               }}
               onMouseLeave={(e) => {
                 (e.currentTarget as HTMLButtonElement).style.background = 'transparent';

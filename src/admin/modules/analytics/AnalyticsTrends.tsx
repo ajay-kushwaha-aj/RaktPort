@@ -53,21 +53,21 @@ export const AnalyticsTrends: React.FC = () => {
     <div style={{ padding: '32px 36px', maxWidth: 1200, fontFamily: 'Inter, sans-serif' }}>
       {/* ── Page header ── */}
       <div style={{ marginBottom: 32 }}>
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#f0e0e4', margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#ffffff', margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
           <Activity size={22} color="#a78bfa" /> Platform Trends
         </h2>
-        <p style={{ fontSize: 13, color: '#6a5a5d', marginTop: 4 }}>
+        <p style={{ fontSize: 13, color: '#94a3b8', marginTop: 4 }}>
           6-month historical analysis of national blood requests versus completed donations based on real data.
         </p>
       </div>
 
       {loading ? (
-        <p style={{ color: '#6a5a5d' }}>Loading trends data...</p>
+        <p style={{ color: '#94a3b8' }}>Loading trends data...</p>
       ) : !hasData ? (
-        <div style={{ background: '#0f0a0b', border: '1px solid #1e1214', borderRadius: 16, padding: '60px 32px', textAlign: 'center' }}>
-          <Activity size={36} color="#2a1a1d" style={{ margin: '0 auto 12px' }} />
-          <h3 style={{ fontSize: 16, color: '#e0d0d4', margin: 0 }}>No Trend Data Yet</h3>
-          <p style={{ color: '#6a5a5d', fontSize: 13, marginTop: 4 }}>
+        <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: 16, padding: '60px 32px', textAlign: 'center' }}>
+          <Activity size={36} color="#475569" style={{ margin: '0 auto 12px' }} />
+          <h3 style={{ fontSize: 16, color: '#f8fafc', margin: 0 }}>No Trend Data Yet</h3>
+          <p style={{ color: '#94a3b8', fontSize: 13, marginTop: 4 }}>
             Trend charts will populate automatically as blood requests and donations accumulate over time.
           </p>
         </div>
@@ -75,14 +75,14 @@ export const AnalyticsTrends: React.FC = () => {
         <div style={{ display: 'grid', gap: 24 }}>
           
           {/* Main Area Chart */}
-          <div style={{ background: '#0f0a0b', border: '1px solid #1e1214', borderRadius: 16, padding: '24px 32px' }}>
+          <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: 16, padding: '24px 32px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
-              <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: '#e0d0d4' }}>Donations vs Requests</h3>
+              <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: '#f8fafc' }}>Donations vs Requests</h3>
               <div style={{ display: 'flex', gap: 16 }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#c0b0b3' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#f1f5f9' }}>
                   <div style={{ width: 12, height: 12, borderRadius: 3, background: '#4ade80' }} /> Donations
                 </span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#c0b0b3' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#f1f5f9' }}>
                   <div style={{ width: 12, height: 12, borderRadius: 3, background: '#60a5fa' }} /> Requests
                 </span>
               </div>
@@ -101,11 +101,11 @@ export const AnalyticsTrends: React.FC = () => {
                       <stop offset="95%" stopColor="#60a5fa" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#2e1a1e" vertical={false} />
-                  <XAxis dataKey="name" stroke="#6a5a5d" tick={{ fill: '#6a5a5d', fontSize: 12 }} axisLine={false} tickLine={false} />
-                  <YAxis stroke="#6a5a5d" tick={{ fill: '#6a5a5d', fontSize: 12 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#475569" vertical={false} />
+                  <XAxis dataKey="name" stroke="#94a3b8" tick={{ fill: '#94a3b8', fontSize: 12 }} axisLine={false} tickLine={false} />
+                  <YAxis stroke="#94a3b8" tick={{ fill: '#94a3b8', fontSize: 12 }} axisLine={false} tickLine={false} allowDecimals={false} />
                   <Tooltip 
-                    contentStyle={{ background: '#1a1012', border: '1px solid #2e1a1e', borderRadius: 8, color: '#f0e0e4' }}
+                    contentStyle={{ background: '#1a1012', border: '1px solid #475569', borderRadius: 8, color: '#ffffff' }}
                     itemStyle={{ fontSize: 13, fontWeight: 500 }}
                   />
                   <Area type="monotone" dataKey="donations" name="Donations" stroke="#4ade80" strokeWidth={3} fillOpacity={1} fill="url(#colorDonations)" />
@@ -116,9 +116,9 @@ export const AnalyticsTrends: React.FC = () => {
           </div>
 
           {/* Secondary Line Chart */}
-          <div style={{ background: '#0f0a0b', border: '1px solid #1e1214', borderRadius: 16, padding: '24px 32px' }}>
+          <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: 16, padding: '24px 32px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
-              <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: '#e0d0d4', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <TrendingUp size={18} color="#f87171" /> 
                 Unfulfilled Requests Index
               </h3>
@@ -127,13 +127,13 @@ export const AnalyticsTrends: React.FC = () => {
             <div style={{ height: 250, width: '100%' }}>
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#2e1a1e" vertical={false} />
-                  <XAxis dataKey="name" stroke="#6a5a5d" tick={{ fill: '#6a5a5d', fontSize: 12 }} axisLine={false} tickLine={false} />
-                  <YAxis stroke="#6a5a5d" tick={{ fill: '#6a5a5d', fontSize: 12 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#475569" vertical={false} />
+                  <XAxis dataKey="name" stroke="#94a3b8" tick={{ fill: '#94a3b8', fontSize: 12 }} axisLine={false} tickLine={false} />
+                  <YAxis stroke="#94a3b8" tick={{ fill: '#94a3b8', fontSize: 12 }} axisLine={false} tickLine={false} allowDecimals={false} />
                   <Tooltip 
-                    contentStyle={{ background: '#1a1012', border: '1px solid #2e1a1e', borderRadius: 8, color: '#f0e0e4' }}
+                    contentStyle={{ background: '#1a1012', border: '1px solid #475569', borderRadius: 8, color: '#ffffff' }}
                   />
-                  <Line type="monotone" dataKey="shortages" name="Unfulfilled Requests" stroke="#f87171" strokeWidth={3} dot={{ r: 4, fill: '#140c0e' }} activeDot={{ r: 6 }} />
+                  <Line type="monotone" dataKey="shortages" name="Unfulfilled Requests" stroke="#f87171" strokeWidth={3} dot={{ r: 4, fill: '#1e293b' }} activeDot={{ r: 6 }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
