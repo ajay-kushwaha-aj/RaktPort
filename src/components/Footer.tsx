@@ -1,6 +1,6 @@
 // src/components/Footer.tsx
 // ─────────────────────────────────────────────────────────────
-// RaktPort — Production Footer v2
+// RaktPort — Production Footer v1
 //
 // Aesthetic: Deep refined darkness — near-black crimson substrate,
 //   layered transparency, animated heartbeat line, scroll-reveal

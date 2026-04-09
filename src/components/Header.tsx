@@ -420,7 +420,6 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
           <span className="rph-d-section">Partners &amp; Access</span>
           <DLink icon={<Hospital size={16} />} label="For Hospitals" onClick={() => { onSignupClick?.('hospital'); setDrawer(false); }} />
           <DLink icon={<TestTubes size={16} />} label="For Blood Banks" onClick={() => { onSignupClick?.('bloodbank'); setDrawer(false); }} />
-          <DLink icon={<Microscope size={16} />} label="Admin Access" href="/admin" onClick={() => setDrawer(false)} />
         </nav>
 
         <div className="rph-d-sep" />
@@ -989,7 +988,8 @@ function RphStyles() {
   border-bottom:1px solid var(--rph-b);
   position:sticky; top:0;
   background:var(--rph-surf);
-  z-index:1;
+  z-index:2;
+  flex-shrink:0;
 }
 .rph-dlogo {
   font-family:'Sora',Georgia,serif;
@@ -1024,6 +1024,7 @@ function RphStyles() {
   cursor:pointer;
   width:calc(100% - 32px);
   transition:transform .2s, box-shadow .2s;
+  flex-shrink:0;
 }
 .rph-d-sos:hover { transform:translateY(-1px); box-shadow: 0 6px 20px rgba(220,38,38,0.35); }
 

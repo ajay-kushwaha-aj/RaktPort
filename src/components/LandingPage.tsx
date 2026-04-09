@@ -1150,7 +1150,7 @@ function LpStyles() {
 .dark .lp-inp{background:#140408!important;border-color:rgba(196,30,58,.22)!important;color:#F0E0DD!important;}
 .dark .lp-inp:focus{border-color:var(--p)!important;}
 .dark .lp-lbl{color:#9A8A82!important;}
-.dark .lp-sel{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23C41E3A' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")!important;}
+.dark .lp-sel{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23C41E3A' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")!important;background-repeat:no-repeat!important;background-position:right 14px center!important;}
 .dark .lp-eok{background:#0E2018!important;border-color:rgba(16,185,129,.22)!important;}
 .dark .lp-ewait{background:#2A1015!important;border-color:rgba(196,30,58,.2)!important;}
 .dark .lp-etitle{color:#F0E0DD!important;}
