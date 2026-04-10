@@ -230,8 +230,8 @@ export const useBloodBankData = () => {
                 donorMobile:     v.donorMobile || '',
                 donationType:    v.donationType || 'Regular',
                 component:       v.component   || 'Whole Blood',
-                hRtid:           v.hRtid       || null,
-                linkedHrtid:     v.linkedHrtid || null,
+                rRtid:           v.rRtid       || null,
+                linkedRrtid:     v.linkedRrtid || null,
                 status:          (v.status as Donation['status']) || 'AVAILABLE',
                 donationLocation:v.donationLocation || userData.district || 'Blood Bank',
                 city:            v.city || '',
@@ -254,14 +254,14 @@ export const useBloodBankData = () => {
             const redems: Redemption[] = dons
               .filter(d =>
                 (d.status === 'REDEEMED' || d.status === 'Redeemed') &&
-                (d.hRtid || d.linkedHrtid)
+                (d.rRtid || d.linkedRrtid)
               )
               .map(d => ({
                 dRtid:             d.dRtid,
                 bloodGroup:        d.bloodGroup,
                 donationLocation:  d.donationLocation,
                 redemptionLocation:d.hospitalName || 'Hospital',
-                linkedHRTID:       (d.hRtid || d.linkedHrtid)!,
+                linkedRRTID:       (d.rRtid || d.linkedRrtid)!,
                 date:              d.redemptionDate || d.date,
                 bloodBankId:       bbId,
               }));

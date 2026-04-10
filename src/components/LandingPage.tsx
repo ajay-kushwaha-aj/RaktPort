@@ -46,7 +46,8 @@ const ELI_RULES: { [k: string]: { [g: string]: number } } = {
   'Whole Blood': { Male: 90, Female: 90 }, 'Platelets': { Male: 14, Female: 14 },
   'Plasma': { Male: 28, Female: 28 }, 'Double Red Cells': { Male: 112, Female: 112 },
 };
-const RTID_STEPS = ['Collected', 'Lab Testing', 'Separation', 'Blood Bank', 'Issued', 'Transfused'];
+const D_RTID_STEPS = ['Collected', 'Lab Testing', 'Separation', 'Blood Bank', 'Issued', 'Transfused'];
+const R_RTID_STEPS = ['Requested', 'Processing', 'Matched', 'Verified', 'Issued', 'Completed'];
 const DB_KEY = 'rp_emergency_requests';
 
 /* ─── Utils ─── */
@@ -166,14 +167,14 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
   const closeEmerg = () => { setEmergOpen(false); setEDone(false); setERTID(''); setEForm({ patientName: '', bloodGroup: '', units: '', hospital: '', city: '', contact: '', urgency: 'Critical' }); };
 
   const [rtidIn, setRtidIn] = React.useState('');
-  const [rtidRes, setRtidRes] = React.useState<{ current: number; record?: EmergencyRecord | any } | null>(null);
+  const [rtidRes, setRtidRes] = React.useState<{ current: number; type: 'D' | 'R'; record?: EmergencyRecord | any } | null>(null);
   const [rtidErr, setRtidErr] = React.useState('');
   const [rtidLoading, setRtidLoading] = React.useState(false);
 
   const track = async () => {
     const v = rtidIn.trim().toUpperCase();
     if (!v) { setRtidErr('Please enter an RTID.'); return; }
-    if (!isValidRTID(v)) { setRtidErr('Format: D/H-RTID-DDMMYY-AXXXX  e.g. D-RTID-060426-A4F7K'); return; }
+    if (!isValidRTID(v)) { setRtidErr('Format: D/R-RTID-DDMMYY-AXXXX  e.g. D-RTID-060426-A4F7K'); return; }
     setRtidErr(''); setRtidRes(null); setRtidLoading(true);
 
     try {
@@ -196,8 +197,8 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
           else if (['REDEEMED', 'COMPLETED', 'REDEEMED-CREDIT'].includes(st)) current = 4;
           else if (['ADMINISTERED', 'PARTIALLY ADMINISTERED'].includes(st)) current = 6;
           else current = 1;
-          if (foundRef.linkedHrtid && foundRef.linkedHrtid !== 'N/A') {
-            const hSnap = await getDocs(query(collection(db, 'bloodRequests'), where('rtid', '==', foundRef.linkedHrtid)));
+          if (foundRef.linkedRrtid && foundRef.linkedRrtid !== 'N/A') {
+            const hSnap = await getDocs(query(collection(db, 'bloodRequests'), where('rtid', '==', foundRef.linkedRrtid)));
             if (!hSnap.empty) {
               const hData = hSnap.docs[0].data();
               details = { patientName: hData.patientName, bloodGroup: hData.bloodGroup };
@@ -231,7 +232,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
       }
 
       if (foundRef) {
-        setRtidRes({ current: Math.max(1, Math.min(current, 6)), record: details });
+        setRtidRes({ current: Math.max(1, Math.min(current, 6)), type: v.startsWith('D-RTID') ? 'D' : 'R', record: details });
       } else {
         setRtidErr('No real-time record found for this RTID.');
       }
@@ -492,7 +493,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
               <div className="lp-rtl-left"><NetworkSVG /></div>
               <div className="lp-rtbox">
                 <p className="lp-rthdr"><Activity size={13} /> Live RTID Tracker</p>
-                <p className="lp-rtfmt">Format: <code>D/H-RTID-DDMMYY-AXXXX</code></p>
+                <p className="lp-rtfmt">Format: <code>D/R-RTID-DDMMYY-AXXXX</code></p>
                 <div className="lp-rtrow">
                   <input className="lp-rtin" placeholder="e.g. D-RTID-060426-A4F7K" value={rtidIn}
                     onChange={e => { setRtidIn(e.target.value); setRtidRes(null); setRtidErr(''); }} onKeyDown={e => e.key === 'Enter' && track()} />
@@ -506,8 +507,8 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
                   <>
                     <div className="lp-rt-success"><CheckCircle2 size={14} /> Donation record found!</div>
                     <div className="lp-steps">
-                      {RTID_STEPS.map((step, i) => {
-                        const done = i < rtidRes.current, act = i === rtidRes.current - 1, last = i === RTID_STEPS.length - 1; return (
+                      {(rtidRes.type === 'D' ? D_RTID_STEPS : R_RTID_STEPS).map((step, i) => {
+                        const done = i < rtidRes.current, act = i === rtidRes.current - 1, last = i === 5; return (
                           <div key={step} className="lp-scol">
                             {!last && <div className={`lp-sline${done ? ' ok' : ''}`} />}
                             <div className={`lp-scirc${done ? ' done' : ''}${act ? ' act' : ''}`}>{done ? '✓' : i + 1}</div>

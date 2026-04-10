@@ -36,7 +36,7 @@ export const RTIDTracking: React.FC = () => {
           <Search size={18} color="#94a3b8" style={{ position: 'absolute', left: 18, top: 15 }} />
           <input
             type="text"
-            placeholder="e.g. D-RTID-010426-A1234 or H-RTID-010426-I1234"
+            placeholder="e.g. D-RTID-010426-A1234 or R-RTID-010426-I1234"
             value={searchInput}
             onChange={e => setSearchInput(e.target.value)}
             style={{

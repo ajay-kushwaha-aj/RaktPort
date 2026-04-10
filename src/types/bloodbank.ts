@@ -46,8 +46,8 @@ export interface Donation {
   city?: string;
 
   // Patient/Hospital Details (filled when redeemed)
-  hRtid?: string | null;
-  linkedHrtid?: string | null;
+  rRtid?: string | null;
+  linkedRrtid?: string | null;
   patientName?: string | null;
   hospitalName?: string | null;
   redemptionDate?: any;
@@ -94,7 +94,7 @@ export interface Notification {
   read: boolean;
   timestamp: any;
   type?: 'info' | 'warning' | 'success' | 'error';
-  relatedHrtid?: string;
+  relatedRrtid?: string;
 }
 
 export interface KPI {

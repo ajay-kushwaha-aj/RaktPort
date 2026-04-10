@@ -340,7 +340,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 export default function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="system" storageKey="viser-theme">
+      <ThemeProvider defaultTheme="light" storageKey="viser-theme">
         <AppContent />
       </ThemeProvider>
     </ErrorBoundary>

@@ -6,24 +6,24 @@ import { Label } from '@/components/ui/label';
 import { ArrowDown, ShieldCheck, User, FileText, KeyRound } from 'lucide-react';
 
 interface VerifyTabProps {
-  // Updated signature to include H-RTID
-  onVerifyAndRedeem: (hRtid: string, dRtid: string, otp: string) => void;
+  // Updated signature to include R-RTID
+  onVerifyAndRedeem: (rRtid: string, dRtid: string, otp: string) => void;
 }
 
 export const VerifyTab = ({ onVerifyAndRedeem }: VerifyTabProps) => {
-  const [hRtid, setHrtid] = useState('');
+  const [rRtid, setRrtid] = useState('');
   const [dRtid, setDrtid] = useState('');
   const [otp, setOtp] = useState('');
   const [patientName, setPatientName] = useState(''); // New field for audit
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Assuming the parent handler checks H-RTID and D-RTID linking
-    onVerifyAndRedeem(hRtid.trim().toUpperCase(), dRtid.trim().toUpperCase(), otp.trim());
+    // Assuming the parent handler checks R-RTID and D-RTID linking
+    onVerifyAndRedeem(rRtid.trim().toUpperCase(), dRtid.trim().toUpperCase(), otp.trim());
   };
 
   const handleClear = () => {
-    setHrtid('');
+    setRrtid('');
     setDrtid('');
     setOtp('');
     setPatientName('');
@@ -58,12 +58,12 @@ export const VerifyTab = ({ onVerifyAndRedeem }: VerifyTabProps) => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="hRtid">Hospital Request ID (H-RTID)</Label>
+                  <Label htmlFor="rRtid">Hospital Request ID (R-RTID)</Label>
                   <Input
-                    id="hRtid"
-                    value={hRtid}
-                    onChange={(e) => setHrtid(e.target.value)}
-                    placeholder="H-RTID-XXXX-XXXX"
+                    id="rRtid"
+                    value={rRtid}
+                    onChange={(e) => setRrtid(e.target.value)}
+                    placeholder="R-RTID-XXXX-XXXX"
                     className="font-mono bg-background"
                     required
                   />

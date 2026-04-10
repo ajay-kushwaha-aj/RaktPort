@@ -150,7 +150,7 @@ interface DonorData {
   availabilityMode?:'available'|'weekends'|'unavailable';
 }
 interface Donation {
-  date:Date; rtidCode:string; linkedHrtid:string; hospitalName:string; city:string;
+  date:Date; rtidCode:string; linkedRrtid:string; hospitalName:string; city:string;
   status:DonationStatus; otp:string; expiryDate?:Date; component?:DonationComponent;
   qrRedemptionStatus?:'Redeemed'|'Pending'|'Expired'; otpExpiryTime?:Date;
   impactTimeline?:ImpactTimeline; time?:string;
@@ -158,7 +158,7 @@ interface Donation {
 interface ImpactTimeline { donated:Date; linkedToRequest?:Date; usedByPatient?:Date; creditIssued?:Date; }
 interface BloodCenter { id:string; name:string; address:string; phone:string; city?:string; state?:string; pincode?:string; latitude?:number; longitude?:number; fullAddress?:string; }
 interface HrtidDetails { patientName:string; bloodGroup:string; units:string|number; hospital:string; rtidCode:string; bloodBankId:string; requiredBy?:string; component?:DonationComponent; impactTimeline?:ImpactTimeline; }
-interface EmergencyAlert { id:string; bloodGroup:string; hospitalName:string; urgency:'critical'|'high'|'medium'; expiresAt:Date; hrtid:string; city:string; }
+interface EmergencyAlert { id:string; bloodGroup:string; hospitalName:string; urgency:'critical'|'high'|'medium'; expiresAt:Date; rrtid:string; city:string; }
 
 // ─────────────────────────────────────────────────────────────
 // CONSTANTS
@@ -660,13 +660,13 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
   const [healthTipsOpen,     setHealthTipsOpen]      = useState(false);
   const [shareOpen,          setShareOpen]           = useState(false);
   const [historyQROpen,      setHistoryQROpen]       = useState(false);
-  const [hrtidModalOpen,     setHrtidModalOpen]      = useState(false);
+  const [rrtidModalOpen,     setRrtidModalOpen]      = useState(false);
   const [emergencyOpen,      setEmergencyOpen]       = useState(false);
 
   // QR / misc state
   const [selectedHistoryQR, setSelectedHistoryQR] = useState<any>(null);
-  const [hrtidDetails,      setHrtidDetails]      = useState<HrtidDetails | null>(null);
-  const [hrtidLoading,      setHrtidLoading]      = useState(false);
+  const [rrtidDetails,      setRrtidDetails]      = useState<HrtidDetails | null>(null);
+  const [rrtidLoading,      setRrtidLoading]      = useState(false);
   const [bookingDetails,    setBookingDetails]    = useState({ rtid: '', qrPayload: '' });
 
   const [bookingForm, setBookingForm] = useState({
@@ -768,7 +768,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
         snap.forEach(docSnap => {
           const d    = docSnap.data() as any;
           const rtid = d.dRtid || d.rtid || d.donationId || docSnap.id;
-          const linked = d.linkedHrtid || d.linkedRTID || d.hRtid || 'N/A';
+          const linked = d.linkedRrtid || d.linkedRTID || d.rRtid || 'N/A';
 
           let status: DonationStatus = d.status;
           if      (d.status === 'AVAILABLE' || d.status === 'Donated')                                    status = 'Donated';
@@ -790,7 +790,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
           };
 
           history.push({
-            date: safeDate(d.date), rtidCode: rtid, linkedHrtid: linked,
+            date: safeDate(d.date), rtidCode: rtid, linkedRrtid: linked,
             hospitalName: d.bloodBankName || d.hospitalName || 'Blood Bank',
             city: d.city || d.donationLocation || 'Unknown',
             status, otp: d.otp || '', expiryDate: d.expiryDate ? safeDate(d.expiryDate) : undefined,
@@ -811,7 +811,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
               const data = d.data() as any;
               if (['PENDING','CREATED','PARTIAL'].includes(data.status||'')) {
                 const exp = data.requiredBy ? safeDate(data.requiredBy) : new Date(Date.now()+12*3600000);
-                if (exp.getTime()>Date.now()) alerts.push({id:d.id,bloodGroup:data.bloodGroup,hospitalName:data.hospitalName||'Hospital',urgency:(data.urgency?.toLowerCase()||'high') as 'critical'|'high'|'medium',expiresAt:exp,hrtid:data.linkedRTID||data.rtid||d.id,city});
+                if (exp.getTime()>Date.now()) alerts.push({id:d.id,bloodGroup:data.bloodGroup,hospitalName:data.hospitalName||'Hospital',urgency:(data.urgency?.toLowerCase()||'high') as 'critical'|'high'|'medium',expiresAt:exp,rrtid:data.linkedRTID||data.rtid||d.id,city});
               }
             });
             setEmergencyAlerts(alerts.slice(0,3));
@@ -989,7 +989,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
         status:'Scheduled',otp,date:Timestamp.fromDate(dt),time:bookingForm.time,
         city:donorData.city||'',donationLocation:donorData.city||'',
         createdAt:Timestamp.now(),otpExpiryTime:Timestamp.fromDate(new Date(dt.getTime()+86400000)),
-        hRtid:null,linkedHrtid:null,patientName:null,hospitalName:null,
+        rRtid:null,linkedRrtid:null,patientName:null,hospitalName:null,
       });
 
       const payload=`${donorData.fullName}|${donorData.bloodGroup}|${rtid}|${selectedCenter.name}|${donorData.city}|${bookingForm.component}`;
@@ -1037,19 +1037,19 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
     }catch(e:any){toast.error('Could not cancel',{description:e.message});}
   };
 
-  const handleViewHrtid = async (hrtid:string) => {
-    setHrtidLoading(true);setHrtidModalOpen(true);setHrtidDetails(null);
+  const handleViewHrtid = async (rrtid:string) => {
+    setRrtidLoading(true);setRrtidModalOpen(true);setRrtidDetails(null);
     try{
       let data:any=null,hospitalName='Hospital';
       const tryDoc=async(id:string)=>{try{const s=await getDoc(doc(db,'bloodRequests',id));return s.exists()?s.data():null;}catch{return null;}};
       const tryQ=async(field:string,val:string)=>{try{const s=await getDocs(query(collection(db,'bloodRequests'),where(field,'==',val)));return s.empty?null:s.docs[0].data();}catch{return null;}};
-      data=await tryDoc(hrtid)||await tryQ('linkedRTID',hrtid)||await tryQ('rtid',hrtid);
+      data=await tryDoc(rrtid)||await tryQ('linkedRTID',rrtid)||await tryQ('rtid',rrtid);
       if(data?.hospitalId){try{const s=await getDoc(doc(db,'users',data.hospitalId));if(s.exists())hospitalName=s.data().fullName||'Hospital';}catch(_){}}
-      if(!data){toast.error('Request not found');setHrtidModalOpen(false);return;}
-      const matching=donationHistory.find(d=>d.linkedHrtid===hrtid);
-      setHrtidDetails({patientName:data.patientName,bloodGroup:data.bloodGroup,units:data.units||data.unitsRequired,hospital:hospitalName,rtidCode:hrtid,bloodBankId:'',component:data.component||'Whole Blood',requiredBy:data.requiredBy?formatDateTimeDMY(safeDate(data.requiredBy)):'N/A',impactTimeline:matching?.impactTimeline});
-    }catch(_){toast.error('Failed to fetch details');setHrtidModalOpen(false);}
-    finally{setHrtidLoading(false);}
+      if(!data){toast.error('Request not found');setRrtidModalOpen(false);return;}
+      const matching=donationHistory.find(d=>d.linkedRrtid===rrtid);
+      setRrtidDetails({patientName:data.patientName,bloodGroup:data.bloodGroup,units:data.units||data.unitsRequired,hospital:hospitalName,rtidCode:rrtid,bloodBankId:'',component:data.component||'Whole Blood',requiredBy:data.requiredBy?formatDateTimeDMY(safeDate(data.requiredBy)):'N/A',impactTimeline:matching?.impactTimeline});
+    }catch(_){toast.error('Failed to fetch details');setRrtidModalOpen(false);}
+    finally{setRrtidLoading(false);}
   };
 
   const handleAvailabilityChange = async (mode:'available'|'weekends'|'unavailable') => {
@@ -1383,8 +1383,8 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                               }`}>
                                 {r.rtidCode}
                               </span>
-                              {r.linkedHrtid&&r.linkedHrtid!=='—'&&r.linkedHrtid!=='N/A'&&(
-                                <button onClick={()=>handleViewHrtid(r.linkedHrtid)}
+                              {r.linkedRrtid&&r.linkedRrtid!=='—'&&r.linkedRrtid!=='N/A'&&(
+                                <button onClick={()=>handleViewHrtid(r.linkedRrtid)}
                                   className="w-5 h-5 rounded-full bg-blue-100 text-[var(--brand-primary)] flex items-center justify-center text-[10px] font-bold border border-blue-200 hover:bg-blue-200 flex-shrink-0"
                                   title="View patient impact">H</button>
                               )}
@@ -1678,18 +1678,18 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
         </DialogContent>
       </Dialog>
 
-      {/* ── H-RTID Details ────────────────────────────────── */}
-      <Dialog open={hrtidModalOpen} onOpenChange={setHrtidModalOpen}>
+      {/* ── R-RTID Details ────────────────────────────────── */}
+      <Dialog open={rrtidModalOpen} onOpenChange={setRrtidModalOpen}>
         <DialogContent className="rounded-2xl no-print max-w-sm">
           <DialogHeader><DialogTitle>Linked Patient Request</DialogTitle><DialogDescription>This donation was linked to a specific patient need</DialogDescription></DialogHeader>
-          {hrtidLoading?<div className="flex justify-center p-6"><Loader2 className="w-7 h-7 animate-spin text-primary"/></div>:hrtidDetails?(
+          {rrtidLoading?<div className="flex justify-center p-6"><Loader2 className="w-7 h-7 animate-spin text-primary"/></div>:rrtidDetails?(
             <div className="space-y-3">
               <div className="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-xl border border-[var(--border-color)] dark:border-blue-800 space-y-2 text-sm">
-                {[['H-RTID',hrtidDetails.rtidCode],['Patient',hrtidDetails.patientName],['Hospital',hrtidDetails.hospital],['Blood Group',hrtidDetails.bloodGroup],['Units',String(hrtidDetails.units)],['Required By',hrtidDetails.requiredBy||'N/A']].map(([k,v])=>(
+                {[['R-RTID',rrtidDetails.rtidCode],['Patient',rrtidDetails.patientName],['Hospital',rrtidDetails.hospital],['Blood Group',rrtidDetails.bloodGroup],['Units',String(rrtidDetails.units)],['Required By',rrtidDetails.requiredBy||'N/A']].map(([k,v])=>(
                   <div key={k} className="flex justify-between gap-2"><span className="text-xs text-[var(--text-secondary)] dark:text-gray-400 font-medium">{k}</span><span className="text-xs font-bold text-[var(--text-primary)] dark:text-gray-100 text-right leading-tight max-w-[65%] break-words">{v}</span></div>
                 ))}
               </div>
-              {hrtidDetails.impactTimeline&&<ImpactTimelineView timeline={hrtidDetails.impactTimeline}/>}
+              {rrtidDetails.impactTimeline&&<ImpactTimelineView timeline={rrtidDetails.impactTimeline}/>}
             </div>
           ):<p className="text-center text-sm text-gray-400 py-4">No details available</p>}
         </DialogContent>

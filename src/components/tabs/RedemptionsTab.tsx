@@ -48,11 +48,11 @@ export const RedemptionsTab = ({ redemptions }: RedemptionsTabProps) => {
                     {formatDate(redemption.date)} at {formatTime(redemption.date)}
                   </span>
                 </div>
-                {redemption.linkedHRTID && (
+                {redemption.linkedRRTID && (
                   <div>
-                    <span className="text-muted-foreground">Linked H-RTID:</span>
+                    <span className="text-muted-foreground">Linked R-RTID:</span>
                     <span className="ml-2 font-mono font-semibold text-warning">
-                      {redemption.linkedHRTID}
+                      {redemption.linkedRRTID}
                     </span>
                   </div>
                 )}

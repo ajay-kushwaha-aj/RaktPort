@@ -764,18 +764,18 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
       if (checkInData && checkInData.appointmentRtid) dRtid = checkInData.appointmentRtid;
       else dRtid = generateRtid('D');
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      let linkedHRTID = null, patientName = null, hospitalName = null;
-      if (data.donationType === 'H-RTID-Linked Donation' && data.hRtid && data.hRtidData) {
-        linkedHRTID = data.hRtid; patientName = data.hRtidData.patientName; hospitalName = data.hRtidData.hospitalName;
+      let linkedRRTID = null, patientName = null, hospitalName = null;
+      if (data.donationType === 'R-RTID-Linked Donation' && data.rRtid && data.rRtidData) {
+        linkedRRTID = data.rRtid; patientName = data.rRtidData.patientName; hospitalName = data.rRtidData.hospitalName;
       }
       const donationRef = doc(db, 'donations', dRtid);
       const existingDonation = await getDoc(donationRef);
       if (existingDonation.exists()) {
         await updateDoc(donationRef, {
           status:'AVAILABLE', donationType:data.donationType||'Regular', component:data.component||'Whole Blood',
-          otp, actualDonationDate:Timestamp.now(), hRtid:linkedHRTID, linkedHrtid:linkedHRTID,
-          patientName, hospitalName, linkedDate:linkedHRTID?Timestamp.now():null,
-          impactTimeline:{donated:Timestamp.now(),linkedToRequest:linkedHRTID?Timestamp.now():null,usedByPatient:null,creditIssued:null},
+          otp, actualDonationDate:Timestamp.now(), rRtid:linkedRRTID, linkedRrtid:linkedRRTID,
+          patientName, hospitalName, linkedDate:linkedRRTID?Timestamp.now():null,
+          impactTimeline:{donated:Timestamp.now(),linkedToRequest:linkedRRTID?Timestamp.now():null,usedByPatient:null,creditIssued:null},
           updatedAt:Timestamp.now()
         });
       } else {
@@ -785,9 +785,9 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
           donationType:data.donationType||'Regular', component:data.component||'Whole Blood',
           otp, status:'AVAILABLE', date:Timestamp.now(), createdAt:Timestamp.now(),
           donationLocation:bloodBankData?.district||'Blood Bank', city:bloodBankData?.district||'Unknown',
-          hRtid:linkedHRTID, linkedHrtid:linkedHRTID, patientName, hospitalName,
-          linkedDate:linkedHRTID?Timestamp.now():null,
-          impactTimeline:{donated:Timestamp.now(),linkedToRequest:linkedHRTID?Timestamp.now():null,usedByPatient:null,creditIssued:null},
+          rRtid:linkedRRTID, linkedRrtid:linkedRRTID, patientName, hospitalName,
+          linkedDate:linkedRRTID?Timestamp.now():null,
+          impactTimeline:{donated:Timestamp.now(),linkedToRequest:linkedRRTID?Timestamp.now():null,usedByPatient:null,creditIssued:null},
           appointmentRtid:checkInData?.appointmentRtid||null, donorId:checkInData?.donorId||null
         });
       }
@@ -812,13 +812,13 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
           });
         }
       }
-      if (linkedHRTID) {
+      if (linkedRRTID) {
         try {
           let reqRef: any = null, reqData: any = null;
-          const reqSnap = await getDoc(doc(db,'bloodRequests',linkedHRTID));
+          const reqSnap = await getDoc(doc(db,'bloodRequests',linkedRRTID));
           if (reqSnap.exists()) { reqRef=reqSnap.ref; reqData=reqSnap.data(); }
           else {
-            for (const q of [query(collection(db,'bloodRequests'),where('linkedRTID','==',linkedHRTID)),query(collection(db,'bloodRequests'),where('rtid','==',linkedHRTID))]) {
+            for (const q of [query(collection(db,'bloodRequests'),where('linkedRTID','==',linkedRRTID)),query(collection(db,'bloodRequests'),where('rtid','==',linkedRRTID))]) {
               const qs = await getDocs(q);
               if (!qs.empty) { reqRef=qs.docs[0].ref; reqData=qs.docs[0].data(); break; }
             }
@@ -829,7 +829,7 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
           }
         } catch(_) {}
       }
-      const msg = linkedHRTID ? `Linked to patient ${patientName}!` : `${finalDonorName} - D-RTID: ${dRtid}`;
+      const msg = linkedRRTID ? `Linked to patient ${patientName}!` : `${finalDonorName} - D-RTID: ${dRtid}`;
       toast.success('Donation Recorded', { description: msg });
       setDonationModalOpen(false); setCheckInData(undefined);
       setTimeout(() => window.location.reload(), 1500);
@@ -838,14 +838,14 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
     } finally { setActionLoading(false); }
   };
 
-  const handleVerifyAndRedeem = async (hRtid: string, dRtid: string, otp: string) => {
+  const handleVerifyAndRedeem = async (rRtid: string, dRtid: string, otp: string) => {
     setActionLoading(true);
     try {
       let reqRef: any = null, reqData: any = null;
-      let reqSnap = await getDoc(doc(db,'bloodRequests',hRtid));
+      let reqSnap = await getDoc(doc(db,'bloodRequests',rRtid));
       if (reqSnap.exists()) { reqRef=reqSnap.ref; reqData=reqSnap.data(); }
       else {
-        for (const q of [query(collection(db,'bloodRequests'),where('linkedRTID','==',hRtid)),query(collection(db,'bloodRequests'),where('rtid','==',hRtid))]) {
+        for (const q of [query(collection(db,'bloodRequests'),where('linkedRTID','==',rRtid)),query(collection(db,'bloodRequests'),where('rtid','==',rRtid))]) {
           const qs = await getDocs(q); if (!qs.empty){reqSnap=qs.docs[0];reqRef=reqSnap.ref;reqData=reqSnap.data();break;}
         }
       }
@@ -906,7 +906,7 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
       setActionLoading(true);
 
       if (donData) {
-        await updateDoc(donRef,{status:'REDEEMED',hRtid,linkedHrtid:hRtid,redemptionDate:Timestamp.now(),redeemedAt:Timestamp.now(),patientName:reqData.patientName||'Patient',hospitalName:reqData.hospitalName||bloodBankData?.fullName||'Hospital',linkedDate:Timestamp.now(),usedDate:Timestamp.now()});
+        await updateDoc(donRef,{status:'REDEEMED',rRtid,linkedRrtid:rRtid,redemptionDate:Timestamp.now(),redeemedAt:Timestamp.now(),patientName:reqData.patientName||'Patient',hospitalName:reqData.hospitalName||bloodBankData?.fullName||'Hospital',linkedDate:Timestamp.now(),usedDate:Timestamp.now()});
         const bg = donData.bloodGroup as BloodGroup;
         const cbi = inventory && inventory[bg] ? inventory[bg] : {total:0,available:0};
         await updateDoc(doc(db,'inventory',bloodBankId!),{[bg]:{total:cbi.total,available:Math.max(0,(cbi.available||0)-1)}});
@@ -928,7 +928,7 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
     setActionLoading(true);
     try {
       let data: any=null, type='';
-      if (rtid.toUpperCase().includes('H-RTID')||rtid.toUpperCase().startsWith('H')) {
+      if (rtid.toUpperCase().includes('R-RTID')||rtid.toUpperCase().startsWith('H')) {
         for (const q of [getDoc(doc(db,'bloodRequests',rtid)),getDocs(query(collection(db,'bloodRequests'),where('linkedRTID','==',rtid))),getDocs(query(collection(db,'bloodRequests'),where('rtid','==',rtid)))]) {
           const r=await q;
           if ('exists' in r&&r.exists()){data=r.data();type='Blood Request';break;}

@@ -185,7 +185,7 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
             for (let i = 0; i < uniqueRtids.length; i += 10) {
               try {
                 const batch = uniqueRtids.slice(i, i + 10);
-                const ds = await getDocs(query(collection(db, "donations"), where("linkedHrtid", "in", batch)));
+                const ds = await getDocs(query(collection(db, "donations"), where("linkedRrtid", "in", batch)));
                 allLinkedDonations.push(...ds.docs.map(d => ({ ...d.data(), _docId: d.id })));
               } catch (_) { }
             }
@@ -194,7 +194,7 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
           snap.forEach(d => {
             const data = d.data();
             const linkedDonors: DonorInfo[] = allLinkedDonations
-              .filter((ld: any) => ld.linkedHrtid === data.linkedRTID || ld.linkedHrtid === data.rtid)
+              .filter((ld: any) => ld.linkedRrtid === data.linkedRTID || ld.linkedRrtid === data.rtid)
               .map((ld: any) => ({
                 dRtid: ld.rtidCode || ld.rtid || "N/A", name: ld.donorName || "Anonymous",
                 date: parseTimestamp(ld.date).toISOString(), units: parseInt(ld.units) || 1,
@@ -324,7 +324,7 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
                    alertsPromises.push(addDoc(collection(db, 'notifications'), {
                       userId: snap.id,
                       message: `Humble request for Donation: ${data.bloodGroup} needed at ${hospitalData?.fullName || 'a nearby hospital'} (approx ${dist.toFixed(1)}km away).`,
-                      relatedHrtid: newHrtid,
+                      relatedRrtid: newHrtid,
                       read: false,
                       timestamp: Timestamp.now(),
                       type: 'warning'
@@ -374,7 +374,7 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
       }));
     }
     try {
-      const byHrtid = await getDocs(query(collection(db, "donations"), where("linkedHrtid", "==", r.rtid)));
+      const byHrtid = await getDocs(query(collection(db, "donations"), where("linkedRrtid", "==", r.rtid)));
       byHrtid.forEach(async d => { await updateDoc(d.ref, donorUpdatePayload); });
     } catch (_) { }
     const label = allDone ? "✅ All units administered — request CLOSED" : `💉 ${unitsNow} unit(s) verified & administered (${newTotal}/${r.unitsRequired} total)`;
@@ -430,7 +430,7 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
     try {
       const linkedRtids = [r.rtid];
       if (r.linkedRTID && r.linkedRTID !== r.rtid) linkedRtids.push(r.linkedRTID);
-      const donQ = await getDocs(query(collection(db, "donations"), where("linkedHrtid", "in", linkedRtids)));
+      const donQ = await getDocs(query(collection(db, "donations"), where("linkedRrtid", "in", linkedRtids)));
       let liveRedeemedCredit = 0;
       donQ.forEach(docSnap => {
         const d = docSnap.data();

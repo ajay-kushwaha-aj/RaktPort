@@ -203,8 +203,8 @@ export const DonationsTab = ({ donations }: DonationsTabProps) => {
               </div>
 
               {/* PATIENT DETAILS (If Redeemed/Linked) */}
-              {(donation.status === 'REDEEMED' || donation.hRtid || donation.linkedHrtid) &&
-                (donation.hRtid || donation.linkedHrtid || donation.patientName) && (
+              {(donation.status === 'REDEEMED' || donation.rRtid || donation.linkedRrtid) &&
+                (donation.rRtid || donation.linkedRrtid || donation.patientName) && (
                   <div className="mt-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
                     <div className="flex items-center gap-2 mb-3">
                       <Heart className="h-4 w-4 text-purple-600 fill-purple-600" />
@@ -212,11 +212,11 @@ export const DonationsTab = ({ donations }: DonationsTabProps) => {
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
-                      {(donation.hRtid || donation.linkedHrtid) && (
+                      {(donation.rRtid || donation.linkedRrtid) && (
                         <div>
-                          <span className="text-xs text-purple-600 font-medium">H-RTID (Request ID)</span>
+                          <span className="text-xs text-purple-600 font-medium">R-RTID (Request ID)</span>
                           <p className="font-mono font-bold text-purple-900 text-xs mt-0.5">
-                            {donation.hRtid || donation.linkedHrtid}
+                            {donation.rRtid || donation.linkedRrtid}
                           </p>
                         </div>
                       )}

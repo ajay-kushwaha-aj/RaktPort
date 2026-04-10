@@ -20,7 +20,7 @@ interface DonationModalProps {
   checkInData?: any;
 }
 
-interface HRTIDData {
+interface RRTIDData {
   patientName: string;
   bloodGroup: string;
   component?: string;
@@ -40,13 +40,13 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
   const [bloodGroup, setBloodGroup] = useState('');
   const [donationType, setDonationType] = useState('Regular');
   const [component, setComponent] = useState('Whole Blood');
-  const [hRtid, setHRtid] = useState('');
+  const [rRtid, setRRtid] = useState('');
 
   // Validation State
-  const [hRtidData, setHRtidData] = useState<HRTIDData | null>(null);
-  const [hRtidLoading, setHRtidLoading] = useState(false);
-  const [hRtidError, setHRtidError] = useState('');
-  const [hRtidValid, setHRtidValid] = useState(false);
+  const [rRtidData, setRRtidData] = useState<RRTIDData | null>(null);
+  const [rRtidLoading, setRRtidLoading] = useState(false);
+  const [rRtidError, setRRtidError] = useState('');
+  const [rRtidValid, setRRtidValid] = useState(false);
 
   // Check if this is an appointment check-in (fields should be read-only)
   const isCheckIn = !!checkInData;
@@ -64,27 +64,27 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
       setComponent(checkInData.component || 'Whole Blood');
 
       setDonationType('Regular');
-      setHRtid('');
-      setHRtidData(null);
+      setRRtid('');
+      setRRtidData(null);
     } else {
       resetForm();
     }
   }, [checkInData, isOpen]);
 
   // ====================================================================
-  // FUNCTION: Validate and Fetch H-RTID Data
+  // FUNCTION: Validate and Fetch R-RTID Data
   // ====================================================================
-  const validateHRTID = async (rtid: string) => {
+  const validateRRTID = async (rtid: string) => {
     if (!rtid || rtid.trim() === '') {
-      setHRtidData(null);
-      setHRtidError('');
-      setHRtidValid(false);
+      setRRtidData(null);
+      setRRtidError('');
+      setRRtidValid(false);
       return;
     }
 
-    setHRtidLoading(true);
-    setHRtidError('');
-    setHRtidValid(false);
+    setRRtidLoading(true);
+    setRRtidError('');
+    setRRtidValid(false);
 
     try {
       let requestData: any = null;
@@ -110,7 +110,7 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
       }
 
       if (!requestData) {
-        throw new Error("H-RTID not found in system");
+        throw new Error("R-RTID not found in system");
       }
 
       let hospitalName = requestData.hospitalName || 'Hospital';
@@ -148,7 +148,7 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
         }
       }
 
-      const validatedData: HRTIDData = {
+      const validatedData: RRTIDData = {
         patientName: requestData.patientName || 'Patient',
         bloodGroup: requestData.bloodGroup || 'Unknown',
         component: requestData.component || 'Whole Blood',
@@ -160,30 +160,30 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
         status: requestData.status || 'PENDING'
       };
 
-      setHRtidData(validatedData);
-      setHRtidValid(true);
+      setRRtidData(validatedData);
+      setRRtidValid(true);
 
     } catch (err: any) {
-      setHRtidError(err.message || "Failed to validate H-RTID");
-      setHRtidData(null);
-      setHRtidValid(false);
+      setRRtidError(err.message || "Failed to validate R-RTID");
+      setRRtidData(null);
+      setRRtidValid(false);
     } finally {
-      setHRtidLoading(false);
+      setRRtidLoading(false);
     }
   };
 
   useEffect(() => {
-    if (donationType === 'H-RTID-Linked Donation' && hRtid.length >= 10) {
+    if (donationType === 'R-RTID-Linked Donation' && rRtid.length >= 10) {
       const debounce = setTimeout(() => {
-        validateHRTID(hRtid);
+        validateRRTID(rRtid);
       }, 500);
       return () => clearTimeout(debounce);
     } else {
-      setHRtidData(null);
-      setHRtidError('');
-      setHRtidValid(false);
+      setRRtidData(null);
+      setRRtidError('');
+      setRRtidValid(false);
     }
-  }, [hRtid, donationType]);
+  }, [rRtid, donationType]);
 
   const resetForm = () => {
     setDonorName('');
@@ -191,10 +191,10 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
     setBloodGroup('');
     setDonationType('Regular');
     setComponent('Whole Blood');
-    setHRtid('');
-    setHRtidData(null);
-    setHRtidError('');
-    setHRtidValid(false);
+    setRRtid('');
+    setRRtidData(null);
+    setRRtidError('');
+    setRRtidValid(false);
   };
 
   const handleSubmit = () => {
@@ -208,13 +208,13 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
       return;
     }
 
-    if (donationType === 'H-RTID-Linked Donation') {
-      if (!hRtid.trim()) {
-        alert('Please enter H-RTID');
+    if (donationType === 'R-RTID-Linked Donation') {
+      if (!rRtid.trim()) {
+        alert('Please enter R-RTID');
         return;
       }
-      if (!hRtidValid) {
-        alert('Please wait for H-RTID validation');
+      if (!rRtidValid) {
+        alert('Please wait for R-RTID validation');
         return;
       }
     }
@@ -225,8 +225,8 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
       bloodGroup: bloodGroup,
       donationType: donationType,
       component: component,
-      hRtid: donationType === 'H-RTID-Linked Donation' ? hRtid : null,
-      hRtidData: donationType === 'H-RTID-Linked Donation' ? hRtidData : null,
+      rRtid: donationType === 'R-RTID-Linked Donation' ? rRtid : null,
+      rRtidData: donationType === 'R-RTID-Linked Donation' ? rRtidData : null,
     };
 
     onSubmit(submissionData);
@@ -363,10 +363,10 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
                         <span>Regular Donation</span>
                       </div>
                     </SelectItem>
-                    <SelectItem value="H-RTID-Linked Donation">
+                    <SelectItem value="R-RTID-Linked Donation">
                       <div className="flex items-center gap-2">
                         <span>🏥</span>
-                        <span>H-RTID-Linked Donation</span>
+                        <span>R-RTID-Linked Donation</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="Emergency">
@@ -399,8 +399,8 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
             </div>
           </div>
 
-          {/* H-RTID VALIDATION CARD */}
-          {donationType === 'H-RTID-Linked Donation' && (
+          {/* R-RTID VALIDATION CARD */}
+          {donationType === 'R-RTID-Linked Donation' && (
             <div className="bg-[var(--bg-surface)] rounded-xl border-2 border-purple-200 shadow-lg">
               <div className="bg-gradient-to-r from-purple-50 to-indigo-50 px-6 py-3 border-b border-purple-100">
                 <div className="flex items-center gap-2">
@@ -411,34 +411,34 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
 
               <div className="p-6 space-y-4">
                 <div>
-                  <Label htmlFor="hRtid" className="text-sm font-semibold text-gray-700">
-                    Patient H-RTID
+                  <Label htmlFor="rRtid" className="text-sm font-semibold text-gray-700">
+                    Patient R-RTID
                   </Label>
                   <div className="flex gap-2 mt-1.5">
                     <Input
-                      id="hRtid"
-                      placeholder="H-RTID-250126-Q1099"
-                      value={hRtid}
-                      onChange={(e) => setHRtid(e.target.value.toUpperCase())}
-                      className={`flex-1 ${hRtidValid ? 'border-[var(--clr-success)] bg-green-50' :
-                        hRtidError ? 'border-[var(--clr-emergency)] bg-red-50' :
+                      id="rRtid"
+                      placeholder="R-RTID-250126-Q1099"
+                      value={rRtid}
+                      onChange={(e) => setRRtid(e.target.value.toUpperCase())}
+                      className={`flex-1 ${rRtidValid ? 'border-[var(--clr-success)] bg-green-50' :
+                        rRtidError ? 'border-[var(--clr-emergency)] bg-red-50' :
                           'border-purple-200'
                         }`}
                     />
-                    {hRtidLoading && <Loader2 className="w-6 h-6 animate-spin text-purple-600 mt-2" />}
-                    {hRtidValid && <CheckCircle2 className="w-6 h-6 text-[var(--clr-success)] mt-2" />}
-                    {hRtidError && <AlertCircle className="w-6 h-6 text-[var(--clr-danger)] mt-2" />}
+                    {rRtidLoading && <Loader2 className="w-6 h-6 animate-spin text-purple-600 mt-2" />}
+                    {rRtidValid && <CheckCircle2 className="w-6 h-6 text-[var(--clr-success)] mt-2" />}
+                    {rRtidError && <AlertCircle className="w-6 h-6 text-[var(--clr-danger)] mt-2" />}
                   </div>
-                  {hRtidError && (
+                  {rRtidError && (
                     <p className="text-sm text-[var(--clr-danger)] mt-2 flex items-center gap-1">
                       <AlertCircle className="h-4 w-4" />
-                      {hRtidError}
+                      {rRtidError}
                     </p>
                   )}
                 </div>
 
-                {/* H-RTID VALIDATION SUCCESS */}
-                {hRtidValid && hRtidData && (
+                {/* R-RTID VALIDATION SUCCESS */}
+                {rRtidValid && rRtidData && (
                   <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-5 shadow-sm">
                     <div className="flex items-center gap-2 mb-4">
                       <CheckCircle2 className="h-5 w-5 text-[var(--clr-success)]" />
@@ -448,27 +448,27 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
                     <div className="grid grid-cols-2 gap-4">
                       <div className="bg-[var(--bg-surface)] rounded-lg p-3 border border-green-100">
                         <span className="text-xs text-[var(--text-secondary)] font-medium">Patient Name</span>
-                        <p className="font-bold text-[var(--text-primary)] mt-1">{hRtidData.patientName}</p>
+                        <p className="font-bold text-[var(--text-primary)] mt-1">{rRtidData.patientName}</p>
                       </div>
 
                       <div className="bg-[var(--bg-surface)] rounded-lg p-3 border border-green-100">
                         <span className="text-xs text-[var(--text-secondary)] font-medium">Blood Group</span>
-                        <p className="font-bold text-[var(--clr-danger)] text-xl mt-1">{hRtidData.bloodGroup}</p>
+                        <p className="font-bold text-[var(--clr-danger)] text-xl mt-1">{rRtidData.bloodGroup}</p>
                       </div>
 
                       <div className="bg-[var(--bg-surface)] rounded-lg p-3 border border-green-100">
                         <span className="text-xs text-[var(--text-secondary)] font-medium">Component</span>
-                        <p className="font-bold text-[var(--text-primary)] mt-1">{hRtidData.component}</p>
+                        <p className="font-bold text-[var(--text-primary)] mt-1">{rRtidData.component}</p>
                       </div>
 
                       <div className="bg-[var(--bg-surface)] rounded-lg p-3 border border-green-100">
                         <span className="text-xs text-[var(--text-secondary)] font-medium">Units Required</span>
-                        <p className="font-bold text-[var(--text-primary)] mt-1">{hRtidData.unitsRequired}</p>
+                        <p className="font-bold text-[var(--text-primary)] mt-1">{rRtidData.unitsRequired}</p>
                       </div>
 
                       <div className="bg-[var(--bg-surface)] rounded-lg p-3 border border-green-100 col-span-2">
                         <span className="text-xs text-[var(--text-secondary)] font-medium">Hospital</span>
-                        <p className="font-bold text-[var(--text-primary)] mt-1">{hRtidData.hospitalName}</p>
+                        <p className="font-bold text-[var(--text-primary)] mt-1">{rRtidData.hospitalName}</p>
                       </div>
 
                       <div className="bg-[var(--bg-surface)] rounded-lg p-3 border border-green-100">
@@ -476,14 +476,14 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
                           <Calendar className="h-3 w-3" />
                           Required By
                         </span>
-                        <p className="font-bold text-[var(--clr-danger)] mt-1 text-sm">{hRtidData.requiredBy}</p>
+                        <p className="font-bold text-[var(--clr-danger)] mt-1 text-sm">{rRtidData.requiredBy}</p>
                       </div>
 
-                      {(hRtidData.district || hRtidData.state) && (
+                      {(rRtidData.district || rRtidData.state) && (
                         <div className="bg-[var(--bg-surface)] rounded-lg p-3 border border-green-100">
                           <span className="text-xs text-[var(--text-secondary)] font-medium">Location</span>
                           <p className="font-bold text-[var(--text-primary)] mt-1 text-sm">
-                            {hRtidData.district}, {hRtidData.state}
+                            {rRtidData.district}, {rRtidData.state}
                           </p>
                         </div>
                       )}
@@ -492,7 +492,7 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
                     <div className="mt-4 p-3 bg-[var(--bg-surface)] rounded-lg border border-green-200">
                       <p className="text-sm text-green-800 font-medium flex items-center gap-2">
                         <span>🎯</span>
-                        <span>This donation will directly help <strong>{hRtidData.patientName}</strong></span>
+                        <span>This donation will directly help <strong>{rRtidData.patientName}</strong></span>
                       </p>
                     </div>
                   </div>
@@ -511,7 +511,7 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
           <Button
             onClick={handleSubmit}
             className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-[var(--txt-inverse)] px-8 shadow-lg"
-            disabled={donationType === 'H-RTID-Linked Donation' && !hRtidValid}
+            disabled={donationType === 'R-RTID-Linked Donation' && !rRtidValid}
           >
             <CheckCircle2 className="h-4 w-4 mr-2" />
             Confirm Check-In

@@ -40,3 +40,6 @@ build_log.txt
 build_output.txt
 tsc_log.txt
 verify_server.mjs
+# One-time migration tools and credentials
+serviceAccountKey.json
+migrate_rrtid.cjs

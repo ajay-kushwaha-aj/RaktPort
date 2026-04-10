@@ -81,11 +81,11 @@ export const generateOtp = (): string => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
-export const validateHrtidFormat = (
-  hrtid: string
+export const validateRrtidFormat = (
+  rrtid: string
 ): { ok: boolean; reason?: string } => {
-  const re = /^H-RTID-(\d{2})(\d{2})(\d{4})-([A-Z0-9]{4})$/;
-  const m = re.exec(hrtid);
+  const re = /^R-RTID-(\d{2})(\d{2})(\d{4})-([A-Z0-9]{4})$/;
+  const m = re.exec(rrtid);
   if (!m) return { ok: false, reason: 'pattern' };
 
   const dd = parseInt(m[1], 10);
