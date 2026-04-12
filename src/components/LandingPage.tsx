@@ -8,7 +8,7 @@ import {
   ShieldCheck, Clock, RefreshCw, X, ChevronRight,
   Droplets, AlertCircle, CheckCircle2, MapPin,
   ArrowRight, Activity, Zap, Fingerprint,
-  Globe, Award, Search, Star, Sparkles,
+  Globe, Award, Search, Star, Sparkles, Building2,
 } from 'lucide-react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -83,6 +83,42 @@ function useReveal(thr = 0.07) {
     obs.observe(el); return () => obs.disconnect();
   }, [thr]);
   return ref as React.RefObject<any>;
+}
+
+const TYPING_PHRASES = [
+  "You can save them.",
+  "Donate Blood Anywhere. Save Life Everywhere.",
+  "Your donation is someone's lifeline.",
+  "Be a hero in someone's story.",
+  "Give blood, give life."
+];
+
+function useTypingEffect(phrases: string[], typingSpeed = 70, deletingSpeed = 40, delay = 2500) {
+  const [text, setText] = React.useState('');
+  const [phraseIndex, setPhraseIndex] = React.useState(0);
+  const [isDeleting, setIsDeleting] = React.useState(false);
+
+  React.useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    const currentPhrase = phrases[phraseIndex] || "";
+
+    if (!isDeleting && text === currentPhrase) {
+      timeout = setTimeout(() => setIsDeleting(true), delay);
+    } else if (isDeleting && text === '') {
+      setIsDeleting(false);
+      setPhraseIndex((prev) => (prev + 1) % phrases.length);
+    } else {
+      const nextText = isDeleting 
+        ? currentPhrase.substring(0, text.length - 1)
+        : currentPhrase.substring(0, text.length + 1);
+      
+      timeout = setTimeout(() => setText(nextText), isDeleting ? deletingSpeed : typingSpeed);
+    }
+
+    return () => clearTimeout(timeout);
+  }, [text, isDeleting, phraseIndex, phrases, typingSpeed, deletingSpeed, delay]);
+
+  return text;
 }
 
 /* ═══ SVG Illustrations ═══ */
@@ -255,6 +291,8 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
   const r0 = useReveal(), r1 = useReveal(), r2 = useReveal(), r3 = useReveal(), r4 = useReveal();
   const r5 = useReveal(), r6 = useReveal(), r7 = useReveal(), r8 = useReveal(), r9 = useReveal();
 
+  const typedText = useTypingEffect(TYPING_PHRASES);
+
   return (
     <>
       <LpStyles />
@@ -270,7 +308,9 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
               <span className="lp-badge"><span className="lp-bdot" />India's National Blood Network</span>
               <h1 className="lp-h1">
                 Someone in India needs blood <span className="lp-h1-em">every 2 seconds.</span><br />
-                <span className="lp-h1-you">You can save them.</span>
+                <span className="lp-h1-you">
+                  {typedText}<span className="blink-cursor">|</span>
+                </span>
               </h1>
               <p className="lp-hero-sub">
                 RaktPort connects donors, hospitals, and blood banks instantly using <strong>RTID technology</strong> — ensuring blood reaches patients faster, smarter, and transparently.
@@ -346,17 +386,17 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
               </div>
               <div className="lp-stats-row">
                 <div className="lp-stat">
-                  <span className="lp-si">🩸</span>
+                  <span className="lp-si"><Droplets size={38} color="#C41E3A" style={{filter: 'drop-shadow(0 2px 4px rgba(196,30,58,0.4))'}} /></span>
                   <span className="lp-sn">{cnt1}+</span>
                   <span className="lp-sl">Donations Today</span>
                 </div>
                 <div className="lp-stat">
-                  <span className="lp-si">❤️</span>
+                  <span className="lp-si"><Heart size={38} color="#E8294A" fill="#E8294A" style={{filter: 'drop-shadow(0 2px 4px rgba(232,41,74,0.4))'}} /></span>
                   <span className="lp-sn">{cnt2.toLocaleString()}+</span>
                   <span className="lp-sl">Lives Saved This Month</span>
                 </div>
                 <div className="lp-stat">
-                  <span className="lp-si">🏥</span>
+                  <span className="lp-si"><Building2 size={38} color="#cbd5e1" style={{filter: 'drop-shadow(0 2px 4px rgba(148,163,184,0.2))'}} /></span>
                   <span className="lp-sn">{cnt3}+</span>
                   <span className="lp-sl">Blood Banks Connected</span>
                 </div>
@@ -798,6 +838,10 @@ function LpStyles() {
 .lp-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,var(--p),var(--pd));color:#fff;border:none;border-radius:12px;padding:12px 26px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 4px 20px rgba(196,30,58,.35);transition:all .2s;}
 .lp-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 28px rgba(196,30,58,.45);}
 .lp-btn:disabled{opacity:.65;cursor:not-allowed;}
+
+/* ── Utilities ── */
+.blink-cursor { animation: blink 1s step-end infinite; color: var(--p); font-weight: 300; }
+@keyframes blink { 50% { opacity: 0; } }
 .lp-blg{padding:14px 32px;font-size:15px;}
 .lp-bfw{width:100%;}
 .lp-btn-s{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.27);color:rgba(255,255,255,.9);border-radius:12px;padding:12px 20px;font-size:13.5px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .22s;white-space:nowrap;}
