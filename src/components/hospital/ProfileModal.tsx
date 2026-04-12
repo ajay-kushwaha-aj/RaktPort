@@ -1,10 +1,10 @@
 // hospital/ProfileModal.tsx
 import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Building2, MapPin, Phone, Hash, Mail, MessageSquarePlus } from "lucide-react";
+import { Building2, MapPin, Phone, Hash, Mail, MessageSquarePlus, Keyboard } from "lucide-react";
 import { FeedbackWidget } from "../FeedbackWidget";
 
-export const ProfileModal = ({ isOpen, onClose, hospital }: { isOpen: boolean; onClose: () => void; hospital: any }) => (
+export const ProfileModal = ({ isOpen, onClose, hospital, onOpenShortcuts }: { isOpen: boolean; onClose: () => void; hospital: any; onOpenShortcuts?: () => void }) => (
   <Dialog open={isOpen} onOpenChange={onClose}>
     <DialogContent className="sm:max-w-sm rounded-2xl">
       <DialogHeader>
@@ -43,6 +43,14 @@ export const ProfileModal = ({ isOpen, onClose, hospital }: { isOpen: boolean; o
               <MessageSquarePlus className="w-4 h-4" /> Bug Report / Feedback
             </button>
           } />
+          {onOpenShortcuts && (
+            <button
+              onClick={() => { onClose(); onOpenShortcuts(); }}
+              className="mt-2 w-full py-2.5 flex items-center justify-center gap-2 border-2 border-[var(--border-color)] dark:border-gray-800 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+            >
+              <Keyboard className="w-4 h-4" /> Keyboard Shortcuts
+            </button>
+          )}
         </div>
       </div>
     </DialogContent>

@@ -1,5 +1,5 @@
-// hospital/ReportGenerator.tsx — PDF-like report generator (Phase 3)
-import { FileText, Download, Printer as PrinterIcon } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { FileText, Download, Printer as PrinterIcon, ChevronDown, FileDown } from "lucide-react";
 import { formatDate, formatTime, maskAadhaar } from "./utils";
 import { getStatusMeta, URGENCY_CONFIG } from "./constants";
 import type { BloodRequest } from "./types";
@@ -8,6 +8,7 @@ interface Props {
   requests: BloodRequest[];
   hospitalName: string;
   hospitalLocation: string;
+  onExportCSV?: () => void;
 }
 
 function buildReportHTML(requests: BloodRequest[], hospitalName: string, hospitalLocation: string): string {
@@ -94,7 +95,20 @@ function buildReportHTML(requests: BloodRequest[], hospitalName: string, hospita
 </div></body></html>`;
 }
 
-export function ReportGenerator({ requests, hospitalName, hospitalLocation }: Props) {
+export function ReportGenerator({ requests, hospitalName, hospitalLocation, onExportCSV }: Props) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const handleGenerate = () => {
     const html = buildReportHTML(requests, hospitalName, hospitalLocation);
     const win = window.open("", "_blank", "width=850,height=1000");
@@ -104,6 +118,7 @@ export function ReportGenerator({ requests, hospitalName, hospitalLocation }: Pr
       win.focus();
       setTimeout(() => win.print(), 800);
     }
+    setIsOpen(false);
   };
 
   const handleDownloadHTML = () => {
@@ -115,22 +130,57 @@ export function ReportGenerator({ requests, hospitalName, hospitalLocation }: Pr
     a.download = `RaktPort_Report_${new Date().toLocaleDateString("en-IN").replace(/\//g, "-")}.html`;
     a.click();
     URL.revokeObjectURL(url);
+    setIsOpen(false);
+  };
+  
+  const handleCSV = () => {
+    if (onExportCSV) onExportCSV();
+    setIsOpen(false);
   };
 
   return (
-    <div className="flex gap-2">
+    <div className="relative" ref={dropdownRef} style={{ marginLeft: "auto" }}>
       <button
-        onClick={handleGenerate}
-        className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold bg-[var(--bg-surface)] dark:bg-gray-800 border border-[var(--border-color)] dark:border-gray-700 rounded-xl hover:bg-[var(--bg-page)] dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-all"
+        onClick={() => setIsOpen(!isOpen)}
+        className="hd-nav-tab"
+        style={{ padding: "6px 12px", border: "1px solid var(--c-border)", borderRadius: "var(--r-md)", display: "flex", alignItems: "center", gap: "6px", cursor: "pointer", background: "var(--c-surface)", color: "var(--c-text-2)", fontSize: "0.77rem", fontWeight: 600, fontFamily: "var(--f-body)", transition: "all 0.2s" }}
       >
-        <PrinterIcon className="w-3.5 h-3.5" /> Print Report
+        <FileDown size={14} /> Export Menu
+        <ChevronDown size={12} style={{ opacity: 0.6, marginLeft: "2px" }} />
       </button>
-      <button
-        onClick={handleDownloadHTML}
-        className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold bg-[var(--bg-surface)] dark:bg-gray-800 border border-[var(--border-color)] dark:border-gray-700 rounded-xl hover:bg-[var(--bg-page)] dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-all"
-      >
-        <Download className="w-3.5 h-3.5" /> Download Report
-      </button>
+
+      {isOpen && (
+        <div style={{ position: "absolute", right: 0, top: "calc(100% + 4px)", width: "170px", background: "var(--c-surface)", border: "1px solid var(--c-border)", borderRadius: "var(--r-md)", boxShadow: "var(--s-md)", zIndex: 60, padding: "4px" }}>
+          <button
+            onClick={handleGenerate}
+            style={{ width: "100%", textAlign: "left", padding: "8px 10px", display: "flex", alignItems: "center", gap: "8px", background: "transparent", border: "none", color: "var(--c-text-2)", fontSize: "0.75rem", cursor: "pointer", borderRadius: "var(--r-sm)", fontFamily: "var(--f-body)" }}
+            onMouseEnter={e => e.currentTarget.style.background = "var(--c-surface-2)"}
+            onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+          >
+            <PrinterIcon size={14} /> Print HTML
+          </button>
+          
+          <button
+            onClick={handleDownloadHTML}
+            style={{ width: "100%", textAlign: "left", padding: "8px 10px", display: "flex", alignItems: "center", gap: "8px", background: "transparent", border: "none", color: "var(--c-text-2)", fontSize: "0.75rem", cursor: "pointer", borderRadius: "var(--r-sm)", fontFamily: "var(--f-body)" }}
+            onMouseEnter={e => e.currentTarget.style.background = "var(--c-surface-2)"}
+            onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+          >
+            <Download size={14} /> Download HTML
+          </button>
+          
+          {onExportCSV && (
+            <button
+              onClick={handleCSV}
+              style={{ width: "100%", textAlign: "left", padding: "8px 10px", display: "flex", alignItems: "center", gap: "8px", background: "transparent", border: "none", color: "var(--c-success)", fontWeight: 600, fontSize: "0.75rem", cursor: "pointer", borderRadius: "var(--r-sm)", fontFamily: "var(--f-body)", borderTop: "1px solid var(--c-border)", marginTop: "2px", paddingTop: "6px" }}
+              onMouseEnter={e => e.currentTarget.style.background = "var(--c-success-bg)"}
+              onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+            >
+              <FileDown size={14} /> Export CSV
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

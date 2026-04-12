@@ -1,7 +1,7 @@
 // hospital/AuditTrailView.tsx — v5.0
 // All original Firebase/logic preserved. UI upgraded.
 import { useState, useEffect, useMemo } from "react";
-import { Shield, Search, RefreshCw } from "lucide-react";
+import { Shield, Search, RefreshCw, ClipboardList, PenTool, FileText, Syringe, FileEdit } from "lucide-react";
 import { collection, query, where, orderBy, limit, getDocs } from "firebase/firestore";
 import { db } from "../../firebase";
 import { AUDIT_ACTION_LABELS } from "./auditLog";
@@ -85,13 +85,13 @@ export function AuditTrailView({ hospitalId }: { hospitalId: string }) {
       {/* ── KPI row ── */}
       <div className="hd-kpi-grid">
         {[
-          { icon: "📋", label: "Total Actions", val: entries.length, cls: "k-blue" },
-          { icon: "📝", label: "Requests Created", val: entries.filter(e => e.action === "REQUEST_CREATED").length, cls: "k-green" },
-          { icon: "✏️", label: "Edits Made", val: entries.filter(e => e.action === "REQUEST_EDITED").length, cls: "k-amber" },
-          { icon: "💉", label: "Administrations", val: entries.filter(e => e.action === "BLOOD_ADMINISTERED").length, cls: "k-purple" },
+          { icon: <ClipboardList size={22} style={{ color: "var(--c-brand)" }} />, label: "Total Actions", val: entries.length, cls: "k-blue" },
+          { icon: <FileText size={22} style={{ color: "var(--clr-success)" }} />, label: "Requests Created", val: entries.filter(e => e.action === "REQUEST_CREATED").length, cls: "k-green" },
+          { icon: <FileEdit size={22} style={{ color: "var(--clr-warning)" }} />, label: "Edits Made", val: entries.filter(e => e.action === "REQUEST_EDITED").length, cls: "k-amber" },
+          { icon: <Syringe size={22} style={{ color: "var(--clr-info)" }} />, label: "Administrations", val: entries.filter(e => e.action === "BLOOD_ADMINISTERED").length, cls: "k-purple" },
         ].map((k, i) => (
           <div key={k.label} className={`hd-kpi ${k.cls} hd-enter hd-s${i + 1}`}>
-            <span style={{ fontSize: "1.35rem", display: "block", marginBottom: "8px" }}>{k.icon}</span>
+            <span style={{ display: "block", marginBottom: "8px" }}>{k.icon}</span>
             <div className="hd-kpi-val">{k.val}</div>
             <div className="hd-kpi-lbl">{k.label}</div>
           </div>
@@ -190,7 +190,7 @@ export function AuditTrailView({ hospitalId }: { hospitalId: string }) {
       ) : filtered.length === 0 ? (
         <div className="hd-card">
           <div className="hd-empty">
-            <div className="hd-empty-icon">🛡️</div>
+            <div className="hd-empty-icon"><Shield size={28} style={{ color: "var(--c-text-4)" }} /></div>
             <p className="hd-empty-title">No audit entries found</p>
             <p className="hd-empty-sub">Actions will be logged here as you use the dashboard</p>
           </div>
@@ -220,7 +220,7 @@ export function AuditTrailView({ hospitalId }: { hospitalId: string }) {
               const meta =
                 AUDIT_ACTION_LABELS[entry.action as AuditAction] || {
                   label: entry.action,
-                  emoji: "📄",
+                  icon: <FileText size={18} style={{ color: "#6B7280" }} />,
                   color: "#6B7280",
                 };
 
@@ -259,7 +259,7 @@ export function AuditTrailView({ hospitalId }: { hospitalId: string }) {
                       border: `1px solid ${meta.color}28`,
                     }}
                   >
-                    {meta.emoji}
+                    <FileText size={18} style={{ color: meta.color }} />
                   </div>
 
                   {/* Content */}

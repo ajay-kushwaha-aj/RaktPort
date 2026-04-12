@@ -2,7 +2,7 @@
 // hospital/TransfusionHistoryView.tsx — v5.0
 // ════════════════════════════════════════════════════════
 import { useState, useMemo } from "react";
-import { Search, HeartHandshake } from "lucide-react";
+import { Search, HeartHandshake, Syringe, Droplet, CheckCircle } from "lucide-react";
 import { getStatusMeta } from "./constants";
 import { formatDate, formatTime } from "./utils";
 import type { BloodRequest } from "./types";
@@ -40,12 +40,12 @@ export function TransfusionHistoryView({ requests }: { requests: BloodRequest[] 
       {/* ── KPI row ── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "12px" }}>
         {[
-          { icon: "💉", label: "Transfusions Done", val: administered.length, cls: "k-blue" },
-          { icon: "🩸", label: "Total Units Given", val: totalUnitsAdmin, cls: "k-red" },
-          { icon: "✅", label: "Fully Closed", val: administered.filter(r => r.status === "CLOSED").length, cls: "k-green" },
+          { icon: <Syringe size={22} style={{ color: "var(--c-brand)" }} />, label: "Transfusions Done", val: administered.length, cls: "k-blue" },
+          { icon: <Droplet size={22} style={{ color: "var(--clr-emergency)" }} />, label: "Total Units Given", val: totalUnitsAdmin, cls: "k-red" },
+          { icon: <CheckCircle size={22} style={{ color: "var(--clr-success)" }} />, label: "Fully Closed", val: administered.filter(r => r.status === "CLOSED").length, cls: "k-green" },
         ].map((k, i) => (
           <div key={k.label} className={`hd-kpi ${k.cls} hd-enter hd-s${i + 1}`}>
-            <span style={{ fontSize: "1.35rem", display: "block", marginBottom: "8px" }}>{k.icon}</span>
+            <span style={{ display: "block", marginBottom: "8px" }}>{k.icon}</span>
             <div className="hd-kpi-val">{k.val}</div>
             <div className="hd-kpi-lbl">{k.label}</div>
           </div>
@@ -76,7 +76,7 @@ export function TransfusionHistoryView({ requests }: { requests: BloodRequest[] 
       {administered.length === 0 ? (
         <div className="hd-card">
           <div className="hd-empty">
-            <div className="hd-empty-icon">💉</div>
+            <div className="hd-empty-icon"><Syringe size={28} style={{ color: "var(--c-text-4)" }} /></div>
             <p className="hd-empty-title">No transfusion records yet</p>
             <p className="hd-empty-sub">
               Records appear here after blood is administered to a patient
@@ -141,7 +141,7 @@ export function TransfusionHistoryView({ requests }: { requests: BloodRequest[] 
                         fontSize: "1.1rem", flexShrink: 0,
                       }}
                     >
-                      💉
+                      <Syringe size={18} style={{ color: "var(--c-info)" }} />
                     </div>
 
                     {/* Info */}

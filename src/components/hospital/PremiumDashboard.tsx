@@ -2,7 +2,8 @@
 import { useMemo } from "react";
 import {
   Plus, Clock, MapPin, Siren, BarChart2, TrendingUp, ClipboardList,
-  Droplet, Zap, ArrowRight, HeartHandshake, Activity, Flame, Printer
+  Droplet, Zap, ArrowRight, HeartHandshake, Activity, Flame, Printer,
+  CheckCircle, Syringe, FileDown
 } from "lucide-react";
 // @ts-ignore
 import { BLOOD_GROUPS } from "@/lib/bloodbank-utils";
@@ -63,9 +64,10 @@ function ActiveRequestCard({
           <div style={{
             width: "36px", height: "36px", borderRadius: "10px", flexShrink: 0,
             background: uc.bg, border: `1.5px solid ${uc.border}`,
-            display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.05rem",
+            display: "flex", alignItems: "center", justifyContent: "center", 
+            color: isEM ? "#DC2626" : urg === "Urgent" ? "#EA580C" : "#16A34A"
           }}>
-            {isEM ? "🚨" : urg === "Urgent" ? "⚡" : "📋"}
+            {isEM ? <Siren size={18} /> : urg === "Urgent" ? <Zap size={18} /> : <ClipboardList size={18} />}
           </div>
 
           {/* Info */}
@@ -247,11 +249,11 @@ export function PremiumDashboard({
     : 0;
 
   const kpiCards = [
-    { label: "Total Requests", val: kpis.totalRequests, cls: "k-red", icon: "📋" },
-    { label: "Active", val: kpis.activeRequests, cls: "k-amber", icon: "⏳" },
-    { label: "Units Required", val: kpis.totalUnits, cls: "k-blue", icon: "🩸" },
-    { label: "Fulfilled", val: kpis.requestsRedeemed, cls: "k-green", icon: "✅" },
-    { label: "Administered", val: kpis.administered, cls: "k-purple", icon: "💉" },
+    { label: "Total Requests", val: kpis.totalRequests, cls: "k-red", icon: <ClipboardList size={22} style={{ color: "var(--c-brand)" }} /> },
+    { label: "Active", val: kpis.activeRequests, cls: "k-amber", icon: <Clock size={22} style={{ color: "#D97706" }} /> },
+    { label: "Units Required", val: kpis.totalUnits, cls: "k-blue", icon: <Droplet size={22} style={{ color: "var(--clr-info)" }} /> },
+    { label: "Fulfilled", val: kpis.requestsRedeemed, cls: "k-green", icon: <CheckCircle size={22} style={{ color: "var(--clr-success)" }} /> },
+    { label: "Administered", val: kpis.administered, cls: "k-purple", icon: <Syringe size={22} style={{ color: "#7C3AED" }} /> },
   ];
 
   /* ── Inline styles for small helper pill ── */
@@ -276,9 +278,9 @@ export function PremiumDashboard({
             width: "40px", height: "40px", borderRadius: "var(--r-lg)",
             background: "rgba(220,38,38,0.1)",
             display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: "1.3rem", flexShrink: 0,
+            color: "var(--c-danger)", flexShrink: 0,
             animation: "hd-pulse-em 1.5s ease-in-out infinite",
-          }}>🚨</div>
+          }}><Siren size={20} /></div>
           <div style={{ flex: 1 }}>
             <p style={{ fontWeight: 700, color: "var(--c-danger)", fontSize: "0.85rem", fontFamily: "var(--f-display)" }}>
               Emergency Blood Request Active
@@ -391,7 +393,7 @@ export function PremiumDashboard({
         {activeRequests.length === 0 ? (
           <div className="hd-card">
             <div className="hd-empty">
-              <div className="hd-empty-icon">✅</div>
+              <div className="hd-empty-icon"><CheckCircle size={28} style={{ color: "var(--clr-success)" }} /></div>
               <p className="hd-empty-title">No active requests</p>
               <p className="hd-empty-sub">All requests are fulfilled, closed, or administered</p>
               <button
@@ -511,7 +513,7 @@ export function PremiumDashboard({
 
               {recentReqs.length === 0 ? (
                 <div className="hd-empty">
-                  <div className="hd-empty-icon">📋</div>
+                  <div className="hd-empty-icon"><ClipboardList size={28} style={{ color: "var(--c-text-4)" }} /></div>
                   <p className="hd-empty-title">No requests yet</p>
                   <p className="hd-empty-sub">
                     <button onClick={() => onNewRequest("Routine")} style={{
@@ -540,9 +542,9 @@ export function PremiumDashboard({
                           width: "34px", height: "34px", borderRadius: "10px",
                           background: uc2.bg, border: `1.5px solid ${uc2.border}`,
                           display: "flex", alignItems: "center", justifyContent: "center",
-                          fontSize: "1rem", flexShrink: 0,
+                          color: r.urgency === "Emergency" ? "#DC2626" : r.urgency === "Urgent" ? "#EA580C" : "#16A34A", flexShrink: 0,
                         }}>
-                          {r.urgency === "Emergency" ? "🚨" : r.urgency === "Urgent" ? "⚡" : "📋"}
+                          {r.urgency === "Emergency" ? <Siren size={18} /> : r.urgency === "Urgent" ? <Zap size={18} /> : <ClipboardList size={18} />}
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: "flex", alignItems: "center", gap: "7px", flexWrap: "wrap" }}>
@@ -645,10 +647,10 @@ export function PremiumDashboard({
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                 {[
-                  { icon: "🚨", label: "Emergency Request", sub: "Life-threatening / Critical", act: () => onNewRequest("Emergency"), accent: "rgba(220,38,38,0.06)", hover: "rgba(220,38,38,0.1)" },
-                  { icon: "⚡", label: "Urgent Request", sub: "Needed within 2–4 hours", act: () => onNewRequest("Urgent"), accent: "rgba(234,88,12,0.06)", hover: "rgba(234,88,12,0.1)" },
-                  { icon: "📋", label: "Routine Request", sub: "Elective / Planned", act: () => onNewRequest("Routine"), accent: "rgba(21,128,61,0.06)", hover: "rgba(21,128,61,0.1)" },
-                  { icon: "📥", label: "Export CSV", sub: "Download all request data", act: onExportCSV, accent: "rgba(37,99,235,0.06)", hover: "rgba(37,99,235,0.1)" },
+                  { icon: <Siren size={18} style={{ color: "#DC2626" }} />, label: "Emergency Request", sub: "Life-threatening / Critical", act: () => onNewRequest("Emergency"), accent: "rgba(220,38,38,0.06)", hover: "rgba(220,38,38,0.1)" },
+                  { icon: <Zap size={18} style={{ color: "#EA580C" }} />, label: "Urgent Request", sub: "Needed within 2–4 hours", act: () => onNewRequest("Urgent"), accent: "rgba(234,88,12,0.06)", hover: "rgba(234,88,12,0.1)" },
+                  { icon: <ClipboardList size={18} style={{ color: "#16A34A" }} />, label: "Routine Request", sub: "Elective / Planned", act: () => onNewRequest("Routine"), accent: "rgba(21,128,61,0.06)", hover: "rgba(21,128,61,0.1)" },
+                  { icon: <FileDown size={18} style={{ color: "#2563EB" }} />, label: "Export CSV", sub: "Download all request data", act: onExportCSV, accent: "rgba(37,99,235,0.06)", hover: "rgba(37,99,235,0.1)" },
                 ].map(a => (
                   <button
                     key={a.label} onClick={a.act}

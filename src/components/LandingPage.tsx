@@ -286,7 +286,37 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
   const [eliErr, setEliErr] = React.useState('');
   const checkEli = () => { if (!eliF.lastDate) { setEliErr('Please select your last donation date.'); return; } setEliErr(''); const days = ELI_RULES[eliF.component]?.[eliF.gender] ?? 90; const next = addDays(new Date(eliF.lastDate), days); setEliRes(next <= new Date() ? `ok:You are eligible — the ${days}-day interval has passed.` : `wait:Next eligible date: ${fmtDate(next)}`); };
 
-  const cnt1 = useCounter(101), cnt2 = useCounter(2542), cnt3 = useCounter(851);
+  const [dbStats, setDbStats] = React.useState({ donationsToday: 0, livesSaved: 0, connectedBanks: 0 });
+  const [loadingStats, setLoadingStats] = React.useState(true);
+
+  React.useEffect(() => {
+    import('firebase/firestore').then(({ collection, onSnapshot }) => {
+      const unsubDons = onSnapshot(collection(db, 'donations'), snap => {
+        let todays = 0;
+        const now = new Date();
+        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+        snap.forEach(d => {
+          const dat = d.data();
+          const pDate = dat.createdAt ? dat.createdAt : dat.date;
+          if (pDate) {
+            const time = typeof pDate.toMillis === 'function' ? pDate.toMillis() : new Date(pDate).getTime();
+            if (time >= startOfDay) todays++;
+          }
+        });
+        setDbStats(s => ({ ...s, donationsToday: todays, livesSaved: snap.size * 3 }));
+        setLoadingStats(false);
+      });
+      const unsubUsers = onSnapshot(collection(db, 'users'), snap => {
+        let banks = 0;
+        snap.forEach(d => {
+          const r = d.data().role;
+          if (r === 'hospital' || r === 'bloodbank') banks++;
+        });
+        setDbStats(s => ({ ...s, connectedBanks: banks }));
+      });
+      return () => { unsubDons(); unsubUsers(); };
+    });
+  }, []);
 
   const r0 = useReveal(), r1 = useReveal(), r2 = useReveal(), r3 = useReveal(), r4 = useReveal();
   const r5 = useReveal(), r6 = useReveal(), r7 = useReveal(), r8 = useReveal(), r9 = useReveal();
@@ -387,17 +417,17 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
               <div className="lp-stats-row">
                 <div className="lp-stat">
                   <span className="lp-si"><Droplets size={38} strokeWidth={2.5} color="#ffffff" style={{filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))'}} /></span>
-                  <span className="lp-sn">{cnt1}+</span>
+                  <span className="lp-sn">{loadingStats ? <span className="lp-spin" style={{borderColor: '#fff', borderTopColor: 'transparent', width: '24px', height:'24px'}} /> : dbStats.donationsToday}</span>
                   <span className="lp-sl">Donations Today</span>
                 </div>
                 <div className="lp-stat">
                   <span className="lp-si"><Heart size={38} strokeWidth={2.5} color="#ffffff" fill="#ffffff" style={{filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))'}} /></span>
-                  <span className="lp-sn">{cnt2.toLocaleString()}+</span>
-                  <span className="lp-sl">Lives Saved This Month</span>
+                  <span className="lp-sn">{loadingStats ? <span className="lp-spin" style={{borderColor: '#fff', borderTopColor: 'transparent', width: '24px', height:'24px'}} /> : dbStats.livesSaved.toLocaleString()}</span>
+                  <span className="lp-sl">Lives Saved System-Wide</span>
                 </div>
                 <div className="lp-stat">
                   <span className="lp-si"><Building2 size={38} strokeWidth={2.5} color="#ffffff" style={{filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))'}} /></span>
-                  <span className="lp-sn">{cnt3}+</span>
+                  <span className="lp-sn">{loadingStats ? <span className="lp-spin" style={{borderColor: '#fff', borderTopColor: 'transparent', width: '24px', height:'24px'}} /> : dbStats.connectedBanks}</span>
                   <span className="lp-sl">Blood Banks Connected</span>
                 </div>
                 <div className="lp-live"><span className="lp-ldot" /> LIVE</div>

@@ -77,6 +77,7 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const [duplicateSource, setDuplicateSource] = useState<BloodRequest | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [silentRefreshKey, setSilentRefreshKey] = useState(0);
   const [hospitalId, setHospitalId] = useState<string | null>(
     () => localStorage.getItem("userId") || localStorage.getItem("userUid") || null
   );
@@ -163,6 +164,20 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
         () => {}
       );
     }
+  }, [hospitalId]);
+
+  // ── Real-time Analytics Sync (Donation Listener) ───────────
+  useEffect(() => {
+    if (!hospitalId) return;
+    let timer: any;
+    const unsubDonationsHook = onSnapshot(collection(db, "donations"), () => {
+      // Debounce the silent refresh to prevent rapid refetches
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        setSilentRefreshKey((k: number) => k + 1);
+      }, 1500);
+    });
+    return () => { unsubDonationsHook(); clearTimeout(timer); };
   }, [hospitalId]);
 
   // ── Real-time Firestore listener (original logic preserved) ──
@@ -253,7 +268,7 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
       }, () => { toast.error("Failed to connect to database"); setLoading(false); });
     });
     return () => { unsubAuth(); unsubDocs(); };
-  }, [hospitalId, refreshKey]);
+  }, [hospitalId, refreshKey, silentRefreshKey]);
 
   // ── KPIs (original) ──
   const kpis = useMemo(() => ({
@@ -484,13 +499,13 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <span className="hd-brand">RaktPort</span>
+                <span className="hd-brand">RaktPort Hospital Dashboard</span>
                 {!loading && <span className="hd-live-dot" title="Live sync" />}
               </div>
               {hospitalData?.fullName && (
                 <div className="hd-hosp-name">
                   <Building2 size={10} style={{ flexShrink: 0, opacity: 0.7 }} />
-                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "180px" }}>
+                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "350px" }}>
                     {hospitalData.fullName}
                   </span>
                 </div>
@@ -530,11 +545,7 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
                 {isDark ? <Sun size={15} /> : <Moon size={15} />}
               </button>
 
-              {/* Shortcuts (desktop) */}
-              <button onClick={() => setIsShortcutsOpen(true)} className="hd-hdr-btn" title="Keyboard Shortcuts (?)" style={{ display: "none" }} id="kbd-btn-desktop">
-                <Keyboard size={15} />
-              </button>
-              <style>{`@media(min-width:640px){#kbd-btn-desktop{display:flex!important}}`}</style>
+
 
               {/* Refresh */}
               <button onClick={handleRefresh} className="hd-hdr-btn" title="Refresh">
@@ -587,49 +598,24 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
         {/* ── NAV ── */}
         <nav className="hd-nav no-print">
           <div className="hd-nav-inner">
-            {TABS.map(t => {
-              const badge = t.id === "requests" ? requests.length
-                : t.id === "history" ? requests.filter((r: BloodRequest) => r.unitsAdministered > 0).length
-                  : 0;
-              return (
-                <button
-                  key={t.id}
-                  onClick={() => handleTabChange(t.id)}
-                  className={`hd-nav-tab ${activeTab === t.id ? "hd-nav-active" : ""}`}
-                >
-                  <span>{t.icon}</span>
-                  <span>{t.label}</span>
-                  {badge > 0 && (
-                    <span style={{
-                      padding: "1px 7px", fontSize: "0.62rem", fontWeight: 800,
-                      borderRadius: "var(--r-pill)",
-                      background: activeTab === t.id ? "rgba(255,255,255,0.2)" : "var(--c-brand)",
-                      color: "#fff",
-                    }}>
-                      {badge}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
+            {TABS.map(t => (
+              <button
+                key={t.id}
+                onClick={() => handleTabChange(t.id)}
+                className={`hd-nav-tab ${activeTab === t.id ? "hd-nav-active" : ""}`}
+              >
+                <span>{t.icon}</span>
+                <span>{t.label}</span>
+              </button>
+            ))}
 
-            {/* Report generator */}
+            {/* Export Menu */}
             <ReportGenerator
               requests={requests}
               hospitalName={hospitalData?.fullName || "Hospital"}
               hospitalLocation={`${hospitalData?.district || ""}, ${hospitalData?.pincode || ""}`}
+              onExportCSV={handleExportCSV}
             />
-
-            {/* CSV (desktop) */}
-            <button
-              onClick={handleExportCSV}
-              className="hd-nav-tab"
-              style={{ color: "var(--c-success)", display: "none" }}
-              id="csv-nav-desktop"
-            >
-              <FileDown size={14} /> CSV
-            </button>
-            <style>{`@media(min-width:640px){#csv-nav-desktop{display:flex!important}}`}</style>
 
             {/* New Request (desktop) */}
             <div style={{ marginLeft: "auto" }}>
@@ -654,7 +640,7 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
 
         {/* ── MODALS & DRAWERS ── */}
         <NotifDrawer isOpen={isNotifOpen} notifs={notifications} onClose={() => setIsNotifOpen(false)} onMarkRead={markRead} onMarkAllRead={markAllRead} onClear={clearNotifs} />
-        <ProfileModal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} hospital={hospitalData} />
+        <ProfileModal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} hospital={hospitalData} onOpenShortcuts={() => setIsShortcutsOpen(true)} />
         <CompleteModal isOpen={isCompleteOpen} onClose={() => setIsCompleteOpen(false)} request={completeTarget} onConfirm={(id: string, unitsNow: number, notes: string) => handleMarkComplete(id, unitsNow, notes)} />
         <PatientHistoryModal isOpen={isPatientHistoryOpen} onClose={() => setIsPatientHistoryOpen(false)} requests={requests} />
         <EditRequestModal isOpen={isEditOpen} onClose={() => { setIsEditOpen(false); setEditTarget(null); }} onSave={handleSaveEdit} request={editTarget} />
