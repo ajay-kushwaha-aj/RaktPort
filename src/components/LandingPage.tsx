@@ -386,17 +386,17 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
               </div>
               <div className="lp-stats-row">
                 <div className="lp-stat">
-                  <span className="lp-si"><Droplets size={38} color="#C41E3A" style={{filter: 'drop-shadow(0 2px 4px rgba(196,30,58,0.4))'}} /></span>
+                  <span className="lp-si"><Droplets size={38} strokeWidth={2.5} color="#ffffff" style={{filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))'}} /></span>
                   <span className="lp-sn">{cnt1}+</span>
                   <span className="lp-sl">Donations Today</span>
                 </div>
                 <div className="lp-stat">
-                  <span className="lp-si"><Heart size={38} color="#E8294A" fill="#E8294A" style={{filter: 'drop-shadow(0 2px 4px rgba(232,41,74,0.4))'}} /></span>
+                  <span className="lp-si"><Heart size={38} strokeWidth={2.5} color="#ffffff" fill="#ffffff" style={{filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))'}} /></span>
                   <span className="lp-sn">{cnt2.toLocaleString()}+</span>
                   <span className="lp-sl">Lives Saved This Month</span>
                 </div>
                 <div className="lp-stat">
-                  <span className="lp-si"><Building2 size={38} color="#cbd5e1" style={{filter: 'drop-shadow(0 2px 4px rgba(148,163,184,0.2))'}} /></span>
+                  <span className="lp-si"><Building2 size={38} strokeWidth={2.5} color="#ffffff" style={{filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))'}} /></span>
                   <span className="lp-sn">{cnt3}+</span>
                   <span className="lp-sl">Blood Banks Connected</span>
                 </div>
