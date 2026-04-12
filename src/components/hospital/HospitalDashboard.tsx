@@ -709,11 +709,7 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
           )}
         </main>
 
-        {/* ── FAB ── */}
-        <button className="hd-fab no-print" onClick={() => openNewRequest("Routine")}>
-          <Plus size={16} /> New Request
-        </button>
-        <style>{`@media(max-width:639px){.hd-fab{display:flex!important}}`}</style>
+        {/* ── FAB (Removed by user request) ── */}
 
         {/* ── MOBILE BOTTOM NAV ── */}
         <nav className="hd-bottom-nav no-print">
