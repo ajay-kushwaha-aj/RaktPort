@@ -50,7 +50,7 @@ export const RedemptionsTab = ({ redemptions }: RedemptionsTabProps) => {
                 </div>
                 {redemption.linkedRRTID && (
                   <div>
-                    <span className="text-muted-foreground">Linked R-RTID:</span>
+                    <span className="text-muted-foreground">Linked RH/RU-RTID:</span>
                     <span className="ml-2 font-mono font-semibold text-warning">
                       {redemption.linkedRRTID}
                     </span>

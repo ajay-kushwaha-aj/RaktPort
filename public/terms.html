@@ -1,216 +1,382 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>RaktPort | Terms & Conditions</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
-      --primary-red: #8b0000;
-      --accent-orange: #f4a261;
-      --light-cream: #fdf3e7;
-      --text-dark: #2b2b2b;
+      --bg:#06091A; --surface:#0D1228;
+      --card:rgba(255,255,255,0.04); --border:rgba(255,255,255,0.07);
+      --red:#C41E3A; --red-glow:rgba(196,30,58,0.25);
+      --teal:#00C9A7; --teal-dim:rgba(0,201,167,0.12);
+      --amber:#F59E0B; --text:#E8EDF7; --muted:#7D8BA3;
+      --heading-font:'Sora',sans-serif; --body-font:'Figtree',sans-serif;
     }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{font-family:var(--body-font);background:var(--bg);color:var(--text);line-height:1.75;min-height:100vh;overflow-x:hidden;}
+    body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(196,30,58,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(196,30,58,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0;}
+    nav{position:sticky;top:0;z-index:100;background:rgba(6,9,26,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px;}
+    .nav-brand{display:flex;align-items:center;gap:10px;font-family:var(--heading-font);font-weight:700;font-size:1.1rem;color:var(--text);text-decoration:none;}
 
-    body {
-      font-family: "Poppins", Arial, sans-serif;
-      background-color: var(--light-cream);
-      margin: 0;
-      padding: 0;
-      color: var(--text-dark);
-      line-height: 1.7;
-    }
+    .nav-links{display:flex;gap:1.5rem;list-style:none;}
+    .nav-links a{color:var(--muted);text-decoration:none;font-size:0.88rem;font-weight:500;transition:color 0.2s;}
+    .nav-links a:hover{color:var(--text);}
+    .nav-back{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:0.85rem;font-weight:600;text-decoration:none;border:1px solid var(--border);padding:6px 14px;border-radius:20px;transition:all 0.2s;}
+    .nav-back:hover{color:var(--text);border-color:rgba(255,255,255,0.2);}
+    .hero{position:relative;z-index:1;padding:5rem 2rem 3rem;text-align:center;border-bottom:1px solid var(--border);}
+    .hero::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:200px;background:radial-gradient(ellipse,var(--red-glow) 0%,transparent 70%);pointer-events:none;}
+    .compliance-strip{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-bottom:1.5rem;}
+    .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:0.72rem;font-weight:600;letter-spacing:0.04em;border:1px solid;}
+    .badge-teal{background:var(--teal-dim);border-color:rgba(0,201,167,0.3);color:var(--teal);}
+    .badge-red{background:rgba(196,30,58,0.1);border-color:rgba(196,30,58,0.3);color:#FF6B6B;}
+    .badge-amber{background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.25);color:var(--amber);}
+    .hero h1{font-family:var(--heading-font);font-size:clamp(2rem,4vw,3.2rem);font-weight:800;line-height:1.1;letter-spacing:-0.02em;}
+    .hero h1 span{color:var(--red);}
+    .hero-meta{margin-top:1rem;color:var(--muted);font-size:0.9rem;display:flex;justify-content:center;flex-wrap:wrap;gap:1.5rem;}
+    .hero-meta span{display:flex;align-items:center;gap:5px;}
+    .page-wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:3rem 2rem 5rem;display:grid;grid-template-columns:260px 1fr;gap:2rem;align-items:start;}
+    @media(max-width:820px){.page-wrap{grid-template-columns:1fr;}.toc{display:none;}}
+    .toc{position:sticky;top:80px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem;}
+    .toc-title{font-family:var(--heading-font);font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:1rem;}
+    .toc-list{list-style:none;}
+    .toc-list li{margin-bottom:4px;}
+    .toc-list a{color:var(--muted);text-decoration:none;font-size:0.82rem;display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;transition:all 0.2s;}
+    .toc-list a:hover{background:var(--border);color:var(--text);}
+    .toc-list a.active{background:var(--red-glow);color:#FF9999;}
+    .toc-dot{width:5px;height:5px;border-radius:50%;background:var(--red);flex-shrink:0;}
+    .content section{margin-bottom:2.5rem;padding:2rem;background:var(--card);border:1px solid var(--border);border-radius:20px;transition:border-color 0.3s;}
+    .content section:hover{border-color:rgba(196,30,58,0.25);}
+    .section-header{display:flex;align-items:flex-start;gap:1rem;margin-bottom:1.25rem;}
+    .section-icon{width:44px;height:44px;border-radius:12px;background:var(--red-glow);border:1px solid rgba(196,30,58,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;color:var(--red);}
+    .section-title{font-family:var(--heading-font);font-size:1.15rem;font-weight:700;margin-bottom:2px;}
+    .section-sub{font-size:0.78rem;color:var(--muted);}
+    .content p{color:var(--muted);font-size:0.93rem;margin-bottom:0.8rem;}
+    .content p:last-child{margin-bottom:0;}
+    .info-list{list-style:none;}
+    .info-list li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border);font-size:0.9rem;color:var(--muted);}
+    .info-list li:last-child{border-bottom:none;}
+    .info-list li i{color:var(--teal);margin-top:3px;flex-shrink:0;}
+    .highlight-box{background:var(--teal-dim);border:1px solid rgba(0,201,167,0.2);border-radius:12px;padding:1rem 1.25rem;margin:1rem 0;}
+    .highlight-box p{color:rgba(0,201,167,0.9)!important;font-size:0.88rem!important;}
+    .warn-box{background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.2);border-radius:12px;padding:1rem 1.25rem;margin:1rem 0;}
+    .warn-box p{color:rgba(245,158,11,0.85)!important;font-size:0.88rem!important;}
+    .red-box{background:rgba(196,30,58,0.06);border:1px solid rgba(196,30,58,0.2);border-radius:12px;padding:1rem 1.25rem;margin:1rem 0;}
+    .red-box p{color:rgba(255,107,107,0.9)!important;font-size:0.88rem!important;}
 
-    /* UPDATED STYLES FOR BACK BUTTON WRAPPER */
-    .back-btn-wrapper {
-      max-width: 900px;
-      margin: 1rem auto 0.5rem;
-      /* Aligns with main container and adds spacing */
-      padding: 0 2.5rem;
-      /* Matches main's padding */
-    }
+    /* Standard Tags */
+    .std-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:0.75rem;}
+    .std-tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:6px;font-size:0.72rem;font-weight:600;background:rgba(0,201,167,0.08);border:1px solid rgba(0,201,167,0.2);color:var(--teal);}
 
-    .back-btn {
-      display: inline-flex;
-      align-items: center;
-      background: #fff;
-      color: var(--primary-red);
-      border: 1px solid #ccc;
-      padding: 8px 12px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 600;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      transition: background 0.2s;
-      font-size: 0.9rem;
-    }
-
-    .back-btn:hover {
-      background: var(--light-cream);
-    }
-
-    .back-btn i {
-      margin-right: 6px;
-    }
-
-    /* END UPDATED STYLES */
-
-    header {
-      background-color: var(--primary-red);
-      color: #fff;
-      text-align: center;
-      padding: 2rem 1rem;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-    }
-
-    header img {
-      height: 80px;
-    }
-
-    header h1 {
-      margin: 0.5rem 0 0;
-      font-size: 1.8rem;
-    }
-
-    header p {
-      margin: 0;
-      font-size: 1rem;
-      opacity: 0.9;
-    }
-
-    main {
-      max-width: 900px;
-      margin: 0 auto;
-      /* Removed top margin, now handled by back-btn-wrapper */
-      background: #fff;
-      border-radius: 10px;
-      padding: 2.5rem;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    h2 {
-      color: var(--primary-red);
-      border-bottom: 3px solid var(--accent-orange);
-      padding-bottom: 0.4rem;
-    }
-
-    h3 {
-      color: var(--accent-orange);
-      margin-top: 1.5rem;
-    }
-
-    ul {
-      padding-left: 1.5rem;
-    }
-
-    footer {
-      background-color: var(--primary-red);
-      color: #fff;
-      text-align: center;
-      padding: 1rem 0;
-      margin-top: 3rem;
-      font-size: 0.9rem;
-    }
-
-    a {
-      color: var(--accent-orange);
-      text-decoration: none;
-    }
-
-    a:hover {
-      text-decoration: underline;
-    }
-
-    @media (max-width: 600px) {
-      .back-btn-wrapper {
-        padding: 0 1.5rem;
-      }
-
-      main {
-        margin: 1rem;
-        padding: 1.5rem;
-      }
-
-      header h1 {
-        font-size: 1.5rem;
-      }
-    }
+    footer{position:relative;z-index:1;border-top:1px solid var(--border);background:var(--surface);padding:2.5rem 2rem;text-align:center;}
+    .footer-brand{font-family:var(--heading-font);font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:0.5rem;}
+    .footer-links{display:flex;justify-content:center;flex-wrap:wrap;gap:1rem;margin:1rem 0;}
+    .footer-links a{color:var(--muted);text-decoration:none;font-size:0.83rem;transition:color 0.2s;}
+    .footer-links a:hover{color:var(--text);}
+    .footer-compliance{margin-top:1.5rem;display:flex;justify-content:center;flex-wrap:wrap;gap:8px;}
+    .footer-copy{color:var(--muted);font-size:0.78rem;margin-top:1.5rem;}
+    .reveal{opacity:0;transform:translateY(20px);transition:opacity 0.5s,transform 0.5s;}
+    .reveal.visible{opacity:1;transform:none;}
   </style>
 </head>
-
 <body>
-  <header>
-    <img src="/raktport-logo.jpg" alt="RaktPort Logo" width="80">
-    <p>Donate Blood Anywhere. Save Lives Everywhere.</p>
-  </header>
 
-  <div class="back-btn-wrapper">
-    <a href="javascript:history.back()" class="back-btn" title="Go Back">
-      <i class="fa-solid fa-arrow-left"></i> Back
-    </a>
+<nav>
+  <a href="/" class="nav-brand"><img src="/RaktPort-logo.jpg" alt="RaktPort Logo" style="width: 32px; height: 32px; border-radius: 8px; object-fit: cover;"> RaktPort</a>
+  <ul class="nav-links">
+    <li><a href="about.html">About</a></li>
+    <li><a href="our-mission.html">Mission</a></li>
+    <li><a href="privacy.html">Privacy</a></li>
+  </ul>
+  <a href="javascript:history.back()" class="nav-back"><i class="fa-solid fa-arrow-left"></i> Back</a>
+</nav>
+
+<div class="hero">
+  <div class="compliance-strip">
+    <span class="badge badge-teal"><i class="fa-solid fa-certificate"></i> IEC 62304 Lifecycle</span>
+    <span class="badge badge-teal"><i class="fa-solid fa-award"></i> ISO 13485 QMS</span>
+    <span class="badge badge-amber"><i class="fa-solid fa-hospital-user"></i> ABDM Compliant</span>
+    <span class="badge badge-red"><i class="fa-solid fa-gavel"></i> DPDP Act 2023</span>
   </div>
+  <h1>Terms & <span>Conditions</span></h1>
+  <div class="hero-meta">
+    <span><i class="fa-regular fa-calendar"></i> Effective: 8 November 2025</span>
+    <span><i class="fa-regular fa-rotate"></i> Last Updated: April 2026</span>
+    <span><i class="fa-solid fa-gavel"></i> Governing Law: India</span>
+  </div>
+</div>
 
-  <main>
-    <h2>Terms and Conditions</h2>
-    <p><strong>Effective Date:</strong> 8th Nov, 2025<br><strong>Last Updated:</strong> 8th Nov, 2025</p>
-
-    <p>Welcome to <strong>RaktPort</strong>, a digital platform connecting voluntary blood donors, hospitals, and blood
-      banks. By using our website or mobile app, you agree to abide by the following Terms and Conditions (“Terms”).
-      Please read them carefully.</p>
-
-    <h3>1. Acceptance of Terms</h3>
-    <p>By accessing or using RaktPort, you acknowledge that you have read, understood, and agree to be bound by these
-      Terms. If you do not agree, please stop using the Platform immediately.</p>
-
-    <h3>2. Purpose of RaktPort</h3>
-    <p>RaktPort acts as a bridge between donors, hospitals, and blood banks. We do not sell or trade blood and follow
-      voluntary, non-remunerated donation principles.</p>
-
-    <h3>3. Eligibility</h3>
-    <ul>
-      <li>Users must be at least 18 years old.</li>
-      <li>All information provided must be accurate and verifiable.</li>
+<div class="page-wrap">
+  <aside class="toc">
+    <div class="toc-title">Contents</div>
+    <ul class="toc-list">
+      <li><a href="#t1"><span class="toc-dot"></span>Acceptance</a></li>
+      <li><a href="#t2"><span class="toc-dot"></span>Platform Purpose</a></li>
+      <li><a href="#t3"><span class="toc-dot"></span>Eligibility</a></li>
+      <li><a href="#t4"><span class="toc-dot"></span>User Accounts</a></li>
+      <li><a href="#t5"><span class="toc-dot"></span>Software Classification</a></li>
+      <li><a href="#t6"><span class="toc-dot"></span>ABDM Integration</a></li>
+      <li><a href="#t7"><span class="toc-dot"></span>Prohibited Activities</a></li>
+      <li><a href="#t8"><span class="toc-dot"></span>RTID System</a></li>
+      <li><a href="#t9"><span class="toc-dot"></span>Liability</a></li>
+      <li><a href="#t10"><span class="toc-dot"></span>Quality & Safety</a></li>
+      <li><a href="#t11"><span class="toc-dot"></span>Intellectual Property</a></li>
+      <li><a href="#t12"><span class="toc-dot"></span>Governing Law</a></li>
     </ul>
+  </aside>
 
-    <h3>4. Account Creation and Use</h3>
-    <ul>
-      <li>Users can register as Donor, Hospital, or Blood Bank.</li>
-      <li>You are responsible for your account security and login credentials.</li>
-      <li>Fake or duplicate accounts are prohibited.</li>
-    </ul>
+  <main class="content">
 
-    <h3>5. Prohibited Activities</h3>
-    <ul>
-      <li>No monetary exchange for blood donation.</li>
-      <li>No sharing of donor IDs (RTIDs) with unauthorized persons.</li>
-      <li>No hacking, scraping, or commercial exploitation.</li>
-    </ul>
+    <section id="t1" class="reveal">
+      <div class="section-header">
+        <div class="section-icon"><i class="fa-solid fa-file-signature"></i></div>
+        <div>
+          <div class="section-title">1. Acceptance of Terms</div>
+          <div class="section-sub">By using RaktPort, you agree to these Terms in full</div>
+        </div>
+      </div>
+      <p>Welcome to <strong>RaktPort</strong> — India's national blood donation and management network. These Terms & Conditions ("Terms") constitute a legally binding agreement between you ("User," "you") and RaktPort ("Platform," "we," "us").</p>
+      <p>By accessing, registering on, or using any service offered by RaktPort — via web, mobile application, or API — you confirm that you have read, understood, and agree to be bound by these Terms. If you do not agree, you must discontinue use immediately.</p>
+      <div class="highlight-box">
+        <p><i class="fa-solid fa-circle-info" style="margin-right:6px"></i>These Terms should be read alongside our <a href="privacy.html" style="color:var(--teal)">Privacy Policy</a>, which forms an integral part of this agreement and governs how we handle your personal data under the DPDP Act 2023.</p>
+      </div>
+    </section>
 
-    <h3>6. Responsibility and Limitation of Liability</h3>
-    <p>RaktPort is a facilitation platform, not a healthcare provider. We are not responsible for the accuracy of user
-      data, medical outcomes, or third-party fraud. Donations must occur under medical supervision.</p>
+    <section id="t2" class="reveal">
+      <div class="section-header">
+        <div class="section-icon"><i class="fa-solid fa-droplet"></i></div>
+        <div>
+          <div class="section-title">2. Platform Purpose & Facilitation Role</div>
+          <div class="section-sub">What RaktPort is and what it is not</div>
+        </div>
+      </div>
+      <p>RaktPort is a <strong>digital facilitation platform</strong>. It connects voluntary blood donors, registered hospitals, and licensed blood banks through verified, real-time requests. RaktPort does not:</p>
+      <ul class="info-list">
+        <li><i class="fa-solid fa-xmark" style="color:#FF6B6B"></i><div>Engage in the commercial trade, sale, or purchase of human blood or blood components</div></li>
+        <li><i class="fa-solid fa-xmark" style="color:#FF6B6B"></i><div>Provide medical advice, diagnosis, or clinical treatment</div></li>
+        <li><i class="fa-solid fa-xmark" style="color:#FF6B6B"></i><div>Guarantee blood availability, donor acceptance, or transfusion outcomes</div></li>
+        <li><i class="fa-solid fa-xmark" style="color:#FF6B6B"></i><div>Replace or substitute professional medical supervision during donation or transfusion</div></li>
+      </ul>
+      <p style="margin-top:0.75rem">All donations facilitated through RaktPort adhere to voluntary, non-remunerated donation principles as specified by the National Blood Policy of India and WHO guidelines.</p>
+    </section>
 
-    <h3>7. Intellectual Property</h3>
-    <p>All logos, names, and materials on RaktPort are intellectual property of RaktPort and cannot be used without
-      written permission.</p>
+    <section id="t3" class="reveal">
+      <div class="section-header">
+        <div class="section-icon"><i class="fa-solid fa-user-check"></i></div>
+        <div>
+          <div class="section-title">3. User Eligibility</div>
+          <div class="section-sub">Who may register and use RaktPort</div>
+        </div>
+      </div>
+      <ul class="info-list">
+        <li><i class="fa-solid fa-circle-check"></i><div><strong>Age:</strong> You must be at least 18 years of age. Blood donation eligibility begins at 18 per Indian medical standards.</div></li>
+        <li><i class="fa-solid fa-circle-check"></i><div><strong>Donor Eligibility:</strong> Donors must meet all medical criteria including weight ≥50 kg, haemoglobin ≥12.5 g/dL, and the prescribed donation intervals (3 months for males, 4 months for females).</div></li>
+        <li><i class="fa-solid fa-circle-check"></i><div><strong>Institutional Registration:</strong> Hospitals must hold a valid CDSCO/State Drug Authority licence for blood bank operation. Blood banks must be NHA-empanelled or state-registered.</div></li>
+        <li><i class="fa-solid fa-circle-check"></i><div><strong>Accurate Information:</strong> All data submitted at registration must be truthful, current, and verifiable. Submission of false information is grounds for immediate account termination.</div></li>
+        <li><i class="fa-solid fa-circle-check"></i><div><strong>Legal Capacity:</strong> You must have the legal capacity to enter into binding agreements under Indian Contract Act, 1872.</div></li>
+      </ul>
+    </section>
 
-    <h3>8. Modification of Terms</h3>
-    <p>We may update these Terms at any time. Continued use after updates constitutes your acceptance.</p>
+    <section id="t4" class="reveal">
+      <div class="section-header">
+        <div class="section-icon"><i class="fa-solid fa-id-card"></i></div>
+        <div>
+          <div class="section-title">4. Account Creation & Security</div>
+          <div class="section-sub">Your responsibilities as an account holder</div>
+        </div>
+      </div>
+      <ul class="info-list">
+        <li><i class="fa-solid fa-circle-check"></i><div>You are responsible for maintaining the confidentiality of your login credentials. Notify us immediately of any suspected unauthorised access.</div></li>
+        <li><i class="fa-solid fa-circle-check"></i><div>Each natural person or institution may maintain only one active account per role category. Duplicate or impersonation accounts are strictly prohibited and constitute fraud.</div></li>
+        <li><i class="fa-solid fa-circle-check"></i><div>Multi-Factor Authentication (MFA) is mandatory for hospital and blood bank administrative accounts. Failure to maintain MFA may result in suspension.</div></li>
+        <li><i class="fa-solid fa-circle-check"></i><div>You agree not to share, sell, or transfer account access to any third party.</div></li>
+      </ul>
+    </section>
 
-    <h3>9. Governing Law</h3>
-    <p>These Terms are governed by the laws of India, with jurisdiction in Delhi.</p>
+    <section id="t5" class="reveal">
+      <div class="section-header">
+        <div class="section-icon"><i class="fa-solid fa-microchip"></i></div>
+        <div>
+          <div class="section-title">5. Software Classification & Regulatory Framework</div>
+          <div class="section-sub">IEC 62304 & ISO 13485 compliance posture</div>
+        </div>
+      </div>
+      <p>RaktPort has conducted a Software as a Medical Device (SaMD) classification assessment in accordance with <strong>IEC 62304:2006+AMD1:2015</strong> and IMDRF SaMD guidelines:</p>
+      <div class="highlight-box">
+        <p><i class="fa-solid fa-info-circle" style="margin-right:6px"></i><strong>Current Classification:</strong> RaktPort's donor-matching and blood requisition modules are assessed as <em>Class B SaMD</em> — software whose failure may result in serious injury but not death. This drives our software lifecycle documentation and risk management obligations.</p>
+      </div>
+      <ul class="info-list">
+        <li><i class="fa-solid fa-code-branch"></i><div><strong>IEC 62304 Lifecycle:</strong> Software development, verification, validation, configuration management, and problem resolution are conducted per documented procedures. Software releases include traceability matrices and change impact assessments.</div></li>
+        <li><i class="fa-solid fa-award"></i><div><strong>ISO 13485 Quality Management:</strong> Our development processes are aligned with ISO 13485:2016 QMS requirements including design controls, document control, CAPA management, and internal audit schedules.</div></li>
+        <li><i class="fa-solid fa-shield-alt"></i><div><strong>Risk Management:</strong> All software changes undergo risk assessment per ISO 14971 principles, with documented risk-benefit justification before deployment.</div></li>
+      </ul>
+      <div class="std-tags">
+        <span class="std-tag"><i class="fa-solid fa-certificate"></i> IEC 62304:2006+AMD1</span>
+        <span class="std-tag"><i class="fa-solid fa-award"></i> ISO 13485:2016</span>
+        <span class="std-tag"><i class="fa-solid fa-shield"></i> ISO 14971:2019</span>
+        <span class="std-tag"><i class="fa-solid fa-lock"></i> IMDRF SaMD N10, N12</span>
+      </div>
+      <div class="warn-box" style="margin-top:1rem">
+        <p><i class="fa-solid fa-triangle-exclamation" style="margin-right:6px"></i>By using RaktPort, you acknowledge that the platform is a digital facilitation tool and not a standalone clinical decision-support system. All clinical decisions remain with qualified medical professionals.</p>
+      </div>
+    </section>
 
-    <h3>10. Contact Us</h3>
-    <p>For questions, contact us at: 📧 <a href="mailto:contact.raktsetu@gmail.com
-">contact.raktsetu@gmail.com
-      </a>
+    <section id="t6" class="reveal">
+      <div class="section-header">
+        <div class="section-icon"><i class="fa-solid fa-hospital"></i></div>
+        <div>
+          <div class="section-title">6. ABDM Integration Terms</div>
+          <div class="section-sub">Ayushman Bharat Digital Mission obligations</div>
+        </div>
+      </div>
+      <p>RaktPort's integration with the <strong>Ayushman Bharat Digital Mission (ABDM)</strong> ecosystem is governed by NHA's Health Information Exchange (HIE) framework and the ABDM participation agreement.</p>
+      <ul class="info-list">
+        <li><i class="fa-solid fa-circle-check"></i><div>Linking your ABHA ID is voluntary. You may unlink at any time without loss of donation history.</div></li>
+        <li><i class="fa-solid fa-circle-check"></i><div>Health information exchange via ABDM occurs only with your active, time-bound consent artefact via the HIE-CM (Health Information Exchange and Consent Manager) protocol.</div></li>
+        <li><i class="fa-solid fa-circle-check"></i><div>RaktPort stores ABHA identifiers in encrypted form only and does not retain ABHA-linked health records outside your explicit consent scope.</div></li>
+        <li><i class="fa-solid fa-circle-check"></i><div>Hospitals accessing donor health information via ABDM-linked flows must be NHA-registered Health Information Users (HIUs) with valid credentials.</div></li>
+      </ul>
+    </section>
+
+    <section id="t7" class="reveal">
+      <div class="section-header">
+        <div class="section-icon"><i class="fa-solid fa-ban"></i></div>
+        <div>
+          <div class="section-title">7. Prohibited Activities</div>
+          <div class="section-sub">Actions that violate these Terms and may constitute criminal offences</div>
+        </div>
+      </div>
+      <ul class="info-list">
+        <li><i class="fa-solid fa-xmark" style="color:#FF6B6B"></i><div><strong>Commercial Blood Trade:</strong> Any form of monetary compensation or commercial benefit for blood donation is strictly prohibited under the Drugs and Cosmetics Act and these Terms.</div></li>
+        <li><i class="fa-solid fa-xmark" style="color:#FF6B6B"></i><div><strong>RTID Misuse:</strong> Sharing, forging, cloning, or misrepresenting RaktPort Tracking IDs (RTIDs) to circumvent verification is a serious violation subject to legal action.</div></li>
+        <li><i class="fa-solid fa-xmark" style="color:#FF6B6B"></i><div><strong>Unauthorised Access:</strong> Attempting to breach, probe, or penetrate RaktPort's systems, databases, or APIs without written authorisation constitutes a cybercrime under IT Act 2000, Section 66.</div></li>
+        <li><i class="fa-solid fa-xmark" style="color:#FF6B6B"></i><div><strong>Data Scraping:</strong> Automated collection, harvesting, or republication of RaktPort data without API authorisation is prohibited.</div></li>
+        <li><i class="fa-solid fa-xmark" style="color:#FF6B6B"></i><div><strong>Misinformation:</strong> Submitting false eligibility data, fabricating medical records, or misrepresenting institutional credentials.</div></li>
+        <li><i class="fa-solid fa-xmark" style="color:#FF6B6B"></i><div><strong>Impersonation:</strong> Representing yourself as another donor, hospital, or blood bank authority.</div></li>
+      </ul>
+      <div class="red-box">
+        <p><i class="fa-solid fa-circle-exclamation" style="margin-right:6px"></i>Violations may be reported to CERT-In, cybercrime police, and relevant regulatory bodies. RaktPort reserves the right to initiate civil and criminal proceedings.</p>
+      </div>
+    </section>
+
+    <section id="t8" class="reveal">
+      <div class="section-header">
+        <div class="section-icon"><i class="fa-solid fa-barcode"></i></div>
+        <div>
+          <div class="section-title">8. RTID System & Traceability</div>
+          <div class="section-sub">RaktPort Tracking ID — the backbone of our audit trail</div>
+        </div>
+      </div>
+      <p>The <strong>RaktPort Tracking ID (RTID)</strong> is a system-generated, Luhn-36 checksum-validated 19-character unique identifier assigned to every donation and hospital requisition event.</p>
+      <ul class="info-list">
+        <li><i class="fa-solid fa-fingerprint"></i><div>Each RTID embeds type, date, and a cryptographically random component. RTIDs are non-transferable and tied to the specific event record.</div></li>
+        <li><i class="fa-solid fa-shield-alt"></i><div>RTIDs support end-to-end blood traceability from donor to recipient — a key requirement under CDSCO blood bank regulations and IEC 62304 audit obligations.</div></li>
+        <li><i class="fa-solid fa-ban"></i><div>Forgery, duplication, or misuse of RTIDs is a criminal offence and grounds for immediate platform ban and law enforcement referral.</div></li>
+      </ul>
+    </section>
+
+    <section id="t9" class="reveal">
+      <div class="section-header">
+        <div class="section-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+        <div>
+          <div class="section-title">9. Limitation of Liability</div>
+          <div class="section-sub">What RaktPort is and is not liable for</div>
+        </div>
+      </div>
+      <p>RaktPort is a technology-facilitated intermediary platform. To the maximum extent permitted by applicable law:</p>
+      <ul class="info-list">
+        <li><i class="fa-solid fa-circle-info" style="color:var(--amber)"></i><div>We are not liable for medical outcomes, adverse transfusion reactions, or clinical decisions made by healthcare professionals using the platform.</div></li>
+        <li><i class="fa-solid fa-circle-info" style="color:var(--amber)"></i><div>We are not responsible for loss arising from donor eligibility misrepresentation, institutional credential fraud, or force majeure events.</div></li>
+        <li><i class="fa-solid fa-circle-info" style="color:var(--amber)"></i><div>Platform uptime is provided on a best-effort basis. Planned maintenance windows will be announced with minimum 24-hour notice.</div></li>
+        <li><i class="fa-solid fa-circle-info" style="color:var(--amber)"></i><div>Our aggregate liability for any single claim shall not exceed the amount paid by the claimant for platform services in the preceding 3 months, or ₹5,000 — whichever is lower.</div></li>
+      </ul>
+    </section>
+
+    <section id="t10" class="reveal">
+      <div class="section-header">
+        <div class="section-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+        <div>
+          <div class="section-title">10. Quality & Safety Commitment</div>
+          <div class="section-sub">Our obligations to you under our QMS framework</div>
+        </div>
+      </div>
+      <ul class="info-list">
+        <li><i class="fa-solid fa-circle-check"></i><div>All platform changes undergo documented testing, validation, and rollback planning before deployment to production.</div></li>
+        <li><i class="fa-solid fa-circle-check"></i><div>Security vulnerabilities are triaged, patched, and disclosed responsibly — critical CVEs addressed within 72 hours of identification.</div></li>
+        <li><i class="fa-solid fa-circle-check"></i><div>User-reported issues are tracked through a Corrective and Preventive Action (CAPA) system in line with ISO 13485 requirements.</div></li>
+        <li><i class="fa-solid fa-circle-check"></i><div>Donor and patient data accuracy is validated at point of entry with duplicate-detection, format verification, and Luhn-checksum validation on all tracking identifiers.</div></li>
+      </ul>
+    </section>
+
+    <section id="t11" class="reveal">
+      <div class="section-header">
+        <div class="section-icon"><i class="fa-solid fa-copyright"></i></div>
+        <div>
+          <div class="section-title">11. Intellectual Property</div>
+          <div class="section-sub">Ownership of platform content and technology</div>
+        </div>
+      </div>
+      <p>All software, trademarks, trade names, logos, RTID system design, UI elements, databases, and documentation constituting the RaktPort platform are the exclusive intellectual property of RaktPort and its creator, Ajay Kushwaha.</p>
+      <p>You are granted a limited, non-exclusive, non-transferable licence to use the platform solely for its intended purpose. No licence is granted to reproduce, reverse-engineer, or create derivative works from any RaktPort technology.</p>
+    </section>
+
+    <section id="t12" class="reveal">
+      <div class="section-header">
+        <div class="section-icon"><i class="fa-solid fa-landmark"></i></div>
+        <div>
+          <div class="section-title">12. Governing Law & Dispute Resolution</div>
+          <div class="section-sub">Legal jurisdiction and contact for disputes</div>
+        </div>
+      </div>
+      <p>These Terms are governed by and construed in accordance with the laws of India. The courts of <strong>New Delhi</strong> shall have exclusive jurisdiction over any dispute arising out of or in connection with these Terms.</p>
+      <p>Before initiating legal proceedings, parties agree to attempt resolution through good-faith negotiation for a minimum of 30 days. For formal notices: <a href="mailto:legal@raktport.in" style="color:var(--teal)">legal@raktport.in</a></p>
+      <p>We may revise these Terms at any time. Continued use of the platform after the effective date of revised Terms constitutes your acceptance. Material changes will be notified in-app at least 15 days in advance.</p>
+    </section>
+
   </main>
+</div>
 
-  <footer>
-    &copy; 2025 RaktPort. All Rights Reserved. | <a href="privacy.html">Privacy Policy</a>
-  </footer>
+<footer>
+  <div class="footer-brand">RaktPort</div>
+  <p style="color:var(--muted);font-size:0.83rem">Donate Blood Anywhere. Save Lives Everywhere.</p>
+  <div class="footer-links">
+    <a href="about.html">About</a>
+    <a href="our-mission.html">Mission</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="contact.html">Contact</a>
+  </div>
+  <div class="footer-compliance">
+    <span class="badge badge-teal"><i class="fa-solid fa-certificate"></i> IEC 62304</span>
+    <span class="badge badge-teal"><i class="fa-solid fa-award"></i> ISO 13485</span>
+    <span class="badge badge-amber"><i class="fa-solid fa-hospital-user"></i> ABDM</span>
+    <span class="badge badge-red"><i class="fa-solid fa-gavel"></i> DPDP Act 2023</span>
+  </div>
+  <p class="footer-copy">© 2025–2026 RaktPort. All rights reserved. Built by Ajay Kushwaha.</p>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  const sections = document.querySelectorAll('.content section');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting) {
+        tocLinks.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.toc-list a[href="#${e.target.id}"]`);
+        if(active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  sections.forEach(s => io.observe(s));
+</script>
 </body>
-
 </html>

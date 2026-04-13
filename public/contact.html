@@ -1,222 +1,384 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>RaktPort | Contact Us</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    :root {
-      --primary-red: #8b0000;
-      --accent-orange: #f4a261;
-      --light-cream: #fdf3e7;
-      --text-dark: #2b2b2b;
-    }
+    :root{--bg:#06091A;--surface:#0D1228;--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.07);--red:#C41E3A;--red-glow:rgba(196,30,58,0.25);--teal:#00C9A7;--teal-dim:rgba(0,201,167,0.12);--amber:#F59E0B;--amber-dim:rgba(245,158,11,0.08);--text:#E8EDF7;--muted:#7D8BA3;--heading-font:'Sora',sans-serif;--body-font:'Figtree',sans-serif;}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{font-family:var(--body-font);background:var(--bg);color:var(--text);line-height:1.75;min-height:100vh;overflow-x:hidden;}
+    body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(196,30,58,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(196,30,58,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0;}
+    nav{position:sticky;top:0;z-index:100;background:rgba(6,9,26,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px;}
+    .nav-brand{display:flex;align-items:center;gap:10px;font-family:var(--heading-font);font-weight:700;font-size:1.1rem;color:var(--text);text-decoration:none;}
 
-    body {
-      font-family: "Poppins", Arial, sans-serif;
-      background-color: var(--light-cream);
-      margin: 0;
-      padding: 0;
-      color: var(--text-dark);
-      line-height: 1.7;
-    }
+    .nav-links{display:flex;gap:1.5rem;list-style:none;}
+    .nav-links a{color:var(--muted);text-decoration:none;font-size:0.88rem;font-weight:500;transition:color 0.2s;}
+    .nav-links a:hover{color:var(--text);}
+    .nav-back{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:0.85rem;font-weight:600;text-decoration:none;border:1px solid var(--border);padding:6px 14px;border-radius:20px;transition:all 0.2s;}
+    .nav-back:hover{color:var(--text);border-color:rgba(255,255,255,0.2);}
+    .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:0.72rem;font-weight:600;letter-spacing:0.04em;border:1px solid;}
+    .badge-teal{background:var(--teal-dim);border-color:rgba(0,201,167,0.3);color:var(--teal);}
+    .badge-red{background:rgba(196,30,58,0.1);border-color:rgba(196,30,58,0.3);color:#FF6B6B;}
+    .badge-amber{background:var(--amber-dim);border-color:rgba(245,158,11,0.25);color:var(--amber);}
 
-    /* UPDATED STYLES FOR BACK BUTTON WRAPPER */
-    .back-btn-wrapper {
-      max-width: 900px;
-      margin: 1rem auto 0.5rem;
-      /* Aligns with main container and adds spacing */
-      padding: 0 2.5rem;
-      /* Matches main's padding */
-    }
+    /* HERO */
+    .hero{position:relative;z-index:1;padding:5.5rem 2rem 4rem;text-align:center;}
+    .hero-glow{position:absolute;top:0;left:50%;transform:translateX(-50%);width:700px;height:250px;background:radial-gradient(ellipse,rgba(196,30,58,0.14) 0%,transparent 70%);pointer-events:none;}
+    .eyebrow{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:1rem;}
+    .eyebrow-line{height:1px;width:40px;background:var(--red);}
+    .eyebrow-text{font-size:0.75rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--red);}
+    .hero h1{font-family:var(--heading-font);font-size:clamp(2rem,4.5vw,3.4rem);font-weight:800;line-height:1.08;letter-spacing:-0.02em;margin-bottom:1rem;}
+    .hero h1 span{color:var(--red);}
+    .hero-sub{max-width:520px;margin:0 auto;color:var(--muted);font-size:0.97rem;}
 
-    .back-btn {
-      display: inline-flex;
-      align-items: center;
-      background: #fff;
-      color: var(--primary-red);
-      border: 1px solid #ccc;
-      padding: 8px 12px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 600;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      transition: background 0.2s;
-      font-size: 0.9rem;
-    }
+    /* LAYOUT */
+    .contact-wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:3.5rem 2rem 5rem;display:grid;grid-template-columns:1fr 380px;gap:2.5rem;align-items:start;}
+    @media(max-width:860px){.contact-wrap{grid-template-columns:1fr;}}
 
-    .back-btn:hover {
-      background: var(--light-cream);
-    }
+    /* FORM */
+    .form-card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:2.5rem;}
+    .form-header{margin-bottom:2rem;}
+    .form-header h2{font-family:var(--heading-font);font-size:1.4rem;font-weight:700;margin-bottom:4px;}
+    .form-header p{color:var(--muted);font-size:0.88rem;}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+    @media(max-width:500px){.form-row{grid-template-columns:1fr;}}
+    .form-group{margin-bottom:1.25rem;}
+    .form-group label{display:block;font-size:0.8rem;font-weight:600;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em;}
+    .form-group input,
+    .form-group textarea,
+    .form-group select{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-family:var(--body-font);font-size:0.92rem;color:var(--text);outline:none;transition:border-color 0.2s;}
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus{border-color:rgba(196,30,58,0.5);box-shadow:0 0 0 3px rgba(196,30,58,0.1);}
+    .form-group input::placeholder,
+    .form-group textarea::placeholder{color:rgba(255,255,255,0.2);}
+    .form-group select option{background:#0D1228;color:var(--text);}
+    .form-group textarea{resize:vertical;min-height:130px;}
+    .consent-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:1.5rem;}
+    .consent-row input[type="checkbox"]{width:16px;height:16px;margin-top:2px;accent-color:var(--red);flex-shrink:0;cursor:pointer;}
+    .consent-row span{font-size:0.82rem;color:var(--muted);line-height:1.6;}
+    .consent-row a{color:var(--teal);text-decoration:none;}
+    .consent-row a:hover{text-decoration:underline;}
+    .submit-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--red);color:#fff;border:none;padding:14px;border-radius:10px;font-family:var(--heading-font);font-size:1rem;font-weight:700;cursor:pointer;transition:all 0.2s;}
+    .submit-btn:hover{background:#a01730;transform:translateY(-1px);}
+    .submit-btn:disabled{background:rgba(196,30,58,0.4);cursor:not-allowed;transform:none;}
 
-    .back-btn i {
-      margin-right: 6px;
-    }
+    /* SUCCESS */
+    .success-msg{display:none;background:var(--teal-dim);border:1px solid rgba(0,201,167,0.3);border-radius:12px;padding:1rem 1.25rem;margin-top:1rem;text-align:center;}
+    .success-msg p{color:var(--teal);font-size:0.9rem;}
 
-    /* END UPDATED STYLES */
+    /* SIDEBAR */
+    .sidebar{display:flex;flex-direction:column;gap:1.25rem;}
 
-    header {
-      background-color: var(--primary-red);
-      color: #fff;
-      text-align: center;
-      padding: 2rem 1rem;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-    }
+    /* CONTACT CARDS */
+    .contact-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem;transition:border-color 0.3s;}
+    .contact-card:hover{border-color:rgba(0,201,167,0.25);}
+    .contact-card-header{display:flex;align-items:center;gap:10px;margin-bottom:1rem;}
+    .contact-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:0.95rem;}
+    .ci-red{background:var(--red-glow);border:1px solid rgba(196,30,58,0.3);color:var(--red);}
+    .ci-teal{background:var(--teal-dim);border:1px solid rgba(0,201,167,0.3);color:var(--teal);}
+    .ci-amber{background:var(--amber-dim);border:1px solid rgba(245,158,11,0.25);color:var(--amber);}
+    .contact-card-header h3{font-family:var(--heading-font);font-size:0.95rem;font-weight:700;}
+    .contact-detail{display:flex;align-items:center;gap:8px;font-size:0.85rem;color:var(--muted);margin-bottom:6px;}
+    .contact-detail i{width:14px;text-align:center;color:var(--red);flex-shrink:0;}
+    .contact-detail a{color:var(--teal);text-decoration:none;}
+    .contact-detail a:hover{text-decoration:underline;}
 
-    header img {
-      height: 80px;
-    }
+    /* DPO CARD */
+    .dpo-card{background:var(--card);border:1px solid rgba(0,201,167,0.2);border-radius:16px;padding:1.5rem;}
+    .dpo-badge{display:inline-flex;align-items:center;gap:5px;background:var(--teal-dim);border:1px solid rgba(0,201,167,0.3);color:var(--teal);padding:3px 10px;border-radius:6px;font-size:0.7rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:0.75rem;}
+    .dpo-card h3{font-family:var(--heading-font);font-size:0.95rem;font-weight:700;margin-bottom:0.75rem;}
+    .dpo-card p{color:var(--muted);font-size:0.82rem;line-height:1.6;}
 
-    header h1 {
-      margin: 0.5rem 0 0;
-      font-size: 1.8rem;
-    }
+    /* RESPONSE TIMES */
+    .rt-list{list-style:none;margin-top:0.75rem;}
+    .rt-list li{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:0.82rem;}
+    .rt-list li:last-child{border-bottom:none;}
+    .rt-list li span:first-child{color:var(--muted);}
+    .rt-label{font-weight:600;font-size:0.75rem;padding:2px 8px;border-radius:4px;}
+    .rt-fast{background:var(--teal-dim);color:var(--teal);}
+    .rt-med{background:var(--amber-dim);color:var(--amber);}
 
-    main {
-      max-width: 900px;
-      margin: 0 auto;
-      /* Removed top margin, now handled by back-btn-wrapper */
-      background: #fff;
-      border-radius: 10px;
-      padding: 2.5rem;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    }
+    /* OFFICES */
+    .office-section{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 2rem 5rem;}
+    .office-section h2{font-family:var(--heading-font);font-size:1.5rem;font-weight:700;margin-bottom:1.5rem;text-align:center;}
+    .office-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;}
+    @media(max-width:720px){.office-grid{grid-template-columns:1fr;}}
+    .office-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.5rem;text-align:center;}
+    .office-card i{font-size:1.8rem;margin-bottom:0.75rem;display:block;}
+    .office-card.oc-red i{color:var(--red);}
+    .office-card.oc-teal i{color:var(--teal);}
+    .office-card.oc-amber i{color:var(--amber);}
+    .office-card h3{font-family:var(--heading-font);font-size:0.9rem;font-weight:700;margin-bottom:4px;}
+    .office-card p{color:var(--muted);font-size:0.82rem;}
 
-    h2 {
-      color: var(--primary-red);
-      border-bottom: 3px solid var(--accent-orange);
-      padding-bottom: 0.4rem;
-    }
-
-    form {
-      margin-top: 1.5rem;
-    }
-
-    label {
-      display: block;
-      font-weight: bold;
-      margin-top: 1rem;
-      color: var(--primary-red);
-    }
-
-    input,
-    textarea {
-      width: 100%;
-      padding: 10px;
-      margin-top: 0.3rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-family: inherit;
-    }
-
-    textarea {
-      resize: vertical;
-    }
-
-    button {
-      margin-top: 1.5rem;
-      background-color: var(--primary-red);
-      color: #fff;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 1rem;
-    }
-
-    button:hover {
-      background-color: var(--accent-orange);
-      color: #2b2b2b;
-    }
-
-    .contact-info {
-      margin-top: 2rem;
-      background: var(--light-cream);
-      border-left: 5px solid var(--accent-orange);
-      padding: 1rem;
-      border-radius: 6px;
-    }
-
-    footer {
-      background-color: var(--primary-red);
-      color: #fff;
-      text-align: center;
-      padding: 1rem 0;
-      margin-top: 3rem;
-      font-size: 0.9rem;
-    }
-
-    a {
-      color: var(--accent-orange);
-      text-decoration: none;
-    }
-
-    a:hover {
-      text-decoration: underline;
-    }
-
-    @media (max-width: 600px) {
-      .back-btn-wrapper {
-        padding: 0 1.5rem;
-      }
-
-      main {
-        margin: 1rem;
-        padding: 1.5rem;
-      }
-
-      header h1 {
-        font-size: 1.5rem;
-      }
-    }
+    footer{position:relative;z-index:1;border-top:1px solid var(--border);background:var(--surface);padding:2.5rem 2rem;text-align:center;}
+    .footer-brand{font-family:var(--heading-font);font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:0.5rem;}
+    .footer-links{display:flex;justify-content:center;flex-wrap:wrap;gap:1rem;margin:1rem 0;}
+    .footer-links a{color:var(--muted);text-decoration:none;font-size:0.83rem;transition:color 0.2s;}
+    .footer-links a:hover{color:var(--text);}
+    .footer-compliance{margin-top:1.5rem;display:flex;justify-content:center;flex-wrap:wrap;gap:8px;}
+    .footer-copy{color:var(--muted);font-size:0.78rem;margin-top:1.5rem;}
+    .reveal{opacity:0;transform:translateY(20px);transition:opacity 0.5s,transform 0.5s;}
+    .reveal.visible{opacity:1;transform:none;}
   </style>
 </head>
-
 <body>
-  <header>
-    <img src="/raktport-logo.jpg" alt="RaktPort Logo" width="80">
-    <h1>RaktPort</h1>
-    <p>Donate Blood Anywhere. Save Lives Everywhere.</p>
-  </header>
 
-  <div class="back-btn-wrapper">
-    <a href="javascript:history.back()" class="back-btn" title="Go Back">
-      <i class="fa-solid fa-arrow-left"></i> Back
-    </a>
+<nav>
+  <a href="/" class="nav-brand"><img src="/RaktPort-logo.jpg" alt="RaktPort Logo" style="width: 32px; height: 32px; border-radius: 8px; object-fit: cover;"> RaktPort</a>
+  <ul class="nav-links">
+    <li><a href="about.html">About</a></li>
+    <li><a href="our-mission.html">Mission</a></li>
+    <li><a href="privacy.html">Privacy</a></li>
+  </ul>
+  <a href="javascript:history.back()" class="nav-back"><i class="fa-solid fa-arrow-left"></i> Back</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="eyebrow">
+    <div class="eyebrow-line"></div>
+    <span class="eyebrow-text">Contact RaktPort</span>
+    <div class="eyebrow-line"></div>
+  </div>
+  <h1>We're Here to <span>Help</span></h1>
+  <p class="hero-sub">Whether you're a donor, hospital, blood bank, or concerned citizen — reach out. Every message is handled with care and responded to within documented timelines.</p>
+</div>
+
+<div class="contact-wrap">
+
+  <!-- FORM -->
+  <div class="form-card reveal">
+    <div class="form-header">
+      <h2>Send a Message</h2>
+      <p>All fields marked with * are required. Your data is processed per our <a href="privacy.html" style="color:var(--teal);text-decoration:none">Privacy Policy</a>.</p>
+    </div>
+
+    <form id="my-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fname">Full Name *</label>
+          <input type="text" id="fname" name="name" placeholder="Ravi Kumar" required data-fs-field>
+        </div>
+        <div class="form-group">
+          <label for="femail">Email Address *</label>
+          <input type="email" id="femail" name="email" placeholder="ravi@example.com" required data-fs-field>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fphone">Mobile Number</label>
+          <input type="tel" id="fphone" name="phone" placeholder="+91 98765 43210" data-fs-field>
+        </div>
+        <div class="form-group">
+          <label for="frole">You are a *</label>
+          <select id="frole" name="role" required data-fs-field>
+            <option value="" disabled selected>Select your role</option>
+            <option value="Voluntary Blood Donor">Voluntary Blood Donor</option>
+            <option value="Hospital / Healthcare Institution">Hospital / Healthcare Institution</option>
+            <option value="Blood Bank">Blood Bank</option>
+            <option value="Researcher / Student">Researcher / Student</option>
+            <option value="Press / Media">Press / Media</option>
+            <option value="General Enquiry">General Enquiry</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="fsubject">Subject *</label>
+        <select id="fsubject" name="subject" required data-fs-field>
+          <option value="" disabled selected>Select a subject</option>
+          <option value="Technical Support / Bug Report">Technical Support / Bug Report</option>
+          <option value="Data Privacy / DPDP Rights Request">Data Privacy / DPDP Rights Request</option>
+          <option value="Grievance / Complaint">Grievance / Complaint</option>
+          <option value="Partnership Enquiry">Partnership Enquiry</option>
+          <option value="Press / Media Enquiry">Press / Media Enquiry</option>
+          <option value="ABDM / ABHA Query">ABDM / ABHA Query</option>
+          <option value="General Feedback">General Feedback</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="fmessage">Message *</label>
+        <textarea id="fmessage" name="message" placeholder="Describe your query in detail. Include any reference IDs (RTID, ticket number) if applicable..." required data-fs-field></textarea>
+      </div>
+
+      <div class="consent-row">
+        <input type="checkbox" id="fconsent" name="consent" required data-fs-field>
+        <span>I consent to RaktPort processing my personal data for the purpose of responding to this enquiry, in accordance with the <a href="privacy.html">Privacy Policy</a> and the <strong>Digital Personal Data Protection Act 2023</strong>. I understand I may withdraw this consent at any time.</span>
+      </div>
+      <button type="submit" class="submit-btn" id="submitBtn" data-fs-submit-btn>
+        <i class="fa-solid fa-paper-plane"></i> Send Message
+      </button>
+    </form>
+    
+    <div data-fs-error style="color:var(--amber);margin-top:1rem;font-size:14px;font-weight:600;text-align:center;"></div>
+    <div class="success-msg" id="successMsg" data-fs-success>
+      <p><i class="fa-solid fa-circle-check" style="margin-right:6px"></i><strong>Message sent successfully!</strong> We'll get back to you shortly.</p>
+    </div>
   </div>
 
-  <main>
-    <h2>Contact Us</h2>
-    <p>We’d love to hear from you! Please fill out the form below or reach us through the provided contact details.</p>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
 
-    <form action="#" method="post">
-      <label for="name">Full Name</label>
-      <input type="text" id="name" name="name" placeholder="Enter your name" required>
-
-      <label for="email">Email Address</label>
-      <input type="email" id="email" name="email" placeholder="you@example.com" required>
-
-      <label for="message">Message</label>
-      <textarea id="message" name="message" rows="5" placeholder="Write your message..." required></textarea>
-
-      <button type="submit">Send Message</button>
-    </form>
-
-    <div class="contact-info">
-      <p><strong>📍 Address:</strong> RaktPort Headquarters, New Delhi, India</p>
-      <p><strong>📧 Email:</strong> contact.raktsetu@gmail.com</p>
-      <p><strong>📞 Phone:</strong> +91-XXXXXXXXXX</p>
+    <!-- GENERAL CONTACT -->
+    <div class="contact-card reveal">
+      <div class="contact-card-header">
+        <div class="contact-icon ci-red"><i class="fa-solid fa-envelope"></i></div>
+        <h3>General Contact</h3>
+      </div>
+      <div class="contact-detail"><i class="fa-solid fa-envelope"></i><a href="mailto:contact.raktsetu@gmail.com">contact.raktsetu@gmail.com</a></div>
+      <div class="contact-detail"><i class="fa-solid fa-location-dot"></i><span>New Delhi, India — 110001</span></div>
+      <div class="contact-detail"><i class="fa-brands fa-github"></i><a href="https://github.com/raktport" target="_blank">github.com/raktport</a></div>
+      <div class="contact-detail"><i class="fa-solid fa-globe"></i><a href="https://portfolio.raktport.in" target="_blank">portfolio.raktport.in</a></div>
     </div>
-  </main>
 
-  <footer>
-    &copy; 2025 RaktPort. All Rights Reserved. |
-    <a href="terms.html">Terms</a> |
-    <a href="privacy.html">Privacy</a> |
+    <!-- PRIVACY / DPDP -->
+    <div class="dpo-card reveal">
+      <div class="dpo-badge"><i class="fa-solid fa-shield-halved"></i> DPDP Act 2023 — Mandatory</div>
+      <h3>Grievance Officer (Data Privacy)</h3>
+      <p>For all data rights requests — access, correction, erasure, consent withdrawal, or privacy complaints — contact our designated Grievance Officer as required under the DPDP Act 2023:</p>
+      <div class="contact-detail" style="margin-top:0.75rem"><i class="fa-solid fa-user-tie"></i><a href="mailto:privacy@raktport.in">privacy@raktport.in</a></div>
+      <div class="contact-detail"><i class="fa-solid fa-clock"></i><span>Response within 30 days (statutory deadline)</span></div>
+      <p style="color:var(--muted);font-size:0.78rem;margin-top:0.75rem">If unsatisfied, you may escalate to the <strong>Data Protection Board of India</strong> upon its constitution under Section 18 of the DPDP Act.</p>
+    </div>
+
+    <!-- RESPONSE TIMES -->
+    <div class="contact-card reveal">
+      <div class="contact-card-header">
+        <div class="contact-icon ci-teal"><i class="fa-solid fa-clock"></i></div>
+        <h3>Response Timelines</h3>
+      </div>
+      <ul class="rt-list">
+        <li><span>General Enquiry</span><span class="rt-label rt-med">48–72 hrs</span></li>
+        <li><span>Technical Support</span><span class="rt-label rt-fast">24 hrs</span></li>
+        <li><span>Privacy / DPDP Request</span><span class="rt-label rt-med">30 days</span></li>
+        <li><span>Grievance Complaint</span><span class="rt-label rt-med">30 days</span></li>
+        <li><span>Security Vulnerability</span><span class="rt-label rt-fast">6 hrs</span></li>
+        <li><span>Partnership Enquiry</span><span class="rt-label rt-med">5 business days</span></li>
+      </ul>
+    </div>
+
+    <!-- ABDM / SECURITY -->
+    <div class="contact-card reveal">
+      <div class="contact-card-header">
+        <div class="contact-icon ci-amber"><i class="fa-solid fa-lock"></i></div>
+        <h3>Security & Compliance</h3>
+      </div>
+      <p style="color:var(--muted);font-size:0.83rem;margin-bottom:0.75rem">To report a security vulnerability, suspected data breach, or CERT-In reportable incident:</p>
+      <div class="contact-detail"><i class="fa-solid fa-bug"></i><a href="mailto:security@raktport.in">security@raktport.in</a></div>
+      <div class="contact-detail"><i class="fa-solid fa-triangle-exclamation"></i><span>Critical CVEs: response within 6 hours</span></div>
+      <p style="color:var(--muted);font-size:0.78rem;margin-top:0.75rem">We adhere to responsible disclosure practices. Coordinated disclosure is welcomed and credited.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- CONTACT CHANNELS -->
+<div class="office-section">
+  <h2>How We Handle Your Enquiry</h2>
+  <div class="office-grid">
+    <div class="office-card oc-red reveal">
+      <i class="fa-solid fa-inbox"></i>
+      <h3>Step 1 — Received</h3>
+      <p>Your message is received and automatically acknowledged with a reference ID within minutes.</p>
+    </div>
+    <div class="office-card oc-teal reveal">
+      <i class="fa-solid fa-user-check"></i>
+      <h3>Step 2 — Triaged</h3>
+      <p>Your enquiry is reviewed, categorised, and routed to the appropriate team — technical, privacy, or compliance.</p>
+    </div>
+    <div class="office-card oc-amber reveal">
+      <i class="fa-solid fa-reply"></i>
+      <h3>Step 3 — Responded</h3>
+      <p>A substantive response is issued within documented timelines. For DPDP requests, we maintain a formal record per statutory requirements.</p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-brand">RaktPort</div>
+  <p style="color:var(--muted);font-size:0.83rem">Donate Blood Anywhere. Save Lives Everywhere.</p>
+  <div class="footer-links">
     <a href="about.html">About</a>
-  </footer>
-</body>
+    <a href="our-mission.html">Mission</a>
+    <a href="terms.html">Terms</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="blood-guidelines.html">Guidelines</a>
+  </div>
+  <div class="footer-compliance">
+    <span class="badge badge-teal"><i class="fa-solid fa-shield-halved"></i> DPDP Act 2023</span>
+    <span class="badge badge-amber"><i class="fa-solid fa-hospital-user"></i> ABDM</span>
+    <span class="badge badge-red"><i class="fa-solid fa-certificate"></i> IEC 62304</span>
+    <span class="badge badge-teal"><i class="fa-solid fa-award"></i> ISO 13485</span>
+  </div>
+  <p class="footer-copy">© 2025–2026 RaktPort. All rights reserved. Built by Ajay Kushwaha.</p>
+</footer>
 
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.07 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+<script>
+  document.getElementById('my-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const form = e.target;
+    const btn = document.getElementById('submitBtn');
+    const successMsg = document.getElementById('successMsg');
+    const errorMsg = document.querySelector('[data-fs-error]');
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+    errorMsg.textContent = '';
+    
+    const data = new FormData(form);
+    
+    try {
+      const resp = await fetch('https://formspree.io/f/mqewkgke', {
+        method: 'POST',
+        body: data,
+        headers: { 'Accept': 'application/json' }
+      });
+      
+      if (resp.ok) {
+        successMsg.style.display = 'block';
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Sent!';
+        btn.style.background = 'var(--teal)';
+        form.reset();
+        
+        setTimeout(() => {
+          successMsg.style.display = 'none';
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Message';
+          btn.style.background = 'var(--red)';
+        }, 5000);
+      } else {
+        const result = await resp.json();
+        if (result.errors) {
+          errorMsg.textContent = result.errors.map(error => error.message).join(', ');
+        } else {
+          errorMsg.textContent = 'Oops! There was a problem submitting your form.';
+        }
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Message';
+      }
+    } catch (err) {
+      errorMsg.textContent = 'Oops! There was a problem submitting your form.';
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Message';
+    }
+  });
+</script>
+</body>
 </html>

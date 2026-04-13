@@ -110,7 +110,7 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
       }
 
       if (!requestData) {
-        throw new Error("R-RTID not found in system");
+        throw new Error("RH/RU-RTID not found in system");
       }
 
       let hospitalName = requestData.hospitalName || 'Hospital';
@@ -164,7 +164,7 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
       setRRtidValid(true);
 
     } catch (err: any) {
-      setRRtidError(err.message || "Failed to validate R-RTID");
+      setRRtidError(err.message || "Failed to validate RH/RU-RTID");
       setRRtidData(null);
       setRRtidValid(false);
     } finally {
@@ -173,7 +173,7 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
   };
 
   useEffect(() => {
-    if (donationType === 'R-RTID-Linked Donation' && rRtid.length >= 10) {
+    if (donationType === 'RH/RU-RTID-Linked Donation' && rRtid.length >= 10) {
       const debounce = setTimeout(() => {
         validateRRTID(rRtid);
       }, 500);
@@ -208,13 +208,13 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
       return;
     }
 
-    if (donationType === 'R-RTID-Linked Donation') {
+    if (donationType === 'RH/RU-RTID-Linked Donation') {
       if (!rRtid.trim()) {
-        alert('Please enter R-RTID');
+        alert('Please enter RH/RU-RTID');
         return;
       }
       if (!rRtidValid) {
-        alert('Please wait for R-RTID validation');
+        alert('Please wait for RH/RU-RTID validation');
         return;
       }
     }
@@ -225,8 +225,8 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
       bloodGroup: bloodGroup,
       donationType: donationType,
       component: component,
-      rRtid: donationType === 'R-RTID-Linked Donation' ? rRtid : null,
-      rRtidData: donationType === 'R-RTID-Linked Donation' ? rRtidData : null,
+      rRtid: donationType === 'RH/RU-RTID-Linked Donation' ? rRtid : null,
+      rRtidData: donationType === 'RH/RU-RTID-Linked Donation' ? rRtidData : null,
     };
 
     onSubmit(submissionData);
@@ -363,10 +363,10 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
                         <span>Regular Donation</span>
                       </div>
                     </SelectItem>
-                    <SelectItem value="R-RTID-Linked Donation">
+                    <SelectItem value="RH/RU-RTID-Linked Donation">
                       <div className="flex items-center gap-2">
                         <span>🏥</span>
-                        <span>R-RTID-Linked Donation</span>
+                        <span>Request-Linked Donation (RH/RU-RTID)</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="Emergency">
@@ -400,7 +400,7 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
           </div>
 
           {/* R-RTID VALIDATION CARD */}
-          {donationType === 'R-RTID-Linked Donation' && (
+          {donationType === 'RH/RU-RTID-Linked Donation' && (
             <div className="bg-[var(--bg-surface)] rounded-xl border-2 border-purple-200 shadow-lg">
               <div className="bg-gradient-to-r from-purple-50 to-indigo-50 px-6 py-3 border-b border-purple-100">
                 <div className="flex items-center gap-2">
@@ -412,12 +412,12 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
               <div className="p-6 space-y-4">
                 <div>
                   <Label htmlFor="rRtid" className="text-sm font-semibold text-gray-700">
-                    Patient R-RTID
+                    Patient Request ID (RH/RU-RTID)
                   </Label>
                   <div className="flex gap-2 mt-1.5">
                     <Input
                       id="rRtid"
-                      placeholder="R-RTID-250126-Q1099"
+                      placeholder="RH-RTID-250126-Q1099 or RU-RTID-..."
                       value={rRtid}
                       onChange={(e) => setRRtid(e.target.value.toUpperCase())}
                       className={`flex-1 ${rRtidValid ? 'border-[var(--clr-success)] bg-green-50' :
@@ -511,7 +511,7 @@ export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: Donati
           <Button
             onClick={handleSubmit}
             className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-[var(--txt-inverse)] px-8 shadow-lg"
-            disabled={donationType === 'R-RTID-Linked Donation' && !rRtidValid}
+            disabled={donationType === 'RH/RU-RTID-Linked Donation' && !rRtidValid}
           >
             <CheckCircle2 className="h-4 w-4 mr-2" />
             Confirm Check-In

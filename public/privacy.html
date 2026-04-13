@@ -1,217 +1,606 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RaktPort | Privacy Policy</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RaktPort | Privacy Policy — DPDP Act Compliant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
-      --primary-red: #8b0000;
-      --accent-orange: #f4a261;
-      --light-cream: #fdf3e7;
-      --text-dark: #2b2b2b;
+      --bg:       #06091A;
+      --surface:  #0D1228;
+      --card:     rgba(255,255,255,0.04);
+      --border:   rgba(255,255,255,0.07);
+      --red:      #C41E3A;
+      --red-glow: rgba(196,30,58,0.25);
+      --teal:     #00C9A7;
+      --teal-dim: rgba(0,201,167,0.12);
+      --amber:    #F59E0B;
+      --text:     #E8EDF7;
+      --muted:    #7D8BA3;
+      --heading-font: 'Sora', sans-serif;
+      --body-font:    'Figtree', sans-serif;
     }
+    *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
 
     body {
-      font-family: "Poppins", Arial, sans-serif;
-      background-color: var(--light-cream);
-      margin: 0;
-      padding: 0;
-      color: var(--text-dark);
-      line-height: 1.7;
+      font-family: var(--body-font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
+      min-height: 100vh;
+      overflow-x: hidden;
     }
 
-    /* UPDATED STYLES FOR BACK BUTTON WRAPPER */
-    .back-btn-wrapper {
-      max-width: 900px;
-      margin: 1rem auto 0.5rem;
-      /* Aligns with main container and adds spacing */
-      padding: 0 2.5rem;
-      /* Matches main's padding */
+    /* Grid pattern */
+    body::before {
+      content:'';
+      position:fixed; inset:0;
+      background-image:
+        linear-gradient(rgba(196,30,58,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(196,30,58,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events:none; z-index:0;
     }
 
-    .back-btn {
-      display: inline-flex;
-      align-items: center;
-      background: #fff;
-      color: var(--primary-red);
-      border: 1px solid #ccc;
-      padding: 8px 12px;
-      border-radius: 8px;
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(6,9,26,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .nav-brand {
+      display: flex; align-items: center; gap: 10px;
+      font-family: var(--heading-font);
+      font-weight: 700; font-size: 1.1rem; color: var(--text);
       text-decoration: none;
-      font-weight: 600;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      transition: background 0.2s;
-      font-size: 0.9rem;
     }
-
-    .back-btn:hover {
-      background: var(--light-cream);
+    .nav-logo {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--red), #8B0000);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: #fff; font-weight: 800;
     }
-
-    .back-btn i {
-      margin-right: 6px;
+    .nav-links { display: flex; gap: 1.5rem; list-style: none; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none; font-size: 0.88rem;
+      font-weight: 500; transition: color 0.2s;
     }
+    .nav-links a:hover { color: var(--text); }
+    .nav-back {
+      display: flex; align-items: center; gap: 6px;
+      color: var(--muted); font-size: 0.85rem; font-weight: 600;
+      text-decoration: none; border: 1px solid var(--border);
+      padding: 6px 14px; border-radius: 20px;
+      transition: all 0.2s;
+    }
+    .nav-back:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
 
-    /* END UPDATED STYLES */
-
-    header {
-      background-color: var(--primary-red);
-      color: #fff;
+    /* ── HERO ── */
+    .hero {
+      position: relative; z-index: 1;
+      padding: 5rem 2rem 3rem;
       text-align: center;
-      padding: 2rem 1rem;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      border-bottom: 1px solid var(--border);
+    }
+    .hero::before {
+      content:'';
+      position:absolute; top:0; left:50%; transform:translateX(-50%);
+      width:600px; height:200px;
+      background: radial-gradient(ellipse, var(--red-glow) 0%, transparent 70%);
+      pointer-events:none;
+    }
+    .compliance-strip {
+      display: flex; justify-content: center; flex-wrap: wrap; gap: 8px;
+      margin-bottom: 1.5rem;
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px; border-radius: 20px;
+      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em;
+      border: 1px solid;
+    }
+    .badge-teal { background: var(--teal-dim); border-color: rgba(0,201,167,0.3); color: var(--teal); }
+    .badge-red  { background: rgba(196,30,58,0.1); border-color: rgba(196,30,58,0.3); color: #FF6B6B; }
+    .badge-amber{ background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.25); color: var(--amber); }
+
+    .hero h1 {
+      font-family: var(--heading-font);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 800; line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+    .hero h1 span { color: var(--red); }
+    .hero-meta {
+      margin-top: 1rem; color: var(--muted);
+      font-size: 0.9rem; display: flex; justify-content: center;
+      flex-wrap: wrap; gap: 1.5rem;
+    }
+    .hero-meta span { display: flex; align-items: center; gap: 5px; }
+
+    /* ── LAYOUT ── */
+    .page-wrap {
+      position: relative; z-index: 1;
+      max-width: 1100px; margin: 0 auto;
+      padding: 3rem 2rem 5rem;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 2rem; align-items: start;
+    }
+    @media(max-width:820px){
+      .page-wrap { grid-template-columns: 1fr; }
+      .toc { display: none; }
     }
 
-    header img {
-      height: 80px;
+    /* ── TOC ── */
+    .toc {
+      position: sticky; top: 80px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 1.5rem;
+    }
+    .toc-title {
+      font-family: var(--heading-font);
+      font-size: 0.75rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--muted); margin-bottom: 1rem;
+    }
+    .toc-list { list-style: none; }
+    .toc-list li { margin-bottom: 4px; }
+    .toc-list a {
+      color: var(--muted); text-decoration: none;
+      font-size: 0.82rem; display: flex; align-items: center; gap: 6px;
+      padding: 5px 8px; border-radius: 6px; transition: all 0.2s;
+    }
+    .toc-list a:hover { background: var(--border); color: var(--text); }
+    .toc-list a.active { background: var(--red-glow); color: #FF9999; }
+    .toc-list .toc-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--red); flex-shrink: 0;
     }
 
-    header h1 {
-      margin: 0.5rem 0 0;
-      font-size: 1.8rem;
+    /* ── CONTENT ── */
+    .content section {
+      margin-bottom: 2.5rem;
+      padding: 2rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      transition: border-color 0.3s;
     }
+    .content section:hover { border-color: rgba(196,30,58,0.25); }
 
-    header p {
-      margin: 0;
-      font-size: 1rem;
-      opacity: 0.9;
+    .section-header {
+      display: flex; align-items: flex-start; gap: 1rem;
+      margin-bottom: 1.25rem;
     }
-
-    main {
-      max-width: 900px;
-      margin: 0 auto;
-      /* Removed top margin, now handled by back-btn-wrapper */
-      background: #fff;
-      border-radius: 10px;
-      padding: 2.5rem;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    .section-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--red-glow); border: 1px solid rgba(196,30,58,0.3);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 1.1rem; color: var(--red);
     }
-
-    h2 {
-      color: var(--primary-red);
-      border-bottom: 3px solid var(--accent-orange);
-      padding-bottom: 0.4rem;
+    .section-title {
+      font-family: var(--heading-font);
+      font-size: 1.15rem; font-weight: 700; margin-bottom: 2px;
     }
+    .section-sub { font-size: 0.78rem; color: var(--muted); }
 
-    h3 {
-      color: var(--accent-orange);
-      margin-top: 1.5rem;
+    .content p { color: var(--muted); font-size: 0.93rem; margin-bottom: 0.8rem; }
+    .content p:last-child { margin-bottom: 0; }
+
+    .info-list { list-style: none; }
+    .info-list li {
+      display: flex; gap: 10px; align-items: flex-start;
+      padding: 8px 0; border-bottom: 1px solid var(--border);
+      font-size: 0.9rem; color: var(--muted);
     }
+    .info-list li:last-child { border-bottom: none; }
+    .info-list li i { color: var(--teal); margin-top: 3px; flex-shrink: 0; }
 
-    ul {
-      padding-left: 1.5rem;
+    .highlight-box {
+      background: var(--teal-dim);
+      border: 1px solid rgba(0,201,167,0.2);
+      border-radius: 12px; padding: 1rem 1.25rem;
+      margin: 1rem 0;
     }
+    .highlight-box p { color: rgba(0,201,167,0.9) !important; font-size: 0.88rem !important; }
 
+    .warn-box {
+      background: rgba(245,158,11,0.06);
+      border: 1px solid rgba(245,158,11,0.2);
+      border-radius: 12px; padding: 1rem 1.25rem;
+      margin: 1rem 0;
+    }
+    .warn-box p { color: rgba(245,158,11,0.85) !important; font-size: 0.88rem !important; }
+
+    .rights-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
+      gap: 0.75rem; margin-top: 1rem;
+    }
+    .right-card {
+      padding: 1rem; background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border); border-radius: 12px;
+      text-align: center;
+    }
+    .right-card i { color: var(--teal); font-size: 1.4rem; margin-bottom: 6px; display: block; }
+    .right-card strong { font-family: var(--heading-font); font-size: 0.82rem; display: block; margin-bottom: 3px; }
+    .right-card span { font-size: 0.75rem; color: var(--muted); }
+
+    /* ── FOOTER ── */
     footer {
-      background-color: var(--primary-red);
-      color: #fff;
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      padding: 2.5rem 2rem;
       text-align: center;
-      padding: 1rem 0;
-      margin-top: 3rem;
-      font-size: 0.9rem;
     }
-
-    a {
-      color: var(--accent-orange);
-      text-decoration: none;
+    .footer-brand {
+      font-family: var(--heading-font); font-size: 1.1rem;
+      font-weight: 700; color: var(--text); margin-bottom: 0.5rem;
     }
-
-    a:hover {
-      text-decoration: underline;
+    .footer-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem; margin: 1rem 0; }
+    .footer-links a { color: var(--muted); text-decoration: none; font-size: 0.83rem; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--text); }
+    .footer-compliance {
+      margin-top: 1.5rem;
+      display: flex; justify-content: center; flex-wrap: wrap; gap: 8px;
     }
+    .footer-copy { color: var(--muted); font-size: 0.78rem; margin-top: 1.5rem; }
 
-    @media (max-width: 600px) {
-      .back-btn-wrapper {
-        padding: 0 1.5rem;
-      }
-
-      main {
-        margin: 1rem;
-        padding: 1.5rem;
-      }
-
-      header h1 {
-        font-size: 1.5rem;
-      }
-    }
+    /* scroll animations */
+    .reveal { opacity:0; transform:translateY(20px); transition: opacity 0.5s, transform 0.5s; }
+    .reveal.visible { opacity:1; transform:none; }
   </style>
 </head>
-
 <body>
-  <header>
-    <img src="/raktport-logo.jpg" alt="RaktPort Logo" width="80">
-    <h1>RaktPort</h1>
-    <p>Donate Blood Anywhere. Save Lives Everywhere.</p>
-  </header>
 
-  <div class="back-btn-wrapper">
-    <a href="javascript:history.back()" class="back-btn" title="Go Back">
-      <i class="fa-solid fa-arrow-left"></i> Back
-    </a>
+<!-- NAV -->
+<nav>
+  <a href="/" class="nav-brand">
+    <img src="/RaktPort-logo.jpg" alt="RaktPort Logo" style="width: 32px; height: 32px; border-radius: 8px; object-fit: cover;">
+    RaktPort
+  </a>
+  <ul class="nav-links">
+    <li><a href="about.html">About</a></li>
+    <li><a href="our-mission.html">Mission</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <a href="javascript:history.back()" class="nav-back">
+    <i class="fa-solid fa-arrow-left"></i> Back
+  </a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="compliance-strip">
+    <span class="badge badge-teal"><i class="fa-solid fa-shield-halved"></i> DPDP Act 2023 Compliant</span>
+    <span class="badge badge-amber"><i class="fa-solid fa-file-shield"></i> ABDM Aligned</span>
+    <span class="badge badge-red"><i class="fa-solid fa-lock"></i> AES-256 Encrypted</span>
+    <span class="badge badge-teal"><i class="fa-solid fa-certificate"></i> ISO 13485 Aware</span>
   </div>
+  <h1>Privacy <span>Policy</span></h1>
+  <div class="hero-meta">
+    <span><i class="fa-regular fa-calendar"></i> Effective: 8 November 2025</span>
+    <span><i class="fa-regular fa-rotate"></i> Last Updated: April 2026</span>
+    <span><i class="fa-solid fa-gavel"></i> Jurisdiction: India (Delhi)</span>
+  </div>
+</div>
 
-  <main>
-    <h2>Privacy Policy</h2>
-    <p><strong>Effective Date:</strong> 8th Nov,2025 <br><strong>Last Updated:</strong> 8th Nov, 2025</p>
+<!-- PAGE BODY -->
+<div class="page-wrap">
 
-    <p>At <strong>RaktPort</strong>, your privacy and trust are our top priorities. This Privacy Policy explains how we
-      collect, use, and protect your information while using our website and mobile app.</p>
-
-    <h3>1. Information We Collect</h3>
-    <p>We collect data to improve service efficiency and donor–hospital connectivity.</p>
-    <ul>
-      <li><strong>Personal Info:</strong> Name, Age, Gender, Blood Group, Contact Details, Location.</li>
-      <li><strong>Technical Info:</strong> Device type, IP address, usage logs.</li>
+  <!-- TOC -->
+  <aside class="toc">
+    <div class="toc-title">Contents</div>
+    <ul class="toc-list">
+      <li><a href="#s1"><span class="toc-dot"></span>Scope & Applicability</a></li>
+      <li><a href="#s2"><span class="toc-dot"></span>Data We Collect</a></li>
+      <li><a href="#s3"><span class="toc-dot"></span>Legal Basis (DPDP)</a></li>
+      <li><a href="#s4"><span class="toc-dot"></span>ABHA & Health Data</a></li>
+      <li><a href="#s5"><span class="toc-dot"></span>Data Processing</a></li>
+      <li><a href="#s6"><span class="toc-dot"></span>Your Rights</a></li>
+      <li><a href="#s7"><span class="toc-dot"></span>Data Security</a></li>
+      <li><a href="#s8"><span class="toc-dot"></span>Retention</a></li>
+      <li><a href="#s9"><span class="toc-dot"></span>Third Parties</a></li>
+      <li><a href="#s10"><span class="toc-dot"></span>Cookies</a></li>
+      <li><a href="#s11"><span class="toc-dot"></span>Children</a></li>
+      <li><a href="#s12"><span class="toc-dot"></span>Grievance Officer</a></li>
     </ul>
+  </aside>
 
-    <h3>2. Purpose of Data Collection</h3>
-    <ul>
-      <li>To match donors and hospitals efficiently.</li>
-      <li>To send alerts and improve user experience.</li>
-      <li>To enhance security and prevent misuse.</li>
-    </ul>
+  <!-- MAIN CONTENT -->
+  <main class="content">
 
-    <h3>3. Data Sharing</h3>
-    <p>We only share necessary data with verified hospitals/blood banks or when legally required. No user data is sold
-      or rented.</p>
+    <section id="s1" class="reveal">
+      <div class="section-header">
+        <div class="section-icon"><i class="fa-solid fa-file-contract"></i></div>
+        <div>
+          <div class="section-title">Scope & Applicability</div>
+          <div class="section-sub">Who this policy covers and how it applies</div>
+        </div>
+      </div>
+      <p>This Privacy Policy governs the collection, processing, storage, and disclosure of personal data by <strong>RaktPort</strong> (hereinafter "Platform," "we," "us," or "our") — operated under applicable Indian law, principally the <strong>Digital Personal Data Protection (DPDP) Act, 2023</strong> and rules notified thereunder.</p>
+      <p>This Policy applies to all users accessing RaktPort via web, mobile, or API — including voluntary donors, registered hospitals, blood banks, and administrative personnel.</p>
+      <div class="highlight-box">
+        <p><i class="fa-solid fa-circle-info" style="margin-right:6px"></i><strong>Data Fiduciary:</strong> RaktPort acts as a <em>Data Fiduciary</em> under the DPDP Act 2023 and is responsible for determining the purposes and means of processing your personal data.</p>
+      </div>
+      <p>By registering or using our services, you acknowledge having read and understood this Policy and provide informed, free, specific, and unambiguous consent to process your personal data as described herein.</p>
+    </section>
 
-    <h3>4. Data Storage and Security</h3>
-    <p>All data is encrypted and securely stored in compliant cloud servers. Access is limited to authorized personnel
-      only.</p>
+    <section id="s2" class="reveal">
+      <div class="section-header">
+        <div class="section-icon"><i class="fa-solid fa-database"></i></div>
+        <div>
+          <div class="section-title">Data We Collect</div>
+          <div class="section-sub">Categories of personal data processed by RaktPort</div>
+        </div>
+      </div>
+      <ul class="info-list">
+        <li><i class="fa-solid fa-circle-check"></i><div><strong>Identity Data:</strong> Full name, date of birth, gender, government-issued ID (Aadhaar, Voter ID, Passport), ABHA Health ID.</div></li>
+        <li><i class="fa-solid fa-circle-check"></i><div><strong>Health & Medical Data:</strong> Blood group, haemoglobin levels, donation history, eligibility status, last donation date. This constitutes <em>Sensitive Personal Data</em> under DPDP Act.</div></li>
+        <li><i class="fa-solid fa-circle-check"></i><div><strong>Contact Data:</strong> Mobile number, email address, residential address, city/district/pincode.</div></li>
+        <li><i class="fa-solid fa-circle-check"></i><div><strong>Institutional Data (Hospitals/Blood Banks):</strong> Organisation name, CDSCO licence number, NHA registration, authorised personnel details.</div></li>
+        <li><i class="fa-solid fa-circle-check"></i><div><strong>Technical Data:</strong> Device identifiers, IP address, browser type, OS, session logs, access timestamps — processed for security and fraud prevention.</div></li>
+        <li><i class="fa-solid fa-circle-check"></i><div><strong>Transaction Data:</strong> Donation records, requisition IDs (RTIDs), transfusion tracking events, appointment logs.</div></li>
+      </ul>
+      <div class="warn-box">
+        <p><i class="fa-solid fa-triangle-exclamation" style="margin-right:6px"></i><strong>No unnecessary collection:</strong> We adhere to the data minimisation principle. Only data necessary for our stated purposes is collected.</p>
+      </div>
+    </section>
 
-    <h3>5. Your Rights</h3>
-    <ul>
-      <li>Access, correct, or delete your personal data.</li>
-      <li>Withdraw consent for data use at any time.</li>
-    </ul>
+    <section id="s3" class="reveal">
+      <div class="section-header">
+        <div class="section-icon"><i class="fa-solid fa-gavel"></i></div>
+        <div>
+          <div class="section-title">Legal Basis for Processing (DPDP Act 2023)</div>
+          <div class="section-sub">Why we are lawfully permitted to process your data</div>
+        </div>
+      </div>
+      <ul class="info-list">
+        <li><i class="fa-solid fa-check-circle"></i><div><strong>Consent (S.6 DPDP):</strong> For all non-essential data processing, we obtain your explicit, informed, and withdrawable consent via a layered notice mechanism at registration and at each material data-use event.</div></li>
+        <li><i class="fa-solid fa-check-circle"></i><div><strong>Legitimate Use (S.7 DPDP):</strong> Processing required to fulfil a service you explicitly requested — including matching donors to urgent hospital requisitions — constitutes a legitimate use under the Act.</div></li>
+        <li><i class="fa-solid fa-check-circle"></i><div><strong>Medical Emergency (S.7(e) DPDP):</strong> In life-threatening situations, contact and blood-group data may be shared with verified hospitals without prior consent, consistent with the Act's emergency exemptions.</div></li>
+        <li><i class="fa-solid fa-check-circle"></i><div><strong>Legal Obligation:</strong> We may process and retain data to comply with orders from courts, regulators, CERT-In, or other competent authorities under Indian law.</div></li>
+      </ul>
+    </section>
 
-    <h3>6. Cookies</h3>
-    <p>We use cookies for analytics. You may disable them in your browser settings.</p>
+    <section id="s4" class="reveal">
+      <div class="section-header">
+        <div class="section-icon"><i class="fa-solid fa-hospital-user"></i></div>
+        <div>
+          <div class="section-title">ABHA & Health Record Data</div>
+          <div class="section-sub">Handling of Ayushman Bharat Health Account data</div>
+        </div>
+      </div>
+      <p>RaktPort integrates with the <strong>Ayushman Bharat Digital Mission (ABDM)</strong> Health Information Exchange framework. Linking your ABHA ID to RaktPort is <em>voluntary</em> and enables interoperability with your national health records.</p>
+      <div class="highlight-box">
+        <p><i class="fa-solid fa-shield-halved" style="margin-right:6px"></i>All Health Information (HI) exchange via ABDM infrastructure uses purpose-limited, time-bound consent artefacts governed by the <strong>ABDM Consent Manager Framework (HIE-CM)</strong>. No health data leaves the ABDM ecosystem without your explicit consent artefact.</p>
+      </div>
+      <ul class="info-list">
+        <li><i class="fa-solid fa-circle-check"></i><div>Donation records may be pushed to your ABHA-linked Personal Health Record (PHR) if you opt in.</div></li>
+        <li><i class="fa-solid fa-circle-check"></i><div>ABHA IDs are stored encrypted; no plain-text ABHA numbers appear in logs.</div></li>
+        <li><i class="fa-solid fa-circle-check"></i><div>You may de-link your ABHA ID at any time without losing your RaktPort donor history.</div></li>
+      </ul>
+    </section>
 
-    <h3>7. Children’s Privacy</h3>
-    <p>Users below 18 years are not permitted to register. If detected, their data will be deleted immediately.</p>
+    <section id="s5" class="reveal">
+      <div class="section-header">
+        <div class="section-icon"><i class="fa-solid fa-cogs"></i></div>
+        <div>
+          <div class="section-title">How We Use Your Data</div>
+          <div class="section-sub">Specific, documented purposes of data processing</div>
+        </div>
+      </div>
+      <ul class="info-list">
+        <li><i class="fa-solid fa-droplet" style="color:var(--red)"></i><div>Match verified donors to urgent hospital blood requisitions in real-time.</div></li>
+        <li><i class="fa-solid fa-bell"></i><div>Send emergency blood need alerts, appointment reminders, and eligibility countdowns via SMS/email.</div></li>
+        <li><i class="fa-solid fa-chart-line"></i><div>Generate anonymised aggregate analytics (national blood inventory insights) for public health planning — no individual is identifiable.</div></li>
+        <li><i class="fa-solid fa-shield-virus"></i><div>Fraud prevention: cross-verify donation intervals, detect duplicate accounts, and investigate misuse of RTID codes.</div></li>
+        <li><i class="fa-solid fa-file-medical"></i><div>Maintain an auditable IEC 62304 / ISO 13485-compliant software lifecycle record — no additional personal data is collected for this purpose.</div></li>
+        <li><i class="fa-solid fa-envelope"></i><div>Respond to your support queries and grievances within the statutory timelines.</div></li>
+      </ul>
+      <p style="margin-top:1rem">We will <strong>never</strong> use your data for advertising profiling, sale to third parties, or any purpose not listed above without obtaining fresh, specific consent.</p>
+    </section>
 
-    <h3>8. Data Retention</h3>
-    <p>Data is retained only for as long as necessary to fulfill service purposes or legal obligations.</p>
+    <section id="s6" class="reveal">
+      <div class="section-header">
+        <div class="section-icon"><i class="fa-solid fa-user-shield"></i></div>
+        <div>
+          <div class="section-title">Your Rights as a Data Principal</div>
+          <div class="section-sub">Rights guaranteed under the DPDP Act 2023 (Chapter III)</div>
+        </div>
+      </div>
+      <div class="rights-grid">
+        <div class="right-card">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <strong>Right to Access</strong>
+          <span>Request a summary of personal data we process about you</span>
+        </div>
+        <div class="right-card">
+          <i class="fa-solid fa-pen-to-square"></i>
+          <strong>Right to Correction</strong>
+          <span>Correct inaccurate or incomplete data at any time</span>
+        </div>
+        <div class="right-card">
+          <i class="fa-solid fa-trash-can"></i>
+          <strong>Right to Erasure</strong>
+          <span>Request deletion of data no longer needed for the original purpose</span>
+        </div>
+        <div class="right-card">
+          <i class="fa-solid fa-hand"></i>
+          <strong>Right to Withdraw</strong>
+          <span>Withdraw consent; we cease processing within 72 hours</span>
+        </div>
+        <div class="right-card">
+          <i class="fa-solid fa-user-slash"></i>
+          <strong>Right to Nominate</strong>
+          <span>Nominate a person to exercise your rights in case of death/incapacity</span>
+        </div>
+        <div class="right-card">
+          <i class="fa-solid fa-balance-scale"></i>
+          <strong>Right to Grieve</strong>
+          <span>File complaints with our Grievance Officer or the Data Protection Board</span>
+        </div>
+      </div>
+      <p style="margin-top:1rem">Submit requests to: <a href="mailto:privacy@raktport.in" style="color:var(--teal)">privacy@raktport.in</a> — response within <strong>30 days</strong> per DPDP Act timelines.</p>
+    </section>
 
-    <h3>9. Updates</h3>
-    <p>We may update this policy periodically. You’ll be notified of major changes via app or email.</p>
+    <section id="s7" class="reveal">
+      <div class="section-header">
+        <div class="section-icon"><i class="fa-solid fa-lock"></i></div>
+        <div>
+          <div class="section-title">Data Security & Cybersecurity Framework</div>
+          <div class="section-sub">Technical and organisational measures protecting your data</div>
+        </div>
+      </div>
+      <ul class="info-list">
+        <li><i class="fa-solid fa-circle-check"></i><div><strong>Encryption at Rest:</strong> All sensitive fields (health data, Aadhaar references, ABHA IDs) are encrypted using AES-256-GCM.</div></li>
+        <li><i class="fa-solid fa-circle-check"></i><div><strong>Encryption in Transit:</strong> TLS 1.3 enforced on all endpoints; HSTS headers enabled; certificate pinning on mobile clients.</div></li>
+        <li><i class="fa-solid fa-circle-check"></i><div><strong>Access Control:</strong> Role-based access control (RBAC) with least-privilege principle; MFA enforced for all administrative accounts.</div></li>
+        <li><i class="fa-solid fa-circle-check"></i><div><strong>Penetration Testing:</strong> Documented third-party VAPT conducted at least annually; findings tracked to closure per OWASP guidelines.</div></li>
+        <li><i class="fa-solid fa-circle-check"></i><div><strong>Ransomware Protection:</strong> Immutable off-site backups, anomaly-based detection, incident response plan tested bi-annually.</div></li>
+        <li><i class="fa-solid fa-circle-check"></i><div><strong>CERT-In Compliance:</strong> Cyber incidents reported to CERT-In within 6 hours per the 2022 directive; affected Data Principals notified without undue delay.</div></li>
+        <li><i class="fa-solid fa-circle-check"></i><div><strong>Audit Logging:</strong> Tamper-evident audit trails retained for 5 years per IEC 62304 software lifecycle documentation requirements.</div></li>
+      </ul>
+    </section>
 
-    <h3>10. Contact Us</h3>
-    <p>For any privacy concerns, contact:
-      📧 <a href="mailto:contact.raktsetu@gmail.com
-">contact.raktsetu@gmail.com
-      </a>
-      <br>📞 +91-XXXXXXXXXX
-    </p>
+    <section id="s8" class="reveal">
+      <div class="section-header">
+        <div class="section-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+        <div>
+          <div class="section-title">Data Retention</div>
+          <div class="section-sub">How long we keep different categories of data</div>
+        </div>
+      </div>
+      <ul class="info-list">
+        <li><i class="fa-solid fa-calendar"></i><div><strong>Active donor records:</strong> Retained for the duration of your active account plus 7 years (medical record retention standard, MCI guidelines).</div></li>
+        <li><i class="fa-solid fa-calendar"></i><div><strong>Donation transactions / RTIDs:</strong> Retained for 10 years per blood bank regulatory requirements (CDSCO, Drugs & Cosmetics Act).</div></li>
+        <li><i class="fa-solid fa-calendar"></i><div><strong>Consent records:</strong> Retained for the lifetime of the account and 3 years post-deletion to demonstrate regulatory compliance.</div></li>
+        <li><i class="fa-solid fa-calendar"></i><div><strong>Technical/log data:</strong> Rolling 180-day retention; anonymised aggregate statistics may be kept indefinitely.</div></li>
+        <li><i class="fa-solid fa-calendar"></i><div><strong>Deleted accounts:</strong> Personal data is purged within 30 days of deletion request, subject to legal hold obligations.</div></li>
+      </ul>
+    </section>
+
+    <section id="s9" class="reveal">
+      <div class="section-header">
+        <div class="section-icon"><i class="fa-solid fa-handshake"></i></div>
+        <div>
+          <div class="section-title">Third-Party Disclosures</div>
+          <div class="section-sub">When and with whom we share your data</div>
+        </div>
+      </div>
+      <p>We do <strong>not</strong> sell, rent, or trade personal data. Disclosure occurs only in the following documented circumstances:</p>
+      <ul class="info-list">
+        <li><i class="fa-solid fa-hospital"></i><div><strong>Verified Hospitals & Blood Banks:</strong> Minimum necessary donor contact + blood-group data shared only upon matched, time-bound requisition with documented consent.</div></li>
+        <li><i class="fa-solid fa-cloud"></i><div><strong>Cloud & Infrastructure:</strong> Data stored on NHA-empanelled cloud providers operating ISO 27001-certified data centres within India (data residency maintained).</div></li>
+        <li><i class="fa-solid fa-envelope"></i><div><strong>Communication Providers:</strong> Mobile/email OTP and alert delivery through TRAI-registered transactional SMS gateways and email services under data processing agreements.</div></li>
+        <li><i class="fa-solid fa-landmark"></i><div><strong>Government & Regulators:</strong> Disclosed only when legally compelled by a valid court order, CERT-In directive, or regulatory authority — and notified to you where legally permissible.</div></li>
+      </ul>
+      <p>All third parties are bound by Data Processing Agreements (DPAs) requiring DPDP Act compliance and prohibiting further disclosure.</p>
+    </section>
+
+    <section id="s10" class="reveal">
+      <div class="section-header">
+        <div class="section-icon"><i class="fa-solid fa-cookie-bite"></i></div>
+        <div>
+          <div class="section-title">Cookies & Tracking</div>
+          <div class="section-sub">How we use cookies and your controls</div>
+        </div>
+      </div>
+      <ul class="info-list">
+        <li><i class="fa-solid fa-circle-check"></i><div><strong>Strictly Necessary:</strong> Session tokens, CSRF tokens — cannot be disabled without breaking functionality.</div></li>
+        <li><i class="fa-solid fa-circle-check"></i><div><strong>Analytics (opt-in):</strong> Anonymised usage metrics via privacy-respecting analytics. Disabled by default; enabled only with your explicit consent.</div></li>
+        <li><i class="fa-solid fa-circle-check"></i><div><strong>No third-party advertising trackers</strong> — we do not use Google Ads, Meta Pixel, or similar commercial tracking tools.</div></li>
+      </ul>
+    </section>
+
+    <section id="s11" class="reveal">
+      <div class="section-header">
+        <div class="section-icon"><i class="fa-solid fa-child"></i></div>
+        <div>
+          <div class="section-title">Children's Privacy</div>
+          <div class="section-sub">Protection of minors under 18</div>
+        </div>
+      </div>
+      <p>RaktPort is strictly not intended for use by persons under 18 years of age. We do not knowingly collect data from minors. Blood donation eligibility begins at age 18 per Indian law.</p>
+      <div class="warn-box">
+        <p><i class="fa-solid fa-triangle-exclamation" style="margin-right:6px"></i>If we identify that a minor has registered, all associated data will be permanently deleted within 48 hours and, if required, reported to relevant authorities per DPDP Act provisions on child data protection.</p>
+      </div>
+    </section>
+
+    <section id="s12" class="reveal">
+      <div class="section-header">
+        <div class="section-icon"><i class="fa-solid fa-headset"></i></div>
+        <div>
+          <div class="section-title">Grievance Officer & Data Protection Contact</div>
+          <div class="section-sub">Escalation path per DPDP Act Section 13</div>
+        </div>
+      </div>
+      <p>In accordance with the DPDP Act 2023, we have designated a <strong>Grievance Officer</strong> to address privacy concerns:</p>
+      <ul class="info-list">
+        <li><i class="fa-solid fa-user-tie"></i><div><strong>Grievance Officer:</strong> Ajay Kushwaha, Founder — RaktPort<br><a href="mailto:privacy@raktport.in" style="color:var(--teal)">privacy@raktport.in</a></div></li>
+        <li><i class="fa-solid fa-clock"></i><div><strong>Response Time:</strong> Acknowledgement within 48 hours; full resolution within 30 days of receipt.</div></li>
+        <li><i class="fa-solid fa-landmark"></i><div><strong>Escalation:</strong> If unsatisfied, you may approach the <strong>Data Protection Board of India</strong> once constituted, as provided under Section 18 of the DPDP Act.</div></li>
+        <li><i class="fa-solid fa-location-dot"></i><div><strong>Registered Address:</strong> RaktPort, New Delhi, India — 110001</div></li>
+      </ul>
+      <div class="highlight-box">
+        <p><i class="fa-solid fa-circle-info" style="margin-right:6px"></i>We may update this Privacy Policy to reflect changes in law, technology, or our services. Material changes will be communicated via in-app notice and email at least 15 days before they take effect.</p>
+      </div>
+    </section>
+
   </main>
+</div>
 
-  <footer>
-    &copy; 2025 RaktPort. All Rights Reserved. | <a href="terms.html">Terms & Conditions</a>
-  </footer>
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">RaktPort</div>
+  <p style="color:var(--muted);font-size:0.83rem">Donate Blood Anywhere. Save Lives Everywhere.</p>
+  <div class="footer-links">
+    <a href="about.html">About</a>
+    <a href="our-mission.html">Our Mission</a>
+    <a href="terms.html">Terms</a>
+    <a href="contact.html">Contact</a>
+    <a href="blood-guidelines.html">Guidelines</a>
+  </div>
+  <div class="footer-compliance">
+    <span class="badge badge-teal"><i class="fa-solid fa-shield-halved"></i> DPDP Act 2023</span>
+    <span class="badge badge-amber"><i class="fa-solid fa-hospital"></i> ABDM Compliant</span>
+    <span class="badge badge-red"><i class="fa-solid fa-lock"></i> IEC 62304</span>
+    <span class="badge badge-teal"><i class="fa-solid fa-certificate"></i> ISO 13485 Aware</span>
+  </div>
+  <p class="footer-copy">© 2025–2026 RaktPort. All rights reserved. Built by Ajay Kushwaha.</p>
+</footer>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Active TOC
+  const sections = document.querySelectorAll('.content section');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting) {
+        tocLinks.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.toc-list a[href="#${e.target.id}"]`);
+        if(active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  sections.forEach(s => io.observe(s));
+</script>
 </body>
-
 </html>

@@ -51,17 +51,17 @@ const R_RTID_STEPS = ['Requested', 'Processing', 'Matched', 'Verified', 'Issued'
 const DB_KEY = 'rp_emergency_requests';
 
 /* ─── Utils ─── */
-function genRTID(t: 'D' | 'H' = 'H') {
+function genRTID(t: 'D' | 'RH' | 'RU' | 'H' = 'RU') {
   const n = new Date(), dd = String(n.getDate()).padStart(2, '0'), mm = String(n.getMonth() + 1).padStart(2, '0'), yy = String(n.getFullYear()).slice(2);
   const a = 'ABCDEFGHJKLMNPQRSTUVWXYZ', al = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let c = a[Math.floor(Math.random() * a.length)];
   for (let i = 0; i < 4; i++)c += al[Math.floor(Math.random() * al.length)];
   return `${t}-RTID-${dd}${mm}${yy}-${c}`;
 }
-function isValidRTID(s: string) { return /^[DH]-RTID-\d{6}-[A-Z0-9]{5}$/i.test(s.trim()); }
+function isValidRTID(s: string) { return /^(D|RH|RU|H)-RTID-\d{6}-[A-Z0-9]{5}$/i.test(s.trim()); }
 async function submitDB(data: Omit<EmergencyRecord, 'rtid' | 'timestamp' | 'status'>): Promise<string> {
   await new Promise(r => setTimeout(r, 1400));
-  const rtid = genRTID('H'), record: EmergencyRecord = { ...data, rtid, timestamp: new Date().toISOString(), status: 'Active' };
+  const rtid = genRTID('RU'), record: EmergencyRecord = { ...data, rtid, timestamp: new Date().toISOString(), status: 'Active' };
   try { const ex: EmergencyRecord[] = JSON.parse(localStorage.getItem(DB_KEY) || '[]'); ex.push(record); localStorage.setItem(DB_KEY, JSON.stringify(ex)); } catch { }
   return rtid;
 }
@@ -210,7 +210,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
   const track = async () => {
     const v = rtidIn.trim().toUpperCase();
     if (!v) { setRtidErr('Please enter an RTID.'); return; }
-    if (!isValidRTID(v)) { setRtidErr('Format: D/R-RTID-DDMMYY-AXXXX  e.g. D-RTID-060426-A4F7K'); return; }
+    if (!isValidRTID(v)) { setRtidErr('Format: D/RH/RU-RTID-DDMMYY-AXXXX  e.g. D-RTID-060426-A4F7K'); return; }
     setRtidErr(''); setRtidRes(null); setRtidLoading(true);
 
     try {
@@ -563,7 +563,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
               <div className="lp-rtl-left"><NetworkSVG /></div>
               <div className="lp-rtbox">
                 <p className="lp-rthdr"><Activity size={13} /> Live RTID Tracker</p>
-                <p className="lp-rtfmt">Format: <code>D/R-RTID-DDMMYY-AXXXX</code></p>
+                <p className="lp-rtfmt">Format: <code>D/RH/RU-RTID-DDMMYY-AXXXX</code></p>
                 <div className="lp-rtrow">
                   <input className="lp-rtin" placeholder="e.g. D-RTID-060426-A4F7K" value={rtidIn}
                     onChange={e => { setRtidIn(e.target.value); setRtidRes(null); setRtidErr(''); }} onKeyDown={e => e.key === 'Enter' && track()} />

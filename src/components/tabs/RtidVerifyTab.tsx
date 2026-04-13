@@ -12,7 +12,7 @@ interface RtidVerifyTabProps {
 }
 
 export const RtidVerifyTab = ({ onVerifyRtid }: RtidVerifyTabProps) => {
-  const [rtidType, setRtidType] = useState<'D-RTID' | 'R-RTID'>('R-RTID');
+  const [rtidType, setRtidType] = useState<'D-RTID' | 'RH/RU-RTID'>('RH/RU-RTID');
   const [rtidValue, setRtidValue] = useState('');
   const [isScanning, setIsScanning] = useState(false);
 
@@ -36,7 +36,7 @@ export const RtidVerifyTab = ({ onVerifyRtid }: RtidVerifyTabProps) => {
     setTimeout(() => {
       setIsScanning(false);
       toast.success("QR Code scanned successfully");
-      // Example: setRtidValue("R-RTID-26012026-A1234");
+      // Example: setRtidValue("RH-RTID-26012026-A1234");
     }, 2000);
   };
 
@@ -62,16 +62,16 @@ export const RtidVerifyTab = ({ onVerifyRtid }: RtidVerifyTabProps) => {
             <Label htmlFor="rtidType" className="text-base font-semibold">
               Select RTID Type
             </Label>
-            <Select value={rtidType} onValueChange={(val) => setRtidType(val as 'D-RTID' | 'R-RTID')}>
+            <Select value={rtidType} onValueChange={(val) => setRtidType(val as 'D-RTID' | 'RH/RU-RTID')}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="R-RTID">
+                <SelectItem value="RH/RU-RTID">
                   <div className="flex items-center gap-2">
                     <span className="text-lg">🏥</span>
                     <div>
-                      <div className="font-semibold">R-RTID</div>
+                      <div className="font-semibold">RH/RU-RTID</div>
                       <div className="text-xs text-muted-foreground">Hospital Blood Request</div>
                     </div>
                   </div>
@@ -130,7 +130,7 @@ export const RtidVerifyTab = ({ onVerifyRtid }: RtidVerifyTabProps) => {
               <span>Verification Info</span>
             </h4>
             <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
-              <li>• <strong>R-RTID:</strong> Verifies hospital blood requests and shows patient details</li>
+              <li>• <strong>RH/RU-RTID:</strong> Verifies hospital and user blood requests and shows patient details</li>
               <li>• <strong>D-RTID:</strong> Verifies donor credits and shows donation status</li>
               <li>• System will validate RTID and display complete details</li>
             </ul>

@@ -5,185 +5,976 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RaktPort | About Us</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Figtree:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
-      --primary-red: #8b0000;
-      --accent-orange: #f4a261;
-      --light-cream: #fdf3e7;
-      --text-dark: #2b2b2b;
+      --bg: #06091A;
+      --surface: #0D1228;
+      --card: rgba(255, 255, 255, 0.04);
+      --border: rgba(255, 255, 255, 0.07);
+      --red: #C41E3A;
+      --red-glow: rgba(196, 30, 58, 0.25);
+      --teal: #00C9A7;
+      --teal-dim: rgba(0, 201, 167, 0.12);
+      --amber: #F59E0B;
+      --amber-dim: rgba(245, 158, 11, 0.08);
+      --text: #E8EDF7;
+      --muted: #7D8BA3;
+      --heading-font: 'Sora', sans-serif;
+      --body-font: 'Figtree', sans-serif;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
     }
 
     body {
-      font-family: "Poppins", Arial, sans-serif;
-      background-color: var(--light-cream);
-      margin: 0;
-      padding: 0;
-      color: var(--text-dark);
+      font-family: var(--body-font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: linear-gradient(rgba(196, 30, 58, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(196, 30, 58, 0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(6, 9, 26, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--heading-font);
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    .nav-back {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 20px;
+      transition: all 0.2s;
+    }
+
+    .nav-back:hover {
+      color: var(--text);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      border: 1px solid;
+    }
+
+    .badge-teal {
+      background: var(--teal-dim);
+      border-color: rgba(0, 201, 167, 0.3);
+      color: var(--teal);
+    }
+
+    .badge-red {
+      background: rgba(196, 30, 58, 0.1);
+      border-color: rgba(196, 30, 58, 0.3);
+      color: #FF6B6B;
+    }
+
+    .badge-amber {
+      background: var(--amber-dim);
+      border-color: rgba(245, 158, 11, 0.25);
+      color: var(--amber);
+    }
+
+    /* HERO */
+    .hero {
+      position: relative;
+      z-index: 1;
+      padding: 6rem 2rem 5rem;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .hero-glow {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 300px;
+      background: radial-gradient(ellipse, rgba(196, 30, 58, 0.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-eyebrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .eyebrow-line {
+      height: 1px;
+      width: 40px;
+      background: var(--red);
+    }
+
+    .eyebrow-text {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--red);
+    }
+
+    .hero h1 {
+      font-family: var(--heading-font);
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.25rem;
+    }
+
+    .hero h1 .line2 {
+      color: var(--red);
+    }
+
+    .hero-desc {
+      max-width: 640px;
+      margin: 0 auto 2rem;
+      color: var(--muted);
+      font-size: 1.05rem;
       line-height: 1.7;
     }
 
-    /* UPDATED STYLES FOR BACK BUTTON WRAPPER */
-    .back-btn-wrapper {
-      max-width: 950px;
-      margin: 1rem auto 0.5rem;
-      /* Aligns with main container and adds spacing */
-      padding: 0 2.5rem;
-      /* Matches main's padding */
+    .hero-cta {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
-    .back-btn {
+    /* STATS */
+    .stats-bar {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .stats-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 1.5rem 2rem;
+    }
+
+    @media(max-width:700px) {
+      .stats-inner {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 1rem;
+      border-right: 1px solid var(--border);
+    }
+
+    .stat-item:last-child {
+      border-right: none;
+    }
+
+    .stat-number {
+      font-family: var(--heading-font);
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .stat-number span {
+      color: var(--red);
+    }
+
+    .stat-label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* MAIN CONTENT */
+    .content-wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 4rem 2rem 5rem;
+    }
+
+    /* SECTION HEADING */
+    .section-heading {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .section-heading h2 {
+      font-family: var(--heading-font);
+      font-size: 1.9rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-heading p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* WHO WE ARE */
+    .intro-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 5rem;
+    }
+
+    @media(max-width:720px) {
+      .intro-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .intro-text h2 {
+      font-family: var(--heading-font);
+      font-size: 1.7rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .intro-text h2 span {
+      color: var(--red);
+    }
+
+    .intro-text p {
+      color: var(--muted);
+      font-size: 0.93rem;
+      margin-bottom: 1rem;
+    }
+
+    .intro-image {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 260px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .intro-image::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 60% 40%, rgba(196, 30, 58, 0.15), transparent 70%);
+    }
+
+    .intro-img-inner {
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .big-icon {
+      font-size: 5rem;
+      color: var(--red);
+      margin-bottom: 1rem;
+      filter: drop-shadow(0 0 20px var(--red-glow));
+    }
+
+    .intro-img-inner p {
+      color: var(--muted);
+      font-size: 0.85rem;
+      max-width: 220px;
+      margin: 0 auto;
+    }
+
+    /* WHAT WE DO */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      margin-bottom: 5rem;
+    }
+
+    @media(max-width:900px) {
+      .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media(max-width:560px) {
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 1.75rem;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--red), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .feature-card:hover {
+      border-color: rgba(196, 30, 58, 0.3);
+      transform: translateY(-3px);
+    }
+
+    .feature-card:hover::before {
+      opacity: 1;
+    }
+
+    .feature-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+    }
+
+    .feature-icon.red {
+      background: var(--red-glow);
+      border: 1px solid rgba(196, 30, 58, 0.3);
+      color: var(--red);
+    }
+
+    .feature-icon.teal {
+      background: var(--teal-dim);
+      border: 1px solid rgba(0, 201, 167, 0.3);
+      color: var(--teal);
+    }
+
+    .feature-icon.amber {
+      background: var(--amber-dim);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      color: var(--amber);
+    }
+
+    .feature-card h3 {
+      font-family: var(--heading-font);
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .feature-card p {
+      color: var(--muted);
+      font-size: 0.85rem;
+      line-height: 1.65;
+    }
+
+    /* COMPLIANCE */
+    .compliance-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
+      margin-bottom: 5rem;
+    }
+
+    @media(max-width:720px) {
+      .compliance-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .compliance-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 1.75rem;
+      display: flex;
+      gap: 1rem;
+      transition: border-color 0.3s;
+    }
+
+    .compliance-card:hover {
+      border-color: rgba(0, 201, 167, 0.3);
+    }
+
+    .comp-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+      background: var(--teal-dim);
+      border: 1px solid rgba(0, 201, 167, 0.25);
+      color: var(--teal);
+    }
+
+    .comp-body h3 {
+      font-family: var(--heading-font);
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .comp-body .comp-tag {
+      font-size: 0.7rem;
+      color: var(--teal);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .comp-body p {
+      color: var(--muted);
+      font-size: 0.83rem;
+      line-height: 1.6;
+    }
+
+    .comp-body.mandatory .comp-tag {
+      color: var(--red);
+    }
+
+    /* TECH STACK */
+    .tech-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 1rem;
+    }
+
+    .tech-chip {
       display: inline-flex;
       align-items: center;
-      background: #fff;
-      color: var(--primary-red);
-      border: 1px solid #ccc;
-      padding: 8px 12px;
+      gap: 6px;
+      padding: 6px 14px;
+      background: var(--card);
+      border: 1px solid var(--border);
       border-radius: 8px;
-      text-decoration: none;
-      font-weight: 600;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      transition: background 0.2s;
-      font-size: 0.9rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 500;
     }
 
-    .back-btn:hover {
-      background: var(--light-cream);
+    .tech-chip i {
+      color: var(--red);
+      font-size: 0.75rem;
     }
 
-    .back-btn i {
-      margin-right: 6px;
+    /* TEAM */
+    .founder-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2rem;
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
     }
 
-    /* END UPDATED STYLES */
-
-    header {
-      background-color: var(--primary-red);
-      color: #fff;
-      text-align: center;
-      padding: 2rem 1rem;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    @media(max-width:560px) {
+      .founder-card {
+        flex-direction: column;
+        text-align: center;
+      }
     }
 
-    header img {
+    .founder-avatar {
+      width: 80px;
       height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--red), #8B0000);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: #fff;
+      flex-shrink: 0;
+      font-family: var(--heading-font);
+      font-weight: 700;
     }
 
-    header h1 {
-      margin: 0.5rem 0 0;
-      font-size: 1.8rem;
+    .founder-info h3 {
+      font-family: var(--heading-font);
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 4px;
     }
 
-    main {
-      max-width: 950px;
-      margin: 0 auto;
-      /* Removed top margin, now handled by back-btn-wrapper */
-      background: #fff;
-      border-radius: 10px;
-      padding: 2.5rem;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    .founder-info .role {
+      font-size: 0.8rem;
+      color: var(--teal);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
     }
 
-    h2 {
-      color: var(--primary-red);
-      border-bottom: 3px solid var(--accent-orange);
-      padding-bottom: 0.4rem;
+    .founder-info p {
+      color: var(--muted);
+      font-size: 0.88rem;
     }
 
-    h3 {
-      color: var(--accent-orange);
-      margin-top: 1.5rem;
-    }
-
-    p {
-      margin-top: 0.5rem;
-    }
-
-    ul {
-      padding-left: 1.5rem;
+    .founder-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 0.75rem;
     }
 
     footer {
-      background-color: var(--primary-red);
-      color: #fff;
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      padding: 2.5rem 2rem;
       text-align: center;
-      padding: 1rem 0;
-      margin-top: 3rem;
-      font-size: 0.9rem;
+    }
+
+    .footer-brand {
+      font-family: var(--heading-font);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+
+    .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.83rem;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--text);
+    }
+
+    .footer-compliance {
+      margin-top: 1.5rem;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .footer-copy {
+      color: var(--muted);
+      font-size: 0.78rem;
+      margin-top: 1.5rem;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.55s, transform 0.55s;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    .reveal-d1 {
+      transition-delay: 0.1s;
+    }
+
+    .reveal-d2 {
+      transition-delay: 0.2s;
+    }
+
+    .reveal-d3 {
+      transition-delay: 0.3s;
     }
 
     a {
-      color: var(--accent-orange);
+      color: var(--teal);
       text-decoration: none;
     }
 
     a:hover {
       text-decoration: underline;
     }
-
-    @media (max-width: 600px) {
-      .back-btn-wrapper {
-        padding: 0 1.5rem;
-      }
-
-      main {
-        margin: 1rem;
-        padding: 1.5rem;
-      }
-
-      header h1 {
-        font-size: 1.5rem;
-      }
-    }
   </style>
 </head>
 
 <body>
-  <header>
-    <img src="/RaktPort-logo.jpg" alt="RaktPort Logo" width="80">
-    <h1>RaktPort</h1>
-    <p>Donate Blood Anywhere. Save Lives Everywhere.</p>
-  </header>
 
-  <div class="back-btn-wrapper">
-    <a href="javascript:history.back()" class="back-btn" title="Go Back">
-      <i class="fa-solid fa-arrow-left"></i> Back
-    </a>
+  <nav>
+    <a href="/" class="nav-brand"><img src="/RaktPort-logo.jpg" alt="RaktPort Logo"
+        style="width: 32px; height: 32px; border-radius: 8px; object-fit: cover;"> RaktPort</a>
+    <ul class="nav-links">
+      <li><a href="our-mission.html">Mission</a></li>
+      <li><a href="terms.html">Terms</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <a href="javascript:history.back()" class="nav-back"><i class="fa-solid fa-arrow-left"></i> Back</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-eyebrow">
+      <div class="eyebrow-line"></div>
+      <span class="eyebrow-text">About RaktPort</span>
+      <div class="eyebrow-line"></div>
+    </div>
+    <h1>India's Most Trusted<br><span class="line2">Blood Donation Network</span></h1>
+    <p class="hero-desc">RaktPort bridges voluntary blood donors, hospitals, and blood banks through real-time verified
+      requests — built on transparency, technology, and trust.</p>
+    <div class="hero-cta">
+      <span class="badge badge-teal"><i class="fa-solid fa-shield-halved"></i> DPDP Act 2023 Compliant</span>
+      <span class="badge badge-teal"><i class="fa-solid fa-certificate"></i> IEC 62304 Lifecycle</span>
+      <span class="badge badge-amber"><i class="fa-solid fa-hospital-user"></i> ABDM Aligned</span>
+      <span class="badge badge-red"><i class="fa-solid fa-award"></i> ISO 13485 Aware</span>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="stats-inner">
+      <div class="stat-item reveal">
+        <div class="stat-number">50<span>K+</span></div>
+        <div class="stat-label">Registered Donors</div>
+      </div>
+      <div class="stat-item reveal reveal-d1">
+        <div class="stat-number">1<span>K+</span></div>
+        <div class="stat-label">Hospitals & Blood Banks</div>
+      </div>
+      <div class="stat-item reveal reveal-d2">
+        <div class="stat-number">28<span>+</span></div>
+        <div class="stat-label">States Covered</div>
+      </div>
+      <div class="stat-item reveal reveal-d3">
+        <div class="stat-number">3<span>×</span></div>
+        <div class="stat-label">Lives Per Donation</div>
+      </div>
+    </div>
   </div>
 
-  <main>
-    <h2>About RaktPort</h2>
-    <p><strong>RaktPort</strong> is a digital bridge that connects voluntary blood donors, hospitals, and blood banks
-      through real-time verified requests and data transparency. Our mission is to ensure that safe blood reaches every
-      patient who needs it — without delay, exploitation, or uncertainty.</p>
+  <!-- MAIN -->
+  <div class="content-wrap">
 
-    <h3>What We Do</h3>
-    <ul>
-      <li><strong>For Donors:</strong> Easy registration, donation tracking, and alerts for nearby needs.</li>
-      <li><strong>For Hospitals:</strong> Verified donor matching and efficient patient request handling.</li>
-      <li><strong>For Blood Banks:</strong> Real-time stock visibility and integration with hospitals.</li>
-    </ul>
+    <!-- WHO WE ARE -->
+    <div class="intro-grid">
+      <div class="intro-text reveal">
+        <h2>Who We <span>Are</span></h2>
+        <p><strong>RaktPort</strong> (from Sanskrit: "Rakta" = Blood, "Port" = Gateway) is a national-scale digital
+          infrastructure for blood donation management — designed, built, and maintained in India.</p>
+        <p>We go beyond simple donor matching. Every request, every donor, and every unit of blood is authenticated
+          through secure, auditable backend systems — preventing misuse, reducing fraud, and ensuring blood reaches
+          those who truly need it.</p>
+        <p>Founded as a biomedical student initiative, RaktPort has grown into a production-grade platform aligning with
+          India's digital health standards, including the <strong>Ayushman Bharat Digital Mission (ABDM)</strong> and
+          national cybersecurity frameworks.</p>
+      </div>
+      <div class="intro-image reveal reveal-d1">
+        <div class="intro-img-inner">
+          <div class="big-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+          <p>Every donation is a verified, traceable, and dignified act of saving lives</p>
+        </div>
+      </div>
+    </div>
 
-    <h3>Why Choose RaktPort?</h3>
-    <p>We go beyond matching donors — we build trust. Each request and donor is authenticated through secure backend
-      systems, preventing misuse and fraud. RaktPort operates on transparency, community participation, and digital
-      safety.</p>
+    <!-- WHAT WE DO -->
+    <div class="section-heading reveal">
+      <h2>What We Do</h2>
+      <p>A complete ecosystem connecting every stakeholder in the blood donation journey</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon red"><i class="fa-solid fa-user-plus"></i></div>
+        <h3>For Donors</h3>
+        <p>Easy registration, eligibility tracking, live donation countdown, health tips, impact certificates, and
+          emergency blood need alerts — empowering voluntary donors at every step.</p>
+      </div>
+      <div class="feature-card reveal reveal-d1">
+        <div class="feature-icon teal"><i class="fa-solid fa-hospital"></i></div>
+        <h3>For Hospitals</h3>
+        <p>NACO/MoHFW-compliant blood requisition forms, real-time Firestore matching, urgency tiering (Emergency /
+          Urgent / Routine), transfusion tracking, and QR-enabled RTID verification.</p>
+      </div>
+      <div class="feature-card reveal reveal-d2">
+        <div class="feature-icon amber"><i class="fa-solid fa-droplet"></i></div>
+        <h3>For Blood Banks</h3>
+        <p>Real-time stock visibility, verified organisation dashboards, national blood inventory ledger, fraud alert
+          system, and full audit log with RTID traceability.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon teal"><i class="fa-solid fa-barcode"></i></div>
+        <h3>RTID Tracking System</h3>
+        <p>Every donation and requisition receives a Luhn-36 checksum-validated 19-character Tracking ID — enabling
+          end-to-end traceability from donor to transfusion recipient.</p>
+      </div>
+      <div class="feature-card reveal reveal-d1">
+        <div class="feature-icon red"><i class="fa-solid fa-shield-halved"></i></div>
+        <h3>Security & Privacy</h3>
+        <p>AES-256 encryption, role-based access, MFA enforcement, penetration-tested infrastructure, and full DPDP Act
+          2023 compliance with a designated Grievance Officer.</p>
+      </div>
+      <div class="feature-card reveal reveal-d2">
+        <div class="feature-icon amber"><i class="fa-solid fa-mobile-screen-button"></i></div>
+        <h3>PWA & Offline Ready</h3>
+        <p>Installable Progressive Web App with service-worker caching — ensures donors can access critical information
+          and submit emergency requests even in low-connectivity conditions.</p>
+      </div>
+    </div>
 
-    <h3>Our Vision</h3>
-    <p>To create India’s most reliable, secure, and accessible digital blood donation network — where no life is lost
-      due to the unavailability of blood.</p>
+    <!-- COMPLIANCE -->
+    <div class="section-heading reveal">
+      <h2>Regulatory & Standards Awareness</h2>
+      <p>Built from day one with India's healthcare regulatory framework in mind</p>
+    </div>
+    <div class="compliance-grid">
+      <div class="compliance-card reveal">
+        <div class="comp-icon"><i class="fa-solid fa-microchip"></i></div>
+        <div class="comp-body">
+          <span class="comp-tag">IEC 62304 · Software Lifecycle</span>
+          <h3>Software as a Medical Device</h3>
+          <p>RaktPort's critical modules are assessed as Class B SaMD. Software development, validation, and problem
+            resolution follow IEC 62304:2006+AMD1 lifecycle procedures.</p>
+        </div>
+      </div>
+      <div class="compliance-card reveal reveal-d1">
+        <div class="comp-icon"
+          style="background:rgba(196,30,58,0.1);border-color:rgba(196,30,58,0.25);color:var(--red)"><i
+            class="fa-solid fa-award"></i></div>
+        <div class="comp-body mandatory">
+          <span class="comp-tag">DPDP Act 2023 · MANDATORY</span>
+          <h3>India's Digital Data Protection</h3>
+          <p>Full compliance with Data Principal rights, consent architecture, Grievance Officer appointment, CERT-In
+            incident reporting, and data residency within India.</p>
+        </div>
+      </div>
+      <div class="compliance-card reveal">
+        <div class="comp-icon"><i class="fa-solid fa-hospital-user"></i></div>
+        <div class="comp-body">
+          <span class="comp-tag">ABDM · Ayushman Bharat Digital Mission</span>
+          <h3>ABHA & Health Record Integration</h3>
+          <p>Aligned with HIE-CM consent framework. ABHA ID linkage, ABHA-based Health Information Exchange with
+            time-bound consent artefacts, and NHA empanelment roadmap.</p>
+        </div>
+      </div>
+      <div class="compliance-card reveal reveal-d1">
+        <div class="comp-icon"><i class="fa-solid fa-certificate"></i></div>
+        <div class="comp-body">
+          <span class="comp-tag">ISO 13485 · Quality Management</span>
+          <h3>Medical Device QMS Alignment</h3>
+          <p>Development processes aligned with ISO 13485:2016 — including design controls, document control, CAPA
+            management, and internal quality audits.</p>
+        </div>
+      </div>
+      <div class="compliance-card reveal">
+        <div class="comp-icon"><i class="fa-solid fa-lock"></i></div>
+        <div class="comp-body">
+          <span class="comp-tag">Cybersecurity Framework</span>
+          <h3>Penetration Testing & Encryption</h3>
+          <p>Annual third-party VAPT, AES-256 at-rest encryption, TLS 1.3 in transit, ransomware-resilient backups, and
+            CERT-In 6-hour incident reporting compliance.</p>
+        </div>
+      </div>
+      <div class="compliance-card reveal reveal-d1">
+        <div class="comp-icon"><i class="fa-solid fa-shield-alt"></i></div>
+        <div class="comp-body">
+          <span class="comp-tag">ISO 14971 · Risk Management</span>
+          <h3>Software Risk Assessment</h3>
+          <p>All production changes undergo documented risk-benefit assessment. Risk files are maintained per ISO
+            14971:2019 with residual risk justification before each release.</p>
+        </div>
+      </div>
+    </div>
 
-    <p>📧 <a href="mailto:contact.raktsetu@gmail.com
-">contact.raktsetu@gmail.com
-      </a>
-  </main>
+    <!-- TECH STACK -->
+    <div class="section-heading reveal">
+      <h2>Built With</h2>
+      <p>Production-grade technology designed for India's scale</p>
+    </div>
+    <div
+      style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2rem;margin-bottom:5rem"
+      class="reveal">
+      <p style="color:var(--muted);font-size:0.9rem;margin-bottom:0.75rem">Frontend & App</p>
+      <div class="tech-row">
+        <span class="tech-chip"><i class="fa-brands fa-react"></i> React + TypeScript</span>
+        <span class="tech-chip"><i class="fa-solid fa-bolt"></i> Vite</span>
+        <span class="tech-chip"><i class="fa-solid fa-mobile-screen"></i> Progressive Web App</span>
+        <span class="tech-chip"><i class="fa-solid fa-palette"></i> Tailwind CSS</span>
+      </div>
+      <p style="color:var(--muted);font-size:0.9rem;margin-bottom:0.75rem;margin-top:1.25rem">Backend & Database</p>
+      <div class="tech-row">
+        <span class="tech-chip"><i class="fa-solid fa-fire"></i> Firebase Firestore</span>
+        <span class="tech-chip"><i class="fa-solid fa-key"></i> Firebase Auth</span>
+        <span class="tech-chip"><i class="fa-solid fa-cloud"></i> Cloud Functions</span>
+      </div>
+      <p style="color:var(--muted);font-size:0.9rem;margin-bottom:0.75rem;margin-top:1.25rem">Security & Compliance</p>
+      <div class="tech-row">
+        <span class="tech-chip"><i class="fa-solid fa-lock"></i> AES-256 Encryption</span>
+        <span class="tech-chip"><i class="fa-solid fa-shield"></i> Luhn-36 RTID Validation</span>
+        <span class="tech-chip"><i class="fa-solid fa-barcode"></i> QR Authentication</span>
+        <span class="tech-chip"><i class="fa-solid fa-user-shield"></i> RBAC + MFA</span>
+      </div>
+    </div>
+
+    <!-- FOUNDER -->
+    <div class="section-heading reveal">
+      <h2>The Builder</h2>
+      <p>Built with care by a biomedical science student on a mission</p>
+    </div>
+    <div class="founder-card reveal">
+      <div class="founder-avatar">AK</div>
+      <div class="founder-info">
+        <h3>Ajay Kushwaha</h3>
+        <div class="role">Founder & Full-Stack Builder</div>
+        <p>B.Sc. Biomedical Science student at the University of Delhi. Ajay built RaktPort end-to-end — frontend,
+          backend, DevOps, security, and design — driven by a belief that no life should be lost due to unavailability
+          of blood. His portfolio spans civic tech, healthcare infrastructure, and digital health compliance.</p>
+        <div class="founder-tags">
+          <span class="badge badge-teal">React · TypeScript</span>
+          <span class="badge badge-teal">Firebase</span>
+          <span class="badge badge-amber">Healthcare IT</span>
+          <span class="badge badge-red">Biomedical Science</span>
+          <span class="badge badge-teal"><a href="https://portfolio.raktport.in" target="_blank"
+              style="color:inherit;text-decoration:none">portfolio.raktport.in</a></span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content-wrap -->
 
   <footer>
-    &copy; 2025 RaktPort. All Rights Reserved. |
-    <a href="terms.html">Terms</a> |
-    <a href="privacy.html">Privacy</a> |
-    <a href="contact.html">Contact</a>
+    <div class="footer-brand">RaktPort</div>
+    <p style="color:var(--muted);font-size:0.83rem">Donate Blood Anywhere. Save Lives Everywhere.</p>
+    <div class="footer-links">
+      <a href="our-mission.html">Mission</a>
+      <a href="terms.html">Terms</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="contact.html">Contact</a>
+      <a href="blood-guidelines.html">Guidelines</a>
+    </div>
+    <div class="footer-compliance">
+      <span class="badge badge-teal"><i class="fa-solid fa-shield-halved"></i> DPDP Act 2023</span>
+      <span class="badge badge-amber"><i class="fa-solid fa-hospital-user"></i> ABDM</span>
+      <span class="badge badge-red"><i class="fa-solid fa-certificate"></i> IEC 62304</span>
+      <span class="badge badge-teal"><i class="fa-solid fa-award"></i> ISO 13485</span>
+    </div>
+    <p class="footer-copy">© 2025–2026 RaktPort. All rights reserved. Built by Ajay Kushwaha.</p>
   </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.07 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
 </body>
 
 </html>

@@ -284,7 +284,7 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
     if (!hospitalId) { toast.error("Hospital ID not found."); return; }
     const reqDateTime = new Date(`${data.requiredByDate}T${data.requiredByTime}:00`);
     if (isNaN(reqDateTime.getTime())) throw new Error("Invalid date/time");
-    const newHrtid = generateRtid("H");
+    const newHrtid = generateRtid("RH");
     const serial = generateSerial();
     const validityH = URGENCY_CONFIG[data.urgency as UrgencyLevel]?.validityHours || 48;
     const now = new Date();

@@ -765,7 +765,7 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
       else dRtid = generateRtid('D');
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       let linkedRRTID = null, patientName = null, hospitalName = null;
-      if (data.donationType === 'R-RTID-Linked Donation' && data.rRtid && data.rRtidData) {
+      if (data.donationType === 'RH/RU-RTID-Linked Donation' && data.rRtid && data.rRtidData) {
         linkedRRTID = data.rRtid; patientName = data.rRtidData.patientName; hospitalName = data.rRtidData.hospitalName;
       }
       const donationRef = doc(db, 'donations', dRtid);
@@ -928,7 +928,7 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
     setActionLoading(true);
     try {
       let data: any=null, type='';
-      if (rtid.toUpperCase().includes('R-RTID')||rtid.toUpperCase().startsWith('H')) {
+      if (rtid.toUpperCase().includes('RH-RTID') || rtid.toUpperCase().includes('RU-RTID') || rtid.toUpperCase().startsWith('H')) {
         for (const q of [getDoc(doc(db,'bloodRequests',rtid)),getDocs(query(collection(db,'bloodRequests'),where('linkedRTID','==',rtid))),getDocs(query(collection(db,'bloodRequests'),where('rtid','==',rtid)))]) {
           const r=await q;
           if ('exists' in r&&r.exists()){data=r.data();type='Blood Request';break;}

@@ -58,12 +58,12 @@ export const VerifyTab = ({ onVerifyAndRedeem }: VerifyTabProps) => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="rRtid">Hospital Request ID (R-RTID)</Label>
+                  <Label htmlFor="rRtid">Hospital/User Request ID (RH/RU-RTID)</Label>
                   <Input
                     id="rRtid"
                     value={rRtid}
                     onChange={(e) => setRrtid(e.target.value)}
-                    placeholder="R-RTID-XXXX-XXXX"
+                    placeholder="RH/RU-RTID-XXXX-XXXX"
                     className="font-mono bg-background"
                     required
                   />

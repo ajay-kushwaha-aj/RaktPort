@@ -214,7 +214,7 @@ export const DonationsTab = ({ donations }: DonationsTabProps) => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
                       {(donation.rRtid || donation.linkedRrtid) && (
                         <div>
-                          <span className="text-xs text-purple-600 font-medium">R-RTID (Request ID)</span>
+                          <span className="text-xs text-purple-600 font-medium">RH/RU-RTID (Request ID)</span>
                           <p className="font-mono font-bold text-purple-900 text-xs mt-0.5">
                             {donation.rRtid || donation.linkedRrtid}
                           </p>

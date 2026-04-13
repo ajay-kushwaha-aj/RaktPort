@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, Search, ArrowRight, Activity, CheckCircle2, Clock } from 'lucide-react';
+import { Shield, Search, ArrowRight, Activity, CheckCircle2, Clock, Database } from 'lucide-react';
 import { useAdminStore } from '../../store/adminStore';
 import { lookupRTID, RTIDRecord } from '../../services/rtidService';
 import { formatDateTime } from '../../services/exportService';
@@ -9,6 +9,82 @@ export const RTIDTracking: React.FC = () => {
   const [searchInput, setSearchInput] = useState('');
   const [result, setResult] = useState<RTIDRecord | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
+  const [migrating, setMigrating] = useState(false);
+
+  const handleMigration = async () => {
+    if (!window.confirm("Are you sure you want to migrate all R-RTID and H-RTID records to RH-RTID? This will modify the database.")) return;
+    setMigrating(true);
+    try {
+      const { collection, getDocs, writeBatch, doc } = await import('firebase/firestore');
+      const { db } = await import('../../../firebase');
+      const bReqs = await getDocs(collection(db, 'bloodRequests'));
+      const dons = await getDocs(collection(db, 'donations'));
+      
+      const batch = writeBatch(db);
+      let count = 0;
+      
+      const migrateStr = (s: string) => {
+        if (!s) return s;
+        if (s.startsWith('R-RTID')) return s.replace(/^R-RTID/, 'RH-RTID');
+        if (s.startsWith('H-RTID')) return s.replace(/^H-RTID/, 'RH-RTID');
+        return s;
+      };
+
+      bReqs.forEach(d => {
+        const data = d.data();
+        let newId = d.id;
+        if (newId.startsWith('R-RTID') || newId.startsWith('H-RTID')) {
+          newId = migrateStr(newId);
+          const newRef = doc(db, 'bloodRequests', newId);
+          const updatedData = { ...data };
+          if (updatedData.rtid) updatedData.rtid = migrateStr(updatedData.rtid);
+          if (updatedData.linkedRTID) updatedData.linkedRTID = migrateStr(updatedData.linkedRTID);
+          batch.set(newRef, updatedData);
+          batch.delete(d.ref);
+          count++;
+        } else {
+          let updates: any = {};
+          let changed = false;
+          if (data.rtid && (data.rtid.startsWith('R-RTID') || data.rtid.startsWith('H-RTID'))) {
+            updates.rtid = migrateStr(data.rtid); changed = true;
+          }
+          if (data.linkedRTID && (data.linkedRTID.startsWith('R-RTID') || data.linkedRTID.startsWith('H-RTID'))) {
+            updates.linkedRTID = migrateStr(data.linkedRTID); changed = true;
+          }
+          if (changed) { batch.update(d.ref, updates); count++; }
+        }
+      });
+
+      dons.forEach(d => {
+        const data = d.data();
+        let updates: any = {};
+        let changed = false;
+        
+        if (data.linkedRrtid && (data.linkedRrtid.startsWith('R-RTID') || data.linkedRrtid.startsWith('H-RTID'))) {
+          updates.linkedRrtid = migrateStr(data.linkedRrtid); changed = true;
+        }
+        if (data.rRtid && (data.rRtid.startsWith('R-RTID') || data.rRtid.startsWith('H-RTID'))) {
+          updates.rRtid = migrateStr(data.rRtid); changed = true;
+        }
+        if (data.donationType === 'R-RTID-Linked Donation') {
+          updates.donationType = 'RH/RU-RTID-Linked Donation'; changed = true;
+        }
+        if (changed) { batch.update(d.ref, updates); count++; }
+      });
+      
+      if (count > 0) {
+        await batch.commit();
+        alert(`Migrated ${count} records successfully!`);
+      } else {
+        alert("No records needed migration.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Migration failed. See console.");
+    } finally {
+      setMigrating(false);
+    }
+  };
 
   const handleSearch = (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -22,9 +98,21 @@ export const RTIDTracking: React.FC = () => {
     <div style={{ padding: '32px 36px', maxWidth: 900, fontFamily: 'Inter, sans-serif' }}>
       {/* ── Page header ── */}
       <div style={{ marginBottom: 32 }}>
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#ffffff', margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
-          <Shield size={22} color="#4ade80" /> RTID Tracking System
-        </h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h2 style={{ fontSize: 20, fontWeight: 700, color: '#ffffff', margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <Shield size={22} color="#4ade80" /> RTID Tracking System
+          </h2>
+          <button 
+            onClick={handleMigration} 
+            disabled={migrating}
+            style={{
+              background: '#3b82f6', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px',
+              fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6, cursor: migrating ? 'wait' : 'pointer'
+            }}
+          >
+            <Database size={15} /> {migrating ? 'Migrating DB...' : 'Run DB Migration'}
+          </button>
+        </div>
         <p style={{ fontSize: 13, color: '#94a3b8', marginTop: 4 }}>
           Enter a RaktPort Tracking ID (RTID) to instantly view its global lifecycle and current status.
         </p>
@@ -36,7 +124,7 @@ export const RTIDTracking: React.FC = () => {
           <Search size={18} color="#94a3b8" style={{ position: 'absolute', left: 18, top: 15 }} />
           <input
             type="text"
-            placeholder="e.g. D-RTID-010426-A1234 or R-RTID-010426-I1234"
+            placeholder="e.g. D-RTID-010426-A1234 or RH/RU-RTID-010426-I1234"
             value={searchInput}
             onChange={e => setSearchInput(e.target.value)}
             style={{

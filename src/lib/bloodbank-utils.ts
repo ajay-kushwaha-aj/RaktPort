@@ -6,7 +6,7 @@ export const BLOOD_BANK_LOCATION = 'AIIMS Blood Bank, Delhi';
 
 export const BLOOD_GROUPS: BloodGroup[] = ['O+', 'O-', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-'];
 
-export const generateRtid = (type: 'D' | 'H'): string => {
+export const generateRtid = (type: 'D' | 'RH' | 'RU' | 'A'): string => {
   const now = new Date();
   const dd = String(now.getDate()).padStart(2, '0');
   const mm = String(now.getMonth() + 1).padStart(2, '0');
@@ -84,7 +84,7 @@ export const generateOtp = (): string => {
 export const validateRrtidFormat = (
   rrtid: string
 ): { ok: boolean; reason?: string } => {
-  const re = /^R-RTID-(\d{2})(\d{2})(\d{4})-([A-Z0-9]{4})$/;
+  const re = /^R[HU]-RTID-(\d{2})(\d{2})(\d{4})-([A-Z0-9]{4})$/;
   const m = re.exec(rrtid);
   if (!m) return { ok: false, reason: 'pattern' };
 
