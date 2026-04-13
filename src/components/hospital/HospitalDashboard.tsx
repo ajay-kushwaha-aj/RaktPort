@@ -18,6 +18,7 @@ import {
   doc, getDoc, updateDoc, onSnapshot, Timestamp
 } from 'firebase/firestore';
 import { calculateDistance } from '../../lib/geo-utils';
+import { encryptField, decryptField } from '../../lib/crypto';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 // @ts-ignore
 import { BLOOD_GROUPS, generateRtid } from "@/lib/bloodbank-utils";
@@ -206,7 +207,7 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
             }
           }
           const fetched: BloodRequest[] = [];
-          snap.forEach(d => {
+          for (const d of snap.docs) {
             const data = d.data();
             const linkedDonors: DonorInfo[] = allLinkedDonations
               .filter((ld: any) => ld.linkedRrtid === data.linkedRTID || ld.linkedRrtid === data.rtid)
@@ -238,7 +239,7 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
               transfusionIndication: data.transfusionIndication, unitsRequired: required,
               unitsFulfilled, unitsAdministered, requiredBy: parseTimestamp(data.requiredBy),
               status, city: data.city, createdAt: parseTimestamp(data.createdAt),
-              patientMobile: data.patientMobile, patientAadhaar: data.patientAadhaar, pincode: data.pincode,
+              patientMobile: await decryptField(data.patientMobile || ''), patientAadhaar: await decryptField(data.patientAadhaar || ''), pincode: data.pincode,
               age: data.age ? parseInt(data.age) : undefined, urgency: u, donors: linkedDonors,
               doctorName: data.doctorName, doctorRegNo: data.doctorRegNo,
               wardDepartment: data.wardDepartment, bedNumber: data.bedNumber,
@@ -249,7 +250,7 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
               generatedBy: data.generatedBy, systemVersion: data.systemVersion,
               transfusionHistory: (data.transfusionHistory || []) as TransfusionRecord[],
             });
-          });
+          }
           fetched.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
           const toExpire: string[] = [];
           fetched.forEach(r => {
@@ -289,8 +290,8 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
     const validityH = URGENCY_CONFIG[data.urgency as UrgencyLevel]?.validityHours || 48;
     const now = new Date();
     await addDoc(collection(db, "bloodRequests"), {
-      hospitalId, bloodBankId: "", patientName: data.patientName, patientMobile: data.mobile,
-      patientAadhaar: data.aadhaar, bloodGroup: data.bloodGroup, componentType: data.componentType || "Whole Blood",
+      hospitalId, bloodBankId: "", patientName: data.patientName, patientMobile: await encryptField(data.mobile),
+      patientAadhaar: await encryptField(data.aadhaar), bloodGroup: data.bloodGroup, componentType: data.componentType || "Whole Blood",
       transfusionIndication: data.transfusionIndication || "Anemia",
       units: String(data.unitsRequired), fulfilled: "0", unitsAdministered: 0, transfusionHistory: [],
       age: String(data.age), city: data.city, pincode: data.pincode,

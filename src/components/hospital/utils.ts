@@ -63,10 +63,19 @@ export const getQRPayload = (r: BloodRequest) =>
     createdAt: r.createdAt?.toISOString?.() || "",
   });
 
-/* ── Aadhaar masking (security fix) ── */
+/* ── Aadhaar masking (security fix — handles encrypted values) ── */
 export const maskAadhaar = (aadhaar: string) => {
-  if (!aadhaar || aadhaar.length < 4) return "XXXX XXXX XXXX";
+  if (!aadhaar || aadhaar.startsWith('enc:')) return "XXXX XXXX XXXX";
+  if (aadhaar.length < 4) return "XXXX XXXX XXXX";
   return `XXXX XXXX ${aadhaar.slice(-4)}`;
+};
+
+/* ── Mobile masking ── */
+export const maskMobile = (mobile: string) => {
+  if (!mobile || mobile.startsWith('enc:')) return "+91 XXXXX XXXXX";
+  const digits = mobile.replace(/\D/g, '');
+  if (digits.length < 4) return "+91 XXXXX XXXXX";
+  return `+91 XXXXX X${digits.slice(-4)}`;
 };
 
 /* ── Parse Firestore timestamps ── */

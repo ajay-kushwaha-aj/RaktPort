@@ -19,6 +19,7 @@ import {
   checkUsernameAvailable,
   formatUsername,
 } from '../lib/identity';
+import { encryptField, hashField } from '../lib/crypto';
 import confetti from 'canvas-confetti';
 import { toast } from 'sonner';
 import {
@@ -773,15 +774,17 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
         ? Object.fromEntries(BLOOD_GROUPS.map(bg => [bg, { total: form.inventory[bg] || 0, available: form.inventory[bg] || 0 }]))
         : undefined;
 
+      const mobileNormalized = `+91${form.mobile}`;
       const res = await registerUserWithPhone(form.email, form.password, {
-        role, fullName: form.fullName, mobile: `+91${form.mobile}`,
+        role, fullName: form.fullName, mobile: await encryptField(mobileNormalized),
+        mobileHash: await hashField(mobileNormalized),
         ...(form.username && { username: form.username }),
         address: form.address, district: form.district, state: form.state, pincode: form.pincode,
         cityLower: form.district.toLowerCase() || form.pincode,
         city: form.district,
         ...(form.lat !== null && form.lng !== null && { lat: form.lat, lng: form.lng }),
         isVerified: role === 'donor',
-        ...(role === 'donor'     && { aadhar: form.aadhar, bloodGroup: form.bloodGroup, gender: form.gender, dob: form.dob, lastDonationDate: form.dontRemember ? null : form.lastDonationDate, credits: 0 }),
+        ...(role === 'donor'     && { aadhar: await encryptField(form.aadhar), bloodGroup: form.bloodGroup, gender: form.gender, dob: form.dob, lastDonationDate: form.dontRemember ? null : form.lastDonationDate, credits: 0 }),
         ...(role === 'hospital'  && { registrationNo: form.registrationNo, totalBeds: form.totalBeds }),
         ...(role === 'bloodbank' && { licenseNo: form.licenseNo, operatingHours: form.operatingHours }),
       }, phoneUid);

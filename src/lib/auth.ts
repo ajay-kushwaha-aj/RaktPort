@@ -36,6 +36,7 @@ import {
   reserveUsername,
   parseUsername,
 } from './identity';
+import { hashField, decryptField } from './crypto';
 
 const auth = getAuth(app);
 
@@ -380,7 +381,9 @@ export async function lookupUserByInternalId(id: string): Promise<UserLookupResu
     }
 
     if (snap.empty) return { found: false };
-    return toLookupResult(snap.docs[0].id, snap.docs[0].data());
+    const result = toLookupResult(snap.docs[0].id, snap.docs[0].data());
+    if (result.phone) result.phone = await decryptField(result.phone);
+    return result;
   } catch (error: any) {
     console.error('[Auth] lookupUserByInternalId:', error);
     return { found: false };
@@ -401,13 +404,21 @@ export async function lookupUserByUsername(rawInput: string): Promise<UserLookup
     if (usernameDoc.exists()) {
       const { uid } = usernameDoc.data();
       const userDoc = await getDoc(doc(db, 'users', uid));
-      if (userDoc.exists()) return toLookupResult(userDoc.id, userDoc.data());
+      if (userDoc.exists()) {
+        const result = toLookupResult(userDoc.id, userDoc.data());
+        if (result.phone) result.phone = await decryptField(result.phone);
+        return result;
+      }
     }
 
     // 2. Fallback: search username field in users collection
     const q = query(collection(db, 'users'), where('username', '==', handle));
     const snap = await getDocs(q);
-    if (!snap.empty) return toLookupResult(snap.docs[0].id, snap.docs[0].data());
+    if (!snap.empty) {
+      const result = toLookupResult(snap.docs[0].id, snap.docs[0].data());
+      if (result.phone) result.phone = await decryptField(result.phone);
+      return result;
+    }
 
     return { found: false };
   } catch (error: any) {
@@ -416,14 +427,31 @@ export async function lookupUserByUsername(rawInput: string): Promise<UserLookup
   }
 }
 
-/** Lookup user by phone number. */
+/** Lookup user by phone number (uses mobileHash for encrypted lookup). */
 export async function lookupUserByPhone(phone: string): Promise<UserLookupResult> {
   try {
     const normalized = phone.startsWith('+91') ? phone : `+91${phone.replace(/\D/g, '')}`;
-    const q = query(collection(db, 'users'), where('mobile', '==', normalized));
-    const snap = await getDocs(q);
+    const phoneHash = await hashField(normalized);
+    
+    // Try mobileHash first (encrypted records)
+    let q = query(collection(db, 'users'), where('mobileHash', '==', phoneHash));
+    let snap = await getDocs(q);
+    
+    // Fallback: try legacy plaintext mobile field
+    if (snap.empty) {
+      q = query(collection(db, 'users'), where('mobile', '==', normalized));
+      snap = await getDocs(q);
+    }
+    
     if (snap.empty) return { found: false };
-    return toLookupResult(snap.docs[0].id, snap.docs[0].data());
+    
+    const docData = snap.docs[0].data();
+    const result = toLookupResult(snap.docs[0].id, docData);
+    // Decrypt the phone for OTP sending
+    if (result.phone) {
+      result.phone = await decryptField(result.phone);
+    }
+    return result;
   } catch (error: any) {
     console.error('[Auth] lookupUserByPhone:', error);
     return { found: false };
@@ -475,8 +503,8 @@ export async function verifyLoginOTP(
 
     const data = userDoc.data();
 
-    // Phone match
-    const storedPhone = (data.mobile || '').replace(/\s/g, '');
+    // Phone match (decrypt if encrypted)
+    const storedPhone = (await decryptField(data.mobile || '')).replace(/\s/g, '');
     const expectedPhone = expectedUser.phone.startsWith('+91')
       ? expectedUser.phone : `+91${expectedUser.phone}`;
     if (storedPhone !== expectedPhone) {

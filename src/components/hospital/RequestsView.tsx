@@ -10,7 +10,7 @@ import { BLOOD_GROUPS } from "@/lib/bloodbank-utils";
 import { URGENCY_CONFIG, getStatusMeta } from "./constants";
 import {
   isRequestValid, getTimeRemaining, getValidityPct,
-  formatDate, formatTime, timeAgo, canDeleteRequest, maskAadhaar,
+  formatDate, formatTime, timeAgo, canDeleteRequest, maskAadhaar, maskMobile,
 } from "./utils";
 import { StatusTimeline } from "./StatusTimeline";
 import { DonorPanel } from "./DonorPanel";
@@ -420,7 +420,7 @@ export function RequestsView({
                         ["Doctor", r.doctorName || "—"],
                         ["Reg. No.", r.doctorRegNo || "—"],
                         ["Bed", r.bedNumber || "—"],
-                        ["Mobile", r.patientMobile ? maskAadhaar(r.patientMobile) : "—"],
+                        ["Mobile", r.patientMobile ? maskMobile(r.patientMobile) : "—"],
                       ].map(([k, v]) => (
                         <div key={k}>
                           <p style={{ fontSize: "0.6rem", color: "var(--c-text-4)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "2px" }}>{k}</p>

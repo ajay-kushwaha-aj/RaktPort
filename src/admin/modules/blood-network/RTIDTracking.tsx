@@ -10,6 +10,93 @@ export const RTIDTracking: React.FC = () => {
   const [result, setResult] = useState<RTIDRecord | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
   const [migrating, setMigrating] = useState(false);
+  const [encMigrating, setEncMigrating] = useState(false);
+
+  /* ── PII Encryption Migration (DPDP Act 2023) ── */
+  const handleEncryptionMigration = async () => {
+    if (!window.confirm(
+      "⚠️ DPDP Encryption Migration\n\n" +
+      "This will encrypt ALL plaintext Aadhaar and mobile fields in:\n" +
+      "• users collection\n" +
+      "• bloodRequests collection\n\n" +
+      "Already encrypted values (enc:...) will be skipped.\n\nProceed?"
+    )) return;
+    setEncMigrating(true);
+    try {
+      const { collection, getDocs, writeBatch, doc } = await import('firebase/firestore');
+      const { db } = await import('../../../firebase');
+      const { encryptField, isEncrypted, hashField } = await import('../../../lib/crypto');
+      
+      let totalEncrypted = 0;
+      
+      // 1. Encrypt users collection (aadhar, mobile)
+      const userSnap = await getDocs(collection(db, 'users'));
+      const userBatch = writeBatch(db);
+      let userCount = 0;
+      
+      for (const d of userSnap.docs) {
+        const data = d.data();
+        const updates: Record<string, string> = {};
+        
+        if (data.aadhar && !isEncrypted(data.aadhar)) {
+          updates.aadhar = await encryptField(data.aadhar);
+        }
+        if (data.mobile && !isEncrypted(data.mobile)) {
+          // Store hash for phone lookup before encrypting
+          updates.mobileHash = await hashField(data.mobile);
+          updates.mobile = await encryptField(data.mobile);
+        }
+        
+        if (Object.keys(updates).length > 0) {
+          userBatch.update(doc(db, 'users', d.id), updates);
+          userCount++;
+        }
+      }
+      
+      if (userCount > 0) {
+        await userBatch.commit();
+        totalEncrypted += userCount;
+      }
+      
+      // 2. Encrypt bloodRequests collection (patientAadhaar, patientMobile)
+      const reqSnap = await getDocs(collection(db, 'bloodRequests'));
+      const reqBatch = writeBatch(db);
+      let reqCount = 0;
+      
+      for (const d of reqSnap.docs) {
+        const data = d.data();
+        const updates: Record<string, string> = {};
+        
+        if (data.patientAadhaar && !isEncrypted(data.patientAadhaar)) {
+          updates.patientAadhaar = await encryptField(data.patientAadhaar);
+        }
+        if (data.patientMobile && !isEncrypted(data.patientMobile)) {
+          updates.patientMobile = await encryptField(data.patientMobile);
+        }
+        
+        if (Object.keys(updates).length > 0) {
+          reqBatch.update(doc(db, 'bloodRequests', d.id), updates);
+          reqCount++;
+        }
+      }
+      
+      if (reqCount > 0) {
+        await reqBatch.commit();
+        totalEncrypted += reqCount;
+      }
+      
+      if (totalEncrypted > 0) {
+        alert(`✅ Encrypted PII in ${totalEncrypted} documents!\n\n• ${userCount} user record(s)\n• ${reqCount} blood request(s)`);
+      } else {
+        alert("All records are already encrypted. No migration needed.");
+      }
+    } catch (err) {
+      console.error('[Encryption Migration]', err);
+      alert("Encryption migration failed. See console for details.");
+    } finally {
+      setEncMigrating(false);
+    }
+  };
 
   const handleMigration = async () => {
     if (!window.confirm("Are you sure you want to migrate all R-RTID and H-RTID records to RH-RTID? This will modify the database.")) return;
@@ -102,6 +189,17 @@ export const RTIDTracking: React.FC = () => {
           <h2 style={{ fontSize: 20, fontWeight: 700, color: '#ffffff', margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
             <Shield size={22} color="#4ade80" /> RTID Tracking System
           </h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button 
+            onClick={handleEncryptionMigration} 
+            disabled={encMigrating}
+            style={{
+              background: '#f59e0b', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px',
+              fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6, cursor: encMigrating ? 'wait' : 'pointer'
+            }}
+          >
+            <Shield size={15} /> {encMigrating ? 'Encrypting PII...' : '🔒 Encrypt PII (DPDP)'}
+          </button>
           <button 
             onClick={handleMigration} 
             disabled={migrating}
@@ -112,6 +210,7 @@ export const RTIDTracking: React.FC = () => {
           >
             <Database size={15} /> {migrating ? 'Migrating DB...' : 'Run DB Migration'}
           </button>
+        </div>
         </div>
         <p style={{ fontSize: 13, color: '#94a3b8', marginTop: 4 }}>
           Enter a RaktPort Tracking ID (RTID) to instantly view its global lifecycle and current status.
