@@ -68,5 +68,34 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
+    // ── Security headers (mirrors vercel.json for local ZAP scans) ──
+    headers: {
+      'X-Frame-Options': 'DENY',
+      'X-Content-Type-Options': 'nosniff',
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
+      'Permissions-Policy': 'camera=(), microphone=(), geolocation=(self)',
+      // NOTE: HSTS has no effect on http://localhost but is included
+      // so that dev-server responses match production exactly.
+      'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
+      'Content-Security-Policy': [
+        "default-src 'self'",
+        // Scripts: own bundle + Firebase reCAPTCHA + Google APIs
+        "script-src 'self' 'unsafe-inline' https://www.gstatic.com https://www.google.com https://apis.google.com",
+        // Styles: own CSS + Google Fonts (link tags in index.html)
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        // Fonts
+        "font-src 'self' https://fonts.gstatic.com",
+        // Images: own assets + Firebase Storage + Google profile pictures
+        "img-src 'self' data: blob: https://firebasestorage.googleapis.com https://lh3.googleusercontent.com",
+        // XHR / fetch / WebSockets: Firebase Auth, Firestore, Storage
+        "connect-src 'self' https://*.googleapis.com https://*.firebasedatabase.app https://*.firebaseio.com https://firebasestorage.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com wss://*.firebaseio.com",
+        // Frames: reCAPTCHA widget + Firebase Auth popup
+        "frame-src https://www.google.com https://*.firebaseapp.com",
+        "object-src 'none'",
+        "base-uri 'self'",
+        "form-action 'self'",
+        "upgrade-insecure-requests",
+      ].join('; '),
+    },
   },
 });
