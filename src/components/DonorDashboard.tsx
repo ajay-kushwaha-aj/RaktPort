@@ -47,6 +47,7 @@ import {
 } from 'firebase/firestore';
 import { generateDonorId } from '../lib/auth';
 import { formatUsername } from '../lib/identity';
+import { decryptField, maskMobileDisplay, encryptField, hashField } from '../lib/crypto';
 
 // ─────────────────────────────────────────────────────────────
 // HELPERS
@@ -229,8 +230,13 @@ const CountdownTimer = ({ targetDate, compact = false, label = '' }: { targetDat
 };
 
 const ComponentBadge = ({ component }: { component: DonationComponent }) => {
-  const colors: Record<DonationComponent, string> = { 'Whole Blood': 'bg-[var(--stats-divider)] text-red-700 border-red-300', Platelets: 'bg-amber-100 text-amber-700 border-amber-300', Plasma: 'bg-yellow-100 text-yellow-700 border-yellow-300', PRBC: 'bg-rose-100 text-rose-700 border-rose-300' };
-  return <Badge variant="outline" className={`text-xs font-medium ${colors[component] ?? ''}`}>{component}</Badge>;
+  const colors: Record<DonationComponent, string> = {
+    'Whole Blood': 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 border-red-300 dark:border-red-700',
+    Platelets:    'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-700',
+    Plasma:       'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300 border-yellow-300 dark:border-yellow-700',
+    PRBC:         'bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 border-rose-300 dark:border-rose-700',
+  };
+  return <Badge variant="outline" className={`text-xs font-semibold ${colors[component] ?? ''}`}>{component}</Badge>;
 };
 
 const QRStatusBadge = ({ status, expiryTime }: { status: 'Redeemed' | 'Pending' | 'Expired'; expiryTime?: Date }) => {
@@ -562,9 +568,9 @@ const BloodCompatibilityModal = ({ isOpen, onClose, bloodGroup }: { isOpen: bool
         <DialogHeader><DialogTitle className="flex items-center gap-2"><HeartHandshake className="w-5 h-5 text-[var(--clr-danger)]" /> Blood Type Compatibility</DialogTitle><DialogDescription>Your blood type <strong>{bloodGroup}</strong> compatibility guide</DialogDescription></DialogHeader>
         <div className="space-y-4">
           <div className="flex items-center justify-center"><div className="w-20 h-20 rounded-full bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center shadow-xl"><span className="text-2xl font-black text-[var(--txt-inverse)]">{bloodGroup}</span></div></div>
-          <p className="text-sm text-[var(--text-secondary)] text-center bg-red-50 rounded-xl p-3 border border-[var(--border-color)]">{info.facts}</p>
-          <div><h4 className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-1.5"><Droplet className="w-4 h-4 text-[var(--clr-danger)]" /> You can donate to</h4><div className="flex flex-wrap gap-2">{ALL.map(g => <div key={g} className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-black border-2 ${info.donateTo.includes(g) ? 'bg-[var(--stats-bg)] text-[var(--txt-inverse)] border-[var(--clr-emergency)] shadow-md scale-110' : 'bg-[var(--bg-page)] text-gray-300 border-[var(--border-color)]'}`}>{g}</div>)}</div></div>
-          <div><h4 className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-1.5"><Heart className="w-4 h-4 text-[var(--clr-success)] fill-green-500" /> You can receive from</h4><div className="flex flex-wrap gap-2">{ALL.map(g => <div key={g} className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-black border-2 ${info.receiveFrom.includes(g) ? 'bg-[var(--clr-success)] text-[var(--txt-inverse)] border-[var(--clr-success)] shadow-md scale-110' : 'bg-[var(--bg-page)] text-gray-300 border-[var(--border-color)]'}`}>{g}</div>)}</div></div>
+          <p className="text-sm text-[var(--text-secondary)] dark:text-gray-300 text-center bg-red-50 dark:bg-red-950/30 rounded-xl p-3 border border-[var(--border-color)] dark:border-red-900">{info.facts}</p>
+          <div><h4 className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-2 flex items-center gap-1.5"><Droplet className="w-4 h-4 text-[var(--clr-danger)]" /> You can donate to</h4><div className="flex flex-wrap gap-2">{ALL.map(g => <div key={g} className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-black border-2 ${info.donateTo.includes(g) ? 'bg-[var(--stats-bg)] text-[var(--txt-inverse)] border-[var(--clr-emergency)] shadow-md scale-110' : 'bg-[var(--bg-page)] text-gray-400 dark:text-gray-600 border-[var(--border-color)]'}`}>{g}</div>)}</div></div>
+          <div><h4 className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-2 flex items-center gap-1.5"><Heart className="w-4 h-4 text-[var(--clr-success)] fill-green-500" /> You can receive from</h4><div className="flex flex-wrap gap-2">{ALL.map(g => <div key={g} className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-black border-2 ${info.receiveFrom.includes(g) ? 'bg-[var(--clr-success)] text-[var(--txt-inverse)] border-[var(--clr-success)] shadow-md scale-110' : 'bg-[var(--bg-page)] text-gray-400 dark:text-gray-600 border-[var(--border-color)]'}`}>{g}</div>)}</div></div>
           {bloodGroup === 'O-' && <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm text-amber-800 flex gap-2"><Star className="w-4 h-4 fill-amber-500 flex-shrink-0 mt-0.5" /><span><strong>Universal Donor:</strong> Your blood can be given to anyone in an emergency!</span></div>}
           {bloodGroup === 'AB+' && <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-sm text-blue-800 flex gap-2"><Star className="w-4 h-4 fill-blue-500 flex-shrink-0 mt-0.5" /><span><strong>Universal Recipient:</strong> You can receive blood from any blood type!</span></div>}
         </div>
@@ -667,6 +673,8 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
   const [bookingForm, setBookingForm] = useState({
     date: '', time: '09:00 AM', component: 'Whole Blood' as DonationComponent,
   });
+  const [mobileInput, setMobileInput] = useState('');
+  const [mobileUpdating, setMobileUpdating] = useState(false);
   const [bookingConsent, setBookingConsent] = useState({
     highRisk: false, illness: false, medication: false, vaccination: false
   });
@@ -733,6 +741,38 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
           const d = userSnap.data();
           let donorId = d.donorId;
           if (!donorId) { donorId = generateDonorId(); await updateDoc(userRef, { donorId }).catch(() => { }); }
+          // Decrypt mobile — donor is viewing their own profile, show full number
+          // Indian mobile validation: 10 digits, must start with 6, 7, 8, or 9
+          const isValidIndianMobile = (num: string): boolean => {
+            const d10 = num.replace(/\D/g, '').slice(-10);
+            return d10.length === 10 && /^[6-9]/.test(d10);
+          };
+
+          let mobileDisplay = 'Not Set';
+          if (d.mobile) {
+            const rawMobile: string = d.mobile;
+            try {
+              const decrypted = await decryptField(rawMobile);
+              if (isValidIndianMobile(decrypted)) {
+                const last10 = decrypted.replace(/\D/g, '').slice(-10);
+                mobileDisplay = `+91 ${last10.slice(0, 5)} ${last10.slice(5)}`;
+              } else if (decrypted && !decrypted.startsWith('enc:') && decrypted !== rawMobile) {
+                // Decrypted to something but not a valid number — show as-is
+                mobileDisplay = decrypted;
+              } else {
+                // Could not decrypt meaningfully
+                mobileDisplay = 'Mobile Registered ✓';
+              }
+            } catch {
+              // decryptField threw — inline fallback, no external call
+              if (!rawMobile.startsWith('enc:') && isValidIndianMobile(rawMobile)) {
+                const last10 = rawMobile.replace(/\D/g, '').slice(-10);
+                mobileDisplay = `+91 ${last10.slice(0, 5)} ${last10.slice(5)}`;
+              } else {
+                mobileDisplay = rawMobile.startsWith('enc:') ? 'Mobile Registered ✓' : rawMobile;
+              }
+            }
+          }
           setDonorData({
             fullName: d.fullName || 'Donor',
             bloodGroup: d.bloodGroup || 'N/A',
@@ -743,7 +783,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
             donationsCount: d.donationsCount || 0,
             credits: d.credits || 0,
             email: d.email || userId,
-            mobile: d.mobile || 'Not Set',
+            mobile: mobileDisplay,
             dob: d.dob || null,
             donorId,
             internalId: d.internalId || undefined,
@@ -1033,16 +1073,23 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
   };
 
   const handleViewHrtid = async (hrtid: string) => {
+    if (!hrtid || hrtid === 'N/A' || hrtid === 'null' || hrtid === '—' || hrtid === '–') return;
     setHrtidLoading(true); setHrtidModalOpen(true); setHrtidDetails(null);
     try {
       let data: any = null, hospitalName = 'Hospital';
-      const tryDoc = async (id: string) => { try { const s = await getDoc(doc(db, 'bloodRequests', id)); return s.exists() ? s.data() : null; } catch { return null; } };
-      const tryQ = async (field: string, val: string) => { try { const s = await getDocs(query(collection(db, 'bloodRequests'), where(field, '==', val))); return s.empty ? null : s.docs[0].data(); } catch { return null; } };
-      data = await tryDoc(hrtid) || await tryQ('linkedRTID', hrtid) || await tryQ('rtid', hrtid);
+      const tryDoc = async (colName: string, id: string) => { try { const s = await getDoc(doc(db, colName, id)); return s.exists() ? s.data() : null; } catch { return null; } };
+      const tryQ = async (colName: string, field: string, val: string) => { try { const s = await getDocs(query(collection(db, colName), where(field, '==', val))); return s.empty ? null : s.docs[0].data(); } catch { return null; } };
+      // Try all known field paths across collections
+      data = await tryDoc('bloodRequests', hrtid)
+        || await tryQ('bloodRequests', 'linkedRTID', hrtid)
+        || await tryQ('bloodRequests', 'rtid', hrtid)
+        || await tryQ('bloodRequests', 'hRtid', hrtid)
+        || await tryDoc('requests', hrtid)
+        || await tryQ('requests', 'rtid', hrtid);
       if (data?.hospitalId) { try { const s = await getDoc(doc(db, 'users', data.hospitalId)); if (s.exists()) hospitalName = s.data().fullName || 'Hospital'; } catch (_) { } }
-      if (!data) { toast.error('Request not found'); setHrtidModalOpen(false); return; }
+      if (!data) { toast.error('Linked request not found', { description: `HRTID: ${hrtid}` }); setHrtidModalOpen(false); return; }
       const matching = donationHistory.find(d => d.linkedHrtid === hrtid);
-      setHrtidDetails({ patientName: data.patientName, bloodGroup: data.bloodGroup, units: data.units || data.unitsRequired, hospital: hospitalName, rtidCode: hrtid, bloodBankId: '', component: data.component || 'Whole Blood', requiredBy: data.requiredBy ? formatDateTimeDMY(safeDate(data.requiredBy)) : 'N/A', impactTimeline: matching?.impactTimeline });
+      setHrtidDetails({ patientName: data.patientName || data.patient || 'Patient', bloodGroup: data.bloodGroup, units: data.units || data.unitsRequired || data.unitsNeeded || 1, hospital: hospitalName, rtidCode: hrtid, bloodBankId: '', component: data.component || 'Whole Blood', requiredBy: data.requiredBy ? formatDateTimeDMY(safeDate(data.requiredBy)) : 'N/A', impactTimeline: matching?.impactTimeline });
     } catch (_) { toast.error('Failed to fetch details'); setHrtidModalOpen(false); }
     finally { setHrtidLoading(false); }
   };
@@ -1051,6 +1098,28 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
     if (!userId) return;
     try { await updateDoc(doc(db, 'users', userId), { availabilityMode: mode }); setDonorData(prev => ({ ...prev, availabilityMode: mode })); toast.success('Availability updated'); }
     catch (_) { toast.error('Update failed'); }
+  };
+
+  const handleUpdateMobile = async () => {
+    const digits = mobileInput.replace(/\D/g, '').slice(-10);
+    if (digits.length !== 10 || !/^[6-9]/.test(digits)) {
+      toast.error('Enter a valid 10-digit Indian mobile number (starts with 6-9)');
+      return;
+    }
+    if (!userId) return;
+    setMobileUpdating(true);
+    try {
+      const normalized = `+91${digits}`;
+      const encrypted = await encryptField(normalized);
+      const hash = await hashField(normalized);
+      await updateDoc(doc(db, 'users', userId), { mobile: encrypted, mobileHash: hash });
+      const displayNumber = `+91 ${digits.slice(0, 5)} ${digits.slice(5)}`;
+      setDonorData(prev => ({ ...prev, mobile: displayNumber }));
+      setMobileInput('');
+      toast.success('Mobile number updated!', { description: displayNumber });
+    } catch (e: any) {
+      toast.error('Update failed', { description: e.message });
+    } finally { setMobileUpdating(false); }
   };
 
   const handleLogoutConfirm = () => {
@@ -1274,7 +1343,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
               {upcomingAppointments.map((appt, i) => {
                 const isFuture = appt.date.getTime() > Date.now();
                 return (
-                  <Card key={i} className="border-2 border-blue-200 bg-gradient-to-r from-blue-50/60 to-white shadow-sm hover:shadow-md transition-shadow">
+                  <Card key={i} className="border-2 border-blue-200 dark:border-blue-800 bg-gradient-to-r from-blue-50/60 dark:from-blue-950/30 to-white dark:to-gray-900 shadow-sm hover:shadow-md transition-shadow">
                     <CardContent className="p-4">
                       <div className="flex items-start gap-4">
                         {/* Date badge */}
@@ -1287,7 +1356,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap mb-1.5">
                             {/* Full RTID — monospace, no truncation */}
-                            <span className="font-mono text-xs bg-blue-100 text-blue-900 px-2 py-0.5 rounded-md border border-blue-300 font-bold tracking-wider whitespace-nowrap">{appt.rtidCode}</span>
+                            <span className="font-mono text-xs bg-blue-100 dark:bg-blue-900/40 text-blue-900 dark:text-blue-200 px-2 py-0.5 rounded-md border border-blue-300 dark:border-blue-700 font-bold tracking-wider whitespace-nowrap">{appt.rtidCode}</span>
                             <ComponentBadge component={appt.component || 'Whole Blood'} />
                             <Badge variant="outline" className="border-blue-300 text-blue-700 bg-blue-50 text-[10px]">{appt.status}</Badge>
                           </div>
@@ -1298,7 +1367,7 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                             <span className="text-xs text-[var(--text-secondary)] flex items-center gap-1"><Droplet className="w-3 h-3 text-[var(--clr-danger)]" />{appt.component || 'Whole Blood'}</span>
                           </div>
                           {isFuture && (
-                            <div className="mt-1.5 inline-flex items-center gap-1 bg-blue-100 text-blue-700 rounded-full px-2 py-0.5">
+                            <div className="mt-1.5 inline-flex items-center gap-1 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 rounded-full px-2 py-0.5">
                               <Timer className="w-3 h-3" /><CountdownTimer targetDate={appt.date} compact label="In" />
                             </div>
                           )}
@@ -1380,10 +1449,10 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                                 }`}>
                                 {r.rtidCode}
                               </span>
-                              {r.linkedHrtid && r.linkedHrtid !== '—' && r.linkedHrtid !== 'N/A' && (
+                              {r.linkedHrtid && r.linkedHrtid !== '—' && r.linkedHrtid !== '–' && r.linkedHrtid !== 'N/A' && r.linkedHrtid !== 'null' && r.linkedHrtid.trim() !== '' && (
                                 <button onClick={() => handleViewHrtid(r.linkedHrtid)}
-                                  className="w-5 h-5 rounded-full bg-blue-100 text-[var(--brand-primary)] flex items-center justify-center text-[10px] font-bold border border-blue-200 hover:bg-blue-200 flex-shrink-0"
-                                  title="View patient impact">H</button>
+                                  className="w-6 h-6 rounded-full bg-blue-600 dark:bg-blue-500 text-white flex items-center justify-center text-[10px] font-bold border border-blue-700 dark:border-blue-400 hover:bg-blue-700 dark:hover:bg-blue-400 flex-shrink-0 shadow-sm transition-colors"
+                                  title={`View patient impact (${r.linkedHrtid})`}>H</button>
                               )}
                             </div>
                           </TableCell>
@@ -1404,15 +1473,15 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
 
                           {/* Status */}
                           <TableCell className="px-3 py-2.5">
-                            {r.status === 'Scheduled' && <Badge variant="outline" className="border-blue-300 text-blue-700 bg-blue-50 text-[10px]">Scheduled</Badge>}
-                            {r.status === 'Pending' && <Badge variant="outline" className="border-yellow-300 text-yellow-700 bg-yellow-50 text-[10px]">Pending</Badge>}
-                            {r.status === 'Donated' && <Badge variant="outline" className="border-green-300 text-green-700 bg-green-50 text-[10px]">Available</Badge>}
-                            {r.status === 'Verified' && <Badge variant="outline" className="border-teal-300 text-teal-700 bg-teal-50 text-[10px]">Verified</Badge>}
-                            {r.status === 'Credited' && <Badge variant="outline" className="border-indigo-300 text-indigo-700 bg-indigo-50 text-[10px]">Credited</Badge>}
-                            {r.status === 'Redeemed-Credit' && <Badge variant="outline" className="border-blue-300 text-blue-700 bg-blue-50 text-[10px]">Redeemed</Badge>}
-                            {r.status === 'Completed' && <Badge variant="outline" className="border-[var(--border-color)] text-[var(--text-secondary)] bg-[var(--bg-page)] text-[10px]">Completed</Badge>}
-                            {r.status === 'Expired' && <Badge variant="outline" className="border-red-300 text-red-700 bg-red-50 text-[10px]">Expired</Badge>}
-                            {r.status === 'Cancelled' && <Badge variant="outline" className="border-gray-400 text-[var(--text-secondary)] bg-[var(--bg-page)] text-[10px]">Cancelled</Badge>}
+                            {r.status === 'Scheduled' && <Badge variant="outline" className="border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/40 text-[10px]">Scheduled</Badge>}
+                            {r.status === 'Pending' && <Badge variant="outline" className="border-yellow-300 dark:border-yellow-700 text-yellow-700 dark:text-yellow-300 bg-yellow-50 dark:bg-yellow-950/40 text-[10px]">Pending</Badge>}
+                            {r.status === 'Donated' && <Badge variant="outline" className="border-green-300 dark:border-green-700 text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-950/40 text-[10px]">Available</Badge>}
+                            {r.status === 'Verified' && <Badge variant="outline" className="border-teal-300 dark:border-teal-700 text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/40 text-[10px]">Verified</Badge>}
+                            {r.status === 'Credited' && <Badge variant="outline" className="border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/40 text-[10px]">Credited</Badge>}
+                            {r.status === 'Redeemed-Credit' && <Badge variant="outline" className="border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/40 text-[10px]">Redeemed</Badge>}
+                            {r.status === 'Completed' && <Badge variant="outline" className="border-[var(--border-color)] text-[var(--text-secondary)] bg-[var(--bg-page)] dark:border-gray-600 dark:text-gray-400 dark:bg-gray-800/40 text-[10px]">Completed</Badge>}
+                            {r.status === 'Expired' && <Badge variant="outline" className="border-red-300 dark:border-red-800 text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-950/40 text-[10px]">Expired</Badge>}
+                            {r.status === 'Cancelled' && <Badge variant="outline" className="border-gray-400 dark:border-gray-600 text-[var(--text-secondary)] dark:text-gray-400 bg-[var(--bg-page)] dark:bg-gray-800/40 text-[10px]">Cancelled</Badge>}
                           </TableCell>
 
                           {/* Actions */}
@@ -1447,9 +1516,10 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
             <div className="w-full sm:w-[200px] sm:flex-shrink-0 bg-gradient-to-br from-[var(--clr-brand)] to-[#5a0000] text-[var(--txt-inverse)] p-5 flex flex-col items-center justify-center text-center">
               <div className="w-20 h-20 rounded-full border-4 border-white/30 bg-[var(--bg-surface)]/10 flex items-center justify-center text-3xl font-black mb-3">{initials(donorData.fullName || 'D')}</div>
               <h2 className="text-lg font-bold mb-0.5">{donorData.fullName}</h2>
-              <p className="text-xs text-red-200 mb-1 font-mono">{donorData.internalId || 'N/A'}</p>
-              {donorData.username && <p className="text-xs text-red-300 mb-3">{formatUsername(donorData.username)}</p>}
-              {!donorData.username && <div className="mb-3" />}
+              <p className="text-xs text-red-200 mb-1 font-mono">{donorData.internalId || donorData.donorId || 'N/A'}</p>
+              {donorData.username
+                ? <p className="text-[11px] text-red-200/80 mb-3 font-medium">{formatUsername(donorData.username)}</p>
+                : <div className="mb-3" />}
               <div className="bg-[var(--bg-surface)]/10 rounded-xl p-3 w-full border border-white/10 mb-3">
                 <div className="flex justify-around">
                   <div className="text-center"><p className="text-[10px] text-red-200 uppercase">Blood</p><p className="text-2xl font-black">{donorData.bloodGroup}</p></div>
@@ -1468,22 +1538,22 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                 </TabsList>
                 <TabsContent value="overview" className="space-y-2.5">
                   {[
-                    { icon: MapPin, label: 'Location', value: `${donorData.city || '—'}${donorData.pincode ? ', ' + donorData.pincode : ''}` },
-                    { icon: BadgeCheck, label: 'Donor ID', value: donorData.internalId || '—' },
-                    ...(donorData.username ? [{ icon: BadgeCheck, label: '@rakt Username', value: formatUsername(donorData.username) }] : []),
-                    { icon: Mail, label: 'Email', value: donorData.email || '—' },
-                    { icon: Phone, label: 'Mobile', value: donorData.mobile || '—' },
+                    { icon: MapPin,        label: 'Location',      value: `${donorData.city || '—'}${donorData.pincode ? ', ' + donorData.pincode : ''}` },
+                    { icon: BadgeCheck,    label: 'Donor ID',      value: donorData.internalId || donorData.donorId || '—' },
+                    { icon: User,          label: 'Username',      value: donorData.username ? formatUsername(donorData.username) : '—' },
+                    { icon: Mail,          label: 'Email',         value: donorData.email || '—' },
+                    { icon: Phone,         label: 'Mobile',        value: donorData.mobile && donorData.mobile !== 'Not Set' && donorData.mobile !== 'Mobile Registered ✓' ? donorData.mobile : donorData.mobile === 'Mobile Registered ✓' ? '🔒 See Settings → Update Mobile' : '—' },
                     { icon: CalendarCheck, label: 'Last Donation', value: lastDonationDisplay },
-                    { icon: Calendar, label: 'Next Eligible', value: nextEligibleDisplay },
+                    { icon: Calendar,      label: 'Next Eligible', value: nextEligibleDisplay },
                   ].map(({ icon: Icon, label, value }) => (
-                    <div key={label} className="flex items-center gap-3 p-3 bg-[var(--bg-page)] rounded-xl border border-gray-100">
-                      <Icon className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                      <div className="min-w-0"><p className="text-[10px] text-gray-400 font-medium">{label}</p><p className="text-sm font-semibold text-[var(--text-primary)] truncate">{value}</p></div>
+                    <div key={label} className="flex items-center gap-3 p-3 bg-[var(--bg-page)] dark:bg-gray-800/60 rounded-xl border border-gray-100 dark:border-gray-700">
+                      <Icon className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+                      <div className="min-w-0"><p className="text-[10px] text-gray-400 dark:text-gray-500 font-medium">{label}</p><p className="text-sm font-semibold text-[var(--text-primary)] dark:text-gray-100 truncate">{value}</p></div>
                     </div>
                   ))}
                   {nextEligibleDate && nextEligibleDate > new Date() && (
-                    <div className="p-3 bg-blue-50 rounded-xl border border-blue-200">
-                      <div className="flex items-center gap-2"><AlarmClock className="w-4 h-4 text-[var(--brand-primary)] flex-shrink-0" /><div><p className="text-xs font-bold text-blue-800">Countdown to next donation</p><CountdownTimer targetDate={nextEligibleDate} compact /></div></div>
+                    <div className="p-3 bg-blue-50 dark:bg-blue-950/40 rounded-xl border border-blue-200 dark:border-blue-800">
+                      <div className="flex items-center gap-2"><AlarmClock className="w-4 h-4 text-[var(--brand-primary)] flex-shrink-0" /><div><p className="text-xs font-bold text-blue-800 dark:text-blue-300">Countdown to next donation</p><CountdownTimer targetDate={nextEligibleDate} compact /></div></div>
                     </div>
                   )}
                   <div className="flex gap-2 pt-2">
@@ -1502,11 +1572,47 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
                   <div className="grid grid-cols-2 gap-3">
                     {[{ icon: '🥉', label: 'Bronze Donor', req: 1, desc: '1+ donations' }, { icon: '🥈', label: 'Silver Donor', req: 5, desc: '5+ donations' }, { icon: '🥇', label: 'Gold Donor', req: 10, desc: '10+ donations' }, { icon: '💎', label: 'Diamond Donor', req: 20, desc: '20+ donations' }].map(b => {
                       const unlocked = (donorData.donationsCount || 0) >= b.req;
-                      return <div key={b.label} className={`p-4 rounded-xl border-2 text-center ${unlocked ? 'border-yellow-300 bg-yellow-50' : 'border-gray-100 bg-[var(--bg-page)] opacity-50 grayscale'}`}><span className="text-3xl">{b.icon}</span><p className="text-xs font-bold mt-1 text-[var(--text-primary)]">{b.label}</p><p className="text-[10px] text-[var(--text-secondary)]">{b.desc}</p>{unlocked && <p className="text-[9px] text-[var(--clr-success)] font-bold mt-0.5">✓ Unlocked</p>}</div>;
+                      return <div key={b.label} className={`p-4 rounded-xl border-2 text-center ${unlocked ? 'border-yellow-300 dark:border-yellow-600 bg-yellow-50 dark:bg-yellow-950/40' : 'border-gray-100 dark:border-gray-700 bg-[var(--bg-page)] opacity-50 grayscale'}`}><span className="text-3xl">{b.icon}</span><p className="text-xs font-bold mt-1 text-[var(--text-primary)] dark:text-gray-100">{b.label}</p><p className="text-[10px] text-[var(--text-secondary)] dark:text-gray-400">{b.desc}</p>{unlocked && <p className="text-[9px] text-[var(--clr-success)] font-bold mt-0.5">✓ Unlocked</p>}</div>;
                     })}
                   </div>
                 </TabsContent>
                 <TabsContent value="settings" className="space-y-4">
+                  {/* ── Update Mobile Number ────────────────── */}
+                  <div className="p-4 bg-blue-50 dark:bg-blue-950/40 rounded-xl border border-blue-200 dark:border-blue-800">
+                    <Label className="text-sm font-bold text-blue-800 dark:text-blue-300 mb-1 block flex items-center gap-2">
+                      <Phone className="w-4 h-4" /> Update Mobile Number
+                    </Label>
+                    <p className="text-xs text-blue-700 dark:text-blue-400 mb-3">
+                      Current: <strong>{donorData.mobile || 'Not set'}</strong>
+                    </p>
+                    <div className="flex gap-2">
+                      <div className="flex-1 relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 pointer-events-none">+91</span>
+                        <Input
+                          type="tel"
+                          inputMode="numeric"
+                          placeholder="Enter 10-digit number"
+                          value={mobileInput}
+                          onChange={e => setMobileInput(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                          className="pl-10 text-sm"
+                          maxLength={10}
+                        />
+                      </div>
+                      <Button
+                        size="sm"
+                        onClick={handleUpdateMobile}
+                        disabled={mobileUpdating || mobileInput.replace(/\D/g,'').length < 10}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-4"
+                      >
+                        {mobileUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save'}
+                      </Button>
+                    </div>
+                    {mobileInput.length > 0 && mobileInput.length < 10 && (
+                      <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">{10 - mobileInput.length} more digits needed</p>
+                    )}
+                  </div>
+
+                  {/* ── Availability ────────────────────────── */}
                   <div>
                     <Label className="text-sm mb-2 block">Availability Mode</Label>
                     <Select value={donorData.availabilityMode || 'available'} onValueChange={v => handleAvailabilityChange(v as any)}>
@@ -1681,8 +1787,8 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
           <DialogHeader><DialogTitle>Linked Patient Request</DialogTitle><DialogDescription>This donation was linked to a specific patient need</DialogDescription></DialogHeader>
           {hrtidLoading ? <div className="flex justify-center p-6"><Loader2 className="w-7 h-7 animate-spin text-primary" /></div> : hrtidDetails ? (
             <div className="space-y-3">
-              <div className="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-xl border border-[var(--border-color)] dark:border-blue-800 space-y-2 text-sm">
-                {[['H-RTID', hrtidDetails.rtidCode], ['Patient', hrtidDetails.patientName], ['Hospital', hrtidDetails.hospital], ['Blood Group', hrtidDetails.bloodGroup], ['Units', String(hrtidDetails.units)], ['Required By', hrtidDetails.requiredBy || 'N/A']].map(([k, v]) => (
+              <div className="p-4 bg-blue-50 dark:bg-blue-950/40 rounded-xl border border-blue-200 dark:border-blue-800 space-y-2 text-sm">
+                {[['H-RTID', hrtidDetails.rtidCode], ['Patient', hrtidDetails.patientName || 'Confidential'], ['Hospital', hrtidDetails.hospital], ['Blood Group', hrtidDetails.bloodGroup], ['Units', String(hrtidDetails.units)], ['Required By', hrtidDetails.requiredBy || 'N/A']].map(([k, v]) => (
                   <div key={k} className="flex justify-between gap-2"><span className="text-xs text-[var(--text-secondary)] dark:text-gray-400 font-medium">{k}</span><span className="text-xs font-bold text-[var(--text-primary)] dark:text-gray-100 text-right leading-tight max-w-[65%] break-words">{v}</span></div>
                 ))}
               </div>
