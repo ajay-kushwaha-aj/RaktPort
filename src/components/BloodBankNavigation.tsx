@@ -24,15 +24,15 @@ interface BloodBankNavigationProps {
 }
 
 const tabs: { id: TabType; label: string; icon: React.ReactNode; shortLabel?: string }[] = [
-  { id: 'overview',     label: 'Overview',         icon: <LayoutDashboard size={15} /> },
-  { id: 'inventory',    label: 'Inventory',        icon: <Droplet size={15} /> },
-  { id: 'appointments', label: 'Appointments',     icon: <CalendarCheck size={15} />, shortLabel: 'Appts' },
-  { id: 'donations',    label: 'Donations',        icon: <ClipboardList size={15} /> },
-  { id: 'redemptions',  label: 'Redemptions',      icon: <RefreshCw size={15} />, shortLabel: 'Redeem' },
-  { id: 'verify',       label: 'Verify & Redeem',  icon: <BadgeCheck size={15} />, shortLabel: 'Verify' },
-  { id: 'rtidVerify',   label: 'RTID',             icon: <QrCode size={15} /> },
-  { id: 'camps',        label: 'Camps',            icon: <MapPin size={15} /> },
-  { id: 'reports',      label: 'Reports',          icon: <BarChart2 size={15} /> },
+  { id: 'overview', label: 'Overview', icon: <LayoutDashboard size={15} /> },
+  { id: 'inventory', label: 'Inventory', icon: <Droplet size={15} /> },
+  { id: 'appointments', label: 'Appointments', icon: <CalendarCheck size={15} />, shortLabel: 'Appts' },
+  { id: 'donations', label: 'Donations', icon: <ClipboardList size={15} /> },
+  { id: 'redemptions', label: 'Redemptions', icon: <RefreshCw size={15} />, shortLabel: 'Redeem' },
+  { id: 'verify', label: 'Verify & Redeem', icon: <BadgeCheck size={15} />, shortLabel: 'Verify' },
+  { id: 'rtidVerify', label: 'RTID', icon: <QrCode size={15} /> },
+  { id: 'camps', label: 'Camps', icon: <MapPin size={15} /> },
+  { id: 'reports', label: 'Reports', icon: <BarChart2 size={15} /> },
 ];
 
 export const BloodBankNavigation = ({
@@ -112,7 +112,7 @@ export const BloodBankNavigation = ({
               const isActive = activeTab === tab.id;
               const badge =
                 tab.id === 'appointments' ? appointmentCount :
-                tab.id === 'donations'    ? requestCount     : 0;
+                  tab.id === 'donations' ? requestCount : 0;
               return (
                 <button
                   key={tab.id}

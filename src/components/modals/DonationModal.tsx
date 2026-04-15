@@ -1,17 +1,17 @@
-// DonationModal.tsx - PROFESSIONAL VERSION
-// Replace your entire DonationModal.tsx with this:
+/**
+ * DonationModal.tsx — RaktPort v5 Premium Redesign
+ * "Process Donation Check-In" — clean, modern, glassmorphic form
+ */
 
 import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, CheckCircle2, AlertCircle, User, Droplet, Shield, Building2, Calendar } from 'lucide-react';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import {
+  Loader2, CheckCircle2, AlertCircle, User, Droplet,
+  Shield, Building2, X, Zap, Heart,
+  Activity, AlarmClock, ArrowRight, Info, Target
+} from 'lucide-react';
 import { db } from '@/firebase';
 import { doc, getDoc, query, collection, where, getDocs } from 'firebase/firestore';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
 
 interface DonationModalProps {
   isOpen: boolean;
@@ -27,496 +27,623 @@ interface RRTIDData {
   unitsRequired: number;
   requiredBy?: string;
   hospitalName: string;
-  hospitalId?: string;
   district?: string;
   state?: string;
   status?: string;
 }
 
+const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+
+const BG_COLORS: Record<string, { bg: string; text: string; border: string }> = {
+  'A+':  { bg: '#fff5f5', text: '#b91c1c', border: '#fca5a5' },
+  'A-':  { bg: '#fff0f6', text: '#be185d', border: '#fbcfe8' },
+  'B+':  { bg: '#eff6ff', text: '#1d4ed8', border: '#93c5fd' },
+  'B-':  { bg: '#f0f9ff', text: '#0369a1', border: '#7dd3fc' },
+  'O+':  { bg: '#f0fdf4', text: '#166534', border: '#86efac' },
+  'O-':  { bg: '#f0fdfa', text: '#0f766e', border: '#5eead4' },
+  'AB+': { bg: '#faf5ff', text: '#7e22ce', border: '#c4b5fd' },
+  'AB-': { bg: '#f5f3ff', text: '#6d28d9', border: '#ddd6fe' },
+};
+
 export const DonationModal = ({ isOpen, onClose, onSubmit, checkInData }: DonationModalProps) => {
-  // Form State
   const [donorName, setDonorName] = useState('');
   const [mobile, setMobile] = useState('');
   const [bloodGroup, setBloodGroup] = useState('');
   const [donationType, setDonationType] = useState('Regular');
   const [component, setComponent] = useState('Whole Blood');
   const [rRtid, setRRtid] = useState('');
-
-  // Validation State
   const [rRtidData, setRRtidData] = useState<RRTIDData | null>(null);
   const [rRtidLoading, setRRtidLoading] = useState(false);
   const [rRtidError, setRRtidError] = useState('');
   const [rRtidValid, setRRtidValid] = useState(false);
 
-  // Check if this is an appointment check-in (fields should be read-only)
   const isCheckIn = !!checkInData;
+  const bgPal = bloodGroup ? BG_COLORS[bloodGroup] : null;
 
-  // ====================================================================
-  // EFFECT: Pre-fill data from appointment check-in
-  // ====================================================================
   useEffect(() => {
     if (checkInData) {
-      console.log("Check-in data received:", checkInData);
-
       setDonorName(checkInData.donorName || '');
       setMobile(checkInData.mobile || '');
       setBloodGroup(checkInData.bloodGroup || '');
       setComponent(checkInData.component || 'Whole Blood');
-
       setDonationType('Regular');
-      setRRtid('');
-      setRRtidData(null);
+      setRRtid(''); setRRtidData(null);
     } else {
       resetForm();
     }
   }, [checkInData, isOpen]);
 
-  // ====================================================================
-  // FUNCTION: Validate and Fetch R-RTID Data
-  // ====================================================================
   const validateRRTID = async (rtid: string) => {
-    if (!rtid || rtid.trim() === '') {
-      setRRtidData(null);
-      setRRtidError('');
-      setRRtidValid(false);
-      return;
-    }
-
-    setRRtidLoading(true);
-    setRRtidError('');
-    setRRtidValid(false);
-
+    if (!rtid.trim()) { setRRtidData(null); setRRtidError(''); setRRtidValid(false); return; }
+    setRRtidLoading(true); setRRtidError(''); setRRtidValid(false);
     try {
       let requestData: any = null;
-
-      const docRef = doc(db, "bloodRequests", rtid);
-      const docSnap = await getDoc(docRef);
-
+      const docSnap = await getDoc(doc(db, 'bloodRequests', rtid));
       if (docSnap.exists()) {
         requestData = docSnap.data();
       } else {
-        const queries = [
-          query(collection(db, "bloodRequests"), where("linkedRTID", "==", rtid)),
-          query(collection(db, "bloodRequests"), where("rtid", "==", rtid))
-        ];
-
-        for (const q of queries) {
-          const qSnap = await getDocs(q);
-          if (!qSnap.empty) {
-            requestData = qSnap.docs[0].data();
-            break;
-          }
+        for (const q of [
+          query(collection(db, 'bloodRequests'), where('linkedRTID', '==', rtid)),
+          query(collection(db, 'bloodRequests'), where('rtid', '==', rtid)),
+        ]) {
+          const qs = await getDocs(q);
+          if (!qs.empty) { requestData = qs.docs[0].data(); break; }
         }
       }
-
-      if (!requestData) {
-        throw new Error("RH/RU-RTID not found in system");
-      }
-
+      if (!requestData) throw new Error('RH/RU-RTID not found in system');
       let hospitalName = requestData.hospitalName || 'Hospital';
-      let hospitalLocation = '';
-
       if (requestData.hospitalId) {
         try {
-          const hospitalDoc = await getDoc(doc(db, "users", requestData.hospitalId));
-          if (hospitalDoc.exists()) {
-            const hospitalData = hospitalDoc.data();
-            hospitalName = hospitalData.fullName || hospitalName;
-            hospitalLocation = `${hospitalData.district || ''}, ${hospitalData.state || ''}`.trim();
-          }
-        } catch (err) {
-          console.warn("Could not fetch hospital details:", err);
-        }
+          const hDoc = await getDoc(doc(db, 'users', requestData.hospitalId));
+          if (hDoc.exists()) hospitalName = hDoc.data().fullName || hospitalName;
+        } catch (_) {}
       }
-
       let requiredByText = 'N/A';
       if (requestData.requiredBy) {
         try {
-          const reqDate = requestData.requiredBy.toDate
-            ? requestData.requiredBy.toDate()
-            : new Date(requestData.requiredBy);
-
-          requiredByText = reqDate.toLocaleString('en-IN', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-          });
-        } catch (e) {
-          console.warn("Could not parse requiredBy date");
-        }
+          const d = requestData.requiredBy.toDate ? requestData.requiredBy.toDate() : new Date(requestData.requiredBy);
+          requiredByText = d.toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        } catch (_) {}
       }
-
-      const validatedData: RRTIDData = {
+      setRRtidData({
         patientName: requestData.patientName || 'Patient',
         bloodGroup: requestData.bloodGroup || 'Unknown',
         component: requestData.component || 'Whole Blood',
-        unitsRequired: requestData.unitsRequired || requestData.units || 1,
+        unitsRequired: requestData.unitsRequired || 1,
         requiredBy: requiredByText,
-        hospitalName: hospitalName,
-        district: requestData.district || '',
-        state: requestData.state || '',
-        status: requestData.status || 'PENDING'
-      };
-
-      setRRtidData(validatedData);
+        hospitalName, district: requestData.district || '', state: requestData.state || '',
+        status: requestData.status || 'PENDING',
+      });
       setRRtidValid(true);
-
     } catch (err: any) {
-      setRRtidError(err.message || "Failed to validate RH/RU-RTID");
-      setRRtidData(null);
-      setRRtidValid(false);
-    } finally {
-      setRRtidLoading(false);
-    }
+      setRRtidError(err.message || 'Failed to validate RH/RU-RTID');
+      setRRtidData(null); setRRtidValid(false);
+    } finally { setRRtidLoading(false); }
   };
 
   useEffect(() => {
     if (donationType === 'RH/RU-RTID-Linked Donation' && rRtid.length >= 10) {
-      const debounce = setTimeout(() => {
-        validateRRTID(rRtid);
-      }, 500);
-      return () => clearTimeout(debounce);
-    } else {
-      setRRtidData(null);
-      setRRtidError('');
-      setRRtidValid(false);
-    }
+      const t = setTimeout(() => validateRRTID(rRtid), 500);
+      return () => clearTimeout(t);
+    } else { setRRtidData(null); setRRtidError(''); setRRtidValid(false); }
   }, [rRtid, donationType]);
 
   const resetForm = () => {
-    setDonorName('');
-    setMobile('');
-    setBloodGroup('');
-    setDonationType('Regular');
-    setComponent('Whole Blood');
-    setRRtid('');
-    setRRtidData(null);
-    setRRtidError('');
-    setRRtidValid(false);
+    setDonorName(''); setMobile(''); setBloodGroup('');
+    setDonationType('Regular'); setComponent('Whole Blood');
+    setRRtid(''); setRRtidData(null); setRRtidError(''); setRRtidValid(false);
   };
 
   const handleSubmit = () => {
-    if (!donorName.trim()) {
-      alert('Please enter donor name');
-      return;
-    }
-
-    if (!bloodGroup) {
-      alert('Please select blood group');
-      return;
-    }
-
+    if (!donorName.trim()) { alert('Please enter donor name'); return; }
+    if (!bloodGroup) { alert('Please select blood group'); return; }
     if (donationType === 'RH/RU-RTID-Linked Donation') {
-      if (!rRtid.trim()) {
-        alert('Please enter RH/RU-RTID');
-        return;
-      }
-      if (!rRtidValid) {
-        alert('Please wait for RH/RU-RTID validation');
-        return;
-      }
+      if (!rRtid.trim()) { alert('Please enter RH/RU-RTID'); return; }
+      if (!rRtidValid) { alert('Please wait for RH/RU-RTID validation'); return; }
     }
-
-    const submissionData = {
+    onSubmit({
       donorName: donorName.trim(),
       mobile: mobile.trim() || checkInData?.mobile || '',
-      bloodGroup: bloodGroup,
-      donationType: donationType,
-      component: component,
+      bloodGroup, donationType, component,
       rRtid: donationType === 'RH/RU-RTID-Linked Donation' ? rRtid : null,
       rRtidData: donationType === 'RH/RU-RTID-Linked Donation' ? rRtidData : null,
-    };
-
-    onSubmit(submissionData);
+    });
     resetForm();
   };
 
-  const handleClose = () => {
-    resetForm();
-    onClose();
-  };
+  const handleClose = () => { resetForm(); onClose(); };
+
+  const DONATION_TYPES = [
+    { value: 'Regular', icon: <Droplet size={18} style={{ color: '#C41E3A' }} />, iconBg: '#fff5f5', label: 'Regular Donation', desc: 'Standard walk-in or appointment donation' },
+    { value: 'RH/RU-RTID-Linked Donation', icon: <Building2 size={18} style={{ color: '#7c3aed' }} />, iconBg: '#f5f3ff', label: 'Request-Linked', desc: 'Linked to hospital blood request' },
+    { value: 'Emergency', icon: <AlarmClock size={18} style={{ color: '#ea580c' }} />, iconBg: '#fff7ed', label: 'Emergency', desc: 'Urgent critical donation' },
+  ];
+
+  const COMPONENTS = ['Whole Blood', 'Platelets', 'Plasma', 'PRBC'];
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-white to-red-50">
+      <DialogContent className="max-w-2xl p-0 overflow-hidden border-0 shadow-2xl rounded-2xl max-h-[90vh] overflow-y-auto">
+        <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
-        {/* PROFESSIONAL HEADER */}
-        <DialogHeader className="border-b border-red-100 pb-4">
-          <div className="flex items-center gap-4">
-            <div className="h-14 w-14 rounded-full bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-lg">
-              <Droplet className="h-7 w-7 text-[var(--txt-inverse)] fill-white" />
-            </div>
-            <div>
-              <DialogTitle className="text-2xl font-bold text-[var(--text-primary)]">
-                {isCheckIn ? 'Process Donation Check-In' : 'Record New Donation'}
-              </DialogTitle>
-              <p className="text-sm text-[var(--text-secondary)] mt-1">
-                {isCheckIn ? 'Complete the donation process for scheduled appointment' : 'Register a walk-in blood donation'}
-              </p>
-            </div>
-          </div>
-        </DialogHeader>
+          .dm-root { font-family: 'Plus Jakarta Sans', sans-serif; }
 
-        <div className="space-y-6 py-4">
+          /* ── Header ── */
+          .dm-header {
+            background: linear-gradient(135deg, #C41E3A 0%, #8b0000 60%, #6b0000 100%);
+            padding: 24px 28px 20px;
+            position: relative; overflow: hidden;
+          }
+          .dm-header::before {
+            content: ''; position: absolute; right: -30px; top: -30px;
+            width: 160px; height: 160px;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 65%);
+            border-radius: 50%;
+          }
+          .dm-header::after {
+            content: ''; position: absolute; left: -20px; bottom: -40px;
+            width: 120px; height: 120px;
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 60%);
+            border-radius: 50%;
+          }
+          .dm-header-inner { position: relative; z-index: 1; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 
-          {/* DONOR INFORMATION CARD */}
-          <div className="bg-[var(--bg-surface)] rounded-xl border-2 border-blue-100 shadow-sm">
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-3 border-b border-blue-100">
-              <div className="flex items-center gap-2">
-                <User className="h-5 w-5 text-[var(--clr-info)]" />
-                <h3 className="font-bold text-[var(--text-primary)]">Donor Information</h3>
-                {isCheckIn && (
-                  <Badge className="ml-auto bg-blue-100 text-blue-700 border-blue-200">
-                    <Shield className="h-3 w-3 mr-1" />
-                    Verified
-                  </Badge>
-                )}
-              </div>
-            </div>
+          .dm-header-icon {
+            width: 52px; height: 52px; border-radius: 14px;
+            background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+          }
+          .dm-header-title {
+            font-family: 'Sora', Georgia, serif;
+            font-size: 1.25rem; font-weight: 800; color: #fff; margin: 0 0 4px; line-height: 1.2;
+          }
+          .dm-header-sub { font-size: 0.8rem; color: rgba(255,210,200,0.85); margin: 0; }
+          .dm-close-btn {
+            width: 30px; height: 30px; border-radius: 8px;
+            background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.8); display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.18s; flex-shrink: 0;
+          }
+          .dm-close-btn:hover { background: rgba(255,255,255,0.22); color: #fff; }
 
-            <div className="p-6 space-y-4">
-              {/* Donor Name */}
-              <div>
-                <Label htmlFor="donorName" className="text-sm font-semibold text-gray-700">
-                  Donor Full Name {isCheckIn && <span className="text-xs text-[var(--clr-info)]">(Registered)</span>}
-                </Label>
-                <Input
-                  id="donorName"
-                  placeholder="e.g., Abhimanyu Kushwaha"
-                  value={donorName}
-                  onChange={(e) => setDonorName(e.target.value)}
-                  disabled={isCheckIn}
-                  className={`mt-1.5 ${isCheckIn ? 'bg-blue-50 border-blue-200 cursor-not-allowed font-semibold text-[var(--text-primary)]' : ''}`}
-                />
-              </div>
+          /* Check-in info strip */
+          .dm-checkin-strip {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 10px; padding: 10px 14px; margin-top: 14px;
+            display: flex; align-items: center; gap: 10px;
+          }
+          .dm-checkin-strip span { font-size: 0.75rem; color: rgba(255,255,255,0.9); font-weight: 500; }
+          .dm-checkin-badge {
+            font-size: 0.62rem; font-weight: 800; padding: 2px 8px;
+            background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);
+            color: #fff; border-radius: 999px; letter-spacing: 0.04em;
+          }
 
-              {/* Blood Group */}
-              <div>
-                <Label htmlFor="bloodGroup" className="text-sm font-semibold text-gray-700">
-                  Blood Group {isCheckIn && <span className="text-xs text-[var(--clr-info)]">(Registered)</span>}
-                </Label>
-                <Select value={bloodGroup} onValueChange={setBloodGroup} disabled={isCheckIn}>
-                  <SelectTrigger className={`mt-1.5 ${isCheckIn ? 'bg-blue-50 border-blue-200 cursor-not-allowed' : ''}`}>
-                    <SelectValue placeholder="Select Blood Group" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="A+">A+</SelectItem>
-                    <SelectItem value="A-">A-</SelectItem>
-                    <SelectItem value="B+">B+</SelectItem>
-                    <SelectItem value="B-">B-</SelectItem>
-                    <SelectItem value="AB+">AB+</SelectItem>
-                    <SelectItem value="AB-">AB-</SelectItem>
-                    <SelectItem value="O+">O+</SelectItem>
-                    <SelectItem value="O-">O-</SelectItem>
-                  </SelectContent>
-                </Select>
-                {isCheckIn && bloodGroup && (
-                  <p className="text-xs text-[var(--clr-info)] mt-1 flex items-center gap-1">
-                    <Shield className="h-3 w-3" />
-                    Verified from donor registration
+          /* ── Body ── */
+          .dm-body { padding: 24px 28px; display: flex; flex-direction: column; gap: 20px; background: #fff; }
+          .dark .dm-body { background: #1e293b; }
+
+          /* ── Section label ── */
+          .dm-section-label {
+            font-family: 'Sora', sans-serif;
+            font-size: 0.72rem; font-weight: 700; color: #94a3b8;
+            text-transform: uppercase; letter-spacing: 0.1em;
+            display: flex; align-items: center; gap: 6px;
+            margin-bottom: 12px;
+          }
+          .dm-section-label::after {
+            content: ''; flex: 1; height: 1px; background: #f0f0f0;
+          }
+          .dark .dm-section-label::after { background: rgba(255,255,255,0.08); }
+
+          /* ── Form fields ── */
+          .dm-field { display: flex; flex-direction: column; gap: 5px; }
+          .dm-label {
+            font-size: 0.78rem; font-weight: 700; color: #374151;
+          }
+          .dark .dm-label { color: #e2e8f0; }
+          .dm-label-badge {
+            font-size: 0.62rem; font-weight: 600; padding: 1px 6px;
+            background: #eff6ff; color: #1d4ed8; border-radius: 999px;
+            border: 1px solid #bfdbfe; margin-left: 6px;
+          }
+
+          .dm-input {
+            width: 100%; height: 44px; border-radius: 12px;
+            border: 1.5px solid #e5e7eb;
+            padding: 0 14px;
+            font-size: 0.87rem; color: #111827;
+            background: #fafafa; outline: none;
+            transition: all 0.18s;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+          }
+          .dm-input:focus { border-color: #C41E3A; background: #fff; box-shadow: 0 0 0 3px rgba(196,30,58,0.07); }
+          .dm-input:disabled { background: #f0f7ff; border-color: #bfdbfe; color: #1e40af; cursor: default; font-weight: 600; }
+          .dark .dm-input { background: #0f172a; border-color: rgba(255,255,255,0.1); color: #f0f4ff; }
+          .dark .dm-input:focus { border-color: #f87171; box-shadow: 0 0 0 3px rgba(248,113,113,0.1); }
+          .dark .dm-input:disabled { background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.2); color: #93c5fd; }
+
+          .dm-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+          @media (max-width: 560px) { .dm-grid-2 { grid-template-columns: 1fr; } }
+
+          /* ── Blood group pill picker — horizontal wrap, no overlap ── */
+          .dm-bg-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+          }
+          @media (max-width: 400px) { .dm-bg-grid { grid-template-columns: repeat(4, 1fr); } }
+
+          .dm-bg-pill {
+            padding: 10px 6px; border-radius: 10px; border: 1.5px solid;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Sora', monospace; font-size: 0.85rem; font-weight: 800;
+            cursor: pointer; transition: all 0.2s;
+            min-width: 0; white-space: nowrap;
+          }
+          .dm-bg-pill:not(.dm-bg-selected):hover { transform: scale(1.08); }
+          .dm-bg-selected {
+            box-shadow: 0 0 0 2px #fff, 0 0 0 4px currentColor;
+            transform: scale(1.08);
+          }
+          .dm-bg-pill-disabled { cursor: not-allowed; opacity: 0.85; }
+
+          /* ── Donation type cards ── */
+          .dm-type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+          @media (max-width: 480px) { .dm-type-grid { grid-template-columns: 1fr; } }
+
+          .dm-type-card {
+            border: 1.5px solid #e5e7eb; border-radius: 12px; padding: 12px;
+            cursor: pointer; transition: all 0.18s; text-align: left;
+            background: #fafafa;
+          }
+          .dm-type-card:hover { border-color: #C41E3A; background: #fff5f5; }
+          .dm-type-card.dm-type-active {
+            border-color: #C41E3A; background: #fff5f5;
+            box-shadow: 0 0 0 3px rgba(196,30,58,0.08);
+          }
+          .dark .dm-type-card { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.09); }
+          .dark .dm-type-card.dm-type-active { background: rgba(196,30,58,0.08); border-color: rgba(196,30,58,0.3); }
+
+          .dm-type-icon-wrap {
+            width: 36px; height: 36px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 8px; flex-shrink: 0;
+          }
+          .dm-type-name { font-size: 0.78rem; font-weight: 700; color: #111827; }
+          .dark .dm-type-name { color: #f0f4ff; }
+          .dm-type-desc { font-size: 0.65rem; color: #9ca3af; margin-top: 2px; }
+
+          /* ── Component selector ── */
+          .dm-comp-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+          .dm-comp-pill {
+            padding: 6px 14px; border-radius: 999px; border: 1.5px solid #e5e7eb;
+            font-size: 0.76rem; font-weight: 600; cursor: pointer; transition: all 0.18s;
+            background: #fafafa; color: #374151;
+          }
+          .dm-comp-pill:hover { border-color: #C41E3A; color: #C41E3A; }
+          .dm-comp-pill.dm-comp-active {
+            background: #C41E3A; border-color: #C41E3A;
+            color: #fff; box-shadow: 0 3px 10px rgba(196,30,58,0.25);
+          }
+          .dark .dm-comp-pill { background: rgba(255,255,255,0.05); color: #94a3b8; border-color: rgba(255,255,255,0.1); }
+          .dark .dm-comp-pill.dm-comp-active { background: #C41E3A; border-color: #C41E3A; color: #fff; }
+
+          /* ── RTID Input ── */
+          .dm-rtid-input-wrap { position: relative; }
+          .dm-rtid-input {
+            width: 100%; height: 46px; border-radius: 12px;
+            border: 1.5px solid #e5e7eb;
+            padding: 0 46px 0 14px;
+            font-family: 'Sora', monospace; font-size: 0.85rem; font-weight: 600;
+            color: #111827; background: #fafafa; outline: none; transition: all 0.18s;
+            letter-spacing: 0.02em;
+          }
+          .dm-rtid-input:focus { border-color: #7c3aed; background: #fff; box-shadow: 0 0 0 3px rgba(124,58,237,0.07); }
+          .dm-rtid-input.valid { border-color: #16a34a; }
+          .dm-rtid-input.error { border-color: #C41E3A; }
+          .dark .dm-rtid-input { background: #0f172a; color: #f0f4ff; border-color: rgba(255,255,255,0.1); }
+
+          .dm-rtid-icon {
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+          }
+
+          /* ── Validated patient card ── */
+          .dm-patient-card {
+            background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+            border: 1.5px solid #86efac; border-radius: 14px; padding: 16px;
+            display: flex; flex-direction: column; gap: 10px;
+            animation: dm-pop 0.3s cubic-bezier(0.34,1.56,0.64,1);
+          }
+          @keyframes dm-pop { from{transform:scale(0.96);opacity:0} to{transform:scale(1);opacity:1} }
+          .dark .dm-patient-card { background: rgba(22,163,74,0.08); border-color: rgba(22,163,74,0.3); }
+
+          .dm-patient-header {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 0.8rem; font-weight: 700; color: #166534;
+          }
+          .dark .dm-patient-header { color: #4ade80; }
+          .dm-patient-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+          .dm-patient-field {
+            background: rgba(255,255,255,0.7); border: 1px solid rgba(22,163,74,0.15);
+            border-radius: 9px; padding: 9px 11px;
+          }
+          .dark .dm-patient-field { background: rgba(255,255,255,0.05); }
+          .dm-patient-field-label { font-size: 0.62rem; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+          .dm-patient-field-val { font-size: 0.87rem; font-weight: 700; color: #111827; margin-top: 2px; }
+          .dark .dm-patient-field-val { color: #f0f4ff; }
+          .dm-patient-impact {
+            background: rgba(255,255,255,0.5); border: 1px solid rgba(22,163,74,0.2);
+            border-radius: 9px; padding: 9px 12px;
+            font-size: 0.76rem; color: #166534; font-weight: 500;
+            display: flex; align-items: center; gap: 8px;
+          }
+          .dark .dm-patient-impact { background: rgba(22,163,74,0.07); color: #4ade80; }
+
+          /* ── Footer ── */
+          .dm-footer {
+            padding: 16px 28px 24px; display: flex; align-items: center; gap: 10px;
+            border-top: 1px solid #f0f0f0; background: #fff;
+          }
+          .dark .dm-footer { background: #1e293b; border-top-color: rgba(255,255,255,0.07); }
+
+          .dm-cancel-btn {
+            padding: 10px 20px; border-radius: 12px;
+            background: #f3f4f6; border: 1px solid #e5e7eb;
+            color: #374151; font-size: 0.84rem; font-weight: 600; cursor: pointer;
+            font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.18s;
+          }
+          .dm-cancel-btn:hover { background: #e5e7eb; }
+          .dark .dm-cancel-btn { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.1); color: #94a3b8; }
+
+          .dm-submit-btn {
+            flex: 1; height: 46px; border-radius: 12px;
+            background: linear-gradient(135deg, #C41E3A, #8b0000);
+            border: none; color: #fff;
+            font-family: 'Sora', sans-serif; font-size: 0.92rem; font-weight: 700;
+            cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            box-shadow: 0 4px 14px rgba(196,30,58,0.3);
+          }
+          .dm-submit-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #a0142e, #6b0000);
+            box-shadow: 0 8px 22px rgba(196,30,58,0.4);
+            transform: translateY(-1px);
+          }
+          .dm-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        `}</style>
+
+        <div className="dm-root">
+          {/* ── HEADER ── */}
+          <div className="dm-header">
+            <div className="dm-header-inner">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                <div className="dm-header-icon">
+                  {isCheckIn ? <Zap size={24} style={{ color: '#fff' }} /> : <Droplet size={24} style={{ color: '#fff', fill: 'rgba(255,255,255,0.7)' }} />}
+                </div>
+                <div>
+                  <h2 className="dm-header-title">
+                    {isCheckIn ? 'Process Donation Check-In' : 'Record New Donation'}
+                  </h2>
+                  <p className="dm-header-sub">
+                    {isCheckIn
+                      ? 'Complete the donation process for this scheduled appointment'
+                      : 'Register a walk-in or emergency blood donation'}
                   </p>
-                )}
-              </div>
-
-              {/* Mobile (Optional) */}
-              <div>
-                <Label htmlFor="mobile" className="text-sm font-semibold text-gray-700">
-                  Mobile Number <span className="text-xs text-[var(--text-secondary)]">(Optional)</span>
-                </Label>
-                <Input
-                  id="mobile"
-                  placeholder="10-digit mobile"
-                  value={mobile}
-                  onChange={(e) => setMobile(e.target.value)}
-                  disabled={isCheckIn}
-                  className={`mt-1.5 ${isCheckIn ? 'bg-[var(--bg-page)] border-[var(--border-color)] cursor-not-allowed' : ''}`}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* DONATION DETAILS CARD */}
-          <div className="bg-[var(--bg-surface)] rounded-xl border-2 border-red-100 shadow-sm">
-            <div className="bg-gradient-to-r from-red-50 to-pink-50 px-6 py-3 border-b border-red-100">
-              <div className="flex items-center gap-2">
-                <Droplet className="h-5 w-5 text-[var(--clr-danger)]" />
-                <h3 className="font-bold text-[var(--text-primary)]">Donation Details</h3>
-              </div>
-            </div>
-
-            <div className="p-6 space-y-4">
-              {/* Donation Type */}
-              <div>
-                <Label htmlFor="donationType" className="text-sm font-semibold text-gray-700">
-                  Donation Type
-                </Label>
-                <Select value={donationType} onValueChange={setDonationType}>
-                  <SelectTrigger className="mt-1.5">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Regular">
-                      <div className="flex items-center gap-2">
-                        <span>🩸</span>
-                        <span>Regular Donation</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="RH/RU-RTID-Linked Donation">
-                      <div className="flex items-center gap-2">
-                        <span>🏥</span>
-                        <span>Request-Linked Donation (RH/RU-RTID)</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="Emergency">
-                      <div className="flex items-center gap-2">
-                        <span>🚨</span>
-                        <span>Emergency Donation</span>
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Component Type */}
-              <div>
-                <Label htmlFor="component" className="text-sm font-semibold text-gray-700">
-                  Component Type
-                </Label>
-                <Select value={component} onValueChange={setComponent}>
-                  <SelectTrigger className="mt-1.5">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Whole Blood">Whole Blood</SelectItem>
-                    <SelectItem value="Platelets">Platelets</SelectItem>
-                    <SelectItem value="Plasma">Plasma</SelectItem>
-                    <SelectItem value="PRBC">Packed Red Blood Cells (PRBC)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
-
-          {/* R-RTID VALIDATION CARD */}
-          {donationType === 'RH/RU-RTID-Linked Donation' && (
-            <div className="bg-[var(--bg-surface)] rounded-xl border-2 border-purple-200 shadow-lg">
-              <div className="bg-gradient-to-r from-purple-50 to-indigo-50 px-6 py-3 border-b border-purple-100">
-                <div className="flex items-center gap-2">
-                  <Building2 className="h-5 w-5 text-purple-600" />
-                  <h3 className="font-bold text-[var(--text-primary)]">Patient Request Linking</h3>
                 </div>
               </div>
+              {/* X button removed — use Dialog overlay click to close */}
+            </div>
 
-              <div className="p-6 space-y-4">
-                <div>
-                  <Label htmlFor="rRtid" className="text-sm font-semibold text-gray-700">
-                    Patient Request ID (RH/RU-RTID)
-                  </Label>
-                  <div className="flex gap-2 mt-1.5">
-                    <Input
-                      id="rRtid"
-                      placeholder="RH-RTID-250126-Q1099 or RU-RTID-..."
+            {isCheckIn && (
+              <div className="dm-checkin-strip">
+                <Shield size={14} style={{ color: 'rgba(255,255,255,0.9)', flexShrink: 0 }} />
+                <span>Pre-filled from appointment record</span>
+                <span className="dm-checkin-badge">VERIFIED</span>
+              </div>
+            )}
+          </div>
+
+          {/* ── BODY ── */}
+          <div className="dm-body">
+
+            {/* Section: Donor Information */}
+            <div>
+              <div className="dm-section-label">
+                <User size={12} /> Donor Information
+              </div>
+              <div className="dm-grid-2">
+                <div className="dm-field">
+                  <label className="dm-label">
+                    Full Name
+                    {isCheckIn && <span className="dm-label-badge">Registered</span>}
+                  </label>
+                  <input
+                    className="dm-input"
+                    placeholder="e.g. Ramesh Kumar"
+                    value={donorName}
+                    onChange={e => setDonorName(e.target.value)}
+                    disabled={isCheckIn}
+                  />
+                </div>
+                <div className="dm-field">
+                  <label className="dm-label">
+                    Mobile Number
+                    <span style={{ fontSize: '0.65rem', color: '#9ca3af', marginLeft: 5 }}>(optional)</span>
+                  </label>
+                  <input
+                    className="dm-input"
+                    placeholder="+91 98765 43210"
+                    value={mobile}
+                    onChange={e => setMobile(e.target.value)}
+                    disabled={isCheckIn}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Section: Blood Group */}
+            <div>
+              <div className="dm-section-label">
+                <Heart size={12} /> Blood Group
+                {isCheckIn && <span className="dm-label-badge" style={{ marginLeft: 0 }}>Registered</span>}
+              </div>
+              <div className="dm-bg-grid">
+                {BLOOD_GROUPS.map(bg => {
+                  const pal = BG_COLORS[bg];
+                  const isSelected = bloodGroup === bg;
+                  return (
+                    <button
+                      key={bg}
+                      className={`dm-bg-pill ${isSelected ? 'dm-bg-selected' : ''} ${isCheckIn ? 'dm-bg-pill-disabled' : ''}`}
+                      style={{
+                        background: isSelected ? pal.text : pal.bg,
+                        color: isSelected ? '#fff' : pal.text,
+                        borderColor: pal.border,
+                      }}
+                      onClick={() => { if (!isCheckIn) setBloodGroup(bg); }}
+                      disabled={isCheckIn}
+                    >
+                      {bg}
+                    </button>
+                  );
+                })}
+              </div>
+              {!bloodGroup && !isCheckIn && (
+                <p style={{ fontSize: '0.7rem', color: '#f59e0b', marginTop: 7, display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <Info size={11} /> Select blood group above
+                </p>
+              )}
+            </div>
+
+            {/* Section: Donation Type */}
+            <div>
+              <div className="dm-section-label">
+                <Droplet size={12} /> Donation Type
+              </div>
+              <div className="dm-type-grid">
+                {DONATION_TYPES.map(dt => (
+                  <button
+                    key={dt.value}
+                    className={`dm-type-card ${donationType === dt.value ? 'dm-type-active' : ''}`}
+                    onClick={() => setDonationType(dt.value)}
+                  >
+                    <div className="dm-type-icon-wrap" style={{ background: dt.iconBg }}>
+                      {dt.icon}
+                    </div>
+                    <div className="dm-type-name">{dt.label}</div>
+                    <div className="dm-type-desc">{dt.desc}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Section: Component */}
+            <div>
+              <div className="dm-section-label">
+                <Droplet size={12} /> Blood Component
+              </div>
+              <div className="dm-comp-grid">
+                {COMPONENTS.map(c => (
+                  <button
+                    key={c}
+                    className={`dm-comp-pill ${component === c ? 'dm-comp-active' : ''}`}
+                    onClick={() => setComponent(c)}
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Section: RTID Linking (only for linked donation) */}
+            {donationType === 'RH/RU-RTID-Linked Donation' && (
+              <div>
+                <div className="dm-section-label">
+                  <Building2 size={12} /> Patient Request Linking
+                </div>
+                <div className="dm-field">
+                  <label className="dm-label">RH/RU-RTID (Patient Request ID)</label>
+                  <div className="dm-rtid-input-wrap">
+                    <input
+                      className={`dm-rtid-input ${rRtidValid ? 'valid' : rRtidError ? 'error' : ''}`}
+                      placeholder="e.g. RH-RTID-250126-Q1099"
                       value={rRtid}
-                      onChange={(e) => setRRtid(e.target.value.toUpperCase())}
-                      className={`flex-1 ${rRtidValid ? 'border-[var(--clr-success)] bg-green-50' :
-                        rRtidError ? 'border-[var(--clr-emergency)] bg-red-50' :
-                          'border-purple-200'
-                        }`}
+                      onChange={e => setRRtid(e.target.value.toUpperCase())}
                     />
-                    {rRtidLoading && <Loader2 className="w-6 h-6 animate-spin text-purple-600 mt-2" />}
-                    {rRtidValid && <CheckCircle2 className="w-6 h-6 text-[var(--clr-success)] mt-2" />}
-                    {rRtidError && <AlertCircle className="w-6 h-6 text-[var(--clr-danger)] mt-2" />}
+                    <span className="dm-rtid-icon">
+                      {rRtidLoading && <Loader2 size={16} style={{ color: '#7c3aed', animation: 'spin 1s linear infinite' }} />}
+                      {rRtidValid && <CheckCircle2 size={16} style={{ color: '#16a34a' }} />}
+                      {rRtidError && <AlertCircle size={16} style={{ color: '#C41E3A' }} />}
+                    </span>
                   </div>
                   {rRtidError && (
-                    <p className="text-sm text-[var(--clr-danger)] mt-2 flex items-center gap-1">
-                      <AlertCircle className="h-4 w-4" />
-                      {rRtidError}
+                    <p style={{ fontSize: '0.72rem', color: '#C41E3A', marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <AlertCircle size={11} /> {rRtidError}
                     </p>
                   )}
                 </div>
 
-                {/* R-RTID VALIDATION SUCCESS */}
+                {/* Validated patient details */}
                 {rRtidValid && rRtidData && (
-                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-5 shadow-sm">
-                    <div className="flex items-center gap-2 mb-4">
-                      <CheckCircle2 className="h-5 w-5 text-[var(--clr-success)]" />
-                      <span className="font-bold text-green-800">Request Validated Successfully</span>
+                  <div className="dm-patient-card" style={{ marginTop: 12 }}>
+                    <div className="dm-patient-header">
+                      <CheckCircle2 size={15} /> Request Validated — Patient Info
                     </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-[var(--bg-surface)] rounded-lg p-3 border border-green-100">
-                        <span className="text-xs text-[var(--text-secondary)] font-medium">Patient Name</span>
-                        <p className="font-bold text-[var(--text-primary)] mt-1">{rRtidData.patientName}</p>
+                    <div className="dm-patient-grid">
+                      <div className="dm-patient-field">
+                        <div className="dm-patient-field-label">Patient Name</div>
+                        <div className="dm-patient-field-val">{rRtidData.patientName}</div>
                       </div>
-
-                      <div className="bg-[var(--bg-surface)] rounded-lg p-3 border border-green-100">
-                        <span className="text-xs text-[var(--text-secondary)] font-medium">Blood Group</span>
-                        <p className="font-bold text-[var(--clr-danger)] text-xl mt-1">{rRtidData.bloodGroup}</p>
+                      <div className="dm-patient-field">
+                        <div className="dm-patient-field-label">Blood Group</div>
+                        <div className="dm-patient-field-val" style={{ color: '#C41E3A', fontSize: '1.1rem' }}>{rRtidData.bloodGroup}</div>
                       </div>
-
-                      <div className="bg-[var(--bg-surface)] rounded-lg p-3 border border-green-100">
-                        <span className="text-xs text-[var(--text-secondary)] font-medium">Component</span>
-                        <p className="font-bold text-[var(--text-primary)] mt-1">{rRtidData.component}</p>
+                      <div className="dm-patient-field">
+                        <div className="dm-patient-field-label">Component</div>
+                        <div className="dm-patient-field-val">{rRtidData.component}</div>
                       </div>
-
-                      <div className="bg-[var(--bg-surface)] rounded-lg p-3 border border-green-100">
-                        <span className="text-xs text-[var(--text-secondary)] font-medium">Units Required</span>
-                        <p className="font-bold text-[var(--text-primary)] mt-1">{rRtidData.unitsRequired}</p>
+                      <div className="dm-patient-field">
+                        <div className="dm-patient-field-label">Units Required</div>
+                        <div className="dm-patient-field-val">{rRtidData.unitsRequired}</div>
                       </div>
-
-                      <div className="bg-[var(--bg-surface)] rounded-lg p-3 border border-green-100 col-span-2">
-                        <span className="text-xs text-[var(--text-secondary)] font-medium">Hospital</span>
-                        <p className="font-bold text-[var(--text-primary)] mt-1">{rRtidData.hospitalName}</p>
+                      <div className="dm-patient-field" style={{ gridColumn: '1 / -1' }}>
+                        <div className="dm-patient-field-label">Hospital</div>
+                        <div className="dm-patient-field-val">{rRtidData.hospitalName}</div>
                       </div>
-
-                      <div className="bg-[var(--bg-surface)] rounded-lg p-3 border border-green-100">
-                        <span className="text-xs text-[var(--text-secondary)] font-medium flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          Required By
-                        </span>
-                        <p className="font-bold text-[var(--clr-danger)] mt-1 text-sm">{rRtidData.requiredBy}</p>
-                      </div>
-
-                      {(rRtidData.district || rRtidData.state) && (
-                        <div className="bg-[var(--bg-surface)] rounded-lg p-3 border border-green-100">
-                          <span className="text-xs text-[var(--text-secondary)] font-medium">Location</span>
-                          <p className="font-bold text-[var(--text-primary)] mt-1 text-sm">
-                            {rRtidData.district}, {rRtidData.state}
-                          </p>
+                      {rRtidData.requiredBy && rRtidData.requiredBy !== 'N/A' && (
+                        <div className="dm-patient-field" style={{ gridColumn: '1 / -1' }}>
+                          <div className="dm-patient-field-label">Required By</div>
+                          <div className="dm-patient-field-val" style={{ color: '#C41E3A', fontSize: '0.82rem' }}>{rRtidData.requiredBy}</div>
                         </div>
                       )}
                     </div>
-
-                    <div className="mt-4 p-3 bg-[var(--bg-surface)] rounded-lg border border-green-200">
-                      <p className="text-sm text-green-800 font-medium flex items-center gap-2">
-                        <span>🎯</span>
-                        <span>This donation will directly help <strong>{rRtidData.patientName}</strong></span>
-                      </p>
+                    <div className="dm-patient-impact">
+                      <Target size={14} style={{ color: '#166534', flexShrink: 0 }} />
+                      This donation will directly help <strong style={{ marginLeft: 3 }}>{rRtidData.patientName}</strong>
                     </div>
                   </div>
                 )}
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
+          {/* ── FOOTER ── */}
+          <div className="dm-footer">
+            <button className="dm-cancel-btn" onClick={handleClose}>Cancel</button>
+            <button
+              className="dm-submit-btn"
+              onClick={handleSubmit}
+              disabled={donationType === 'RH/RU-RTID-Linked Donation' && !rRtidValid}
+            >
+              <CheckCircle2 size={16} />
+              {isCheckIn ? 'Confirm Check-In & Record Donation' : 'Record Donation'}
+              <ArrowRight size={14} />
+            </button>
+          </div>
         </div>
-
-        {/* FOOTER */}
-        <DialogFooter className="border-t border-[var(--border-color)] pt-4">
-          <Button variant="outline" onClick={handleClose} className="px-6">
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-[var(--txt-inverse)] px-8 shadow-lg"
-            disabled={donationType === 'RH/RU-RTID-Linked Donation' && !rRtidValid}
-          >
-            <CheckCircle2 className="h-4 w-4 mr-2" />
-            Confirm Check-In
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

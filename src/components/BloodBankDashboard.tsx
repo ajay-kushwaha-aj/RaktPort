@@ -20,6 +20,7 @@ import { RedemptionsTab } from '@/components/tabs/RedemptionsTab';
 import { VerifyTab } from '@/components/tabs/VerifyTab';
 import { RtidVerifyTab } from '@/components/tabs/RtidVerifyTab';
 import { ReportsTab } from '@/components/tabs/ReportsTab';
+import { CampsTab } from '@/components/tabs/CampsTab';
 import { Button } from '@/components/ui/button';
 import { generateRtid } from '@/lib/bloodbank-utils';
 import { BloodRequestModal } from '@/components/modals/BloodRequestModal';
@@ -267,24 +268,24 @@ const dashStyles = `
 `;
 
 /* ─── Types ─────────────────────────────────────────── */
-const BLOOD_GROUPS = ['A+','A-','B+','B-','O+','O-','AB+','AB-'];
+const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'];
 
-const BG_COLORS: Record<string, { bg:string; text:string; border:string; bar:string }> = {
-  'A+': { bg:'#fff5f5', text:'#b91c1c', border:'#fca5a5', bar:'var(--clr-emergency)' },
-  'A-': { bg:'#fff1f2', text:'#be185d', border:'#fda4af', bar:'#f43f5e' },
-  'B+': { bg:'#eff6ff', text:'#1d4ed8', border:'#93c5fd', bar:'var(--clr-info)' },
-  'B-': { bg:'#f0f9ff', text:'#0369a1', border:'#7dd3fc', bar:'#0ea5e9' },
-  'O+': { bg:'#f0fdf4', text:'#166534', border:'#86efac', bar:'#22c55e' },
-  'O-': { bg:'#f0fdfa', text:'#0f766e', border:'#5eead4', bar:'#14b8a6' },
-  'AB+':{ bg:'#faf5ff', text:'#7e22ce', border:'#c4b5fd', bar:'#8b5cf6' },
-  'AB-':{ bg:'#f5f3ff', text:'#6d28d9', border:'#ddd6fe', bar:'#7c3aed' },
+const BG_COLORS: Record<string, { bg: string; text: string; border: string; bar: string }> = {
+  'A+': { bg: '#fff5f5', text: '#b91c1c', border: '#fca5a5', bar: 'var(--clr-emergency)' },
+  'A-': { bg: '#fff1f2', text: '#be185d', border: '#fda4af', bar: '#f43f5e' },
+  'B+': { bg: '#eff6ff', text: '#1d4ed8', border: '#93c5fd', bar: 'var(--clr-info)' },
+  'B-': { bg: '#f0f9ff', text: '#0369a1', border: '#7dd3fc', bar: '#0ea5e9' },
+  'O+': { bg: '#f0fdf4', text: '#166534', border: '#86efac', bar: '#22c55e' },
+  'O-': { bg: '#f0fdfa', text: '#0f766e', border: '#5eead4', bar: '#14b8a6' },
+  'AB+': { bg: '#faf5ff', text: '#7e22ce', border: '#c4b5fd', bar: '#8b5cf6' },
+  'AB-': { bg: '#f5f3ff', text: '#6d28d9', border: '#ddd6fe', bar: '#7c3aed' },
 };
 
 function getLevel(units: number) {
-  if (units >= 50) return { label:'Good',    cls:'text-emerald-600', barClass:'bg-emerald-500' };
-  if (units >= 30) return { label:'Moderate', cls:'text-[var(--rtid-badge)]',    barClass:'bg-[var(--rtid-badge)]'    };
-  if (units >= 10) return { label:'Low',      cls:'text-amber-600',   barClass:'bg-amber-500'   };
-  return                    { label:'Critical', cls:'text-[var(--clr-danger)]',    barClass:'bg-[var(--stats-bg)]'     };
+  if (units >= 50) return { label: 'Good', cls: 'text-emerald-600', barClass: 'bg-emerald-500' };
+  if (units >= 30) return { label: 'Moderate', cls: 'text-[var(--rtid-badge)]', barClass: 'bg-[var(--rtid-badge)]' };
+  if (units >= 10) return { label: 'Low', cls: 'text-amber-600', barClass: 'bg-amber-500' };
+  return { label: 'Critical', cls: 'text-[var(--clr-danger)]', barClass: 'bg-[var(--stats-bg)]' };
 }
 
 /* ─── Premium Overview ─────────────────────────────── */
@@ -308,7 +309,7 @@ function PremiumOverview({
   const now = new Date();
   const hour = now.getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-  const dateStr = now.toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  const dateStr = now.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
   const upcomingToday = appointments.filter(a => {
     const d = a.date instanceof Date ? a.date : new Date(a.date);
@@ -316,7 +317,7 @@ function PremiumOverview({
   });
 
   const recentDonations = [...donations]
-    .sort((a,b) => {
+    .sort((a, b) => {
       const da = a.date instanceof Date ? a.date : new Date(a.date);
       const db2 = b.date instanceof Date ? b.date : new Date(b.date);
       return db2.getTime() - da.getTime();
@@ -326,19 +327,19 @@ function PremiumOverview({
   const maxInv = Math.max(...BLOOD_GROUPS.map(bg => inventory?.[bg]?.available || 0), 1);
 
   const kpiCards = [
-    { label:'Total Inventory', val: kpi.totalInventory,     icon: <Archive size={18} />,      cls:'c-crimson', trend:null,    subtext:'units stored',  iconBg:'#fff0f0', iconColor:'var(--clr-brand)'   },
-    { label:'Available Units',  val: kpi.availableUnits,     icon: <CheckCircle2 size={18} />, cls:'c-emerald', trend:'up',    subtext:'ready to use',  iconBg:'#f0fdf4', iconColor:'#16a34a'            },
-    { label:"Today's Appts",   val: kpi.todayAppointments,  icon: <CalendarCheck size={18} />,cls:'c-blue',    trend:null,    subtext:'scheduled',     iconBg:'#eff6ff', iconColor:'#1d4ed8'            },
-    { label:'Donations',        val: kpi.totalDonations,     icon: <Droplet size={18} />,      cls:'c-amber',   trend:'up',    subtext:'all time',      iconBg:'#fffbeb', iconColor:'#d97706'            },
-    { label:'Redemptions',      val: kpi.totalRedemptions,   icon: <RefreshCw size={18} />,    cls:'c-purple',  trend:null,    subtext:'fulfilled',     iconBg:'#faf5ff', iconColor:'#7c3aed'            },
-    { label:'Blood Requests',   val: kpi.totalBloodRequests, icon: <Activity size={18} />,     cls:'c-rose',    trend: kpi.totalBloodRequests > 0 ? 'up' : null, subtext:'pending', iconBg:'#fff0f4', iconColor:'#e11d48' },
+    { label: 'Total Inventory', val: kpi.totalInventory, icon: <Archive size={18} />, cls: 'c-crimson', trend: null, subtext: 'units stored', iconBg: '#fff0f0', iconColor: 'var(--clr-brand)' },
+    { label: 'Available Units', val: kpi.availableUnits, icon: <CheckCircle2 size={18} />, cls: 'c-emerald', trend: 'up', subtext: 'ready to use', iconBg: '#f0fdf4', iconColor: '#16a34a' },
+    { label: "Today's Appts", val: kpi.todayAppointments, icon: <CalendarCheck size={18} />, cls: 'c-blue', trend: null, subtext: 'scheduled', iconBg: '#eff6ff', iconColor: '#1d4ed8' },
+    { label: 'Donations', val: kpi.totalDonations, icon: <Droplet size={18} />, cls: 'c-amber', trend: 'up', subtext: 'all time', iconBg: '#fffbeb', iconColor: '#d97706' },
+    { label: 'Redemptions', val: kpi.totalRedemptions, icon: <RefreshCw size={18} />, cls: 'c-purple', trend: null, subtext: 'fulfilled', iconBg: '#faf5ff', iconColor: '#7c3aed' },
+    { label: 'Blood Requests', val: kpi.totalBloodRequests, icon: <Activity size={18} />, cls: 'c-rose', trend: kpi.totalBloodRequests > 0 ? 'up' : null, subtext: 'pending', iconBg: '#fff0f4', iconColor: '#e11d48' },
   ];
 
   const quickActions = [
-    { icon: <CalendarCheck size={18} />, iconColor:'var(--clr-brand)',     label:'New Appointment',  sub:'Schedule a donor',   color:'var(--clr-brand)',      bg:'#fff5f5', action: onAppointmentOpen },
-    { icon: <Droplet size={18} />,       iconColor:'var(--clr-emergency)', label:'Record Donation',  sub:'Walk-in / Check-in', color:'var(--clr-emergency)',  bg:'#fff0f0', action: onDonationOpen    },
-    { icon: <BadgeCheck size={18} />,    iconColor:'var(--clr-success)',   label:'Verify & Redeem',  sub:'RTID verification',  color:'var(--clr-success)',    bg:'#f0fdf4', action: () => onNavigate('verify')  },
-    { icon: <FileBarChart2 size={18} />, iconColor:'#0284c7',              label:'View Reports',     sub:'Analytics & export', color:'#0284c7',               bg:'#f0f9ff', action: () => onNavigate('reports') },
+    { icon: <CalendarCheck size={18} />, iconColor: 'var(--clr-brand)', label: 'New Appointment', sub: 'Schedule a donor', color: 'var(--clr-brand)', bg: '#fff5f5', action: onAppointmentOpen },
+    { icon: <Droplet size={18} />, iconColor: 'var(--clr-emergency)', label: 'Record Donation', sub: 'Walk-in / Check-in', color: 'var(--clr-emergency)', bg: '#fff0f0', action: onDonationOpen },
+    { icon: <BadgeCheck size={18} />, iconColor: 'var(--clr-success)', label: 'Verify & Redeem', sub: 'RTID verification', color: 'var(--clr-success)', bg: '#f0fdf4', action: () => onNavigate('verify') },
+    { icon: <FileBarChart2 size={18} />, iconColor: '#0284c7', label: 'View Reports', sub: 'Analytics & export', color: '#0284c7', bg: '#f0f9ff', action: () => onNavigate('reports') },
   ];
 
   return (
@@ -387,13 +388,19 @@ function PremiumOverview({
                 className="flex items-center gap-2 bg-[var(--bg-surface)]/15 hover:bg-[var(--bg-surface)]/25 border border-white/25 text-[var(--txt-inverse)] text-sm font-semibold px-4 py-2 rounded-xl transition-all hover:scale-105 active:scale-100"
               >
                 <PlusCircle className="w-4 h-4" />
-                Quick Appointment
+                New Appointment
               </button>
               <button
-                onClick={onRefresh}
-                className="flex items-center gap-2 bg-[var(--bg-surface)]/10 hover:bg-[var(--bg-surface)]/20 border border-white/20 text-[var(--txt-inverse)]/80 text-sm px-3 py-2 rounded-xl transition-all"
+                onClick={() => onNavigate('appointments')}
+                className="flex items-center gap-2 bg-white/20 hover:bg-white/30 border border-white/30 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all hover:scale-105 active:scale-100"
               >
-                <RefreshCw className="w-4 h-4" />
+                <CalendarCheck className="w-4 h-4" />
+                Check-in Appointments
+                {upcomingToday.length > 0 && (
+                  <span className="ml-1 bg-white text-red-700 text-[10px] font-black px-1.5 py-0.5 rounded-full">
+                    {upcomingToday.length}
+                  </span>
+                )}
               </button>
             </div>
           </div>
@@ -446,7 +453,7 @@ function PremiumOverview({
             </div>
             <div className="bbd-inv-grid">
               {BLOOD_GROUPS.map(bg => {
-                const inv = inventory?.[bg] || { total:0, available:0 };
+                const inv = inventory?.[bg] || { total: 0, available: 0 };
                 const units = inv.available;
                 const c = BG_COLORS[bg];
                 const level = getLevel(units);
@@ -455,15 +462,15 @@ function PremiumOverview({
                   <div
                     key={bg}
                     className="bbd-inv-cell"
-                    style={{ background:c.bg, borderColor:c.border, color:c.text }}
+                    style={{ background: c.bg, borderColor: c.border, color: c.text }}
                     onClick={() => onNavigate('inventory')}
                     title={`${bg}: ${units} available / ${inv.total} total`}
                   >
-                    <div className="bbd-inv-group" style={{color:c.text}}>{bg}</div>
-                    <div className="bbd-inv-units" style={{color:c.text}}>{units}</div>
+                    <div className="bbd-inv-group" style={{ color: c.text }}>{bg}</div>
+                    <div className="bbd-inv-units" style={{ color: c.text }}>{units}</div>
                     <div className="bbd-inv-sub">{level.label}</div>
                     <div className="bbd-inv-bar">
-                      <div className="bbd-inv-bar-fill" style={{width:`${pct}%`, background:c.bar}} />
+                      <div className="bbd-inv-bar-fill" style={{ width: `${pct}%`, background: c.bar }} />
                     </div>
                   </div>
                 );
@@ -472,13 +479,13 @@ function PremiumOverview({
             {/* Legend */}
             <div className="flex flex-wrap gap-3 mt-4 pt-3 border-t border-gray-100">
               {[
-                { label:'Critical (<10)', color:'var(--clr-emergency)' },
-                { label:'Low (<30)',       color:'#f59e0b' },
-                { label:'Moderate (<50)', color:'var(--clr-info)' },
-                { label:'Good (50+)',      color:'#22c55e' },
+                { label: 'Critical (<10)', color: 'var(--clr-emergency)' },
+                { label: 'Low (<30)', color: '#f59e0b' },
+                { label: 'Moderate (<50)', color: 'var(--clr-info)' },
+                { label: 'Good (50+)', color: '#22c55e' },
               ].map(l => (
                 <div key={l.label} className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)]">
-                  <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{background:l.color}} />
+                  <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: l.color }} />
                   {l.label}
                 </div>
               ))}
@@ -496,9 +503,9 @@ function PremiumOverview({
                   key={a.label}
                   className="bbd-action-card"
                   onClick={a.action}
-                  style={{'--action-color': a.color} as any}
+                  style={{ '--action-color': a.color } as any}
                 >
-                  <style>{`.bbd-action-card:nth-child(${i+1})::before { background:${a.color}; }`}</style>
+                  <style>{`.bbd-action-card:nth-child(${i + 1})::before { background:${a.color}; }`}</style>
                   <div className="bbd-action-icon" style={{ background: a.bg, color: a.iconColor }}>
                     {a.icon}
                   </div>
@@ -533,17 +540,17 @@ function PremiumOverview({
                 const timeAgo = (() => {
                   const diff = Date.now() - date.getTime();
                   const mins = Math.floor(diff / 60000);
-                  const hrs  = Math.floor(diff / 3600000);
+                  const hrs = Math.floor(diff / 3600000);
                   const days = Math.floor(diff / 86400000);
-                  if (days > 0)   return `${days}d ago`;
-                  if (hrs > 0)    return `${hrs}h ago`;
-                  if (mins >= 0)  return `${mins}m ago`;
+                  if (days > 0) return `${days}d ago`;
+                  if (hrs > 0) return `${hrs}h ago`;
+                  if (mins >= 0) return `${mins}m ago`;
                   return 'just now';
                 })();
                 return (
-                  <div key={d.dRtid || i} className="bbd-activity-item" style={{animationDelay:`${i*0.05}s`}}>
+                  <div key={d.dRtid || i} className="bbd-activity-item" style={{ animationDelay: `${i * 0.05}s` }}>
                     <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-sm font-black"
-                      style={{background:bgCols.bg, color:bgCols.text, border:`1px solid ${bgCols.border}`}}>
+                      style={{ background: bgCols.bg, color: bgCols.text, border: `1px solid ${bgCols.border}` }}>
                       {d.bloodGroup}
                     </div>
                     <div className="bbd-activity-text">
@@ -552,12 +559,11 @@ function PremiumOverview({
                     </div>
                     <div className="flex flex-col items-end gap-1">
                       <span className="bbd-activity-time">{timeAgo}</span>
-                      <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
-                        d.status === 'AVAILABLE' ? 'bg-green-100 text-green-700' :
-                        d.status === 'REDEEMED'  ? 'bg-purple-100 text-purple-700' :
-                        d.status === 'SCHEDULED' ? 'bg-blue-100 text-blue-700' :
-                        'bg-[var(--bg-page)] text-[var(--text-secondary)]'
-                      }`}>{d.status}</span>
+                      <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${d.status === 'AVAILABLE' ? 'bg-green-100 text-green-700' :
+                          d.status === 'REDEEMED' ? 'bg-purple-100 text-purple-700' :
+                            d.status === 'SCHEDULED' ? 'bg-blue-100 text-blue-700' :
+                              'bg-[var(--bg-page)] text-[var(--text-secondary)]'
+                        }`}>{d.status}</span>
                     </div>
                   </div>
                 );
@@ -576,16 +582,16 @@ function PremiumOverview({
             </div>
             <div className="space-y-3">
               {[
-                { label:'Total Units',     val: kpi.totalInventory,   color:'var(--clr-brand)',     icon: <Archive size={13} /> },
-                { label:'Available',       val: kpi.availableUnits,   color:'var(--clr-success)',   icon: <CheckCircle2 size={13} /> },
-                { label:'Reserved',        val: Math.max(0, kpi.totalInventory - kpi.availableUnits), color:'#d97706', icon: <Lock size={13} /> },
-                { label:'Critical Groups', val: criticalGroups.length, color: criticalGroups.length > 0 ? 'var(--clr-emergency)' : '#6b7280', icon: <AlertTriangle size={13} /> },
+                { label: 'Total Units', val: kpi.totalInventory, color: 'var(--clr-brand)', icon: <Archive size={13} /> },
+                { label: 'Available', val: kpi.availableUnits, color: 'var(--clr-success)', icon: <CheckCircle2 size={13} /> },
+                { label: 'Reserved', val: Math.max(0, kpi.totalInventory - kpi.availableUnits), color: '#d97706', icon: <Lock size={13} /> },
+                { label: 'Critical Groups', val: criticalGroups.length, color: criticalGroups.length > 0 ? 'var(--clr-emergency)' : '#6b7280', icon: <AlertTriangle size={13} /> },
               ].map(s => (
                 <div key={s.label} className="flex items-center justify-between py-1.5 border-b border-gray-50 last:border-0">
                   <span className="text-xs text-[var(--text-secondary)] flex items-center gap-2">
                     <span>{s.icon}</span>{s.label}
                   </span>
-                  <span className="text-sm font-bold" style={{color:s.color}}>{s.val}</span>
+                  <span className="text-sm font-bold" style={{ color: s.color }}>{s.val}</span>
                 </div>
               ))}
             </div>
@@ -620,12 +626,12 @@ function PremiumOverview({
                     <div key={a.appointmentRtid || i} className="bbd-appt-card">
                       <div className="bbd-appt-date">
                         <span className="bbd-appt-dd">{date.getDate()}</span>
-                        <span className="bbd-appt-mo">{date.toLocaleString('default',{month:'short'})}</span>
+                        <span className="bbd-appt-mo">{date.toLocaleString('default', { month: 'short' })}</span>
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{a.donorName}</p>
                         <div className="flex items-center gap-1.5 mt-0.5">
-                          <span className="text-[10px] font-black px-1.5 py-0.5 rounded" style={{background:bgc.bg, color:bgc.text}}>{a.bloodGroup}</span>
+                          <span className="text-[10px] font-black px-1.5 py-0.5 rounded" style={{ background: bgc.bg, color: bgc.text }}>{a.bloodGroup}</span>
                           <span className="text-[10px] text-gray-400">{a.time || ''}</span>
                         </div>
                       </div>
@@ -658,11 +664,11 @@ function PremiumOverview({
                           stroke={color} strokeWidth="3"
                           strokeDasharray={`${rate * 0.999}, 100`}
                           strokeLinecap="round"
-                          style={{transition:'stroke-dasharray 1s ease'}}
+                          style={{ transition: 'stroke-dasharray 1s ease' }}
                         />
                       </svg>
                       <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-xl font-black" style={{color, fontFamily:'Outfit,sans-serif'}}>{rate}%</span>
+                        <span className="text-xl font-black" style={{ color, fontFamily: 'Outfit,sans-serif' }}>{rate}%</span>
                       </div>
                     </div>
                     <p className="text-xs text-[var(--text-secondary)]">
@@ -674,11 +680,11 @@ function PremiumOverview({
             </div>
             <div className="grid grid-cols-2 gap-2 mt-2">
               <div className="bg-green-50 rounded-xl p-3 text-center">
-                <div className="text-lg font-black text-green-700" style={{fontFamily:'Outfit,sans-serif'}}>{kpi.totalRedemptions}</div>
+                <div className="text-lg font-black text-green-700" style={{ fontFamily: 'Outfit,sans-serif' }}>{kpi.totalRedemptions}</div>
                 <div className="text-[10px] text-[var(--clr-success)] font-medium">Redeemed</div>
               </div>
               <div className="bg-red-50 rounded-xl p-3 text-center">
-                <div className="text-lg font-black text-red-700" style={{fontFamily:'Outfit,sans-serif'}}>{Math.max(0, kpi.totalBloodRequests - kpi.totalRedemptions)}</div>
+                <div className="text-lg font-black text-red-700" style={{ fontFamily: 'Outfit,sans-serif' }}>{Math.max(0, kpi.totalBloodRequests - kpi.totalRedemptions)}</div>
                 <div className="text-[10px] text-[var(--clr-danger)] font-medium">Pending</div>
               </div>
             </div>
@@ -704,6 +710,7 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
   const [donationModalOpen, setDonationModalOpen] = useState(false);
   const [appointmentModalOpen, setAppointmentModalOpen] = useState(false);
   const [checkInData, setCheckInData] = useState<Appointment | undefined>(undefined);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [tabKey, setTabKey] = useState(0); // For animation reset
 
   const handleTabChange = useCallback((tab: TabType) => {
@@ -713,9 +720,9 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
 
   const handleLogoutConfirm = () => {
     Swal.fire({
-      title:'Logout?', text:'Are you sure you want to logout?', icon:'warning',
-      showCancelButton:true, confirmButtonColor:'#d33', cancelButtonColor:'#3085d6',
-      confirmButtonText:'Yes, logout!'
+      title: 'Logout?', text: 'Are you sure you want to logout?', icon: 'warning',
+      showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, logout!'
     }).then(result => {
       if (result.isConfirmed) { localStorage.clear(); onLogout(); }
     });
@@ -733,19 +740,19 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
     try {
       const appRtid = generateRtid('A');
       let appointmentDate: Timestamp;
-      if (data.date instanceof Date)           appointmentDate = Timestamp.fromDate(data.date);
-      else if (typeof data.date === 'string')  appointmentDate = Timestamp.fromDate(new Date(data.date));
-      else                                     appointmentDate = Timestamp.fromDate(new Date());
+      if (data.date instanceof Date) appointmentDate = Timestamp.fromDate(data.date);
+      else if (typeof data.date === 'string') appointmentDate = Timestamp.fromDate(new Date(data.date));
+      else appointmentDate = Timestamp.fromDate(new Date());
 
       await addDoc(collection(db, 'appointments'), {
-        rtid: appRtid, donorName:data.donorName||'', mobile:data.mobile||'',
-        gender:data.gender||'Male', bloodGroup:data.bloodGroup||'O+',
-        date:appointmentDate, time:data.time||'10:00',
-        bloodBankId, bloodBankName:bloodBankData?.fullName||'Blood Bank',
-        status:'Upcoming', createdAt:Timestamp.now(),
-        district:bloodBankData?.district||'', pincode:bloodBankData?.pincode||'',
+        rtid: appRtid, donorName: data.donorName || '', mobile: data.mobile || '',
+        gender: data.gender || 'Male', bloodGroup: data.bloodGroup || 'O+',
+        date: appointmentDate, time: data.time || '10:00',
+        bloodBankId, bloodBankName: bloodBankData?.fullName || 'Blood Bank',
+        status: 'Upcoming', createdAt: Timestamp.now(),
+        district: bloodBankData?.district || '', pincode: bloodBankData?.pincode || '',
       });
-      toast.success('Appointment Scheduled', { description:`${data.donorName} - ${appRtid}` });
+      toast.success('Appointment Scheduled', { description: `${data.donorName} - ${appRtid}` });
       setAppointmentModalOpen(false);
       setTimeout(() => handleTabChange('appointments'), 500);
     } catch (err: any) {
@@ -757,9 +764,9 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
     if (!bloodBankId) { toast.error('Blood Bank ID not found'); return; }
     setActionLoading(true);
     try {
-      const finalDonorName  = data.donorName || checkInData?.donorName || 'Unknown Donor';
+      const finalDonorName = data.donorName || checkInData?.donorName || 'Unknown Donor';
       const finalBloodGroup = data.bloodGroup || checkInData?.bloodGroup || 'O+';
-      const finalMobile     = data.mobile || checkInData?.mobile || '';
+      const finalMobile = data.mobile || checkInData?.mobile || '';
       let dRtid: string;
       if (checkInData && checkInData.appointmentRtid) dRtid = checkInData.appointmentRtid;
       else dRtid = generateRtid('D');
@@ -772,62 +779,62 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
       const existingDonation = await getDoc(donationRef);
       if (existingDonation.exists()) {
         await updateDoc(donationRef, {
-          status:'AVAILABLE', donationType:data.donationType||'Regular', component:data.component||'Whole Blood',
-          otp, actualDonationDate:Timestamp.now(), rRtid:linkedRRTID, linkedRrtid:linkedRRTID,
-          patientName, hospitalName, linkedDate:linkedRRTID?Timestamp.now():null,
-          impactTimeline:{donated:Timestamp.now(),linkedToRequest:linkedRRTID?Timestamp.now():null,usedByPatient:null,creditIssued:null},
-          updatedAt:Timestamp.now()
+          status: 'AVAILABLE', donationType: data.donationType || 'Regular', component: data.component || 'Whole Blood',
+          otp, actualDonationDate: Timestamp.now(), rRtid: linkedRRTID, linkedRrtid: linkedRRTID,
+          patientName, hospitalName, linkedDate: linkedRRTID ? Timestamp.now() : null,
+          impactTimeline: { donated: Timestamp.now(), linkedToRequest: linkedRRTID ? Timestamp.now() : null, usedByPatient: null, creditIssued: null },
+          updatedAt: Timestamp.now()
         });
       } else {
         await setDoc(donationRef, {
-          rtid:dRtid, dRtid, bloodBankId, bloodBankName:bloodBankData?.fullName||'Blood Bank',
-          donorName:finalDonorName, donorMobile:finalMobile, bloodGroup:finalBloodGroup,
-          donationType:data.donationType||'Regular', component:data.component||'Whole Blood',
-          otp, status:'AVAILABLE', date:Timestamp.now(), createdAt:Timestamp.now(),
-          donationLocation:bloodBankData?.district||'Blood Bank', city:bloodBankData?.district||'Unknown',
-          rRtid:linkedRRTID, linkedRrtid:linkedRRTID, patientName, hospitalName,
-          linkedDate:linkedRRTID?Timestamp.now():null,
-          impactTimeline:{donated:Timestamp.now(),linkedToRequest:linkedRRTID?Timestamp.now():null,usedByPatient:null,creditIssued:null},
-          appointmentRtid:checkInData?.appointmentRtid||null, donorId:checkInData?.donorId||null
+          rtid: dRtid, dRtid, bloodBankId, bloodBankName: bloodBankData?.fullName || 'Blood Bank',
+          donorName: finalDonorName, donorMobile: finalMobile, bloodGroup: finalBloodGroup,
+          donationType: data.donationType || 'Regular', component: data.component || 'Whole Blood',
+          otp, status: 'AVAILABLE', date: Timestamp.now(), createdAt: Timestamp.now(),
+          donationLocation: bloodBankData?.district || 'Blood Bank', city: bloodBankData?.district || 'Unknown',
+          rRtid: linkedRRTID, linkedRrtid: linkedRRTID, patientName, hospitalName,
+          linkedDate: linkedRRTID ? Timestamp.now() : null,
+          impactTimeline: { donated: Timestamp.now(), linkedToRequest: linkedRRTID ? Timestamp.now() : null, usedByPatient: null, creditIssued: null },
+          appointmentRtid: checkInData?.appointmentRtid || null, donorId: checkInData?.donorId || null
         });
       }
       const bg = finalBloodGroup as BloodGroup;
-      const currentBgInv = inventory && inventory[bg] ? inventory[bg] : {total:0,available:0};
-      await updateDoc(doc(db,'inventory',bloodBankId), {
-        [bg]:{ total:(currentBgInv.total||0)+1, available:(currentBgInv.available||0)+1 }
+      const currentBgInv = inventory && inventory[bg] ? inventory[bg] : { total: 0, available: 0 };
+      await updateDoc(doc(db, 'inventory', bloodBankId), {
+        [bg]: { total: (currentBgInv.total || 0) + 1, available: (currentBgInv.available || 0) + 1 }
       });
       if (checkInData?.appointmentRtid) {
-        const aq = query(collection(db,'appointments'),where('rtid','==',checkInData.appointmentRtid));
+        const aq = query(collection(db, 'appointments'), where('rtid', '==', checkInData.appointmentRtid));
         const as = await getDocs(aq);
-        if (!as.empty) await updateDoc(as.docs[0].ref,{status:'Completed',completedAt:Timestamp.now()});
+        if (!as.empty) await updateDoc(as.docs[0].ref, { status: 'Completed', completedAt: Timestamp.now() });
       }
       if (checkInData?.donorId) {
-        const donorRef = doc(db,'users',checkInData.donorId);
+        const donorRef = doc(db, 'users', checkInData.donorId);
         const donorDoc = await getDoc(donorRef);
         if (donorDoc.exists()) {
           const d2 = donorDoc.data();
-          await updateDoc(donorRef,{
-            donationsCount:(d2.donationsCount||0)+1, credits:(d2.credits||0)+1,
-            lastDonationDate:new Date().toISOString()
+          await updateDoc(donorRef, {
+            donationsCount: (d2.donationsCount || 0) + 1, credits: (d2.credits || 0) + 1,
+            lastDonationDate: new Date().toISOString()
           });
         }
       }
       if (linkedRRTID) {
         try {
           let reqRef: any = null, reqData: any = null;
-          const reqSnap = await getDoc(doc(db,'bloodRequests',linkedRRTID));
-          if (reqSnap.exists()) { reqRef=reqSnap.ref; reqData=reqSnap.data(); }
+          const reqSnap = await getDoc(doc(db, 'bloodRequests', linkedRRTID));
+          if (reqSnap.exists()) { reqRef = reqSnap.ref; reqData = reqSnap.data(); }
           else {
-            for (const q of [query(collection(db,'bloodRequests'),where('linkedRTID','==',linkedRRTID)),query(collection(db,'bloodRequests'),where('rtid','==',linkedRRTID))]) {
+            for (const q of [query(collection(db, 'bloodRequests'), where('linkedRTID', '==', linkedRRTID)), query(collection(db, 'bloodRequests'), where('rtid', '==', linkedRRTID))]) {
               const qs = await getDocs(q);
-              if (!qs.empty) { reqRef=qs.docs[0].ref; reqData=qs.docs[0].data(); break; }
+              if (!qs.empty) { reqRef = qs.docs[0].ref; reqData = qs.docs[0].data(); break; }
             }
           }
           if (reqRef && reqData) {
-            const nf = (reqData.unitsFulfilled||0)+1;
-            await updateDoc(reqRef,{status:nf>=(reqData.unitsRequired||1)?'FULFILLED':'PARTIAL',unitsFulfilled:nf,fulfilledBy:bloodBankId,lastUpdated:Timestamp.now()});
+            const nf = (reqData.unitsFulfilled || 0) + 1;
+            await updateDoc(reqRef, { status: nf >= (reqData.unitsRequired || 1) ? 'FULFILLED' : 'PARTIAL', unitsFulfilled: nf, fulfilledBy: bloodBankId, lastUpdated: Timestamp.now() });
           }
-        } catch(_) {}
+        } catch (_) { }
       }
       const msg = linkedRRTID ? `Linked to patient ${patientName}!` : `${finalDonorName} - D-RTID: ${dRtid}`;
       toast.success('Donation Recorded', { description: msg });
@@ -842,32 +849,32 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
     setActionLoading(true);
     try {
       let reqRef: any = null, reqData: any = null;
-      let reqSnap = await getDoc(doc(db,'bloodRequests',rRtid));
-      if (reqSnap.exists()) { reqRef=reqSnap.ref; reqData=reqSnap.data(); }
+      let reqSnap = await getDoc(doc(db, 'bloodRequests', rRtid));
+      if (reqSnap.exists()) { reqRef = reqSnap.ref; reqData = reqSnap.data(); }
       else {
-        for (const q of [query(collection(db,'bloodRequests'),where('linkedRTID','==',rRtid)),query(collection(db,'bloodRequests'),where('rtid','==',rRtid))]) {
-          const qs = await getDocs(q); if (!qs.empty){reqSnap=qs.docs[0];reqRef=reqSnap.ref;reqData=reqSnap.data();break;}
+        for (const q of [query(collection(db, 'bloodRequests'), where('linkedRTID', '==', rRtid)), query(collection(db, 'bloodRequests'), where('rtid', '==', rRtid))]) {
+          const qs = await getDocs(q); if (!qs.empty) { reqSnap = qs.docs[0]; reqRef = reqSnap.ref; reqData = reqSnap.data(); break; }
         }
       }
       if (!reqData) throw new Error('Blood request not found.');
-      
-      let donRef: any=null, donData: any=null;
+
+      let donRef: any = null, donData: any = null;
       if (dRtid) {
-        let donSnap = await getDoc(doc(db,'donations',dRtid));
-        if (donSnap.exists()){donRef=donSnap.ref;donData=donSnap.data();}
+        let donSnap = await getDoc(doc(db, 'donations', dRtid));
+        if (donSnap.exists()) { donRef = donSnap.ref; donData = donSnap.data(); }
         else {
-          for (const q of [query(collection(db,'donations'),where('rtid','==',dRtid)),query(collection(db,'donations'),where('dRtid','==',dRtid))]) {
-            const qs=await getDocs(q);if(!qs.empty){donSnap=qs.docs[0];donRef=donSnap.ref;donData=donSnap.data();break;}
+          for (const q of [query(collection(db, 'donations'), where('rtid', '==', dRtid)), query(collection(db, 'donations'), where('dRtid', '==', dRtid))]) {
+            const qs = await getDocs(q); if (!qs.empty) { donSnap = qs.docs[0]; donRef = donSnap.ref; donData = donSnap.data(); break; }
           }
         }
         if (!donData) throw new Error('Donation not found.');
-        if (!['AVAILABLE','Donated'].includes(donData.status)) throw new Error(`Donation not available. Status: ${donData.status}`);
-        if (donData.otp && donData.otp!==otp) throw new Error('Invalid OTP.');
+        if (!['AVAILABLE', 'Donated'].includes(donData.status)) throw new Error(`Donation not available. Status: ${donData.status}`);
+        if (donData.otp && donData.otp !== otp) throw new Error('Invalid OTP.');
       }
 
       setActionLoading(false);
 
-      const confirmText = donData 
+      const confirmText = donData
         ? `<div class="text-left text-sm space-y-3 mt-4">
              <div class="bg-[var(--bg-page)] p-3 rounded-lg border border-[var(--border-color)]">
                <p class="text-xs text-[var(--text-secondary)] uppercase font-bold mb-1">Patient Info</p>
@@ -906,55 +913,55 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
       setActionLoading(true);
 
       if (donData) {
-        await updateDoc(donRef,{status:'REDEEMED',rRtid,linkedRrtid:rRtid,redemptionDate:Timestamp.now(),redeemedAt:Timestamp.now(),patientName:reqData.patientName||'Patient',hospitalName:reqData.hospitalName||bloodBankData?.fullName||'Hospital',linkedDate:Timestamp.now(),usedDate:Timestamp.now()});
+        await updateDoc(donRef, { status: 'REDEEMED', rRtid, linkedRrtid: rRtid, redemptionDate: Timestamp.now(), redeemedAt: Timestamp.now(), patientName: reqData.patientName || 'Patient', hospitalName: reqData.hospitalName || bloodBankData?.fullName || 'Hospital', linkedDate: Timestamp.now(), usedDate: Timestamp.now() });
         const bg = donData.bloodGroup as BloodGroup;
-        const cbi = inventory && inventory[bg] ? inventory[bg] : {total:0,available:0};
-        await updateDoc(doc(db,'inventory',bloodBankId!),{[bg]:{total:cbi.total,available:Math.max(0,(cbi.available||0)-1)}});
+        const cbi = inventory && inventory[bg] ? inventory[bg] : { total: 0, available: 0 };
+        await updateDoc(doc(db, 'inventory', bloodBankId!), { [bg]: { total: cbi.total, available: Math.max(0, (cbi.available || 0) - 1) } });
         if (donData.donorId) {
-          const dr=doc(db,'users',donData.donorId);const dd=await getDoc(dr);
-          if(dd.exists()) await updateDoc(dr,{credits:(dd.data().credits||0)+1});
+          const dr = doc(db, 'users', donData.donorId); const dd = await getDoc(dr);
+          if (dd.exists()) await updateDoc(dr, { credits: (dd.data().credits || 0) + 1 });
         }
       }
-      const nf=(reqData.unitsFulfilled||0)+1,req2=reqData.unitsRequired||1;
-      await updateDoc(reqRef,{status:nf>=req2?'REDEEMED':'PARTIAL',unitsFulfilled:nf,fulfilled:nf,redeemedAt:Timestamp.now(),scannedLocation:bloodBankData?.fullName||'Blood Bank',fulfilledBy:bloodBankId});
-      toast.success('Redemption Successful! 🎉',{description:`${reqData.patientName} received ${nf} unit(s) of ${reqData.bloodGroup}`});
-      setTimeout(()=>window.location.reload(),2000);
+      const nf = (reqData.unitsFulfilled || 0) + 1, req2 = reqData.unitsRequired || 1;
+      await updateDoc(reqRef, { status: nf >= req2 ? 'REDEEMED' : 'PARTIAL', unitsFulfilled: nf, fulfilled: nf, redeemedAt: Timestamp.now(), scannedLocation: bloodBankData?.fullName || 'Blood Bank', fulfilledBy: bloodBankId });
+      toast.success('Redemption Successful! 🎉', { description: `${reqData.patientName} received ${nf} unit(s) of ${reqData.bloodGroup}` });
+      setTimeout(() => window.location.reload(), 2000);
     } catch (err: any) {
-      toast.error(err.message||'Redemption Failed');
+      toast.error(err.message || 'Redemption Failed');
     } finally { setActionLoading(false); }
   };
 
   const handleVerifyRtid = async (rtid: string) => {
     setActionLoading(true);
     try {
-      let data: any=null, type='';
+      let data: any = null, type = '';
       if (rtid.toUpperCase().includes('RH-RTID') || rtid.toUpperCase().includes('RU-RTID') || rtid.toUpperCase().startsWith('H')) {
-        for (const q of [getDoc(doc(db,'bloodRequests',rtid)),getDocs(query(collection(db,'bloodRequests'),where('linkedRTID','==',rtid))),getDocs(query(collection(db,'bloodRequests'),where('rtid','==',rtid)))]) {
-          const r=await q;
-          if ('exists' in r&&r.exists()){data=r.data();type='Blood Request';break;}
-          else if ('empty' in r&&!r.empty){data=r.docs[0].data();type='Blood Request';break;}
+        for (const q of [getDoc(doc(db, 'bloodRequests', rtid)), getDocs(query(collection(db, 'bloodRequests'), where('linkedRTID', '==', rtid))), getDocs(query(collection(db, 'bloodRequests'), where('rtid', '==', rtid)))]) {
+          const r = await q;
+          if ('exists' in r && r.exists()) { data = r.data(); type = 'Blood Request'; break; }
+          else if ('empty' in r && !r.empty) { data = r.docs[0].data(); type = 'Blood Request'; break; }
         }
       } else {
-        for (const q of [getDoc(doc(db,'donations',rtid)),getDocs(query(collection(db,'donations'),where('rtid','==',rtid))),getDocs(query(collection(db,'donations'),where('dRtid','==',rtid)))]) {
-          const r=await q;
-          if ('exists' in r&&r.exists()){data=r.data();type='Donation';break;}
-          else if ('empty' in r&&!r.empty){data=r.docs[0].data();type='Donation';break;}
+        for (const q of [getDoc(doc(db, 'donations', rtid)), getDocs(query(collection(db, 'donations'), where('rtid', '==', rtid))), getDocs(query(collection(db, 'donations'), where('dRtid', '==', rtid)))]) {
+          const r = await q;
+          if ('exists' in r && r.exists()) { data = r.data(); type = 'Donation'; break; }
+          else if ('empty' in r && !r.empty) { data = r.docs[0].data(); type = 'Donation'; break; }
         }
       }
       if (!data) throw new Error('RTID not found');
-      const sc=data.status==='AVAILABLE'?'text-[var(--clr-success)]':data.status==='REDEEMED'?'text-[var(--clr-danger)]':'text-yellow-600';
+      const sc = data.status === 'AVAILABLE' ? 'text-[var(--clr-success)]' : data.status === 'REDEEMED' ? 'text-[var(--clr-danger)]' : 'text-yellow-600';
       await Swal.fire({
-        title:'✅ Verified', icon:'success', confirmButtonColor:'var(--clr-success)',
-        html:`<div class="text-left space-y-3 p-4">
+        title: '✅ Verified', icon: 'success', confirmButtonColor: 'var(--clr-success)',
+        html: `<div class="text-left space-y-3 p-4">
           <div class="bg-blue-50 p-3 rounded-lg border border-blue-200"><p class="text-sm text-[var(--text-secondary)] mb-1">Type</p><p class="font-bold text-lg">${type}</p></div>
-          <div class="bg-[var(--bg-page)] p-3 rounded-lg border border-[var(--border-color)]"><p class="text-sm text-[var(--text-secondary)] mb-1">ID</p><p class="font-mono font-bold">${data.rtid||rtid}</p></div>
-          <div class="bg-[var(--bg-page)] p-3 rounded-lg border border-[var(--border-color)]"><p class="text-sm text-[var(--text-secondary)] mb-1">Name</p><p class="font-semibold">${data.patientName||data.donorName||'N/A'}</p></div>
-          <div class="bg-[var(--bg-page)] p-3 rounded-lg border border-[var(--border-color)]"><p class="text-sm text-[var(--text-secondary)] mb-1">Blood Group</p><p class="font-bold text-[var(--clr-danger)] text-xl">${data.bloodGroup||'N/A'}</p></div>
-          <div class="bg-[var(--bg-page)] p-3 rounded-lg border border-[var(--border-color)]"><p class="text-sm text-[var(--text-secondary)] mb-1">Status</p><p class="font-bold ${sc}">${data.status||'N/A'}</p></div>
+          <div class="bg-[var(--bg-page)] p-3 rounded-lg border border-[var(--border-color)]"><p class="text-sm text-[var(--text-secondary)] mb-1">ID</p><p class="font-mono font-bold">${data.rtid || rtid}</p></div>
+          <div class="bg-[var(--bg-page)] p-3 rounded-lg border border-[var(--border-color)]"><p class="text-sm text-[var(--text-secondary)] mb-1">Name</p><p class="font-semibold">${data.patientName || data.donorName || 'N/A'}</p></div>
+          <div class="bg-[var(--bg-page)] p-3 rounded-lg border border-[var(--border-color)]"><p class="text-sm text-[var(--text-secondary)] mb-1">Blood Group</p><p class="font-bold text-[var(--clr-danger)] text-xl">${data.bloodGroup || 'N/A'}</p></div>
+          <div class="bg-[var(--bg-page)] p-3 rounded-lg border border-[var(--border-color)]"><p class="text-sm text-[var(--text-secondary)] mb-1">Status</p><p class="font-bold ${sc}">${data.status || 'N/A'}</p></div>
         </div>`
       });
-    } catch(err:any){ toast.error(err.message); }
-    finally{ setActionLoading(false); }
+    } catch (err: any) { toast.error(err.message); }
+    finally { setActionLoading(false); }
   };
 
   /* Loading */
@@ -988,8 +995,9 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
           notificationCount={notifications.filter(n => !n.read).length}
           bloodRequestsCount={bloodRequests.length}
           onLogout={handleLogoutConfirm}
-          location={`${bloodBankData?.district||'…'}, ${bloodBankData?.pincode||'…'}`}
+          location={`${bloodBankData?.district || '…'}, ${bloodBankData?.pincode || '…'}`}
           bloodBankName={bloodBankData?.fullName}
+          onProfileClick={() => setProfileModalOpen(true)}
         />
 
         {/* Navigation */}
@@ -1053,21 +1061,15 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
               <AppointmentsTab appointments={appointments} onCheckIn={handleCheckIn} />
             )}
 
-            {activeTab === 'donations'   && <DonationsTab donations={donations} />}
+            {activeTab === 'donations' && <DonationsTab donations={donations} />}
             {activeTab === 'redemptions' && <RedemptionsTab redemptions={redemptions} />}
-            {activeTab === 'verify'      && <VerifyTab onVerifyAndRedeem={handleVerifyAndRedeem} />}
-            {activeTab === 'rtidVerify'  && <RtidVerifyTab onVerifyRtid={handleVerifyRtid} />}
-            {activeTab === 'reports'     && (
+            {activeTab === 'verify' && <VerifyTab onVerifyAndRedeem={handleVerifyAndRedeem} />}
+            {activeTab === 'rtidVerify' && <RtidVerifyTab onVerifyRtid={handleVerifyRtid} />}
+            {activeTab === 'reports' && (
               <ReportsTab inventory={inventory} donations={donations} redemptions={redemptions} criticalGroups={criticalGroups} />
             )}
 
-            {activeTab === 'camps' && (
-              <div className="text-center py-20">
-                <div className="text-6xl mb-4 opacity-30">⛺</div>
-                <h2 className="text-xl font-bold text-[var(--text-secondary)] mb-2">Blood Donation Camps</h2>
-                <p className="text-sm text-gray-400">Coming soon — organize & manage camps</p>
-              </div>
-            )}
+            {activeTab === 'camps' && <CampsTab />}
           </div>
         </main>
 
@@ -1102,9 +1104,139 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
           onClose={() => setAppointmentModalOpen(false)}
           onSubmit={handleRegisterAppointment}
         />
+
+        {/* ── Blood Bank Profile Panel ── */}
+        {profileModalOpen && (
+          <div
+            style={{
+              position: 'fixed', inset: 0, zIndex: 200,
+              background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(6px)',
+              display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end',
+            }}
+            onClick={() => setProfileModalOpen(false)}
+          >
+            <div
+              style={{
+                width: 380, maxWidth: '95vw', height: '100vh',
+                background: '#fff', boxShadow: '-8px 0 40px rgba(0,0,0,0.15)',
+                display: 'flex', flexDirection: 'column', overflow: 'hidden',
+                animation: 'profileSlideIn 0.3s cubic-bezier(0.22,1,0.36,1)',
+              }}
+              onClick={e => e.stopPropagation()}
+              className="dark:bg-gray-900"
+            >
+              <style>{`
+                @keyframes profileSlideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+              `}</style>
+
+              {/* Header */}
+              <div style={{
+                background: 'linear-gradient(135deg, #C41E3A 0%, #8b0000 100%)',
+                padding: '28px 24px 24px', position: 'relative', overflow: 'hidden',
+              }}>
+                <div style={{
+                  position: 'absolute', right: -20, top: -20,
+                  width: 120, height: 120,
+                  background: 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 65%)',
+                  borderRadius: '50%',
+                }} />
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', zIndex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                    <div style={{
+                      width: 54, height: 54, borderRadius: 14,
+                      background: 'rgba(255,255,255,0.15)',
+                      border: '1.5px solid rgba(255,255,255,0.25)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <span style={{ fontSize: 24 }}>🏥</span>
+                    </div>
+                    <div>
+                      <p style={{ fontSize: '0.68rem', color: 'rgba(255,220,210,0.8)', fontWeight: 600, margin: 0, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Blood Bank Profile</p>
+                      <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fff', margin: '3px 0 0', fontFamily: "'Sora', sans-serif", lineHeight: 1.2 }}>
+                        {bloodBankData?.fullName || 'Blood Bank'}
+                      </h3>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setProfileModalOpen(false)}
+                    style={{
+                      width: 30, height: 30, borderRadius: 8,
+                      background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)',
+                      color: 'rgba(255,255,255,0.8)', cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {/* Status pill */}
+                <div style={{
+                  marginTop: 16, display: 'inline-flex', alignItems: 'center', gap: 6,
+                  background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)',
+                  borderRadius: 999, padding: '4px 12px',
+                  fontSize: '0.72rem', color: '#fff', fontWeight: 600,
+                }}>
+                  <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#4ade80', display: 'inline-block' }} />
+                  Active &amp; Verified
+                </div>
+              </div>
+
+              {/* Info fields */}
+              <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {[
+                  { label: 'Blood Bank Name', value: bloodBankData?.fullName || '—', icon: '🏥' },
+                  { label: 'Email', value: bloodBankData?.email || '—', icon: '📧' },
+                  { label: 'Mobile', value: bloodBankData?.mobile || '—', icon: '📱' },
+                  { label: 'License Number', value: bloodBankData?.licenseNo || bloodBankData?.license || '—', icon: '🪪' },
+                  { label: 'District', value: bloodBankData?.district || '—', icon: '📍' },
+                  { label: 'State', value: bloodBankData?.state || '—', icon: '🗺️' },
+                  { label: 'Pincode', value: bloodBankData?.pincode || '—', icon: '🔢' },
+                  { label: 'Blood Bank ID', value: bloodBankId || '—', icon: '🔑' },
+                ].map(f => (
+                  <div key={f.label} style={{
+                    background: '#f9fafb', border: '1px solid #f0f0f0',
+                    borderRadius: 12, padding: '12px 14px',
+                  }}>
+                    <p style={{ fontSize: '0.65rem', color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 3px' }}>
+                      {f.icon} {f.label}
+                    </p>
+                    <p style={{ fontSize: '0.88rem', fontWeight: 600, color: '#111827', margin: 0, wordBreak: 'break-all' }}>
+                      {f.value}
+                    </p>
+                  </div>
+                ))}
+
+                {/* Quick stats */}
+                <div style={{ marginTop: 8 }}>
+                  <p style={{ fontSize: '0.72rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>
+                    Quick Stats
+                  </p>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                    {[
+                      { label: 'Total Donations', val: kpi?.totalDonations ?? donations.length, color: '#C41E3A' },
+                      { label: 'Appointments', val: appointments.length, color: '#1d4ed8' },
+                      { label: 'Available Units', val: kpi?.availableUnits ?? '—', color: '#16a34a' },
+                      { label: 'Pending Requests', val: bloodRequests.length, color: '#d97706' },
+                    ].map(s => (
+                      <div key={s.label} style={{
+                        background: '#fff', border: '1.5px solid #f0f0f0',
+                        borderRadius: 10, padding: '12px 14px', textAlign: 'center',
+                      }}>
+                        <p style={{ fontSize: '1.3rem', fontWeight: 800, color: s.color, margin: 0, fontFamily: "'Sora', monospace" }}>{s.val}</p>
+                        <p style={{ fontSize: '0.62rem', color: '#9ca3af', margin: '3px 0 0' }}>{s.label}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
 };
+
 
 export default BloodBankDashboard;
