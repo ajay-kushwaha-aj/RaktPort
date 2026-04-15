@@ -2,7 +2,7 @@
 import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Building2, MapPin, Phone, Hash, Mail, MessageSquarePlus, Keyboard } from "lucide-react";
-import { FeedbackWidget } from "../FeedbackWidget";
+import { FeedbackWidget } from "@/components/FeedbackWidget";
 
 export const ProfileModal = ({ isOpen, onClose, hospital, onOpenShortcuts }: { isOpen: boolean; onClose: () => void; hospital: any; onOpenShortcuts?: () => void }) => (
   <Dialog open={isOpen} onOpenChange={onClose}>

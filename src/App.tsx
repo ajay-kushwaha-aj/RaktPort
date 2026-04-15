@@ -3,16 +3,16 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
-import { LandingPage } from './components/LandingPage';
-import { LoginPage } from './components/LoginPage';
-import { SignupPage } from './components/SignupPage';
-import { AdminSignupPage } from './components/AdminSignupPage';
-import { DonorDashboard } from './components/DonorDashboard';
-import { ImpactPage } from './components/ImpactPage';
-import { LocateDonationSite } from './components/LocateDonationSite';
-// --- Import the dashboards with CONSISTENT DEFAULT IMPORTS ---
-import HospitalDashboard from './components/hospital/HospitalDashboard';
-import BloodBankDashboard from './components/BloodBankDashboard';
+import { LandingPage } from './pages/LandingPage';
+import { LoginPage } from './pages/auth/LoginPage';
+import { SignupPage } from './pages/auth/SignupPage';
+import { AdminSignupPage } from './pages/auth/AdminSignupPage';
+import { DonorDashboard } from './pages/dashboards/DonorDashboard';
+import { ImpactPage } from './pages/ImpactPage';
+import { LocateDonationSite } from './pages/LocateDonationSite';
+// --- Import the dashboards ---
+import HospitalDashboard from './pages/dashboards/hospital/HospitalDashboard';
+import BloodBankDashboard from './pages/dashboards/BloodBankDashboard';
 import AdminLayout from './admin/AdminLayout';
 import { Button } from './components/ui/button';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';

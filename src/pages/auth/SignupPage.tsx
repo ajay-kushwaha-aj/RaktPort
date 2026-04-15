@@ -4,7 +4,7 @@
 
 import { useState, useEffect, useCallback, useId, useRef } from 'react';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage } from '../firebase';
+import { storage } from '../../firebase';
 import {
   initRecaptcha,
   sendRegistrationOTP,
@@ -12,14 +12,14 @@ import {
   registerUserWithPhone,
   signInWithGoogle,
   lookupUserByEmail,
-} from '../lib/auth';
-import { sendVerificationEmail } from '../lib/emailService';
+} from '../../lib/auth';
+import { sendVerificationEmail } from '../../lib/emailService';
 import {
   isValidUsername,
   checkUsernameAvailable,
   formatUsername,
-} from '../lib/identity';
-import { encryptField, hashField } from '../lib/crypto';
+} from '../../lib/identity';
+import { encryptField, hashField } from '../../lib/crypto';
 import confetti from 'canvas-confetti';
 import { toast } from 'sonner';
 import {
@@ -29,7 +29,7 @@ import {
   ChevronRight, ChevronLeft, Home, Smartphone, KeyRound,
   Package, Clock, Zap, Check, Info, AtSign, Navigation,
 } from 'lucide-react';
-import logo from '../assets/raktport-logo.png';
+import logo from '../../assets/raktport-logo.png';
 import type { ConfirmationResult, RecaptchaVerifier } from 'firebase/auth';
 
 interface SignupPageProps {
@@ -324,7 +324,7 @@ function GoogleProfileCompletion({
     try {
       // Update the Firestore doc with org-specific details
       const { doc, updateDoc } = await import('firebase/firestore');
-      const { db } = await import('../firebase');
+      const { db } = await import('../../firebase');
       await updateDoc(doc(db, 'users', googleUid), {
         address, district, state, pincode,
         ...(lat !== null && lng !== null && { lat, lng }),
@@ -794,7 +794,7 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
         if (role === 'hospital' || role === 'bloodbank') {
           try {
             const { doc, updateDoc, setDoc } = await import('firebase/firestore');
-            const { db } = await import('../firebase');
+            const { db } = await import('../../firebase');
             
             // Upload documents if any
             let documentUrls: string[] = [];

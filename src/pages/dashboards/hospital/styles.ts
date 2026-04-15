@@ -147,13 +147,13 @@ export const HD_STYLES = `
 
 /* Logo */
 .hd-logo-frame {
-  width: 36px; height: 36px; border-radius: 10px;
-  background: #fff; display: flex; align-items: center;
-  justify-content: center; flex-shrink: 0; overflow: hidden;
-  box-shadow: var(--s-brand); transition: transform var(--t-spring), box-shadow var(--t-med);
+  width: 36px; height: 36px;
+  display: flex; align-items: center;
+  justify-content: center; flex-shrink: 0;
+  transition: transform var(--t-spring);
 }
-.hd-logo-frame:hover { transform: scale(1.06) rotate(-2deg); box-shadow: var(--s-brand-lg); }
-.hd-logo-frame img { width:80%; height:80%; object-fit:contain; border-radius:10px; }
+.hd-logo-frame:hover { transform: scale(1.06) rotate(-2deg); }
+.hd-logo-frame img { width:100%; height:100%; object-fit:contain; }
 
 /* Brand text */
 .hd-brand {

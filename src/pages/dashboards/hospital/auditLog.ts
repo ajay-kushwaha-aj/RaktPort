@@ -1,6 +1,6 @@
 // hospital/auditLog.ts — Audit trail logging utility (Phase 2)
 import { collection, addDoc } from "firebase/firestore";
-import { db } from "../../firebase";
+import { db } from "../../../firebase";
 
 export type AuditAction =
   | "REQUEST_CREATED"

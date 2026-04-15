@@ -3,13 +3,13 @@
 // ═══════════════════════════════════════════════════════════════
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { ModeToggle } from './mode-toggle';
-import { FeedbackWidget } from './FeedbackWidget';
+import { ModeToggle } from '../../components/mode-toggle';
+import { FeedbackWidget } from '../../components/FeedbackWidget';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { Button } from './ui/button';
-import { Card, CardHeader, CardContent, CardTitle, CardDescription } from './ui/card';
-import { Badge } from './ui/badge';
+import { Button } from '../../components/ui/button';
+import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '../../components/ui/card';
+import { Badge } from '../../components/ui/badge';
 import {
   Bell, CheckCircle2, ChevronRight, Clock, MapPin, Search, Star, MessageSquarePlus,
   ArrowRight, ShieldCheck, Download, Trash2, Calendar, Map, Phone, AlertCircle, Heart, User, PowerOff, Droplet, Zap, Target, Loader2, Navigation, Award, CheckCircle, Info, X, Home,
@@ -22,32 +22,32 @@ import {
 import {
   Table, TableBody, TableCell, TableHead,
   TableHeader, TableRow,
-} from './ui/table';
+} from '../../components/ui/table';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
   DialogFooter, DialogDescription,
-} from './ui/dialog';
+} from '../../components/ui/dialog';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from './ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Input } from './ui/input';
-import { Switch } from './ui/switch';
-import { Label } from './ui/label';
-import { Progress } from './ui/progress';
-import { calculateDonorEligibility } from '../lib/medical-eligibility';
+} from '../../components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
+import { Input } from '../../components/ui/input';
+import { Switch } from '../../components/ui/switch';
+import { Label } from '../../components/ui/label';
+import { Progress } from '../../components/ui/progress';
+import { calculateDonorEligibility } from '../../lib/medical-eligibility';
 import QRious from 'qrious';
-import { toast } from './ui/sonner';
-import logo from '../assets/raktport-logo.png';
+import { toast } from '../../components/ui/sonner';
+import logo from '../../assets/raktport-logo.png';
 import Swal from 'sweetalert2';
-import { db } from '../firebase';
+import { db } from '../../firebase';
 import {
   doc, getDoc, collection, query, where, getDocs,
   addDoc, setDoc, updateDoc, Timestamp,
 } from 'firebase/firestore';
-import { generateDonorId } from '../lib/auth';
-import { formatUsername } from '../lib/identity';
-import { decryptField, maskMobileDisplay, encryptField, hashField } from '../lib/crypto';
+import { generateDonorId } from '../../lib/auth';
+import { formatUsername } from '../../lib/identity';
+import { decryptField, maskMobileDisplay, encryptField, hashField } from '../../lib/crypto';
 
 // ─────────────────────────────────────────────────────────────
 // HELPERS
@@ -81,7 +81,7 @@ const formatDateTimeDMY = (d: Date | string | null | undefined): string => {
   } catch { return 'N/A'; }
 };
 
-// generateDonorId is now imported from '../lib/auth'
+// generateDonorId is now imported from '../../lib/auth'
 
 const generateUniqueAppointmentRtid = async (dateStr: string): Promise<string> => {
   const d = new Date(dateStr);

@@ -640,17 +640,11 @@ function RphStyles() {
 .rph-logo:hover { opacity:.88; }
 .rph-logo-box {
   width:42px; height:42px;
-  border-radius:11px;
-  overflow:hidden;
-  border:1.5px solid var(--rph-b);
-  box-shadow:0 2px 8px rgba(0,0,0,.07);
-  background:#fff;
   display:flex; align-items:center; justify-content:center;
   flex-shrink:0;
-  transition:transform .22s cubic-bezier(.22,1,.36,1), box-shadow .22s;
+  transition:transform .22s cubic-bezier(.22,1,.36,1);
 }
-.rph-logo:hover .rph-logo-box { transform:translateY(-1px); box-shadow:0 4px 14px rgba(196,30,58,.18); }
-.dark .rph-logo-box { background:#1a1a1a; border-color:#2a2a2a; }
+.rph-logo:hover .rph-logo-box { transform:translateY(-1px) scale(1.05); }
 .rph-logo-img { width:100%; height:100%; object-fit:contain; display:block; }
 .rph-logo-name {
   font-family:'Sora',Georgia,serif;

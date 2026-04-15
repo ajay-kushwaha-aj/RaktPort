@@ -26,7 +26,7 @@ import { generateRtid } from '@/lib/bloodbank-utils';
 import { BloodRequestModal } from '@/components/modals/BloodRequestModal';
 import { DonationModal } from '@/components/modals/DonationModal';
 import { AppointmentModal } from '@/components/modals/AppointmentModal';
-import { db } from '../firebase';
+import { db } from '../../firebase';
 import {
   collection, getDocs, query, where, doc, getDoc,
   addDoc, updateDoc, Timestamp, setDoc,

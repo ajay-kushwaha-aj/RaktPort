@@ -13,11 +13,11 @@ import {
   lookupUserByInternalId, lookupUserByUsername, lookupUserByPhone,
   sendLoginOTP, verifyLoginOTP, resetPassword,
   type UserLookupResult,
-} from '../lib/auth';
+} from '../../lib/auth';
 import {
   detectInputType, formatUsername, normalizePhone,
   type InputType,
-} from '../lib/identity';
+} from '../../lib/identity';
 import { toast } from 'sonner';
 import {
   Eye, EyeOff, Mail, Lock, UserCircle,
@@ -25,7 +25,7 @@ import {
   Phone, Search, Loader2, CheckCircle2, ChevronDown,
   KeyRound, Smartphone, AtSign, Hash, Fingerprint,
 } from 'lucide-react';
-import logo from '../assets/raktport-logo.png';
+import logo from '../../assets/raktport-logo.png';
 import type { ConfirmationResult, RecaptchaVerifier } from 'firebase/auth';
 
 /* ─── Props & Config ─── */

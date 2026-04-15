@@ -1,9 +1,9 @@
 // src/components/AdminSignupPage.tsx
 import { useState, useEffect } from 'react';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Card } from './ui/card';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Label } from '../../components/ui/label';
+import { Card } from '../../components/ui/card';
 import {
   ArrowLeft,
   Loader2,
@@ -23,14 +23,14 @@ import {
 } from 'lucide-react';
 
 // --- FIREBASE IMPORTS ---
-import { db } from '../firebase';
+import { db } from '../../firebase';
 import { doc, setDoc, getDoc, query, where, collection, getDocs } from 'firebase/firestore';
 import {
   initRecaptcha,
   sendRegistrationOTP,
   verifyRegistrationOTP,
   registerUserWithPhone
-} from '../lib/auth';
+} from '../../lib/auth';
 import type { RecaptchaVerifier } from 'firebase/auth';
 import { toast } from 'sonner';
 

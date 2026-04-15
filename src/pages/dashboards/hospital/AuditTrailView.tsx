@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Shield, Search, RefreshCw, ClipboardList, PenTool, FileText, Syringe, FileEdit } from "lucide-react";
 import { collection, query, where, orderBy, limit, getDocs } from "firebase/firestore";
-import { db } from "../../firebase";
+import { db } from "../../../firebase";
 import { AUDIT_ACTION_LABELS } from "./auditLog";
 import type { AuditAction, AuditEntry } from "./auditLog";
 

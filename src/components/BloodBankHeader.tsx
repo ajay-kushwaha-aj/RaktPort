@@ -105,21 +105,13 @@ export const BloodBankHeader = ({
 
         /* ── Logo ring ── */
         .hdr-logo-ring {
-          width: 42px; height: 42px; border-radius: 11px;
-          background: #fff5f5;
-          border: 1.5px solid rgba(196,30,58,0.18);
+          width: 42px; height: 42px;
           display: flex; align-items: center; justify-content: center;
           transition: all 0.22s ease;
           flex-shrink: 0;
         }
         .hdr-logo-ring:hover {
-          background: rgba(196,30,58,0.07);
-          border-color: rgba(196,30,58,0.35);
           transform: scale(1.05);
-        }
-        .dark .hdr-logo-ring {
-          background: rgba(196,30,58,0.1);
-          border-color: rgba(196,30,58,0.25);
         }
 
         /* ── Brand block ── */

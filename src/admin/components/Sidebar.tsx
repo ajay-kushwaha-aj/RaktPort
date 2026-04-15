@@ -214,12 +214,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ adminEmail, onLogout }) => {
           style={{
             width: 36,
             height: 36,
-            borderRadius: 8,
-            objectFit: 'cover',
+            objectFit: 'contain',
             objectPosition: 'center',
             flexShrink: 0,
-            border: '1px solid rgba(37,99,235,0.3)',
-            boxShadow: '0 0 10px rgba(37,99,235,0.25)',
           }}
         />
         {!sidebarCollapsed && (
