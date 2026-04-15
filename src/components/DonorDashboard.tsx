@@ -756,20 +756,15 @@ export function DonorDashboard({ onLogout }: DonorDashboardProps) {
               if (isValidIndianMobile(decrypted)) {
                 const last10 = decrypted.replace(/\D/g, '').slice(-10);
                 mobileDisplay = `+91 ${last10.slice(0, 5)} ${last10.slice(5)}`;
-              } else if (decrypted && !decrypted.startsWith('enc:') && decrypted !== rawMobile) {
-                // Decrypted to something but not a valid number — show as-is
-                mobileDisplay = decrypted;
               } else {
-                // Could not decrypt meaningfully
-                mobileDisplay = 'Mobile Registered ✓';
+                mobileDisplay = decrypted;
               }
             } catch {
-              // decryptField threw — inline fallback, no external call
-              if (!rawMobile.startsWith('enc:') && isValidIndianMobile(rawMobile)) {
+              if (isValidIndianMobile(rawMobile)) {
                 const last10 = rawMobile.replace(/\D/g, '').slice(-10);
                 mobileDisplay = `+91 ${last10.slice(0, 5)} ${last10.slice(5)}`;
               } else {
-                mobileDisplay = rawMobile.startsWith('enc:') ? 'Mobile Registered ✓' : rawMobile;
+                mobileDisplay = rawMobile; // Show raw text instead of Mobile Registered checkmark
               }
             }
           }

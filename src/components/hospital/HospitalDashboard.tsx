@@ -190,7 +190,14 @@ const HospitalDashboard = ({ onLogout }: { onLogout: () => void }) => {
       const resolvedId = user?.uid || hospitalId || localStorage.getItem("userId") || localStorage.getItem("userUid");
       if (resolvedId && resolvedId !== hospitalId) setHospitalId(resolvedId);
       if (!resolvedId) { toast.error("Not logged in."); setLoading(false); return; }
-      getDoc(doc(db, "users", resolvedId)).then(snap => { if (snap.exists()) setHospitalData(snap.data()); });
+      getDoc(doc(db, "users", resolvedId)).then(async snap => { 
+        if (snap.exists()) {
+          const d = snap.data();
+          if (d.mobile) d.mobile = await decryptField(d.mobile);
+          if (d.phone) d.phone = await decryptField(d.phone);
+          setHospitalData(d);
+        }
+      });
       const q = query(collection(db, "bloodRequests"), where("hospitalId", "==", resolvedId));
       unsubDocs = onSnapshot(q, async (snap) => {
         try {

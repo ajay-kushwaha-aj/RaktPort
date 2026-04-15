@@ -17,6 +17,7 @@ import {
   doc, getDoc, onSnapshot, setDoc,
 } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { decryptField } from '../lib/crypto';
 import {
   Inventory, Appointment, Donation, Redemption,
   BloodRequest, Notification, KPIData, BloodGroup,
@@ -150,6 +151,9 @@ export const useBloodBankData = () => {
           localStorage.setItem('userUid', bbId);
         }
 
+        if (userData.mobile) userData.mobile = await decryptField(userData.mobile);
+        if (userData.phone) userData.phone = await decryptField(userData.phone);
+
         setBloodBankData(userData);
         setBloodBankId(bbId);
 
@@ -158,7 +162,14 @@ export const useBloodBankData = () => {
         // Profile
         unsubs.push(onSnapshot(
           doc(db, 'users', bbId),
-          s  => { if (s.exists()) setBloodBankData(s.data()); },
+          async s  => { 
+            if (s.exists()) {
+              const d = s.data();
+              if (d.mobile) d.mobile = await decryptField(d.mobile);
+              if (d.phone) d.phone = await decryptField(d.phone);
+              setBloodBankData(d);
+            }
+          },
           err => console.error('[BBData] profile:', err)
         ));
 
