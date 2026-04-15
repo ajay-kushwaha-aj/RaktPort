@@ -8,8 +8,7 @@ const OFFLINE_URL = '/';
 // Assets to pre-cache on install
 const PRE_CACHE = [
   '/',
-  '/icon-192.png',
-  '/icon-512.png',
+  '/raktport-logo.png',
   '/manifest.json',
 ];
 

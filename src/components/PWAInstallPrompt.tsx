@@ -143,7 +143,7 @@ export function PWAInstallPrompt() {
           <div className="p-4 pr-10 flex items-center gap-3.5">
             {/* App icon */}
             <div className="flex-shrink-0 w-14 h-14 rounded-xl overflow-hidden border-2 border-white/20 shadow-lg bg-[var(--bg-surface)]/10">
-              <img src="/icon-192.png" alt="RaktPort" className="w-full h-full object-cover" />
+              <img src="/raktport-logo.png" alt="RaktPort" className="w-full h-full object-cover" />
             </div>
 
             {/* Text */}
@@ -212,7 +212,7 @@ export function PWAInstallPrompt() {
             {/* Header */}
             <div className="bg-gradient-to-r from-[var(--clr-brand)] to-[#a01010] text-[var(--txt-inverse)] px-5 py-4 flex items-center gap-3">
               <div className="w-12 h-12 rounded-xl overflow-hidden border-2 border-white/20 bg-[var(--bg-surface)]/10">
-                <img src="/icon-192.png" alt="RaktPort" className="w-full h-full object-cover" />
+                <img src="/raktport-logo.png" alt="RaktPort" className="w-full h-full object-cover" />
               </div>
               <div>
                 <h3 className="font-bold text-base">Install RaktPort</h3>
