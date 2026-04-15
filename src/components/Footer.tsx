@@ -17,7 +17,7 @@
 //   • Preserves Faqs import and all existing real hrefs
 // ─────────────────────────────────────────────────────────────
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Faqs } from './Faqs';
 
 /* ─── Scroll-reveal hook ───────────────────────────────── */
@@ -310,6 +310,24 @@ export function Footer() {
                 </span>
                 {' '}for India
               </p>
+              <div className="rpf-metrics-box" style={{ marginTop: '14px', display: 'flex', justifyContent: 'center' }}>
+                <span style={{
+                  background: 'rgba(196,30,58,0.1)',
+                  border: '1px solid rgba(196,30,58,0.2)',
+                  color: '#ff8fa3',
+                  padding: '4px 10px',
+                  borderRadius: '6px',
+                  fontSize: '11.5px',
+                  fontWeight: '600',
+                  letterSpacing: '0.04em',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
+                  <VisitorCounterText />
+                </span>
+              </div>
             </div>
 
             <div className="rpf-bottom-right">
@@ -333,6 +351,27 @@ export function Footer() {
       </footer>
     </>
   );
+}
+
+function VisitorCounterText() {
+  const [count, setCount] = useState<number | null>(null);
+  
+  useEffect(() => {
+    // We use a counter API that tracks visits to raktport.in
+    fetch('https://api.counterapi.dev/v1/raktport_in/visitors/up')
+      .then(res => {
+        if (!res.ok) throw new Error('API down');
+        return res.json();
+      })
+      .then(data => setCount(data.count))
+      .catch((err) => {
+        console.error('Visitor counter error:', err);
+        // Do not put fake data. Just leave it null or try to read from local storage
+      });
+  }, []);
+  
+  if (count === null) return <span>Live Views: Computing...</span>;
+  return <span>Live Views: {count.toLocaleString()}</span>;
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -370,14 +409,12 @@ function FooterStyles() {
   overflow: hidden;
 }
 
-/* Subtle noise texture overlay */
+/* Subtle glow (texture removed per request) */
 .rpf::before {
   content: '';
   position: absolute;
   inset: 0;
-  background-image:
-    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(196,30,58,0.08) 0%, transparent 60%),
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  background-image: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(196,30,58,0.08) 0%, transparent 60%);
   pointer-events: none;
   z-index: 0;
 }

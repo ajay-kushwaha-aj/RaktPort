@@ -267,13 +267,13 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
                   onMouseEnter={keepDD_}
                   onMouseLeave={closeDD_}
                 >
-                  <DDRow icon="" title={t.ddDonor} desc={t.ddDonorDesc}
+                  <DDRow icon={<UserCircle size={16} />} title={t.ddDonor} desc={t.ddDonorDesc}
                     onClick={() => { onSignupClick?.('donor'); closeAll(); }} />
-                  <DDRow icon="" title={t.ddEli} desc={t.ddEliDesc}
+                  <DDRow icon={<CheckSquare size={16} />} title={t.ddEli} desc={t.ddEliDesc}
                     href="/Donation-eligibility-rules.html" onClick={closeAll} />
-                  <DDRow icon="" title={t.ddCamp} desc={t.ddCampDesc}
+                  <DDRow icon={<MapPin size={16} />} title={t.ddCamp} desc={t.ddCampDesc}
                     href="/locate-site" onClick={closeAll} />
-                  <DDRow icon="" title={t.ddPrep} desc={t.ddPrepDesc}
+                  <DDRow icon={<ClipboardList size={16} />} title={t.ddPrep} desc={t.ddPrepDesc}
                     href="/Donation-Preparation&Aftercare.html" onClick={closeAll} />
                 </Dropdown>
               </li>
@@ -468,10 +468,10 @@ function Dropdown({ open, children, align = 'left', minWidth = 220, onMouseEnter
 
 /** Dropdown item (link or button) */
 function DDRow({ icon, title, desc, href, onClick }:
-  { icon: string; title: string; desc: string; href?: string; onClick?: () => void }) {
+  { icon: React.ReactNode; title: string; desc: string; href?: string; onClick?: () => void }) {
   const body = (
     <>
-      <span className="rph-dd-icon" aria-hidden="true">{icon}</span>
+      <span className="rph-dd-icon" aria-hidden="true" style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>{icon}</span>
       <span className="rph-dd-text">
         <span className="rph-dd-title">{title}</span>
         <span className="rph-dd-desc">{desc}</span>

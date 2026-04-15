@@ -18,6 +18,7 @@ import { Button } from './components/ui/button';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { CookieConsent } from './components/CookieConsent';
 import { FeedbackWidget } from './components/FeedbackWidget';
+import { BackToTop } from './components/BackToTop';
 
 // --- Error Boundary to prevent blank page on runtime errors ---
 class ErrorBoundary extends React.Component<
@@ -82,7 +83,6 @@ type View = 'home' | 'login' | 'signup' | 'dashboard';
 function AppContent() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [currentView, setCurrentView] = useState<View>('home');
   const [selectedRole, setSelectedRole] = useState<string>('donor');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -96,57 +96,44 @@ function AppContent() {
       console.warn("Corrupted session detected: Logged in but no userId. Forcing logout.");
       localStorage.clear(); // Safe to clear all for this app to ensure clean slate
       setIsLoggedIn(false);
-      // Let it fall through to default routing
-    }
-    // If user is logged in AND has valid userId, always show dashboard UNLESS trying to view public pages explicitly
-    else if (loggedIn) {
+    } else if (loggedIn) {
       setIsLoggedIn(true);
       setSelectedRole(role);
       
-      // Allow logged-in users to view these public pages
-      if (location.pathname === '/' || location.pathname === '/impact' || location.pathname === '/locate-site') {
-        const viewMap: Record<string, View> = { '/': 'home' };
-        setCurrentView(viewMap[location.pathname] || 'home');
-      } else {
-        setCurrentView('dashboard');
+      // If user is logged in (session exists) and their current location.pathname 
+      // starts with /login or /register, automatically navigate to /dashboard
+      if (location.pathname.startsWith('/login') || location.pathname.startsWith('/register') || location.pathname === '/admin') {
+        navigate('/dashboard', { replace: true });
       }
-      return; // Exit early - don't process URL routing when logged in
-    }
-
-    // Handle URL routing only when NOT logged in
-    if (location.pathname === '/register/admin') {
-      setCurrentView('signup');
-      setSelectedRole('admin');
-    } else if (location.pathname.startsWith('/register/')) {
-      const roleFromPath = location.pathname.split('/register/')[1];
-      if (roleFromPath) setSelectedRole(roleFromPath);
-      setCurrentView('signup');
-    } else if (location.pathname.startsWith('/login')) {
-      const roleParam = new URLSearchParams(location.search).get('role');
-      if (roleParam) {
-        setSelectedRole(roleParam);
+    } else {
+      setIsLoggedIn(false);
+      // Sync selectedRole with URL for unauthenticated flows
+      if (location.pathname.startsWith('/register/')) {
+        const roleFromPath = location.pathname.split('/register/')[1];
+        if (roleFromPath && roleFromPath !== 'admin') {
+          setSelectedRole(roleFromPath);
+        } else if (location.pathname === '/register/admin') {
+          setSelectedRole('admin');
+        }
+      } else if (location.pathname.startsWith('/login')) {
+        const roleParam = new URLSearchParams(location.search).get('role');
+        if (roleParam) {
+          setSelectedRole(roleParam);
+        }
+      } else if (location.pathname === '/admin') {
+        setSelectedRole('admin');
       }
-      setCurrentView('login');
-    } else if (location.pathname === '/') {
-      setCurrentView('home');
     }
-  }, [location]);
+  }, [location.pathname, location.search, navigate]);
 
   const handleRoleSelect = (role: string) => {
     setSelectedRole(role);
     navigate(`/login?role=${role}`);
-    setCurrentView('login');
-  };
-
-  const handleBackToHome = () => {
-    navigate('/');
-    setCurrentView('home');
   };
 
   const handleLoginClick = (role: string = 'donor') => {
     setSelectedRole(role);
     navigate(`/login?role=${role}`);
-    setCurrentView('login');
   };
 
   const handleSignupClick = (role: string = 'donor') => {
@@ -154,15 +141,13 @@ function AppContent() {
     if (role === 'admin') {
       navigate('/register/admin');
     } else {
-      setCurrentView('signup');
       navigate(`/register/${role}`);
     }
   };
 
   const handleDonorSignupClick = () => {
     setSelectedRole('donor');
-    navigate('/login?role=donor');
-    setCurrentView('signup');
+    navigate('/register/donor');
   };
 
   const handleLogout = () => {
@@ -171,23 +156,18 @@ function AppContent() {
     localStorage.removeItem('userId');
     setIsLoggedIn(false);
     navigate('/');
-    setCurrentView('home');
   };
 
   const renderDashboard = () => {
     switch (selectedRole) {
       case 'donor':
         return <DonorDashboard onLogout={handleLogout} />;
-
       case 'hospital':
         return <HospitalDashboard onLogout={handleLogout} />;
-
       case 'bloodbank':
         return <BloodBankDashboard onLogout={handleLogout} />;
-
       case 'admin':
         return <AdminLayout onLogout={handleLogout} />;
-
       default:
         return (
           <div className="min-h-screen flex items-center justify-center bg-[var(--bg-page)]">
@@ -206,6 +186,16 @@ function AppContent() {
     }
   };
 
+  const WithHeaderFooter = ({ children }: { children: React.ReactNode }) => (
+    <div className="min-h-screen flex flex-col">
+      <Header onLoginClick={handleLoginClick} onSignupClick={handleSignupClick} />
+      <main className="flex-1">
+        {children}
+      </main>
+      <Footer />
+    </div>
+  );
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -213,123 +203,97 @@ function AppContent() {
         <Sonner />
 
         <Routes>
-          {/* Admin Registration Route */}
-          <Route
-            path="/register/admin"
+          <Route 
+            path="/" 
             element={
-              <AdminSignupPage
-                onBack={() => {
-                  navigate('/login?role=admin');
-                  setCurrentView('login');
-                }}
-                onLoginClick={() => {
-                  navigate('/login?role=admin');
-                  setCurrentView('login');
-                }}
-              />
+              <WithHeaderFooter>
+                <LandingPage onRoleSelect={handleRoleSelect} onDonorSignupClick={handleDonorSignupClick} />
+              </WithHeaderFooter>
+            } 
+          />
+
+          <Route 
+            path="/login" 
+            element={
+              <div className="min-h-screen flex flex-col">
+                <LoginPage
+                  initialRole={selectedRole || new URLSearchParams(location.search).get('role') || 'donor'}
+                  onBack={() => navigate('/')}
+                  onSignupClick={handleSignupClick}
+                />
+              </div>
             }
           />
 
-          <Route
-            path="/admin"
+          <Route 
+            path="/admin" 
             element={
               <div className="min-h-screen flex flex-col">
                 <LoginPage
                   initialRole="admin"
                   onBack={() => navigate('/')}
-                  onSignupClick={(_role: string) => navigate('/register/admin')}
+                  onSignupClick={() => navigate('/register/admin')}
                 />
               </div>
             }
           />
 
-          {/* Default Routes */}
           <Route
-            path="*"
+            path="/register/admin"
             element={
-              <div className="min-h-screen flex flex-col">
-                {currentView === 'home' && (
-                  <>
-                    <Header
-                      onLoginClick={handleLoginClick}
-                      onSignupClick={handleSignupClick}
-                    />
-                    <main className="flex-1">
-                      <LandingPage
-                        onRoleSelect={handleRoleSelect}
-                        onDonorSignupClick={handleDonorSignupClick}
-                      />
-                    </main>
-                    <Footer />
-                  </>
-                )}
-
-                {currentView === 'login' && (
-                  <LoginPage
-                    initialRole={selectedRole}
-                    onBack={handleBackToHome}
-                    onSignupClick={handleSignupClick}
-                  />
-                )}
-
-                {currentView === 'signup' && selectedRole !== 'admin' && (
-                  <SignupPage
-                    role={selectedRole}
-                    onBack={() => {
-                      setCurrentView('login');
-                      navigate('/login');
-                    }}
-                    onLoginClick={() => {
-                      setCurrentView('login');
-                      navigate('/login');
-                    }}
-                  />
-                )}
-
-                {currentView === 'dashboard' && (
-                  <>
-                    {renderDashboard()}
-                  </>
-                )}
-              </div>
+              <AdminSignupPage
+                onBack={() => navigate('/login?role=admin')}
+                onLoginClick={() => navigate('/login?role=admin')}
+              />
             }
           />
+
+          <Route 
+            path="/register/:role" 
+            element={
+              <div className="min-h-screen flex flex-col">
+                <SignupPage
+                  role={selectedRole}
+                  onBack={() => navigate('/login')}
+                  onLoginClick={() => navigate('/login')}
+                />
+              </div>
+            } 
+          />
+
+          <Route 
+            path="/dashboard" 
+            element={
+              isLoggedIn ? renderDashboard() : <div className="min-h-screen flex flex-col"><LoginPage initialRole="donor" onBack={() => navigate('/')} onSignupClick={handleSignupClick} /></div>
+            } 
+          />
+
           <Route
             path="/impact"
             element={
-              <div className="min-h-screen flex flex-col">
-                <Header
-                  onLoginClick={handleLoginClick}
-                  onSignupClick={handleSignupClick}
-                />
-                <main className="flex-1">
-                  <ImpactPage />
-                </main>
-                <Footer />
-              </div>
+              <WithHeaderFooter>
+                <ImpactPage />
+              </WithHeaderFooter>
             }
           />
 
           <Route
             path="/locate-site"
             element={
-              <div className="min-h-screen flex flex-col">
-                <Header
-                  onLoginClick={handleLoginClick}
-                  onSignupClick={handleSignupClick}
-                />
-                <main className="flex-1">
-                  <LocateDonationSite />
-                </main>
-                <Footer />
-              </div>
+              <WithHeaderFooter>
+                <LocateDonationSite />
+              </WithHeaderFooter>
             }
           />
+
+          {/* Fallback component handles any undefined routes by dropping to landing */}
+          <Route path="*" element={<WithHeaderFooter><LandingPage onRoleSelect={handleRoleSelect} onDonorSignupClick={handleDonorSignupClick} /></WithHeaderFooter>} />
         </Routes>
 
         {/* Global overlays */}
         <PWAInstallPrompt />
         <CookieConsent />
+        <BackToTop />
       </TooltipProvider>
     </QueryClientProvider>
   );
