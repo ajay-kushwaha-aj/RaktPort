@@ -19,7 +19,7 @@
 // ─────────────────────────────────────────────────────────────
 
 import { useState, useEffect, useCallback, useRef, ReactNode } from 'react';
-import { Globe, X, ChevronDown, Zap, Home, Info, Lightbulb, Droplets, CheckSquare, MapPin, ClipboardList, Microscope, Hospital, TestTubes, UserCircle } from 'lucide-react';
+import { Globe, X, ChevronDown, Zap, Home, Info, Lightbulb, Droplets, CheckSquare, MapPin, ClipboardList, Microscope, Hospital, TestTubes, UserCircle, Search } from 'lucide-react';
 import raktportLogo from '../assets/raktport-logo.png';
 import { ModeToggle } from './mode-toggle';
 import { useNavigate } from 'react-router-dom';
@@ -38,6 +38,7 @@ const COPY = {
     about: 'About',
     impact: 'Impact',
     donor: 'Donate',
+    findBlood: 'Find Blood',
     needBlood: 'Need Blood',
     eligibility: 'Eligibility Rules',
     camp: 'Locate Donation Site',
@@ -50,6 +51,8 @@ const COPY = {
     ddEliDesc: 'Donation health criteria & rules',
     ddCamp: 'Locate Donation Site',
     ddCampDesc: 'Find blood banks & camps near you',
+    ddSearch: 'Find Blood / Donors',
+    ddSearchDesc: 'Search verified donors & blood banks',
     ddPrep: 'Preparation & Aftercare',
     ddPrepDesc: 'What to do before & after donation',
     ddHospital: 'For Hospitals',
@@ -66,6 +69,7 @@ const COPY = {
     about: 'हमारे बारे में',
     impact: 'प्रभाव',
     donor: 'रक्तदान',
+    findBlood: 'रक्त खोजें',
     needBlood: 'रक्त चाहिए',
     eligibility: 'पात्रता नियम',
     camp: 'डोनेशन साइट खोजें',
@@ -78,6 +82,8 @@ const COPY = {
     ddEliDesc: 'स्वास्थ्य मानदंड और नियम',
     ddCamp: 'डोनेशन साइट खोजें',
     ddCampDesc: 'नजदीकी ब्लड बैंक और शिविर',
+    ddSearch: 'रक्त / दाता खोजें',
+    ddSearchDesc: 'सत्यापित दाता और ब्लड बैंक खोजें',
     ddPrep: 'तैयारी और देखभाल',
     ddPrepDesc: 'दान से पहले और बाद में',
     ddHospital: 'अस्पतालों के लिए',
@@ -279,9 +285,15 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
               </li>
 
               <li>
-                <button className="rph-pill" onClick={() => { onSignupClick?.('donor'); }}>
-                  {t.needBlood}
-                </button>
+                <a
+                  href="/search"
+                  className="rph-pill rph-pill-search"
+                  onClick={e => { e.preventDefault(); navigate('/search'); }}
+                  aria-label="Find blood donors and blood banks"
+                >
+                  <Search size={12} aria-hidden="true" />
+                  {t.findBlood}
+                </a>
               </li>
 
               <li>
@@ -406,6 +418,7 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
           <DLink href="/" icon={<Home size={16} />} label={t.home} active onClick={() => setDrawer(false)} />
           <DLink href="/about.html" icon={<Info size={16} />} label={t.about} onClick={() => setDrawer(false)} />
           <DLink href="/impact" icon={<Lightbulb size={16} />} label={t.impact} onClick={() => setDrawer(false)} />
+          <DLink href="/search" icon={<Search size={16} />} label={t.findBlood} onClick={() => setDrawer(false)} />
           <DLink icon={<Droplets size={16} />} label={t.donor}
             onClick={() => { onSignupClick?.('donor'); setDrawer(false); }} />
           <DLink href="/Donation-eligibility-rules.html" icon={<CheckSquare size={16} />} label={t.eligibility} onClick={() => setDrawer(false)} />
@@ -772,6 +785,22 @@ function RphStyles() {
 }
 .rph-pill:hover, .rph-pill-open { color:#fff; background:rgba(255,255,255,.13); }
 .rph-active { color:#fff !important; font-weight:700 !important; }
+
+/* "Find Blood" search pill — highlighted */
+.rph-pill-search {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.28);
+  font-weight: 700;
+  color: #fff;
+  gap: 6px;
+  box-shadow: 0 0 0 0 rgba(255,255,255,0.3);
+  transition: all .22s;
+}
+.rph-pill-search:hover {
+  background: rgba(255,255,255,0.26);
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.1);
+  transform: translateY(-1px);
+}
 .rph-active::after {
   content:'';
   position:absolute;

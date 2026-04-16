@@ -1503,6 +1503,11 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
                   )}
                 </div>
 
+                {/* Disclaimer */}
+                <p className="text-center text-[10px] sm:text-xs text-[var(--text-secondary)] pt-3 pb-1">
+                  By clicking complete registration, you agree to our <a href="/terms.html" target="_blank" className="font-semibold text-gray-600 hover:text-[var(--text-primary)] hover:underline">Terms of Service</a> &amp; <a href="/privacy.html" target="_blank" className="font-semibold text-gray-600 hover:text-[var(--text-primary)] hover:underline">Privacy Policy</a>.
+                </p>
+
                 {/* Login link */}
                 <p className="text-center text-xs sm:text-sm text-[var(--text-secondary)] pt-1">
                   Already have an account?{' '}

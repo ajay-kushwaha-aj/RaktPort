@@ -82,9 +82,9 @@ export default defineConfig({
         // Scripts: own bundle + Firebase reCAPTCHA + Google APIs
         "script-src 'self' 'unsafe-inline' https://www.gstatic.com https://www.google.com https://apis.google.com",
         // Styles: own CSS + Google Fonts (link tags in index.html)
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
         // Fonts
-        "font-src 'self' https://fonts.gstatic.com",
+        "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com",
         // Images: own assets + Firebase Storage + Google profile pictures
         "img-src 'self' data: blob: https://firebasestorage.googleapis.com https://lh3.googleusercontent.com",
         // XHR / fetch / WebSockets: Firebase Auth, Firestore, Storage

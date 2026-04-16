@@ -905,6 +905,11 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
                 )}
               </div>
 
+              {/* Disclaimer */}
+              <p className="text-center text-[10px] sm:text-xs text-[var(--text-secondary)] mt-3 mb-2">
+                By clicking complete registration, you agree to our <a href="/terms.html" target="_blank" className="font-semibold text-emerald-600 hover:text-emerald-800 hover:underline">Terms of Service</a> &amp; <a href="/privacy.html" target="_blank" className="font-semibold text-emerald-600 hover:text-emerald-800 hover:underline">Privacy Policy</a>.
+              </p>
+
               {/* Login Link */}
               <div className="text-center pt-6 border-t border-[var(--border-color)]">
                 <p className="text-[var(--text-secondary)] mb-3">Already have an admin account?</p>
