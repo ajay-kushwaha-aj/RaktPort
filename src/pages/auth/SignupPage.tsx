@@ -20,6 +20,7 @@ import {
   formatUsername,
 } from '../../lib/identity';
 import { encryptField, hashField } from '../../lib/crypto';
+import { isDisposableEmail } from '../../lib/emailBlocklist';
 import confetti from 'canvas-confetti';
 import { toast } from 'sonner';
 import {
@@ -653,6 +654,10 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
   /* OTP helpers */
   const sendOTP = async () => {
     if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) { toast.error('Enter a valid email address first'); return; }
+    if (isDisposableEmail(form.email)) {
+      toast.error('Disposable emails are not allowed', { description: 'Please use a valid personal or organizational email address.' });
+      return;
+    }
     // if (!recaptchaV) { toast.error('reCAPTCHA not ready — please refresh'); return; } // Dormant reCAPTCHA logic
     setOtpLoading(true);
     try {

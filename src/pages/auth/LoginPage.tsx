@@ -18,6 +18,7 @@ import {
   detectInputType, formatUsername, normalizePhone,
   type InputType,
 } from '../../lib/identity';
+import { isDisposableEmail } from '../../lib/emailBlocklist';
 import { toast } from 'sonner';
 import {
   Eye, EyeOff, Mail, Lock, UserCircle,
@@ -274,6 +275,10 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
   const handleEmailLogin = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!emailInput.trim() || !passwordInput.trim()) { toast.error('Enter email and password'); return; }
+    if (isDisposableEmail(emailInput)) {
+      toast.error('Login blocked', { description: 'Disposable emails are not permitted.' });
+      return;
+    }
     setLoginLoading(true);
     try {
       const res = await loginUser(emailInput, passwordInput, role);

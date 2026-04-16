@@ -31,6 +31,7 @@ import {
   verifyRegistrationOTP,
   registerUserWithPhone
 } from '../../lib/auth';
+import { isDisposableEmail } from '../../lib/emailBlocklist';
 import type { RecaptchaVerifier } from 'firebase/auth';
 import { toast } from 'sonner';
 
@@ -176,6 +177,11 @@ export function AdminSignupPage({ onBack, onLoginClick }: AdminSignupPageProps) 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       setError('Please enter a valid email address');
+      return false;
+    }
+
+    if (isDisposableEmail(formData.email)) {
+      setError('Disposable emails are not allowed');
       return false;
     }
 
