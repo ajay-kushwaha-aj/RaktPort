@@ -81,6 +81,16 @@ const queryClient = new QueryClient();
 
 type View = 'home' | 'login' | 'signup' | 'dashboard';
 
+const WithHeaderFooter = ({ children, onLoginClick, onSignupClick }: { children: React.ReactNode; onLoginClick?: (r?:string)=>void; onSignupClick?: (r:string)=>void; }) => (
+  <div className="min-h-screen flex flex-col">
+    <Header onLoginClick={onLoginClick} onSignupClick={onSignupClick} />
+    <main className="flex-1">
+      {children}
+    </main>
+    <Footer />
+  </div>
+);
+
 function AppContent() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -187,15 +197,7 @@ function AppContent() {
     }
   };
 
-  const WithHeaderFooter = ({ children }: { children: React.ReactNode }) => (
-    <div className="min-h-screen flex flex-col">
-      <Header onLoginClick={handleLoginClick} onSignupClick={handleSignupClick} />
-      <main className="flex-1">
-        {children}
-      </main>
-      <Footer />
-    </div>
-  );
+
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -207,7 +209,7 @@ function AppContent() {
           <Route 
             path="/" 
             element={
-              <WithHeaderFooter>
+              <WithHeaderFooter onLoginClick={handleLoginClick} onSignupClick={handleSignupClick}>
                 <LandingPage onRoleSelect={handleRoleSelect} onDonorSignupClick={handleDonorSignupClick} />
               </WithHeaderFooter>
             } 
@@ -272,7 +274,7 @@ function AppContent() {
           <Route
             path="/impact"
             element={
-              <WithHeaderFooter>
+              <WithHeaderFooter onLoginClick={handleLoginClick} onSignupClick={handleSignupClick}>
                 <ImpactPage />
               </WithHeaderFooter>
             }
@@ -281,7 +283,7 @@ function AppContent() {
           <Route
             path="/locate-site"
             element={
-              <WithHeaderFooter>
+              <WithHeaderFooter onLoginClick={handleLoginClick} onSignupClick={handleSignupClick}>
                 <LocateDonationSite />
               </WithHeaderFooter>
             }
@@ -290,14 +292,14 @@ function AppContent() {
           <Route
             path="/search"
             element={
-              <WithHeaderFooter>
+              <WithHeaderFooter onLoginClick={handleLoginClick} onSignupClick={handleSignupClick}>
                 <BloodDonationSearch onSignupClick={handleSignupClick} />
               </WithHeaderFooter>
             }
           />
 
           {/* Fallback component handles any undefined routes by dropping to landing */}
-          <Route path="*" element={<WithHeaderFooter><LandingPage onRoleSelect={handleRoleSelect} onDonorSignupClick={handleDonorSignupClick} /></WithHeaderFooter>} />
+          <Route path="*" element={<WithHeaderFooter onLoginClick={handleLoginClick} onSignupClick={handleSignupClick}><LandingPage onRoleSelect={handleRoleSelect} onDonorSignupClick={handleDonorSignupClick} /></WithHeaderFooter>} />
         </Routes>
 
         {/* Global overlays */}

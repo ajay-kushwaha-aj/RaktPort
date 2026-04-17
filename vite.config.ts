@@ -87,8 +87,8 @@ export default defineConfig({
         "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com",
         // Images: own assets + Firebase Storage + Google profile pictures
         "img-src 'self' data: blob: https://firebasestorage.googleapis.com https://lh3.googleusercontent.com",
-        // XHR / fetch / WebSockets: Firebase Auth, Firestore, Storage
-        "connect-src 'self' https://*.googleapis.com https://*.firebasedatabase.app https://*.firebaseio.com https://firebasestorage.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com wss://*.firebaseio.com",
+        // XHR / fetch / WebSockets: Firebase Auth, Firestore, Storage, Location APIs
+        "connect-src 'self' https://*.googleapis.com https://*.firebasedatabase.app https://*.firebaseio.com https://firebasestorage.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com wss://*.firebaseio.com https://ipapi.co https://nominatim.openstreetmap.org https://api.bigdatacloud.net https://api.counterapi.dev",
         // Frames: reCAPTCHA widget + Firebase Auth popup
         "frame-src https://www.google.com https://*.firebaseapp.com",
         "object-src 'none'",

@@ -77,14 +77,32 @@ function distLabel(km: number | null | undefined): string {
 
 /* ─── Reverse Geocode ───────────────────────────────────────── */
 async function reverseGeocode(lat: number, lng: number): Promise<string> {
+  // Try BigDataCloud (Reliable for localities without restrictive CORS/User-Agent blocks in browser)
   try {
-    const r = await fetch(
+    const r1 = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`);
+    if (r1.ok) {
+      const d1 = await r1.json();
+      const city = d1?.city || d1?.locality || d1?.principalSubdivision;
+      if (city && city.trim()) return city.trim();
+    }
+  } catch {}
+
+  // Fallback to Nominatim OSM
+  try {
+    const r2 = await fetch(
       `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,
       { headers: { 'Accept-Language': 'en' } }
     );
-    const d = await r.json();
-    return d?.address?.city || d?.address?.town || d?.address?.village || '';
-  } catch { return ''; }
+    if (r2.ok) {
+      const d2 = await r2.json();
+      const addr = d2?.address;
+      if (addr) {
+        return addr.city || addr.town || addr.municipality || addr.city_district || addr.district || addr.suburb || addr.village || addr.county || addr.state_district || '';
+      }
+    }
+  } catch {}
+  
+  return '';
 }
 
 /* ─── Firestore search ──────────────────────────────────────── */
@@ -373,14 +391,52 @@ export function BloodDonationSearch({ onSignupClick }: { onSignupClick?: (role: 
       setBlood(searchParams.get('blood') || 'any');
       setResultType(searchParams.get('type') || 'all');
       doSearch(urlCity, searchParams.get('blood') || 'any', searchParams.get('type') || 'all', null, null);
+    } else {
+      // Auto-detect city via IP quietly on load without popup and autofill input
+      fetch('https://ipapi.co/json/')
+        .then(r => r.json())
+        .then(d => {
+          if (d && d.city) {
+            setCity(d.city);
+            setGpsCity(d.city);
+            setUserLat(d.latitude);
+            setUserLng(d.longitude);
+          }
+        })
+        .catch(() => {});
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   /* ── GPS ──────────────────────────────────────────────────── */
   const handleGPS = useCallback(() => {
-    if (!navigator.geolocation) { setError('Geolocation not supported by your browser.'); return; }
     setGpsLoading(true);
     setError('');
+
+    const fallbackToIP = async (errMsg: string) => {
+        try {
+            const ipRes = await fetch('https://ipapi.co/json/');
+            const ipData = await ipRes.json();
+            if (ipData && ipData.city) {
+                const cityStr = ipData.city;
+                setUserLat(ipData.latitude);
+                setUserLng(ipData.longitude);
+                setCity(cityStr);
+                setGpsCity(cityStr);
+                setGpsLoading(false);
+                doSearch(cityStr, blood, resultType, ipData.latitude, ipData.longitude);
+                return;
+            }
+        } catch {}
+        
+        setGpsLoading(false);
+        setError(errMsg);
+    };
+
+    if (!navigator.geolocation) {
+      fallbackToIP('Geolocation not supported. Used IP fallback.');
+      return;
+    }
+
     navigator.geolocation.getCurrentPosition(
       async pos => {
         const lat = pos.coords.latitude, lng = pos.coords.longitude;
@@ -391,8 +447,7 @@ export function BloodDonationSearch({ onSignupClick }: { onSignupClick?: (role: 
         doSearch(name || city, blood, resultType, lat, lng);
       },
       err => {
-        setGpsLoading(false);
-        setError(err.code === 1 ? 'Location access denied. Enter city manually.' : 'Could not get location. Try manually.');
+        fallbackToIP(err.code === 1 ? 'Location access denied. Using IP location.' : 'Could not get high-accuracy location. Using IP fallback.');
       },
       { timeout: 10000, enableHighAccuracy: true }
     );
@@ -404,7 +459,10 @@ export function BloodDonationSearch({ onSignupClick }: { onSignupClick?: (role: 
     lat: number | null, lng: number | null,
   ) => {
     const q = c.trim();
-    if (!q) { setError('Please enter a city name or pincode.'); return; }
+    if (!q && !(lat != null && lng != null)) { 
+      setError('Please enter a city name or pincode.'); 
+      return; 
+    }
     setLoading(true); setError(''); setSearched(true);
 
     // Update URL params — enables sharing & back-button
