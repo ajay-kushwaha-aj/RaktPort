@@ -1,0 +1,67 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Function to check if user is an admin
+    function isAdmin() {
+      return request.auth != null && request.auth.token.admin == true;
+    }
+
+    // Function to check if user is authenticated
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    match /users/{userId} {
+      // Standard users can only read/write their own document
+      allow read, write: if isAuth() && request.auth.uid == userId;
+      // Admins can read/write any user document
+      allow read, write: if isAdmin();
+    }
+    
+    match /usernames/{username} {
+      // Usernames are public to read for uniqueness checks, but writes are restricted to owner or admin
+      allow read: if isAuth();
+      allow write: if isAuth() && request.resource.data.uid == request.auth.uid;
+      allow write: if isAdmin();
+    }
+
+    match /inventory/{userId} {
+      // Public read for matching
+      allow read: if isAuth();
+      // Only the owning bloodbank or admin can write
+      allow write: if isAuth() && request.auth.uid == userId;
+      allow write: if isAdmin();
+    }
+    
+    match /appointments/{appointmentId} {
+      allow read: if isAuth() && (resource.data.donorId == request.auth.uid || resource.data.hospitalId == request.auth.uid || resource.data.bloodBankId == request.auth.uid);
+      allow write: if isAuth() && (request.resource.data.donorId == request.auth.uid || request.resource.data.hospitalId == request.auth.uid || request.resource.data.bloodBankId == request.auth.uid);
+      allow read, write: if isAdmin();
+    }
+
+    match /camps/{campId} {
+      // Public read for discovering camps
+      allow read: if isAuth();
+      // Admin only write
+      allow write: if isAdmin();
+    }
+
+    match /feedback/{feedbackId} {
+      allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
+      allow read, write: if isAdmin();
+    }
+    
+    match /audit_logs/{logId} {
+      // Normal users can only write standard logs (like 'login'), but admins can read everything
+      allow create: if isAuth();
+      allow read, write: if isAdmin();
+    }
+
+    // Default deny for everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

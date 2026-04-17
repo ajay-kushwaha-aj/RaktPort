@@ -4,6 +4,7 @@
 
 import { useState, useEffect, useCallback, useId, useRef } from 'react';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import imageCompression from 'browser-image-compression';
 import { storage } from '../../firebase';
 import {
   initRecaptcha,
@@ -805,8 +806,16 @@ export function SignupPage({ role, onBack, onLoginClick }: SignupPageProps) {
             let documentUrls: string[] = [];
             if (docs.length > 0 && res.userId) {
               for (const file of docs) {
-                const docRef = ref(storage, `verification_docs/${res.userId}_${file.name}`);
-                await uploadBytes(docRef, file);
+                let fileToUpload = file;
+                if (file.type.startsWith('image/')) {
+                  try {
+                    fileToUpload = await imageCompression(file, { maxSizeMB: 1, maxWidthOrHeight: 1920, useWebWorker: true });
+                  } catch (e) {
+                    console.warn('Image compression failed', e);
+                  }
+                }
+                const docRef = ref(storage, `verification_docs/${res.userId}_${fileToUpload.name}`);
+                await uploadBytes(docRef, fileToUpload);
                 const url = await getDownloadURL(docRef);
                 documentUrls.push(url);
               }

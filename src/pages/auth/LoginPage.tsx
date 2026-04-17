@@ -84,6 +84,11 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
 
   // Role & tab
   const [role, setRole] = useState(initialRole || 'donor');
+  
+  useEffect(() => {
+    if (initialRole) setRole(initialRole);
+  }, [initialRole]);
+
   const [tab, setTab] = useState<LoginTab>('smart');
   const [flowStep, setFlowStep] = useState<FlowStep>('input');
   const [instMenuOpen, setInstMenuOpen] = useState(false);

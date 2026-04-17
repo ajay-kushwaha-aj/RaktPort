@@ -1,6 +1,6 @@
 // In-memory rate limiting store (persists for the lifetime of the serverless function instance)
-const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
-const MAX_REQUESTS_PER_IP = 5;
+const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
+const MAX_REQUESTS_PER_IP = 3;
 const MAX_REQUESTS_PER_EMAIL = 3;
 
 const ipRequests = new Map();

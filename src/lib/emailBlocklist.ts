@@ -1194,6 +1194,7 @@ export const DISPOSABLE_EMAIL_DOMAINS = new Set([
   "emeraldwebmail.com",
   "emil.com",
   "emz.net",
+  "dwseal.com",
 ]);
 
 /**
@@ -1233,6 +1234,7 @@ const DISPOSABLE_KEYWORDS = [
   "dumpmail",
   "trsh.to",
   "selfdestruc",
+  "dwseal",
 ];
 
 /**

@@ -1,7 +1,10 @@
 import React, { useMemo, useState } from 'react';
-import { Building2, Search, Mail, MapPin, FileText, Phone, Filter, CheckCircle2, Download, Droplet } from 'lucide-react';
+import { Building2, Search, Mail, MapPin, FileText, Phone, Filter, CheckCircle2, Download, Droplet, Ban } from 'lucide-react';
 import { useAdminStore } from '../../store/adminStore';
 import { formatDate, downloadCSV, downloadPDF } from '../../services/exportService';
+import Swal from 'sweetalert2';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '../../../firebase';
 
 export const VerifiedOrganizations: React.FC = () => {
   const { organizations, loading } = useAdminStore();
@@ -44,6 +47,29 @@ export const VerifiedOrganizations: React.FC = () => {
 
   const handleExportPDF = () => {
     downloadPDF(getExportData(), 'verified_organizations', 'Verified Organizations Report');
+  };
+
+  const handleSuspend = async (orgId: string, orgName: string) => {
+    const result = await Swal.fire({
+      title: 'Suspend Organization?',
+      text: `Are you sure you want to suspend ${orgName}? They will no longer be able to access the platform.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#f87171',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Yes, Suspend',
+      background: '#1e293b',
+      color: '#ffffff'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await updateDoc(doc(db, 'users', orgId), { status: 'suspended' });
+        Swal.fire({ title: 'Suspended!', text: 'Organization suspended.', icon: 'success', background: '#1e293b', color: '#ffffff' });
+      } catch (e: any) {
+        Swal.fire({ title: 'Error', text: 'Action failed: ' + e.message, icon: 'error', background: '#1e293b', color: '#ffffff' });
+      }
+    }
   };
 
   return (
@@ -210,6 +236,22 @@ export const VerifiedOrganizations: React.FC = () => {
                     </p>
                   )}
                 </div>
+              </div>
+              {/* Actions */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flexShrink: 0 }}>
+                <button 
+                  onClick={() => handleSuspend(org.id, org.name)}
+                  style={{
+                    background: 'transparent', color: '#f87171',
+                    border: '1px solid rgba(248,113,113,0.3)', borderRadius: 8, padding: '8px 16px',
+                    fontSize: 13, fontWeight: 600, fontFamily: 'Inter, sans-serif',
+                    cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                    minWidth: 100
+                  }}
+                >
+                  <Ban size={16} /> Suspend
+                </button>
               </div>
             </div>
           ))}

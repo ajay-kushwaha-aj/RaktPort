@@ -1,7 +1,10 @@
 import React, { useMemo, useState } from 'react';
-import { Users, Search, Download, FileText, CheckCircle2, UserX } from 'lucide-react';
+import { Users, Search, Download, FileText, CheckCircle2, UserX, Ban } from 'lucide-react';
 import { useAdminStore } from '../../store/adminStore';
 import { formatDate, downloadCSV } from '../../services/exportService';
+import Swal from 'sweetalert2';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '../../../firebase';
 
 export const AllDonors: React.FC = () => {
   const { donors, loading } = useAdminStore();
@@ -42,6 +45,29 @@ export const AllDonors: React.FC = () => {
       })),
       'donors_export'
     );
+  };
+
+  const handleSuspend = async (donorId: string, donorName: string) => {
+    const result = await Swal.fire({
+      title: 'Suspend Donor?',
+      text: `Are you sure you want to suspend ${donorName}?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#f87171',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Yes, Suspend',
+      background: '#1e293b',
+      color: '#ffffff'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await updateDoc(doc(db, 'users', donorId), { status: 'suspended' });
+        Swal.fire({ title: 'Suspended!', text: 'Donor suspended.', icon: 'success', background: '#1e293b', color: '#ffffff' });
+      } catch (e: any) {
+        Swal.fire({ title: 'Error', text: 'Action failed: ' + e.message, icon: 'error', background: '#1e293b', color: '#ffffff' });
+      }
+    }
   };
 
   return (
@@ -117,6 +143,7 @@ export const AllDonors: React.FC = () => {
                 <th style={{ padding: '14px 20px', fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5 }}>Contact</th>
                 <th style={{ padding: '14px 20px', fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5 }}>Contributions</th>
                 <th style={{ padding: '14px 20px', fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5 }}>Eligibility</th>
+                <th style={{ padding: '14px 20px', fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5, textAlign: 'right' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -158,6 +185,18 @@ export const AllDonors: React.FC = () => {
                         <UserX size={14} /> Ineligible (90 days)
                       </span>
                     )}
+                  </td>
+                  <td style={{ padding: '16px 20px', textAlign: 'right' }}>
+                    <button 
+                      onClick={() => handleSuspend(donor.id, donor.name)}
+                      style={{
+                        background: 'transparent', color: '#f87171', border: '1px solid rgba(248,113,113,0.3)',
+                        borderRadius: 6, padding: '6px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                        display: 'inline-flex', alignItems: 'center', gap: 6, transition: 'all 0.2s'
+                      }}
+                    >
+                      <Ban size={14} /> Suspend
+                    </button>
                   </td>
                 </tr>
               ))}

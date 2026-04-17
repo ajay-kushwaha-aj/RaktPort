@@ -30,6 +30,7 @@ import type {
 } from '../store/adminStore';
 import { buildRTIDFromRequest, buildRTIDFromDonation } from './rtidService';
 import { toDate, toDateString } from './exportService';
+import { decryptField } from '../../lib/crypto';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -106,7 +107,7 @@ export async function fetchAllAdminData(): Promise<void> {
     });
 
     // ── 4. Map orgs to store type ─────────────────────────────────────────────
-    const mapOrg = (u: any, status: Organization['status']): Organization => ({
+    const mapOrg = async (u: any, status: Organization['status']): Promise<Organization> => ({
       id: u.id,
       name: u.fullName || u.organizationName || 'Unknown',
       type: u.role === 'hospital' ? 'hospital' : 'bloodbank',
@@ -114,7 +115,7 @@ export async function fetchAllAdminData(): Promise<void> {
       city: u.district || u.city || 'Unknown',
       state: u.state || '',
       email: u.userId || u.email || u.id,
-      phone: u.mobile || '',
+      phone: await decryptField(u.mobile || u.phone || ''),
       registrationNumber: u.registrationNo || u.licenseNo || 'N/A',
       createdAt: toDate(u.createdAt) || new Date(0),
       verifiedAt: u.verifiedAt || undefined,
@@ -124,14 +125,14 @@ export async function fetchAllAdminData(): Promise<void> {
       documentUrls: u.documentUrls || (u.registrationFileUrl ? [u.registrationFileUrl] : undefined),
     });
 
-    const allOrgs: Organization[] = [
+    const allOrgs: Organization[] = await Promise.all([
       ...pendingOrgs.map((u: any) => mapOrg(u, 'pending')),
       ...verifiedOrgsAll.map((u: any) => mapOrg(u, 'verified')),
-    ];
+    ]);
     store.setOrganizations(allOrgs);
 
     // ── 5. Donors ─────────────────────────────────────────────────────────────
-    const donorRecords: DonorRecord[] = donorUsers.map((u: any): DonorRecord => {
+    const donorRecords: DonorRecord[] = await Promise.all(donorUsers.map(async (u: any): Promise<DonorRecord> => {
       const lastDon = toDate(u.lastDonationDate);
       const isEligible = lastDon
         ? (Date.now() - lastDon.getTime()) / (1000 * 60 * 60 * 24) >= 90
@@ -149,14 +150,14 @@ export async function fetchAllAdminData(): Promise<void> {
         id: u.id,
         name: u.fullName || u.name || 'Anonymous',
         bloodGroup: bg,
-        phone: u.mobile || '',
+        phone: await decryptField(u.mobile || u.phone || ''),
         city: u.district || u.city || 'Unknown',
         state: u.state || '',
         lastDonationDate: lastDon?.toISOString(),
         totalDonations: actualDonations || Number(u.totalDonations) || 0,
         isEligible,
       };
-    });
+    }));
     store.setDonors(donorRecords);
 
     // ── 6. Metrics ────────────────────────────────────────────────────────────
