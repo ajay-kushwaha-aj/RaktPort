@@ -5,7 +5,9 @@ import {
   Clock, TrendingUp, TrendingDown, Users, CalendarCheck, Shield,
   CheckCircle2, Zap, ArrowRight, Heart, BarChart2, RefreshCw,
   Bell, Search, ChevronRight, Sparkles, Flame, LayoutDashboard,
-  Archive, BadgeCheck, FileBarChart2, Siren, Lock
+  Archive, BadgeCheck, FileBarChart2, Siren, Lock,
+  X, Building2, Mail, Phone, FileText, MapPin, Map, Hash, KeyRound,
+  Syringe, ClipboardList, FlaskConical, AlertCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Appointment, BloodGroup } from '@/types/bloodbank';
@@ -1105,129 +1107,159 @@ export const BloodBankDashboard = ({ onLogout }: { onLogout: () => void }) => {
           onSubmit={handleRegisterAppointment}
         />
 
-        {/* ── Blood Bank Profile Panel ── */}
+        {/* ── Blood Bank Profile Modal (centered) ── */}
         {profileModalOpen && (
           <div
             style={{
               position: 'fixed', inset: 0, zIndex: 200,
-              background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(6px)',
-              display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end',
+              background: 'rgba(5,2,2,0.65)', backdropFilter: 'blur(10px)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: '16px',
             }}
             onClick={() => setProfileModalOpen(false)}
           >
+            <style>{`
+              @keyframes profilePopIn {
+                from { transform: scale(0.93) translateY(12px); opacity: 0; }
+                to   { transform: scale(1) translateY(0); opacity: 1; }
+              }
+              .prf-row { display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid #f1f5f9; }
+              .prf-row:last-child { border-bottom:none; }
+              .prf-ico { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+              .prf-stat { border-radius:14px; padding:14px 12px; text-align:center; transition:transform 0.18s; }
+              .prf-stat:hover { transform:translateY(-2px); }
+            `}</style>
+
+            {/* Modal card */}
             <div
               style={{
-                width: 380, maxWidth: '95vw', height: '100vh',
-                background: '#fff', boxShadow: '-8px 0 40px rgba(0,0,0,0.15)',
-                display: 'flex', flexDirection: 'column', overflow: 'hidden',
-                animation: 'profileSlideIn 0.3s cubic-bezier(0.22,1,0.36,1)',
+                width: '100%', maxWidth: 520,
+                maxHeight: '90vh',
+                background: '#fff',
+                borderRadius: 24,
+                boxShadow: '0 32px 80px rgba(0,0,0,0.28), 0 8px 24px rgba(0,0,0,0.12)',
+                display: 'flex', flexDirection: 'column',
+                overflow: 'hidden',
+                animation: 'profilePopIn 0.3s cubic-bezier(0.22,1,0.36,1)',
               }}
               onClick={e => e.stopPropagation()}
-              className="dark:bg-gray-900"
             >
-              <style>{`
-                @keyframes profileSlideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-              `}</style>
-
-              {/* Header */}
+              {/* ── Gradient Header ── */}
               <div style={{
-                background: 'linear-gradient(135deg, #C41E3A 0%, #8b0000 100%)',
-                padding: '28px 24px 24px', position: 'relative', overflow: 'hidden',
+                background: 'linear-gradient(140deg, #7b0000 0%, #C41E3A 60%, #d4213e 100%)',
+                padding: '24px 24px 22px',
+                position: 'relative', overflow: 'hidden', flexShrink: 0,
               }}>
-                <div style={{
-                  position: 'absolute', right: -20, top: -20,
-                  width: 120, height: 120,
-                  background: 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 65%)',
-                  borderRadius: '50%',
-                }} />
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', zIndex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                {/* Orbs */}
+                <div style={{ position:'absolute', right:-40, top:-40, width:180, height:180, background:'radial-gradient(circle,rgba(255,255,255,0.09) 0%,transparent 65%)', borderRadius:'50%', pointerEvents:'none' }} />
+                <div style={{ position:'absolute', left:-30, bottom:-40, width:140, height:140, background:'radial-gradient(circle,rgba(255,255,255,0.05) 0%,transparent 65%)', borderRadius:'50%', pointerEvents:'none' }} />
+
+                {/* Top row: avatar + close */}
+                <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', position:'relative', zIndex:1 }}>
+                  {/* Avatar */}
+                  <div style={{ display:'flex', alignItems:'center', gap:16 }}>
                     <div style={{
-                      width: 54, height: 54, borderRadius: 14,
-                      background: 'rgba(255,255,255,0.15)',
-                      border: '1.5px solid rgba(255,255,255,0.25)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      width:60, height:60, borderRadius:16,
+                      background:'rgba(255,255,255,0.15)',
+                      border:'2px solid rgba(255,255,255,0.28)',
+                      display:'flex', alignItems:'center', justifyContent:'center',
+                      boxShadow:'0 4px 16px rgba(0,0,0,0.18)',
+                      flexShrink:0,
                     }}>
-                      <span style={{ fontSize: 24 }}>🏥</span>
+                      <Building2 size={26} color="rgba(255,255,255,0.9)" />
                     </div>
                     <div>
-                      <p style={{ fontSize: '0.68rem', color: 'rgba(255,220,210,0.8)', fontWeight: 600, margin: 0, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Blood Bank Profile</p>
-                      <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fff', margin: '3px 0 0', fontFamily: "'Sora', sans-serif", lineHeight: 1.2 }}>
+                      <p style={{ margin:'0 0 1px', fontSize:'0.62rem', fontWeight:700, letterSpacing:'0.1em', color:'rgba(255,200,190,0.8)', textTransform:'uppercase' }}>Blood Bank Profile</p>
+                      <h2 style={{ margin:0, fontSize:'1.1rem', fontWeight:800, color:'#fff', fontFamily:"'Outfit',sans-serif", lineHeight:1.25 }}>
                         {bloodBankData?.fullName || 'Blood Bank'}
-                      </h3>
+                      </h2>
+                      {bloodBankData?.district && (
+                        <p style={{ margin:'4px 0 0', fontSize:'0.72rem', color:'rgba(255,220,210,0.75)', display:'flex', alignItems:'center', gap:4 }}>
+                          <MapPin size={11} /> {bloodBankData.district}{bloodBankData.state ? `, ${bloodBankData.state}` : ''}
+                        </p>
+                      )}
                     </div>
                   </div>
+
+                  {/* Close */}
                   <button
                     onClick={() => setProfileModalOpen(false)}
                     style={{
-                      width: 30, height: 30, borderRadius: 8,
-                      background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)',
-                      color: 'rgba(255,255,255,0.8)', cursor: 'pointer',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      width:32, height:32, borderRadius:9, flexShrink:0,
+                      background:'rgba(255,255,255,0.13)', border:'1px solid rgba(255,255,255,0.22)',
+                      color:'rgba(255,255,255,0.85)', cursor:'pointer',
+                      display:'flex', alignItems:'center', justifyContent:'center',
+                      transition:'background 0.18s',
                     }}
+                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.24)')}
+                    onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.13)')}
+                    aria-label="Close profile"
                   >
-                    ✕
+                    <X size={15} />
                   </button>
                 </div>
 
                 {/* Status pill */}
-                <div style={{
-                  marginTop: 16, display: 'inline-flex', alignItems: 'center', gap: 6,
-                  background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)',
-                  borderRadius: 999, padding: '4px 12px',
-                  fontSize: '0.72rem', color: '#fff', fontWeight: 600,
-                }}>
-                  <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#4ade80', display: 'inline-block' }} />
+                <div style={{ display:'inline-flex', alignItems:'center', gap:6, marginTop:14, background:'rgba(255,255,255,0.12)', border:'1px solid rgba(255,255,255,0.2)', borderRadius:999, padding:'4px 12px', fontSize:'0.7rem', color:'#fff', fontWeight:600 }}>
+                  <span style={{ width:7, height:7, borderRadius:'50%', background:'#4ade80', display:'inline-block', boxShadow:'0 0 6px rgba(74,222,128,0.7)' }} />
                   Active &amp; Verified
                 </div>
               </div>
 
-              {/* Info fields */}
-              <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {[
-                  { label: 'Blood Bank Name', value: bloodBankData?.fullName || '—', icon: '🏥' },
-                  { label: 'Email', value: bloodBankData?.email || '—', icon: '📧' },
-                  { label: 'Mobile', value: bloodBankData?.mobile || '—', icon: '📱' },
-                  { label: 'License Number', value: bloodBankData?.licenseNo || bloodBankData?.license || '—', icon: '🪪' },
-                  { label: 'District', value: bloodBankData?.district || '—', icon: '📍' },
-                  { label: 'State', value: bloodBankData?.state || '—', icon: '🗺️' },
-                  { label: 'Pincode', value: bloodBankData?.pincode || '—', icon: '🔢' },
-                  { label: 'Blood Bank ID', value: bloodBankId || '—', icon: '🔑' },
-                ].map(f => (
-                  <div key={f.label} style={{
-                    background: '#f9fafb', border: '1px solid #f0f0f0',
-                    borderRadius: 12, padding: '12px 14px',
-                  }}>
-                    <p style={{ fontSize: '0.65rem', color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 3px' }}>
-                      {f.icon} {f.label}
-                    </p>
-                    <p style={{ fontSize: '0.88rem', fontWeight: 600, color: '#111827', margin: 0, wordBreak: 'break-all' }}>
-                      {f.value}
-                    </p>
-                  </div>
-                ))}
+              {/* ── Scrollable body ── */}
+              <div style={{ flex:1, overflowY:'auto', padding:'20px 22px 24px', background:'#f8fafc' }}>
 
-                {/* Quick stats */}
-                <div style={{ marginTop: 8 }}>
-                  <p style={{ fontSize: '0.72rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>
-                    Quick Stats
-                  </p>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                    {[
-                      { label: 'Total Donations', val: kpi?.totalDonations ?? donations.length, color: '#C41E3A' },
-                      { label: 'Appointments', val: appointments.length, color: '#1d4ed8' },
-                      { label: 'Available Units', val: kpi?.availableUnits ?? '—', color: '#16a34a' },
-                      { label: 'Pending Requests', val: bloodRequests.length, color: '#d97706' },
-                    ].map(s => (
-                      <div key={s.label} style={{
-                        background: '#fff', border: '1.5px solid #f0f0f0',
-                        borderRadius: 10, padding: '12px 14px', textAlign: 'center',
-                      }}>
-                        <p style={{ fontSize: '1.3rem', fontWeight: 800, color: s.color, margin: 0, fontFamily: "'Sora', monospace" }}>{s.val}</p>
-                        <p style={{ fontSize: '0.62rem', color: '#9ca3af', margin: '3px 0 0' }}>{s.label}</p>
+                {/* Info rows */}
+                <div style={{ background:'#fff', borderRadius:16, border:'1.5px solid #f1f5f9', boxShadow:'0 1px 4px rgba(0,0,0,0.04)', padding:'2px 16px', marginBottom:16 }}>
+                  {[
+                    { label:'Full Name',      value: bloodBankData?.fullName || '—',                                     iconBg:'#fff0f0', iconColor:'#C41E3A', Icon: Building2 },
+                    { label:'Email Address',  value: bloodBankData?.email || '—',                                        iconBg:'#eff6ff', iconColor:'#1d4ed8', Icon: Mail },
+                    { label:'Mobile Number',  value: String(bloodBankData?.mobile || bloodBankData?.phone || '—'),        iconBg:'#f0fdf4', iconColor:'#16a34a', Icon: Phone },
+                    { label:'License No.',    value: bloodBankData?.licenseNo || bloodBankData?.license || '—',          iconBg:'#fefce8', iconColor:'#ca8a04', Icon: FileText },
+                    { label:'District',       value: bloodBankData?.district || '—',                                     iconBg:'#fdf4ff', iconColor:'#9333ea', Icon: MapPin },
+                    { label:'State',          value: bloodBankData?.state || '—',                                        iconBg:'#fff7ed', iconColor:'#ea580c', Icon: Map },
+                    { label:'Pincode',        value: bloodBankData?.pincode || '—',                                      iconBg:'#f0fdfa', iconColor:'#0d9488', Icon: Hash },
+                  ].map(f => (
+                    <div key={f.label} className="prf-row">
+                      <div className="prf-ico" style={{ background: f.iconBg }}>
+                        <f.Icon size={16} color={f.iconColor} />
                       </div>
-                    ))}
+                      <div style={{ flex:1, minWidth:0 }}>
+                        <p style={{ margin:0, fontSize:'0.6rem', fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.07em' }}>{f.label}</p>
+                        <p style={{ margin:'2px 0 0', fontSize:'0.87rem', fontWeight:600, color:'#111827', wordBreak:'break-word', lineHeight:1.3 }}>{f.value}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Blood Bank ID */}
+                <div style={{ background:'linear-gradient(135deg,#1e1b4b,#312e81)', borderRadius:14, padding:'13px 16px', marginBottom:16, display:'flex', alignItems:'center', gap:12 }}>
+                  <div style={{ width:36, height:36, borderRadius:9, background:'rgba(255,255,255,0.12)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                    <KeyRound size={17} color="rgba(199,210,254,0.9)" />
                   </div>
+                  <div style={{ minWidth:0 }}>
+                    <p style={{ margin:'0 0 2px', fontSize:'0.6rem', fontWeight:700, color:'rgba(199,210,254,0.75)', textTransform:'uppercase', letterSpacing:'0.08em' }}>Blood Bank ID</p>
+                    <p style={{ margin:0, fontSize:'0.82rem', fontWeight:700, color:'#e0e7ff', fontFamily:'monospace', wordBreak:'break-all' }}>{bloodBankId || '—'}</p>
+                  </div>
+                </div>
+
+                {/* Live stats */}
+                <p style={{ margin:'0 0 10px', fontSize:'0.63rem', fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.1em' }}>Live Stats</p>
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:9 }}>
+                  {[
+                    { label:'Total Donations',   val: kpi?.totalDonations ?? donations.length, color:'#C41E3A', bg:'#fff5f5', Icon: Syringe },
+                    { label:'Appointments',      val: appointments.length,                      color:'#1d4ed8', bg:'#eff6ff', Icon: CalendarCheck },
+                    { label:'Available Units',   val: kpi?.availableUnits ?? '—',               color:'#16a34a', bg:'#f0fdf4', Icon: FlaskConical },
+                    { label:'Pending Requests',  val: bloodRequests.length,                     color:'#d97706', bg:'#fffbeb', Icon: AlertCircle },
+                  ].map(s => (
+                    <div key={s.label} className="prf-stat" style={{ background: s.bg, border:`1.5px solid ${s.color}20` }}>
+                      <div style={{ display:'flex', justifyContent:'center', marginBottom:6 }}>
+                        <s.Icon size={18} color={s.color} />
+                      </div>
+                      <p style={{ margin:0, fontSize:'1.5rem', fontWeight:900, color:s.color, fontFamily:"'Outfit',sans-serif", lineHeight:1 }}>{s.val}</p>
+                      <p style={{ margin:'4px 0 0', fontSize:'0.62rem', color:'#6b7280', fontWeight:500 }}>{s.label}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
