@@ -28,14 +28,14 @@ import { db } from '../firebase';
 /* ─── Blood groups ──────────────────────────────────────────── */
 const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 const BLOOD_COMPAT: Record<string, string[]> = {
-  'A+':  ['A+', 'A-', 'O+', 'O-'],
-  'A-':  ['A-', 'O-'],
-  'B+':  ['B+', 'B-', 'O+', 'O-'],
-  'B-':  ['B-', 'O-'],
+  'A+': ['A+', 'A-', 'O+', 'O-'],
+  'A-': ['A-', 'O-'],
+  'B+': ['B+', 'B-', 'O+', 'O-'],
+  'B-': ['B-', 'O-'],
   'AB+': ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
   'AB-': ['A-', 'B-', 'AB-', 'O-'],
-  'O+':  ['O+', 'O-'],
-  'O-':  ['O-'],
+  'O+': ['O+', 'O-'],
+  'O-': ['O-'],
 };
 
 /* ─── Types ─────────────────────────────────────────────────── */
@@ -85,7 +85,7 @@ async function reverseGeocode(lat: number, lng: number): Promise<string> {
       const city = d1?.city || d1?.locality || d1?.principalSubdivision;
       if (city && city.trim()) return city.trim();
     }
-  } catch {}
+  } catch { }
 
   // Fallback to Nominatim OSM
   try {
@@ -100,8 +100,8 @@ async function reverseGeocode(lat: number, lng: number): Promise<string> {
         return addr.city || addr.town || addr.municipality || addr.city_district || addr.district || addr.suburb || addr.village || addr.county || addr.state_district || '';
       }
     }
-  } catch {}
-  
+  } catch { }
+
   return '';
 }
 
@@ -188,7 +188,7 @@ async function searchFirestore(
         try {
           const s = await getDocs(query(collection(db, col), where(field, '==', val), limit(60)));
           if (s && !s.empty) return s;
-        } catch {}
+        } catch { }
       }
     }
     return null;
@@ -252,7 +252,7 @@ async function searchFirestore(
             if (resultType === 'all' || resultType === type) addBank(doc, type);
           }
         });
-      } catch {}
+      } catch { }
     }
   }
 
@@ -378,21 +378,21 @@ export function BloodDonationSearch({ onSignupClick }: { onSignupClick?: (role: 
   const navigate = useNavigate();
 
   // Search state — synced with URL params
-  const [city, setCity]           = useState(searchParams.get('city') || '');
-  const [blood, setBlood]         = useState(searchParams.get('blood') || 'any');
+  const [city, setCity] = useState(searchParams.get('city') || '');
+  const [blood, setBlood] = useState(searchParams.get('blood') || 'any');
   const [resultType, setResultType] = useState(searchParams.get('type') || 'all');
-  const [sortBy, setSortBy]       = useState<'distance' | 'verified'>('distance');
+  const [sortBy, setSortBy] = useState<'distance' | 'verified'>('distance');
 
   // UI state
-  const [results, setResults]     = useState<SearchResult[]>([]);
-  const [loading, setLoading]     = useState(false);
-  const [searched, setSearched]   = useState(false);
-  const [error, setError]         = useState('');
-  const [userLat, setUserLat]     = useState<number | null>(null);
-  const [userLng, setUserLng]     = useState<number | null>(null);
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [searched, setSearched] = useState(false);
+  const [error, setError] = useState('');
+  const [userLat, setUserLat] = useState<number | null>(null);
+  const [userLng, setUserLng] = useState<number | null>(null);
   const [gpsLoading, setGpsLoading] = useState(false);
-  const [gpsCity, setGpsCity]     = useState('');
-  const [openFaq, setOpenFaq]     = useState<number | null>(null);
+  const [gpsCity, setGpsCity] = useState('');
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // committedCity is only set after a search fires — prevents title flickering on every keystroke
@@ -418,23 +418,23 @@ export function BloodDonationSearch({ onSignupClick }: { onSignupClick?: (role: 
     setError('');
 
     const fallbackToIP = async (errMsg: string) => {
-        try {
-            const ipRes = await fetch('https://ipapi.co/json/');
-            const ipData = await ipRes.json();
-            if (ipData && ipData.city) {
-                const cityStr = ipData.city;
-                setUserLat(ipData.latitude);
-                setUserLng(ipData.longitude);
-                setCity(cityStr);
-                setGpsCity(cityStr);
-                setGpsLoading(false);
-                doSearch(cityStr, blood, resultType, ipData.latitude, ipData.longitude);
-                return;
-            }
-        } catch {}
-        
-        setGpsLoading(false);
-        setError(errMsg);
+      try {
+        const ipRes = await fetch('https://ipapi.co/json/');
+        const ipData = await ipRes.json();
+        if (ipData && ipData.city) {
+          const cityStr = ipData.city;
+          setUserLat(ipData.latitude);
+          setUserLng(ipData.longitude);
+          setCity(cityStr);
+          setGpsCity(cityStr);
+          setGpsLoading(false);
+          doSearch(cityStr, blood, resultType, ipData.latitude, ipData.longitude);
+          return;
+        }
+      } catch { }
+
+      setGpsLoading(false);
+      setError(errMsg);
     };
 
     if (!navigator.geolocation) {
@@ -464,9 +464,9 @@ export function BloodDonationSearch({ onSignupClick }: { onSignupClick?: (role: 
     lat: number | null, lng: number | null,
   ) => {
     const q = c.trim();
-    if (!q && !(lat != null && lng != null)) { 
-      setError('Please enter a city name or pincode.'); 
-      return; 
+    if (!q && !(lat != null && lng != null)) {
+      setError('Please enter a city name or pincode.');
+      return;
     }
     setLoading(true); setError(''); setSearched(true);
 
@@ -1001,15 +1001,17 @@ export function BloodDonationSearch({ onSignupClick }: { onSignupClick?: (role: 
               <p className="bds-section-sub">Everything you need to know about blood donation in India</p>
 
               {/* Schema.org FAQPage */}
-              <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
-                '@context': 'https://schema.org',
-                '@type': 'FAQPage',
-                mainEntity: FAQ_ITEMS.map(f => ({
-                  '@type': 'Question',
-                  name: f.q,
-                  acceptedAnswer: { '@type': 'Answer', text: f.a },
-                })),
-              })}} />
+              <script type="application/ld+json" dangerouslySetInnerHTML={{
+                __html: JSON.stringify({
+                  '@context': 'https://schema.org',
+                  '@type': 'FAQPage',
+                  mainEntity: FAQ_ITEMS.map(f => ({
+                    '@type': 'Question',
+                    name: f.q,
+                    acceptedAnswer: { '@type': 'Answer', text: f.a },
+                  })),
+                })
+              }} />
 
               <dl className="bds-faq-list">
                 {FAQ_ITEMS.map((item, i) => (
