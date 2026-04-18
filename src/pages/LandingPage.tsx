@@ -108,10 +108,10 @@ function useTypingEffect(phrases: string[], typingSpeed = 70, deletingSpeed = 40
       setIsDeleting(false);
       setPhraseIndex((prev) => (prev + 1) % phrases.length);
     } else {
-      const nextText = isDeleting 
+      const nextText = isDeleting
         ? currentPhrase.substring(0, text.length - 1)
         : currentPhrase.substring(0, text.length + 1);
-      
+
       timeout = setTimeout(() => setText(nextText), isDeleting ? deletingSpeed : typingSpeed);
     }
 
@@ -417,19 +417,19 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
               </div>
               <div className="lp-stats-row">
                 <div className="lp-stat">
-                  <span className="lp-si"><Droplets size={38} strokeWidth={2.5} color="#ffffff" style={{filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))'}} /></span>
-                  <span className="lp-sn">{loadingStats ? <span className="lp-spin" style={{borderColor: '#fff', borderTopColor: 'transparent', width: '24px', height:'24px'}} /> : dbStats.donationsToday}</span>
+                  <span className="lp-si"><Droplets size={38} strokeWidth={2.5} color="#ffffff" style={{ filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))' }} /></span>
+                  <span className="lp-sn">{loadingStats ? <span className="lp-spin" style={{ borderColor: '#fff', borderTopColor: 'transparent', width: '24px', height: '24px' }} /> : dbStats.donationsToday}</span>
                   <span className="lp-sl">Donations Today</span>
                 </div>
                 <div className="lp-stat">
-                  <span className="lp-si"><Heart size={38} strokeWidth={2.5} color="#ffffff" fill="#ffffff" style={{filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))'}} /></span>
-                  <span className="lp-sn">{loadingStats ? <span className="lp-spin" style={{borderColor: '#fff', borderTopColor: 'transparent', width: '24px', height:'24px'}} /> : dbStats.livesSaved.toLocaleString()}</span>
-                  <span className="lp-sl">Lives Saved System-Wide</span>
+                  <span className="lp-si"><Heart size={38} strokeWidth={2.5} color="#ffffff" fill="#ffffff" style={{ filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))' }} /></span>
+                  <span className="lp-sn">{loadingStats ? <span className="lp-spin" style={{ borderColor: '#fff', borderTopColor: 'transparent', width: '24px', height: '24px' }} /> : dbStats.livesSaved.toLocaleString()}</span>
+                  <span className="lp-sl">Lives Saved</span>
                 </div>
                 <div className="lp-stat">
-                  <span className="lp-si"><Building2 size={38} strokeWidth={2.5} color="#ffffff" style={{filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))'}} /></span>
-                  <span className="lp-sn">{loadingStats ? <span className="lp-spin" style={{borderColor: '#fff', borderTopColor: 'transparent', width: '24px', height:'24px'}} /> : dbStats.connectedBanks}</span>
-                  <span className="lp-sl">Blood Banks Connected</span>
+                  <span className="lp-si"><Building2 size={38} strokeWidth={2.5} color="#ffffff" style={{ filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))' }} /></span>
+                  <span className="lp-sn">{loadingStats ? <span className="lp-spin" style={{ borderColor: '#fff', borderTopColor: 'transparent', width: '24px', height: '24px' }} /> : dbStats.connectedBanks}</span>
+                  <span className="lp-sl">Blood Banks</span>
                 </div>
                 <div className="lp-live"><span className="lp-ldot" /> LIVE</div>
               </div>
