@@ -1180,13 +1180,15 @@ function RphStyles() {
   .rph-nav      { display:none; }
   .rph-ham      { display:flex; }
   .rph-logo-name { font-size: 1.15rem; }
-  .rph-logo-tag { font-size: 7px; white-space: nowrap; }
+  .rph-logo-tag { font-size: 8px; white-space: normal; line-height: 1.15; margin-top: 2px; max-width: 160px; }
+  .rph-brand-ctrl > .rph-lang { display: none; }
 }
 @media (max-width:400px) {
   .rph-mbar     { height:26px; }
   .rph-mitem    { font-size:10.5px; padding:0 20px; }
   .rph-logo-name { font-size: 1.05rem; }
-  .rph-logo-tag { font-size: 6.5px; white-space: normal; line-height: 1.1; margin-top:2px; max-width: 140px; }
+  .rph-logo-tag { font-size: 6.5px; max-width: 130px; }
+  .rph-brand-ctrl { gap: 6px; }
 }
 @media (min-width:768px) { .rph-ham { display:none !important; } }
 
