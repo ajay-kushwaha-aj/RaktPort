@@ -331,6 +331,7 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
         {/* ══ 1. HERO — Decision-Based Layout ══ */}
         <section className="lp-hero">
           <div className="lp-orb o1" /><div className="lp-orb o2" /><div className="lp-orb o3" />
+
           <div className="lp-hero-split">
 
             {/* Left: Emotional messaging */}
@@ -831,6 +832,7 @@ function LpStyles() {
 /* ── Base ── */
 .lp,.lp *{font-family:'DM Sans',system-ui,sans-serif;box-sizing:border-box;margin:0;padding:0;}
 .lp{background:#fff;color:var(--tx);}
+.lp p,.lp span,.lp div,.lp li,.lp label,.lp input,.lp select,.lp textarea,.lp button{font-size:calc(1em);}
 .lp-c{max-width:1200px;margin:0 auto;padding:0 22px;}
 .lp-rel{position:relative;}
 .lp-sec{padding:80px 0;}
@@ -924,8 +926,9 @@ function LpStyles() {
 .lp-btn-hero:hover{transform:translateY(-3px);box-shadow:0 10px 36px rgba(196,30,58,.55);}
 .lp-btn-emg{width:100%;justify-content:center;margin-bottom:20px;}
 
-.lp-comp-row{display:flex;flex-wrap:wrap;gap:6px;}
-.lp-comp-tag{display:inline-flex;align-items:center;gap:5px;font-size:9.5px;font-weight:600;color:rgba(74,222,128,.8);background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.18);padding:4px 10px;border-radius:6px;}
+.lp-comp-row{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:4px;}
+.lp-comp-tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:rgba(74,222,128,.9);background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.15);padding:5px 12px;border-radius:999px;transition:all 0.2s;}
+.lp-comp-tag:hover{background:rgba(74,222,128,.15);border-color:rgba(74,222,128,.3);}
 
 /* ════ WHY DONATE (Dark Section) ════ */
 .lp-why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;padding:0 0 20px;}
@@ -1171,7 +1174,6 @@ function LpStyles() {
 @media(max-width:380px){
   .lp-feat-grid{grid-template-columns:1fr;}
   .lp-bgrid{gap:6px;}.lp-btype{font-size:.95rem;}
-  .lp-h1{font-size:1.55rem;}
   .lp-c{padding:0 13px;}
 }
 

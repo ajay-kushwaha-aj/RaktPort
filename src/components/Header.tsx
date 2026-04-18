@@ -23,6 +23,7 @@ import { Globe, X, ChevronDown, Zap, Home, Info, Lightbulb, Droplets, CheckSquar
 import raktportLogo from '../assets/raktport-logo.png';
 import { ModeToggle } from './mode-toggle';
 import { useNavigate } from 'react-router-dom';
+import { useFontSize } from '../hooks/useFontSize';
 
 /* ─── Props ─────────────────────────────────────────────── */
 interface HeaderProps {
@@ -110,6 +111,7 @@ const MARQUEE = [
 ═══════════════════════════════════════════════════════════ */
 export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
   const [lang, setLang] = useState<Lang>('EN');
+  const { idx: fsIdx, decrease: fsDecrease, increase: fsIncrease, reset: fsReset, min: fsMin, max: fsMax } = useFontSize();
   const [scrolled, setScroll] = useState(false);
   const [drawer, setDrawer] = useState(false);
   const [openDD, setOpenDD] = useState<string | null>(null);
@@ -212,6 +214,30 @@ export function Header({ onLoginClick, onSignupClick }: HeaderProps) {
               <button onClick={toggleLang} className="rph-lang" aria-label="Toggle language">
                 <Globe size={12} aria-hidden="true" />{lang === 'EN' ? 'हिंदी' : 'EN'}
               </button>
+
+              {/* ── Font Size Controls ── */}
+              <div className="rph-fs-ctrl" role="group" aria-label="Text size">
+                <button
+                  className="rph-fs-btn rph-fs-dec"
+                  onClick={fsDecrease}
+                  disabled={fsIdx === fsMin}
+                  aria-label="Decrease text size"
+                  title="Decrease text size"
+                >A−</button>
+                <button
+                  className="rph-fs-btn rph-fs-norm"
+                  onClick={fsReset}
+                  aria-label="Default text size"
+                  title="Default text size"
+                >A</button>
+                <button
+                  className="rph-fs-btn rph-fs-inc"
+                  onClick={fsIncrease}
+                  disabled={fsIdx === fsMax}
+                  aria-label="Increase text size"
+                  title="Increase text size"
+                >A+</button>
+              </div>
 
               {/* ModeToggle — no wrapper div, renders directly */}
               <ModeToggle />
@@ -708,6 +734,45 @@ function RphStyles() {
 .rph-lang:hover { border-color:var(--rph-p); color:var(--rph-p); }
 .dark .rph-lang { background:#2a2a2a; border-color:#3a3a3a; color:#c0a8a0; }
 .dark .rph-lang:hover { border-color:var(--rph-p); color:#ff6b6b; }
+
+/* Font-size control */
+.rph-fs-ctrl {
+  display:inline-flex;
+  align-items:center;
+  border-radius:999px;
+  border:1.5px solid var(--rph-b);
+  background:#fff;
+  overflow:hidden;
+  flex-shrink:0;
+}
+.dark .rph-fs-ctrl { background:#2a2a2a; border-color:#3a3a3a; }
+
+.rph-fs-btn {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 8px;
+  height:28px;
+  border:none;
+  background:transparent;
+  cursor:pointer;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  font-weight:700;
+  color:#5a4a42;
+  line-height:1;
+  transition:background .15s, color .15s;
+  white-space:nowrap;
+  user-select:none;
+  -webkit-user-select:none;
+}
+.rph-fs-btn:disabled { opacity:.35; cursor:not-allowed; }
+.rph-fs-dec { font-size:10px; border-right:1px solid var(--rph-b); }
+.rph-fs-norm { font-size:11px; border-right:1px solid var(--rph-b); }
+.rph-fs-inc { font-size:12px; }
+.rph-fs-btn:not(:disabled):hover { background:var(--rph-pl); color:var(--rph-p); }
+.dark .rph-fs-btn { color:#c0a8a0; }
+.dark .rph-fs-dec, .dark .rph-fs-norm { border-right-color:#3a3a3a; }
+.dark .rph-fs-btn:not(:disabled):hover { background:rgba(196,30,58,.18); color:#ff8fa3; }
 
 /* Hamburger */
 .rph-ham {
