@@ -175,15 +175,31 @@ async function searchFirestore(
     } catch { return null; }
   };
 
-  const fetchFromUsers = async (role: string) => {
-    const fieldVal = isPin ? cityOrPin.trim() : cityLow;
-    const field = isPin ? 'pincode' : 'cityLower';
-    let s = await snap('users', field, fieldVal);
-    if (!s || s.empty) {
-      const titleCase = cityOrPin.charAt(0).toUpperCase() + cityOrPin.slice(1).toLowerCase();
-      s = await snap('users', 'city', titleCase);
+  // Build all city string variants to try across different field formats
+  const titleCase = cityOrPin.trim().charAt(0).toUpperCase() + cityOrPin.trim().slice(1).toLowerCase();
+  const cityVariants = isPin
+    ? [cityOrPin.trim()]
+    : Array.from(new Set([cityLow, titleCase, cityOrPin.trim()]));
+
+  // Try multiple field names and city variants until we get results
+  const snapAny = async (col: string, fields: string[], values: string[]) => {
+    for (const field of fields) {
+      for (const val of values) {
+        try {
+          const s = await getDocs(query(collection(db, col), where(field, '==', val), limit(60)));
+          if (s && !s.empty) return s;
+        } catch {}
+      }
     }
-    if (!s || s.empty) s = await snap('users', 'city', cityOrPin.trim());
+    return null;
+  };
+
+  const cityFields = isPin
+    ? ['pincode']
+    : ['cityLower', 'city', 'City', 'district', 'state'];
+
+  const fetchFromUsers = async (role: string) => {
+    const s = await snapAny('users', cityFields, cityVariants);
     if (s) s.forEach(doc => {
       const d = doc.data();
       if (d.role === role) {
@@ -203,9 +219,7 @@ async function searchFirestore(
     tasks.push(fetchFromUsers('bloodbank'));
     // also try dedicated bloodBanks collection
     tasks.push((async () => {
-      const field = isPin ? 'pincode' : 'cityLower';
-      const val = isPin ? cityOrPin.trim() : cityLow;
-      const s = await snap('bloodBanks', field, val);
+      const s = await snapAny('bloodBanks', cityFields, cityVariants);
       if (s) s.forEach(doc => addBank(doc, 'bloodbank'));
     })());
   }
@@ -264,6 +278,7 @@ async function searchFirestore(
 }
 
 /* ─── SEO Head injection ────────────────────────────────────── */
+// Accepts a "committed" city (set only after search, not on every keystroke)
 function useSEOHead(city: string, blood: string, type: string) {
   useEffect(() => {
     const bloodLabel = blood && blood !== 'any' ? ` ${blood}` : '';
@@ -380,8 +395,11 @@ export function BloodDonationSearch({ onSignupClick }: { onSignupClick?: (role: 
   const [openFaq, setOpenFaq]     = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Inject SEO head tags
-  useSEOHead(city, blood, resultType);
+  // committedCity is only set after a search fires — prevents title flickering on every keystroke
+  const [committedCity, setCommittedCity] = useState(searchParams.get('city') || '');
+
+  // Inject SEO head tags — uses committed city, not live input value
+  useSEOHead(committedCity, blood, resultType);
 
   // Auto-search if URL already has params
   useEffect(() => {
@@ -451,6 +469,9 @@ export function BloodDonationSearch({ onSignupClick }: { onSignupClick?: (role: 
       return; 
     }
     setLoading(true); setError(''); setSearched(true);
+
+    // Commit the city now (for SEO title) — only updates after search, not on each keystroke
+    setCommittedCity(q);
 
     // Update URL params — enables sharing & back-button
     setSearchParams({ city: q, blood: bg, type: rt });
