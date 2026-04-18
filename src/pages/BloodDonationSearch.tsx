@@ -391,19 +391,6 @@ export function BloodDonationSearch({ onSignupClick }: { onSignupClick?: (role: 
       setBlood(searchParams.get('blood') || 'any');
       setResultType(searchParams.get('type') || 'all');
       doSearch(urlCity, searchParams.get('blood') || 'any', searchParams.get('type') || 'all', null, null);
-    } else {
-      // Auto-detect city via IP quietly on load without popup and autofill input
-      fetch('https://ipapi.co/json/')
-        .then(r => r.json())
-        .then(d => {
-          if (d && d.city) {
-            setCity(d.city);
-            setGpsCity(d.city);
-            setUserLat(d.latitude);
-            setUserLng(d.longitude);
-          }
-        })
-        .catch(() => {});
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
