@@ -78,10 +78,10 @@ export function ImpactPage() {
         <section className="reveal opacity-0 translate-y-6 transition-all duration-700 delay-150 ease-out py-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { n: "2,542", l: "LIVES SAVED" },
-              { n: "18,000", l: "ACTIVE DONORS" },
-              { n: "851", l: "BLOOD BANKS" },
-              { n: "24", l: "CITIES COVERED" }
+              { n: "2,54", l: "LIVES SAVED" },
+              { n: "1,000", l: "ACTIVE DONORS" },
+              { n: "100", l: "BLOOD BANKS" },
+              { n: "2", l: "CITIES COVERED" }
             ].map((stat, i) => (
               <div key={i} className="bg-transparent border-[1.5px] border-blue-600/30 dark:border-blue-400/20 lg:border-[var(--rp-primary)]/40 rounded-[20px] py-10 px-4 text-center transform transition-transform hover:-translate-y-1 hover:shadow-lg relative overflow-hidden group bg-gradient-to-b from-transparent to-black/5 dark:to-white/5">
                 <div className="absolute inset-0 bg-[var(--rp-primary)]/5 opacity-0 group-hover:opacity-100 transition-opacity" />

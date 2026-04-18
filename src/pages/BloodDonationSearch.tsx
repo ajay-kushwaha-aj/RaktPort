@@ -674,9 +674,9 @@ export function BloodDonationSearch({ onSignupClick }: { onSignupClick?: (role: 
           {/* Stats strip */}
           <div className="bds-stats" role="list" aria-label="Platform statistics">
             {[
-              { icon: '🩸', label: 'Registered Donors', val: '10,000+' },
-              { icon: '🏦', label: 'Blood Banks', val: '500+' },
-              { icon: '🌆', label: 'Cities Covered', val: '200+' },
+              { icon: '🩸', label: 'Registered Donors', val: '100+' },
+              { icon: '🏦', label: 'Blood Banks', val: '50+' },
+              { icon: '🌆', label: 'Cities Covered', val: '2+' },
             ].map(s => (
               <div key={s.label} className="bds-stat" role="listitem">
                 <span className="bds-stat-val">{s.icon} {s.val}</span>
