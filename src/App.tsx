@@ -11,6 +11,7 @@ import { DonorDashboard } from './pages/dashboards/DonorDashboard';
 import { ImpactPage } from './pages/ImpactPage';
 import { LocateDonationSite } from './pages/LocateDonationSite';
 import { BloodDonationSearch } from './pages/BloodDonationSearch';
+import { FaqsPage } from './pages/FaqsPage';
 // --- Import the dashboards ---
 import HospitalDashboard from './pages/dashboards/hospital/HospitalDashboard';
 import BloodBankDashboard from './pages/dashboards/BloodBankDashboard';
@@ -294,6 +295,15 @@ function AppContent() {
             element={
               <WithHeaderFooter onLoginClick={handleLoginClick} onSignupClick={handleSignupClick}>
                 <BloodDonationSearch onSignupClick={handleSignupClick} />
+              </WithHeaderFooter>
+            }
+          />
+
+          <Route
+            path="/faqs"
+            element={
+              <WithHeaderFooter onLoginClick={handleLoginClick} onSignupClick={handleSignupClick}>
+                <FaqsPage />
               </WithHeaderFooter>
             }
           />

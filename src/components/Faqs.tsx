@@ -1,11 +1,12 @@
 // src/components/Faqs.tsx
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const FAQS = [
+export const FAQS = [
   { q: "What is RaktPort?", a: <><strong>RaktPort</strong> is a digital infrastructure that enables <strong>location-independent blood donation and utilization</strong> through a unique <strong>RTID</strong> (RaktPort Transfusion ID) system.<br /><br />It allows a donor to donate at one place while the benefit can be utilized for a patient elsewhere.</> },
   { q: "How is RaktPort different from e-RaktKosh?", a: <><strong>e-RaktKosh</strong> → Manages blood inventory locally<br /><strong>RaktPort</strong> → Enables interoperable donation value transfer<br /><br /><strong>Key difference:</strong><br />e-RaktKosh = <strong>Storage system</strong><br />RaktPort = <strong>Transfer system</strong></> },
   { q: "What is the RTID system?", a: <><strong>RTID</strong> (RaktPort Transfusion ID) is a unique, trackable digital ID assigned to each donation.<br /><br />It enables:<br />• Linking <strong>donor → donation → patient</strong><br />• Tracking usage across locations<br />• Creating a portable <strong>donation credit</strong></> },
-  { q: "What does “eliminating geographical separation” mean?", a: <>It means: A donor <strong>does not need to be physically near</strong> the patient to help them.<br /><br />Example:<br />Donor donates in <strong>Delhi</strong><br />Patient needs blood in <strong>Lucknow</strong><br />👉 Through the RTID system, the contribution is <strong>digitally mapped and utilized</strong>.</> },
+  { q: "What does “eliminating geographical separation” mean?", a: <>It means: A donor <strong>does not need to be physically near</strong> the patient to help them.<br /><br />Example:<br />Donor donates in <strong>Delhi</strong><br />Patient needs blood in <strong>Lucknow</strong><br />Through the RTID system, the contribution is <strong>digitally mapped and utilized</strong>.</> },
   { q: "Does RaktPort replace blood banks?", a: <><strong>No.</strong><br />Blood banks still <strong>collect, test, store, and transfuse</strong>.<br /><br />RaktPort only adds a <strong>coordination and tracking layer</strong> across locations.</> },
   { q: "Is this legally compliant?", a: <><strong>Yes</strong>, because:<br />• <strong>No physical transfer</strong> without hospital control<br />• <strong>No commercialization</strong><br />• Works within the <strong>voluntary donation framework</strong><br /><br />RaktPort manages tracking and allocation logic, <strong>not</strong> medical procedures.</> },
   { q: "How is transparency ensured?", a: <>Through RTID:<br />• Every donation is <strong>traceable</strong><br />• Every usage is <strong>recorded</strong><br />• There is <strong>no ambiguity</strong> in donor contribution.</> },
@@ -15,14 +16,15 @@ const FAQS = [
 
 export function Faqs() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const navigate = useNavigate();
 
   return (
-    <div style={{ marginBottom: '40px', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', padding: '24px 28px', border: '1px solid rgba(255,255,255,0.06)' }}>
+    <div style={{ marginBottom: '40px', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', padding: '24px 28px', border: '1px solid rgba(255,255,255,0.06)', position: 'relative' }}>
       <h3 style={{ color: 'white', fontSize: '1.25rem', fontFamily: "'Sora', sans-serif", fontWeight: 800, marginBottom: '20px', letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '8px' }}>
         <span style={{ color: 'var(--rp-primary)' }}>?</span> Frequently Asked Questions
       </h3>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
-        {FAQS.map((faq, i) => (
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px', paddingBottom: '40px' }}>
+        {FAQS.slice(0, 6).map((faq, i) => (
           <div key={i} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', padding: '16px', transition: 'all 0.2s' }}>
             <button
               onClick={() => setOpenFaq(openFaq === i ? null : i)}
@@ -38,6 +40,22 @@ export function Faqs() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* View More Button */}
+      <div style={{ position: 'absolute', bottom: '24px', right: '28px' }}>
+        <button
+          onClick={() => navigate('/faqs')}
+          className="group flex items-center gap-2 px-4 py-2 bg-transparent text-[color:var(--rp-primary)] text-sm font-bold rounded-lg transition-all duration-300 hover:bg-[rgba(196,30,58,0.1)] hover:-translate-y-0.5 active:translate-y-0"
+        >
+          View More
+          <svg 
+            width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+            className="transition-transform duration-300 group-hover:translate-x-1.5"
+          >
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
       </div>
     </div>
   );

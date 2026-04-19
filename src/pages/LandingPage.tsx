@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
+import { Faqs } from '../components/Faqs';
 
 /* ─── Types ─── */
 interface LandingPageProps { onRoleSelect: (role: string) => void; onDonorSignupClick: () => void; }
@@ -731,6 +732,13 @@ export function LandingPage({ onRoleSelect, onDonorSignupClick }: LandingPagePro
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* ══ 10.5. FAQS ══ */}
+        <section className="lp-sec lp-dark lp-rel" ref={r9}>
+          <div className="lp-c lp-rel">
+            <Faqs />
           </div>
         </section>
 

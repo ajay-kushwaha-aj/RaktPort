@@ -18,7 +18,6 @@
 // ─────────────────────────────────────────────────────────────
 
 import { useEffect, useRef, useState } from 'react';
-import { Faqs } from './Faqs';
 
 /* ─── Scroll-reveal hook ───────────────────────────────── */
 function useScrollReveal(threshold = 0.12) {
@@ -107,7 +106,6 @@ const HEARTBEAT_PATH = "M0,30 L60,30 L75,10 L90,50 L105,5 L120,50 L135,10 L150,3
 ═══════════════════════════════════════════════════════════ */
 export function Footer() {
   const statsRef = useScrollReveal(0.1);
-  const faqRef = useScrollReveal(0.05);
   const helpRef = useScrollReveal(0.1);
   const gridRef = useScrollReveal(0.05);
   const bottomRef = useScrollReveal(0.1);
@@ -165,11 +163,6 @@ export function Footer() {
 
         {/* ═ MAIN CONTENT ══════════════════════════════════ */}
         <div className="rpf-container rpf-main">
-
-          {/* ─ FAQ ─────────────────────────────────────── */}
-          <div className="rpf-reveal" ref={faqRef}>
-            <Faqs />
-          </div>
 
           {/* ─ HELPLINE STRIP ──────────────────────────── */}
           <div className="rpf-helpline rpf-reveal" ref={helpRef}>
