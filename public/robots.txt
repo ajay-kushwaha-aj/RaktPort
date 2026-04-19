@@ -4,11 +4,19 @@ Allow: /
 # Block private/auth routes from indexing
 Disallow: /dashboard
 Disallow: /admin
+Disallow: /register/
+Disallow: /login
 Disallow: /hospital-dashboard
 Disallow: /bloodbank-dashboard
 Disallow: /donor-dashboard
 
-# Allow all public pages
+# Allow all public React pages
+Allow: /faqs
+Allow: /search
+Allow: /locate-site
+Allow: /impact
+
+# Allow all static public pages
 Allow: /about.html
 Allow: /our-mission.html
 Allow: /contact.html
@@ -22,17 +30,24 @@ Allow: /privacy.html
 
 # Sitemaps
 Sitemap: https://www.raktport.in/sitemap.xml
-Sitemap: https://www.raktport.in/sitemap-index.xml
 
 # Crawl delay for polite crawling
 Crawl-delay: 1
 
-# Google-specific
+# Google-specific (no delay for faster indexing)
 User-agent: Googlebot
 Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /register/
+Disallow: /login
 Crawl-delay: 0
 
 # Bing
 User-agent: Bingbot
 Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /register/
+Disallow: /login
 Crawl-delay: 1

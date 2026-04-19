@@ -16,9 +16,60 @@ export function FaqsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-  // Scroll to top when this page opens
+  // Per-page SEO: update document title, meta description, canonical & inject FAQ schema
   React.useEffect(() => {
+    // Title
+    document.title = 'Frequently Asked Questions | RaktPort — Blood Donation FAQs';
+
+    // Meta description
+    let desc = document.querySelector('meta[name="description"]');
+    if (desc) desc.setAttribute('content', 'Find answers to common questions about RaktPort — India\'s digital blood donation platform. Learn about RTID, blood bank compatibility, eligibility rules, transparency, and the long-term vision.');
+
+    // Canonical
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (canonical) canonical.setAttribute('href', 'https://raktport.in/faqs');
+
+    // OG
+    let ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.setAttribute('content', 'Frequently Asked Questions | RaktPort');
+    let ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) ogDesc.setAttribute('content', 'Get answers to all your questions about RaktPort — RTID system, blood bank integration, legal compliance, and more.');
+    let ogUrl = document.querySelector('meta[property="og:url"]');
+    if (ogUrl) ogUrl.setAttribute('content', 'https://raktport.in/faqs');
+
+    // Inject FAQ JSON-LD schema specific to this page
+    const schemaId = 'faq-page-schema';
+    let existing = document.getElementById(schemaId);
+    if (!existing) {
+      const script = document.createElement('script');
+      script.id = schemaId;
+      script.type = 'application/ld+json';
+      script.text = JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": FAQS.map(faq => ({
+          "@type": "Question",
+          "name": faq.q,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": typeof faq.a === 'string' ? faq.a : faq.q
+          }
+        }))
+      });
+      document.head.appendChild(script);
+    }
+
+    // Scroll to top
     window.scrollTo(0, 0);
+
+    // Cleanup: restore defaults on unmount
+    return () => {
+      document.title = 'RaktPort — Donate Blood Anywhere, Save Everywhere | India\'s Blood Network';
+      if (desc) desc.setAttribute('content', 'RaktPort is India\'s unified digital blood donation platform. Donate blood anywhere, track every unit via RTID, find verified blood banks near you, and save up to 3 lives per donation.');
+      if (canonical) canonical.setAttribute('href', 'https://raktport.in/');
+      const s = document.getElementById(schemaId);
+      if (s) s.remove();
+    };
   }, []);
 
   const filteredFaqs = useMemo(() => {

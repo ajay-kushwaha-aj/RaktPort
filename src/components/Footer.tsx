@@ -350,17 +350,34 @@ function VisitorCounterText() {
   const [count, setCount] = useState<number | null>(null);
   
   useEffect(() => {
-    // We use a counter API that tracks visits to raktport.in
-    fetch('https://api.counterapi.dev/v1/raktport_in/visitors/up')
-      .then(res => {
-        if (!res.ok) throw new Error('API down');
-        return res.json();
-      })
-      .then(data => setCount(data.count))
-      .catch((err) => {
-        console.error('Visitor counter error:', err);
-        // Do not put fake data. Just leave it null or try to read from local storage
-      });
+    // Professional Tracking: Unique visit per 24 hours via localStorage
+    const lastVisit = localStorage.getItem('raktport_last_visit');
+    const now = new Date().getTime();
+    const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+    
+    // Check if new visitor or returning visitor after 24 hrs
+    if (!lastVisit || (now - parseInt(lastVisit)) > TWENTY_FOUR_HOURS) {
+      // It's a unique hit. Increment the counter.
+      fetch('https://api.counterapi.dev/v1/raktport_in/visitors/up')
+        .then(res => {
+          if (!res.ok) throw new Error('API down');
+          return res.json();
+        })
+        .then(data => {
+          setCount(data.count);
+          localStorage.setItem('raktport_last_visit', now.toString());
+        })
+        .catch(err => console.error('Visitor counter error:', err));
+    } else {
+      // Returning visitor within 24 hours. Don't increment, just fetch current count.
+      fetch('https://api.counterapi.dev/v1/raktport_in/visitors')
+        .then(res => {
+          if (!res.ok) throw new Error('API down');
+          return res.json();
+        })
+        .then(data => setCount(data.count))
+        .catch(err => console.error('Visitor counter error:', err));
+    }
   }, []);
   
   if (count === null) return <span>Live Views: Computing...</span>;
