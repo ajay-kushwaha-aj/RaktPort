@@ -84,7 +84,7 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
 
   // Role & tab
   const [role, setRole] = useState(initialRole || 'donor');
-  
+
   useEffect(() => {
     if (initialRole) setRole(initialRole);
   }, [initialRole]);
@@ -416,7 +416,7 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
                             type="text"
                             value={smartInput}
                             onChange={e => setSmartInput(e.target.value)}
-                            placeholder="DON-DL-26-0001 / ajay@rakt / 98765..."
+                            placeholder="DON-DL-26-0001 / ravi@rakt / 98765..."
                             disabled={anyBusy}
                             onKeyDown={e => e.key === 'Enter' && handleSmartLookup()}
                             className="w-full pl-9 sm:pl-12 pr-3 sm:pr-4 py-3 sm:py-3.5 bg-[var(--bg-surface)]/60 border-2 border-[var(--border-color)] rounded-xl focus:border-gray-400 focus:ring-4 focus:ring-gray-200/50 outline-none transition-all text-[var(--text-primary)] placeholder-gray-400 text-sm disabled:opacity-50"
@@ -525,8 +525,8 @@ export function LoginPage({ initialRole, onBack, onSignupClick }: LoginPageProps
 
                       <button type="button" onClick={handleVerifyOTP} disabled={anyBusy || otp.join('').length !== 6}
                         className={`w-full min-h-[50px] py-3 sm:py-3.5 rounded-xl font-bold text-[var(--txt-inverse)] text-sm sm:text-base shadow-lg transition-all touch-manipulation ${otp.join('').length === 6 && !anyBusy
-                            ? `bg-gradient-to-r ${current.color} hover:shadow-xl active:scale-[0.99]`
-                            : 'bg-gray-300 cursor-not-allowed'
+                          ? `bg-gradient-to-r ${current.color} hover:shadow-xl active:scale-[0.99]`
+                          : 'bg-gray-300 cursor-not-allowed'
                           }`}>
                         {verifyLoading
                           ? <span className="flex items-center justify-center gap-2"><Spinner white />Verifying…</span>
